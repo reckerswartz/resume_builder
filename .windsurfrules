@@ -43,6 +43,7 @@
 ## Maintenance
 - Fix nearby issues when safe
 - Allow small improvements
+- Keep db/seeds.rb updated when auth, models, templates, or demo flows change so visible credentials and usable sample data stay valid
 - Track risks/follow-ups
 - Self-review before done
 - Remove unused code
