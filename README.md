@@ -9,8 +9,8 @@ Resume Builder is a conventional Rails 8, server-rendered application for creati
 - PostgreSQL
 - Hotwire
 - Tailwind CSS
-- Webpack via `jsbundling-rails`
-- Yarn
+- Webpack via `jsbundling-rails` with PostCSS
+- Yarn 4 via Corepack
 - ViewComponent
 - Pundit
 - RSpec
@@ -19,7 +19,7 @@ Resume Builder is a conventional Rails 8, server-rendered application for creati
 ## Local setup
 
 - Install gems and prepare the database with `bin/setup --skip-server`
-- JavaScript dependencies are managed with Yarn and bundled with Webpack via `jsbundling-rails`
+- Front-end assets are managed with Corepack-backed Yarn 4 and bundled through Webpack via `jsbundling-rails`
 - Start the development environment with `bin/dev`
 - Run the test suite with `bundle exec rspec`
 - Run security tooling with `bin/brakeman` and `bin/bundler-audit check --update`
