@@ -1,5 +1,5 @@
 ---
-name: vikinger-ui-agent
+name: vikinger-ui
 description: >-
   Translates Vikinger-inspired community, dashboard, marketplace, and account-hub
   UI patterns into Rails-first ViewComponents, Tailwind CSS, and Hotwire flows.
