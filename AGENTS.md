@@ -22,6 +22,7 @@
 ## Implementation Preferences
 
 - Follow Rails conventions, project linting rules, and the existing repo style.
+- Use Yarn for JavaScript dependency management and Webpack via `jsbundling-rails` for JavaScript bundling unless an explicit migration is requested.
 - Favor strong parameters, explicit validations, transactions, and eager loading where they improve correctness and performance.
 - Prefer Active Record relations over raw SQL unless a query clearly needs otherwise.
 - Preserve established HTML and progressive enhancement flows when both already exist.
@@ -40,6 +41,7 @@
 - Surface correctness, authorization, performance, security, and rollback concerns in summaries or reviews.
 - Avoid speculative refactors, dead code, clutter, and broken flows.
 - Do not add new dependencies unless they are clearly justified.
+- Never commit generated dependency directories or package manager install artifacts such as `node_modules/`, `vendor/bundle/`, or similar caches; keep them ignored and out of staged changes.
 
 ## Windsurf
 

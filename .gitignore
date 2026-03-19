@@ -7,6 +7,11 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore generated dependency directories.
+node_modules/
+vendor/bundle/
+/package-lock.json
+
 # Ignore all environment files.
 /.env*
 
