@@ -22,8 +22,19 @@ class JobLog < ApplicationRecord
 
   private
     def normalize_payloads
-      self.input = (input || {}).deep_stringify_keys
-      self.output = (output || {}).deep_stringify_keys
-      self.error_details = (error_details || {}).deep_stringify_keys
+      self.input = normalize_payload(input)
+      self.output = normalize_payload(output)
+      self.error_details = normalize_payload(error_details)
+    end
+
+    def normalize_payload(value)
+      case value
+      when nil
+        {}
+      when Hash
+        value.deep_stringify_keys
+      else
+        { "value" => value.as_json }
+      end
     end
 end

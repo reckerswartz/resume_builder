@@ -7,6 +7,7 @@ class RegistrationsController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    @user.role = nil
 
     if @user.save
       Resumes::Bootstrapper.new(user: @user).call if @user.resumes.empty?

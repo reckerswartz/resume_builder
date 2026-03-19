@@ -10,7 +10,7 @@ class ApplicationJob < ActiveJob::Base
       log.job_type = job.class.name
       log.queue_name = job.queue_name
       log.status = :queued
-      log.input = serialize_arguments(job.arguments)
+      log.input = job_input_payload(job.arguments)
     end
   end
 
@@ -21,7 +21,7 @@ class ApplicationJob < ActiveJob::Base
       job_type: job.class.name,
       queue_name: job.queue_name,
       status: :running,
-      input: serialize_arguments(job.arguments),
+      input: job_input_payload(job.arguments),
       started_at: started_at
     )
     @job_log.save!
@@ -66,7 +66,7 @@ class ApplicationJob < ActiveJob::Base
       }
     end
 
-    def serialize_arguments(arguments)
-      arguments.as_json
+    def job_input_payload(arguments)
+      { arguments: arguments.as_json }
     end
 end

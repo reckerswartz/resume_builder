@@ -36,8 +36,19 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install JavaScript dependencies
+        run: npm install
+
+      - name: Precompile assets
+        run: SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile
+
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bin/importmap audit
+        run: npm audit --omit=dev
 
   lint:
     runs-on: ubuntu-latest

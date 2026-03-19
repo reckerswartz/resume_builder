@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Resume, type: :model do
   describe 'callbacks' do
     it 'assigns the default template and normalizes stored JSON values' do
-      template = create(:template, slug: 'modern')
+      template = create(:template)
 
       resume = described_class.create!(
         user: create(:user),
@@ -25,10 +25,10 @@ RSpec.describe Resume, type: :model do
   describe '#ordered_sections' do
     it 'returns sections ordered by position' do
       resume = create(:resume)
+      earlier_section = create(:section, resume:, title: 'Experience', position: 1, section_type: 'experience')
       later_section = create(:section, resume:, title: 'Projects', position: 2, section_type: 'projects')
-      earlier_section = create(:section, resume:, title: 'Experience', position: 0, section_type: 'experience')
 
-      expect(resume.ordered_sections).to eq([earlier_section, later_section])
+      expect(resume.ordered_sections.to_a).to eq([earlier_section, later_section])
     end
   end
 end

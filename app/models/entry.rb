@@ -12,9 +12,10 @@ class Entry < ApplicationRecord
 
   private
     def assign_position
-      return if position.present? || section.blank?
+      return if section.blank? || position.to_i.positive?
 
-      self.position = section.entries.where.not(id: id).maximum(:position).to_i + 1
+      max_position = section.entries.where.not(id: id).maximum(:position)
+      self.position = max_position.nil? ? 0 : max_position + 1
     end
 
     def normalize_content

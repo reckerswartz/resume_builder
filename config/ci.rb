@@ -3,10 +3,12 @@
 CI.run do
   step "Setup", "bin/setup --skip-server"
 
+  step "Assets: Precompile", "SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile"
+
   step "Style: Ruby", "bin/rubocop"
 
   step "Security: Gem audit", "bin/bundler-audit"
-  step "Security: Importmap vulnerability audit", "bin/importmap audit"
+  step "Security: JavaScript dependency audit", "npm audit --omit=dev"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
 
 

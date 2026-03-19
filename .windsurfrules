@@ -4,7 +4,10 @@
 
 - Build this as a conventional Rails 8, server-rendered Resume Builder.
 - Favor Rails-first, HTML-first solutions that fit the current app shape.
+- Always write clean, readable, production-ready code.
+- Prefer clarity over cleverness.
 - Keep code clear, small, DRY, SOLID, and easy to review.
+- Keep methods and classes small, focused, and meaningfully named.
 - Prefer modern, stable approaches over extra abstraction or dependency weight.
 
 ## Architecture
@@ -12,6 +15,8 @@
 - Keep controllers centered on HTTP concerns.
 - Keep business workflows in services, domain rules in models and policies, reusable presentation in components, and async work in jobs.
 - Extend existing namespaces and flows instead of creating parallel patterns.
+- Keep each class, component, service, and job focused on a single responsibility.
+- Do not introduce generic utility layers or folder structures unless the existing app clearly needs them.
 
 ## Rails Best Practices
 
@@ -20,6 +25,7 @@
 - Prefer Active Record relations over raw SQL unless a query clearly needs otherwise.
 - Preserve established HTML and progressive enhancement flows when both already exist.
 - Keep persisted JSON and JSONB payloads consistent, with string keys for stored data.
+- Avoid N+1 queries, unnecessary loops, and unnecessary work on the request path.
 
 ## Resume Builder Direction
 
@@ -27,6 +33,14 @@
 - Keep preview and PDF output aligned through shared rendering and export paths.
 - Follow established authentication, authorization, and background-work conventions.
 - Keep async tasks small and push complex workflows toward services.
+- When an API or JSON response is needed, follow existing app patterns, use proper status codes, and return consistent structured responses.
+
+## Error Handling and Observability
+
+- Handle errors explicitly and never fail silently.
+- Include meaningful logging for critical failures and enough context to debug them safely.
+- Use structured, user-appropriate error responses that match the current layer and flow.
+- Do not leave ad hoc debug prints or temporary diagnostics in committed code.
 
 ## Comments, Docs, and Tests
 
@@ -34,6 +48,7 @@
 - Keep comments and docs concise, accurate, and close to the feature.
 - Update documentation and tests whenever behavior, setup, or workflows change.
 - Match test coverage to the layer being changed and avoid testing implementation details.
+- Write code so external dependencies are easy to isolate or mock in tests.
 
 ## Maintenance and Reviews
 
@@ -41,6 +56,7 @@
 - Fold in small, low-risk improvements when they clearly help the feature or codebase.
 - Record deferred issues, risks, and future enhancements in summaries or docs.
 - Self-review for correctness, authorization, performance, comments, docs, and tests before considering work done.
+- Remove unused code and avoid commented-out blocks unless explicitly requested.
 
 ## Commits and Quality
 
@@ -48,17 +64,26 @@
 - When committing, favor clear messages that explain intent and scope.
 - Before pushing, verify relevant tests, linting, migrations, and documentation updates.
 - Avoid dead code, clutter, broken flows, and speculative refactors.
+- Push to remote repo after each logical change.
 
 ## Security and Reliability
 
-- Never hardcode secrets, credentials, or API keys.
+- Never hardcode secrets, credentials, or API keys. Use builtin Rails configuration management.
+- Use database to store credentials and admin panel to manage them.
 - Validate and sanitize input and rely on standard Rails protections against SQL injection, XSS, and CSRF.
 - Keep side effects explicit, move heavy work off the request path when reasonable, and prefer idempotent background behavior where practical.
 - Surface risky areas, rollback concerns, and practical follow-up recommendations.
+
+## Windsurf Skills
+
+- Use the local `vikinger-ui-agent` skill when you need Vikinger-inspired dashboard, profile, marketplace, settings-hub, or dense signed-in UI patterns.
+- Treat third-party themes as inspiration unless licensing is explicitly confirmed; do not copy proprietary assets, icon packs, or vendor bundles into the app by default.
 
 ## Windsurf Output
 
 - Match existing structure, naming, and formatting.
 - Prefer production-ready Rails solutions over quick hacks.
 - Include authorization, error handling, comments, tests, and docs when the change warrants them.
+- Do not leave placeholders or TODOs unless explicitly asked.
 - Call out issues outside the immediate task with a practical recommendation.
+

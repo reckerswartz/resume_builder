@@ -25,5 +25,21 @@ RSpec.describe JobLog, type: :model do
       expect(job_log.output).to eq('filename' => 'resume.pdf')
       expect(job_log.error_details).to eq('message' => 'none')
     end
+
+    it 'wraps non-hash payloads instead of raising' do
+      job_log = described_class.create!(
+        active_job_id: 'job-2',
+        job_type: 'ResumeExportJob',
+        queue_name: 'default',
+        status: 'queued',
+        input: [1, 2, 3],
+        output: nil,
+        error_details: nil
+      )
+
+      expect(job_log.input).to eq('value' => [1, 2, 3])
+      expect(job_log.output).to eq({})
+      expect(job_log.error_details).to eq({})
+    end
   end
 end

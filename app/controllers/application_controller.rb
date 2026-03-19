@@ -1,11 +1,11 @@
 class ApplicationController < ActionController::Base
   include Authentication
   include Pundit::Authorization
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
+  # Only allow modern browsers supporting webp images, web push, badges, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
-  # Changes to the importmap will invalidate the etag for HTML responses
-  stale_when_importmap_changes
+  # Changes to the asset files will invalidate the etag for HTML responses
+  stale_when_assets_change
 
   helper_method :current_user, :feature_enabled?
 

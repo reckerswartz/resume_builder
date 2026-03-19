@@ -17,6 +17,7 @@ RSpec.describe Template, type: :model do
 
   describe '.default!' do
     it 'returns the first active template' do
+      described_class.update_all(active: false)
       inactive = create(:template, active: false, created_at: 2.days.ago)
       active = create(:template, active: true, created_at: 1.day.ago)
 

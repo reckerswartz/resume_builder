@@ -12,5 +12,6 @@ class CreateTemplates < ActiveRecord::Migration[8.1]
 
     add_index :templates, :slug, unique: true
     add_index :templates, :active
+    add_foreign_key :resumes, :templates
   end
 end

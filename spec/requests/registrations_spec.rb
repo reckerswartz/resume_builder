@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Registrations', type: :request do
   before do
-    create(:template, slug: 'modern')
+    create(:template)
   end
 
   describe 'GET /registration/new' do
@@ -27,6 +27,7 @@ RSpec.describe 'Registrations', type: :request do
 
       expect(Resume.count).to eq(1)
       expect(Resume.last.sections.count).to eq(4)
+      expect(User.last).to be_admin
       expect(response).to redirect_to(resumes_path)
     end
   end

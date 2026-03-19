@@ -2,7 +2,7 @@ class CreateResumes < ActiveRecord::Migration[8.1]
   def change
     create_table :resumes do |t|
       t.references :user, null: false, foreign_key: true
-      t.references :template, null: false, foreign_key: true
+      t.references :template, null: false
       t.string :title, null: false
       t.string :headline
       t.string :slug, null: false

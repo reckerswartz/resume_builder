@@ -19,6 +19,14 @@ class ResumePolicy < ApplicationPolicy
     owner?
   end
 
+  def export?
+    owner?
+  end
+
+  def download?
+    owner?
+  end
+
   class Scope < Scope
     def resolve
       return scope.none unless user

@@ -24,9 +24,10 @@ class Section < ApplicationRecord
 
   private
     def assign_position
-      return if position.present? || resume.blank?
+      return if resume.blank? || position.to_i.positive?
 
-      self.position = resume.sections.where.not(id: id).maximum(:position).to_i + 1
+      max_position = resume.sections.where.not(id: id).maximum(:position)
+      self.position = max_position.nil? ? 0 : max_position + 1
     end
 
     def default_title
