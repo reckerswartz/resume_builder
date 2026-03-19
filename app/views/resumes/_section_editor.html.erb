@@ -1,0 +1,40 @@
+<div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-[0.2em] text-slate-500"><%= section.section_type.titleize %></p>
+      <h4 class="mt-1 text-lg font-semibold text-slate-900"><%= section.title %></h4>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= button_to "Up", move_resume_section_path(resume, section, direction: :up), method: :patch, class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+      <%= button_to "Down", move_resume_section_path(resume, section, direction: :down), method: :patch, class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+      <%= button_to "Remove", resume_section_path(resume, section), method: :delete, class: "rounded-full border border-rose-200 px-3 py-2 text-xs font-medium text-rose-700 transition hover:bg-rose-50" %>
+    </div>
+  </div>
+
+  <%= form_with model: [resume, section], data: { controller: "autosave", autosave_delay_value: 400, action: "input->autosave#queue change->autosave#queue" }, class: "mt-4 grid gap-4 sm:grid-cols-2" do |form| %>
+    <div>
+      <%= form.label :title, class: "text-sm font-medium text-slate-700" %>
+      <%= form.text_field :title, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+    </div>
+
+    <div>
+      <%= form.label :section_type, "Type", class: "text-sm font-medium text-slate-700" %>
+      <%= form.select :section_type, options_for_select(section_type_options_for_builder, section.section_type), {}, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+    </div>
+  <% end %>
+
+  <div class="mt-5 space-y-4">
+    <% if section.ordered_entries.any? %>
+      <% section.ordered_entries.each do |entry| %>
+        <%= render "entry_form", resume: resume, section: section, entry: entry %>
+      <% end %>
+    <% else %>
+      <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm text-slate-500">No entries yet. Add your first item below.</div>
+    <% end %>
+  </div>
+
+  <div class="mt-5 border-t border-slate-200 pt-5">
+    <%= render "entry_form", resume: resume, section: section, entry: Entry.new(section: section) %>
+  </div>
+</div>

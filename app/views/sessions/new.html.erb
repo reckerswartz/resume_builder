@@ -1,0 +1,33 @@
+<div class="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+  <div class="space-y-4">
+    <span class="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">Welcome back</span>
+    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">Sign in to keep refining your resume.</h1>
+    <p class="text-base leading-7 text-slate-600">Jump back into the live editor, swap templates, and export your latest version when you are ready.</p>
+  </div>
+
+  <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
+    <div class="mb-6">
+      <h2 class="text-2xl font-semibold text-slate-900">Sign in</h2>
+      <p class="mt-2 text-sm text-slate-600">Use the email and password you registered with.</p>
+    </div>
+
+    <%= form_with url: session_path, class: "space-y-5" do |form| %>
+      <div>
+        <%= form.label :email_address, class: "text-sm font-medium text-slate-700" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      </div>
+
+      <div>
+        <%= form.label :password, class: "text-sm font-medium text-slate-700" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <%= form.submit "Sign in", class: "inline-flex justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
+        <%= link_to "Forgot password?", new_password_path, class: "text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4" %>
+      </div>
+
+      <p class="text-sm text-slate-500">Need an account? <%= link_to "Create one", new_registration_path, class: "font-medium text-slate-900 underline decoration-slate-300 underline-offset-4" %></p>
+    <% end %>
+  </div>
+</div>

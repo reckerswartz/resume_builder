@@ -1,0 +1,64 @@
+# Resume Builder Windsurf Rules
+
+## Core Direction
+
+- Build this as a conventional Rails 8, server-rendered Resume Builder.
+- Favor Rails-first, HTML-first solutions that fit the current app shape.
+- Keep code clear, small, DRY, SOLID, and easy to review.
+- Prefer modern, stable approaches over extra abstraction or dependency weight.
+
+## Architecture
+
+- Keep controllers centered on HTTP concerns.
+- Keep business workflows in services, domain rules in models and policies, reusable presentation in components, and async work in jobs.
+- Extend existing namespaces and flows instead of creating parallel patterns.
+
+## Rails Best Practices
+
+- Follow Rails conventions, project linting rules, and the existing repo style.
+- Favor strong parameters, explicit validations, transactions, and eager loading where they improve correctness and performance.
+- Prefer Active Record relations over raw SQL unless a query clearly needs otherwise.
+- Preserve established HTML and progressive enhancement flows when both already exist.
+- Keep persisted JSON and JSONB payloads consistent, with string keys for stored data.
+
+## Resume Builder Direction
+
+- Keep the app HTML-first; add JSON only when clearly needed and keep it aligned with current patterns.
+- Keep preview and PDF output aligned through shared rendering and export paths.
+- Follow established authentication, authorization, and background-work conventions.
+- Keep async tasks small and push complex workflows toward services.
+
+## Comments, Docs, and Tests
+
+- Add high-signal comments for non-obvious logic, workflows, data shapes, and tradeoffs.
+- Keep comments and docs concise, accurate, and close to the feature.
+- Update documentation and tests whenever behavior, setup, or workflows change.
+- Match test coverage to the layer being changed and avoid testing implementation details.
+
+## Maintenance and Reviews
+
+- Look for nearby bugs, edge cases, and safe cleanup opportunities while working.
+- Fold in small, low-risk improvements when they clearly help the feature or codebase.
+- Record deferred issues, risks, and future enhancements in summaries or docs.
+- Self-review for correctness, authorization, performance, comments, docs, and tests before considering work done.
+
+## Commits and Quality
+
+- Keep changes focused and ready for small, logical commits.
+- When committing, favor clear messages that explain intent and scope.
+- Before pushing, verify relevant tests, linting, migrations, and documentation updates.
+- Avoid dead code, clutter, broken flows, and speculative refactors.
+
+## Security and Reliability
+
+- Never hardcode secrets, credentials, or API keys.
+- Validate and sanitize input and rely on standard Rails protections against SQL injection, XSS, and CSRF.
+- Keep side effects explicit, move heavy work off the request path when reasonable, and prefer idempotent background behavior where practical.
+- Surface risky areas, rollback concerns, and practical follow-up recommendations.
+
+## Windsurf Output
+
+- Match existing structure, naming, and formatting.
+- Prefer production-ready Rails solutions over quick hacks.
+- Include authorization, error handling, comments, tests, and docs when the change warrants them.
+- Call out issues outside the immediate task with a practical recommendation.

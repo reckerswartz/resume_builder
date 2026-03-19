@@ -1,0 +1,49 @@
+<div class="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+  <div class="space-y-4">
+    <span class="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">Create your workspace</span>
+    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">Start with a resume that is already structured for editing.</h1>
+    <p class="text-base leading-7 text-slate-600">New accounts get a starter resume, default sections, and a template so you can begin editing immediately.</p>
+    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <ul class="space-y-3 text-sm text-slate-600">
+        <li>Split-screen editing and preview</li>
+        <li>Structured experience, education, skills, and projects</li>
+        <li>Template switching and tracked PDF export</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
+    <div class="mb-6">
+      <h2 class="text-2xl font-semibold text-slate-900">Create account</h2>
+      <p class="mt-2 text-sm text-slate-600">Use your email and a secure password to create your workspace.</p>
+    </div>
+
+    <%= form_with model: @user, url: registration_path, class: "space-y-5" do |form| %>
+      <% if @user.errors.any? %>
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <%= @user.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :email_address, class: "text-sm font-medium text-slate-700" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      </div>
+
+      <div>
+        <%= form.label :password, class: "text-sm font-medium text-slate-700" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      </div>
+
+      <div>
+        <%= form.label :password_confirmation, class: "text-sm font-medium text-slate-700" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <%= form.submit "Create workspace", class: "inline-flex justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
+        <p class="text-sm text-slate-500">Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-slate-900 underline decoration-slate-300 underline-offset-4" %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

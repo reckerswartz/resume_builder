@@ -1,0 +1,17 @@
+<%= turbo_frame_tag dom_id(resume, :preview) do %>
+  <div class="xl:sticky xl:top-6">
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <div class="mb-4 flex items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div>
+          <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Live preview</h2>
+          <p class="mt-1 text-sm text-slate-600">This rendering is shared with the export pipeline.</p>
+        </div>
+        <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-500"><%= resume.template.name %></span>
+      </div>
+
+      <div class="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 sm:p-6">
+        <%= render ResumeTemplates::ComponentResolver.component_for(resume) %>
+      </div>
+    </div>
+  </div>
+<% end %>

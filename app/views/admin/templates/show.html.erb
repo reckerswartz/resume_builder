@@ -1,0 +1,47 @@
+<section class="space-y-6">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Template</p>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900"><%= @template.name %></h1>
+      <p class="mt-2 text-sm text-slate-600"><%= @template.description.presence || "No description provided." %></p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Edit", edit_admin_template_path(@template), class: "rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700" %>
+      <%= button_to "Delete", admin_template_path(@template), method: :delete, class: "rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50" %>
+    </div>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+    <div class="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+      <div>
+        <p class="text-sm font-medium text-slate-500">Slug</p>
+        <p class="mt-2 text-base font-medium text-slate-900"><%= @template.slug %></p>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Status</p>
+        <span class="mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium <%= template_badge_classes(@template) %>"><%= @template.active? ? "Active" : "Inactive" %></span>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Variant</p>
+        <p class="mt-2 text-base font-medium text-slate-900"><%= @template.layout_config.fetch("variant", "modern") %></p>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Accent color</p>
+        <div class="mt-2 flex items-center gap-3">
+          <span class="h-8 w-8 rounded-full border border-slate-200" style="background-color: <%= @template.layout_config.fetch("accent_color", "#0F172A") %>;"></span>
+          <span class="text-base font-medium text-slate-900"><%= @template.layout_config.fetch("accent_color", "#0F172A") %></span>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Font scale</p>
+        <p class="mt-2 text-base font-medium text-slate-900"><%= @template.layout_config.fetch("font_scale", "base") %></p>
+      </div>
+    </div>
+
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-xl font-semibold tracking-tight text-slate-900">Raw layout config</h2>
+      <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-sm text-slate-100"><%= JSON.pretty_generate(@template.layout_config) %></pre>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Resume Builder" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Resume Builder">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="min-h-screen">
+      <header class="border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+          <div>
+            <%= link_to "Resume Builder", authenticated? ? resumes_path : root_path, class: "text-lg font-semibold tracking-tight text-slate-900" %>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <% if authenticated? %>
+              <%= link_to "Resumes", resumes_path, class: nav_link_classes(controller_name == "resumes") %>
+              <% if current_user.admin? %>
+                <%= link_to "Admin", admin_root_path, class: nav_link_classes(controller_path.start_with?("admin/")) %>
+              <% end %>
+              <span class="hidden rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 sm:inline-flex"><%= current_user.email_address %></span>
+              <%= button_to "Sign out", session_path, method: :delete, class: "rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700" %>
+            <% else %>
+              <%= link_to "Sign in", new_session_path, class: nav_link_classes(controller_name == "sessions") %>
+              <%= link_to "Create account", new_registration_path, class: "rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700" %>
+            <% end %>
+          </div>
+        </div>
+      </header>
+
+      <main class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8">
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

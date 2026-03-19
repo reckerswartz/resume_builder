@@ -1,0 +1,44 @@
+<section class="space-y-6">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Admin</p>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Templates</h1>
+      <p class="mt-2 text-sm text-slate-600">Manage the layouts used by the resume preview and PDF export pipeline.</p>
+    </div>
+
+    <%= link_to "New template", new_admin_template_path, class: "rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
+  </div>
+
+  <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200">
+      <thead class="bg-slate-50 text-left text-sm font-medium text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Template</th>
+          <th class="px-6 py-4">Slug</th>
+          <th class="px-6 py-4">Variant</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+        <% @templates.each do |template| %>
+          <tr>
+            <td class="px-6 py-4">
+              <p class="font-medium text-slate-900"><%= template.name %></p>
+              <p class="mt-1 text-slate-500"><%= template.description.presence || "No description" %></p>
+            </td>
+            <td class="px-6 py-4"><%= template.slug %></td>
+            <td class="px-6 py-4"><%= template.layout_config.fetch("variant", "modern") %></td>
+            <td class="px-6 py-4"><span class="rounded-full px-3 py-1 text-xs font-medium <%= template_badge_classes(template) %>"><%= template.active? ? "Active" : "Inactive" %></span></td>
+            <td class="px-6 py-4 text-right">
+              <div class="inline-flex flex-wrap justify-end gap-2">
+                <%= link_to "View", admin_template_path(template), class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+                <%= link_to "Edit", edit_admin_template_path(template), class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

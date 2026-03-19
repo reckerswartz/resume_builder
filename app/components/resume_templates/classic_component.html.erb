@@ -1,0 +1,64 @@
+<div class="mx-auto w-full max-w-3xl bg-white p-8 text-slate-900 sm:p-10">
+  <header class="border-b-2 pb-5" style="border-color: <%= accent_color %>;">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900"><%= full_name %></h1>
+    <% if resume.headline.present? %>
+      <p class="mt-2 text-base uppercase tracking-[0.18em] text-slate-500"><%= resume.headline %></p>
+    <% end %>
+
+    <% if contact_items.any? %>
+      <p class="mt-4 text-sm leading-6 text-slate-600"><%= contact_items.map { |_label, value| value }.join(" · ") %></p>
+    <% end %>
+
+    <% if resume.summary.present? %>
+      <p class="mt-4 text-sm leading-7 text-slate-700"><%= resume.summary %></p>
+    <% end %>
+  </header>
+
+  <div class="mt-8 space-y-7">
+    <% resume.ordered_sections.each do |section| %>
+      <section>
+        <h2 class="border-b pb-2 text-lg font-semibold uppercase tracking-[0.18em]" style="border-color: <%= accent_color %>44; color: <%= accent_color %>;"><%= section.title %></h2>
+
+        <% if section.section_type == "skills" %>
+          <p class="mt-3 text-sm leading-7 text-slate-700"><%= section_entries(section).map { |entry| [value_for(entry, "name"), value_for(entry, "level")].reject(&:blank?).join(" (")&.sub(/\z/, value_for(entry, "level").present? ? ")" : "") }.join(" • ") %></p>
+        <% else %>
+          <div class="mt-4 space-y-4">
+            <% section_entries(section).each do |entry| %>
+              <article>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h3 class="text-base font-semibold text-slate-900"><%= value_for(entry, "title").presence || value_for(entry, "degree").presence || value_for(entry, "name") %></h3>
+                    <p class="mt-1 text-sm text-slate-600"><%= [value_for(entry, "organization"), value_for(entry, "institution"), value_for(entry, "role")].reject(&:blank?).join(" · ") %></p>
+                  </div>
+                  <div class="text-sm text-slate-500 sm:text-right">
+                    <div><%= date_range_for(entry) %></div>
+                    <% if value_for(entry, "location").present? %>
+                      <div class="mt-1"><%= value_for(entry, "location") %></div>
+                    <% end %>
+                  </div>
+                </div>
+
+                <% [value_for(entry, "summary"), value_for(entry, "details")].reject(&:blank?).each do |paragraph| %>
+                  <p class="mt-2 text-sm leading-6 text-slate-700"><%= paragraph %></p>
+                <% end %>
+
+                <% highlights = list_values_for(entry, "highlights") %>
+                <% if highlights.any? %>
+                  <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-700">
+                    <% highlights.each do |highlight| %>
+                      <li><%= highlight %></li>
+                    <% end %>
+                  </ul>
+                <% end %>
+
+                <% if value_for(entry, "url").present? %>
+                  <p class="mt-2 text-sm text-slate-600"><%= value_for(entry, "url") %></p>
+                <% end %>
+              </article>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

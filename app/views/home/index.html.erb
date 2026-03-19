@@ -1,0 +1,54 @@
+<section class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+  <div class="space-y-6">
+    <span class="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">Production-grade resume building with Rails, Hotwire, and PDF export</span>
+    <div class="space-y-4">
+      <h1 class="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Create polished, ATS-friendly resumes with live editing and template switching.</h1>
+      <p class="max-w-2xl text-lg leading-8 text-slate-600">Build resumes in a split-screen editor, preview every change instantly, export to PDF, and manage templates and feature flags from an admin dashboard.</p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <%= link_to "Create account", new_registration_path, class: "rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
+      <%= link_to "Sign in", new_session_path, class: "rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+    </div>
+
+    <dl class="grid gap-4 sm:grid-cols-3">
+      <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <dt class="text-sm font-medium text-slate-500">Live preview</dt>
+        <dd class="mt-2 text-2xl font-semibold text-slate-900">Turbo powered</dd>
+      </div>
+      <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <dt class="text-sm font-medium text-slate-500">Flexible schema</dt>
+        <dd class="mt-2 text-2xl font-semibold text-slate-900">JSONB sections</dd>
+      </div>
+      <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <dt class="text-sm font-medium text-slate-500">Export pipeline</dt>
+        <dd class="mt-2 text-2xl font-semibold text-slate-900">Tracked jobs</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+    <div class="space-y-4 rounded-[1.5rem] bg-slate-900 p-6 text-white">
+      <div>
+        <p class="text-sm uppercase tracking-[0.2em] text-slate-300">Preview snapshot</p>
+        <h2 class="mt-2 text-2xl font-semibold">Alex Morgan</h2>
+        <p class="mt-1 text-sm text-slate-300">Senior Product Designer</p>
+      </div>
+
+      <div class="space-y-3 text-sm text-slate-200">
+        <div class="rounded-2xl bg-white/5 p-4">
+          <p class="font-medium text-white">Experience</p>
+          <p class="mt-2">Led cross-functional product improvements that increased conversion and reduced edit friction.</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 p-4">
+          <p class="font-medium text-white">Skills</p>
+          <p class="mt-2">Rails, Hotwire, TailwindCSS, PostgreSQL, PDF export workflows</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 p-4">
+          <p class="font-medium text-white">Templates</p>
+          <p class="mt-2">Switch between modern and classic layouts without leaving the editor.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

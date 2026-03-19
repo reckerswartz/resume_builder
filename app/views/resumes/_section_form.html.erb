@@ -1,0 +1,22 @@
+<div class="rounded-[2rem] border border-dashed border-slate-300 bg-white p-5 shadow-sm">
+  <div class="mb-4">
+    <h4 class="text-lg font-semibold text-slate-900">Add section</h4>
+    <p class="mt-1 text-sm text-slate-600">Create a new section and then add entries to it.</p>
+  </div>
+
+  <%= form_with model: [resume, Section.new], class: "grid gap-4 sm:grid-cols-[1fr_200px_auto] sm:items-end" do |form| %>
+    <div>
+      <%= form.label :title, class: "text-sm font-medium text-slate-700" %>
+      <%= form.text_field :title, placeholder: "Awards", class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+    </div>
+
+    <div>
+      <%= form.label :section_type, "Type", class: "text-sm font-medium text-slate-700" %>
+      <%= form.select :section_type, options_for_select(section_type_options_for_builder), {}, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+    </div>
+
+    <div>
+      <%= form.submit "Add section", class: "inline-flex justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
+    </div>
+  <% end %>
+</div>

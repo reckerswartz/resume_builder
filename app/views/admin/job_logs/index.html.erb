@@ -1,0 +1,37 @@
+<section class="space-y-6">
+  <div>
+    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Admin</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Job logs</h1>
+    <p class="mt-2 text-sm text-slate-600">Inspect background job execution, payloads, and failures.</p>
+  </div>
+
+  <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200">
+      <thead class="bg-slate-50 text-left text-sm font-medium text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Job</th>
+          <th class="px-6 py-4">Queue</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4">Created</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+        <% @job_logs.each do |job_log| %>
+          <tr>
+            <td class="px-6 py-4">
+              <p class="font-medium text-slate-900"><%= job_log.job_type %></p>
+              <% if job_log.active_job_id.present? %>
+                <p class="mt-1 text-slate-500"><%= job_log.active_job_id %></p>
+              <% end %>
+            </td>
+            <td class="px-6 py-4"><%= job_log.queue_name %></td>
+            <td class="px-6 py-4"><span class="rounded-full px-3 py-1 text-xs font-medium <%= job_log_status_classes(job_log) %>"><%= job_log.status.humanize %></span></td>
+            <td class="px-6 py-4"><%= l(job_log.created_at, format: :short) %></td>
+            <td class="px-6 py-4 text-right"><%= link_to "Inspect", admin_job_log_path(job_log), class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

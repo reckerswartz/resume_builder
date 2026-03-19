@@ -1,0 +1,49 @@
+<section class="space-y-6">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Job detail</p>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900"><%= @job_log.job_type %></h1>
+      <p class="mt-2 text-sm text-slate-600">Queue: <%= @job_log.queue_name %></p>
+    </div>
+
+    <span class="inline-flex rounded-full px-3 py-1 text-xs font-medium <%= job_log_status_classes(@job_log) %>"><%= @job_log.status.humanize %></span>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
+    <div class="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+      <div>
+        <p class="text-sm font-medium text-slate-500">Active Job ID</p>
+        <p class="mt-2 break-all text-sm text-slate-900"><%= @job_log.active_job_id.presence || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Started at</p>
+        <p class="mt-2 text-sm text-slate-900"><%= @job_log.started_at ? l(@job_log.started_at, format: :long) : "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Finished at</p>
+        <p class="mt-2 text-sm text-slate-900"><%= @job_log.finished_at ? l(@job_log.finished_at, format: :long) : "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-slate-500">Duration</p>
+        <p class="mt-2 text-sm text-slate-900"><%= @job_log.duration_ms.present? ? number_with_precision(@job_log.duration_seconds, precision: 2) : "N/A" %> seconds</p>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-xl font-semibold tracking-tight text-slate-900">Input</h2>
+        <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-sm text-slate-100"><%= JSON.pretty_generate(@job_log.input) %></pre>
+      </div>
+
+      <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-xl font-semibold tracking-tight text-slate-900">Output</h2>
+        <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-sm text-slate-100"><%= JSON.pretty_generate(@job_log.output) %></pre>
+      </div>
+
+      <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-xl font-semibold tracking-tight text-slate-900">Errors</h2>
+        <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-sm text-slate-100"><%= JSON.pretty_generate(@job_log.error_details) %></pre>
+      </div>
+    </div>
+  </div>
+</section>

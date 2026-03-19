@@ -1,0 +1,39 @@
+<% persisted = entry.persisted? %>
+<% form_options = persisted ? { data: { controller: "autosave", autosave_delay_value: 350, action: "input->autosave#queue change->autosave#queue" } } : {} %>
+
+<div class="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
+  <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h5 class="text-base font-semibold text-slate-900"><%= persisted ? "Edit entry" : "Add entry" %></h5>
+      <p class="mt-1 text-sm text-slate-500"><%= section.section_type.titleize %> details appear in the preview as soon as they save.</p>
+    </div>
+
+    <% if persisted %>
+      <div class="flex flex-wrap gap-2">
+        <%= button_to "Up", move_resume_section_entry_path(resume, section, entry, direction: :up), method: :patch, class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+        <%= button_to "Down", move_resume_section_entry_path(resume, section, entry, direction: :down), method: :patch, class: "rounded-full border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+        <% if feature_enabled?("llm_access") && feature_enabled?("resume_suggestions") %>
+          <%= button_to "Improve", improve_resume_section_entry_path(resume, section, entry), method: :post, class: "rounded-full border border-amber-200 px-3 py-2 text-xs font-medium text-amber-700 transition hover:bg-amber-50" %>
+        <% end %>
+        <%= button_to "Remove", resume_section_entry_path(resume, section, entry), method: :delete, class: "rounded-full border border-rose-200 px-3 py-2 text-xs font-medium text-rose-700 transition hover:bg-rose-50" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= form_with model: [resume, section, entry], class: "grid gap-4 sm:grid-cols-2", **form_options do |form| %>
+    <% entry_fields_for(section).each do |field| %>
+      <div class="<%= entry_field_text_area?(field) ? 'sm:col-span-2' : '' %>">
+        <%= label_tag "#{form.object_name}_content_#{field[:key]}", field[:label], class: "text-sm font-medium text-slate-700" %>
+        <% if entry_field_text_area?(field) %>
+          <%= text_area_tag "#{form.object_name}[content][#{field[:key]}]", entry_field_value(entry, field[:key]), rows: 4, id: "#{form.object_name}_content_#{field[:key]}", class: "mt-2 block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+        <% else %>
+          <%= text_field_tag "#{form.object_name}[content][#{field[:key]}]", entry_field_value(entry, field[:key]), id: "#{form.object_name}_content_#{field[:key]}", class: "mt-2 block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="sm:col-span-2 flex justify-end">
+      <%= form.submit(persisted ? "Save entry" : "Add entry", class: "inline-flex justify-center rounded-full bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-700") %>
+    </div>
+  <% end %>
+</div>
