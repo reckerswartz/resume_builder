@@ -53,16 +53,16 @@ module ResumeBuilder
     def hero_badges
       @hero_badges ||= [
         { label: primary_identity, tone: :hero },
-        { label: "#{resume.template.name} template", tone: :hero },
-        { label: "#{completed_steps_count}/#{total_steps} core steps complete", tone: :hero_success }
+        { label: I18n.t("resume_builder.editor_state.hero_badges.template", template: resume.template.name), tone: :hero },
+        { label: I18n.t("resume_builder.editor_state.hero_badges.steps_complete", completed: completed_steps_count, total: total_steps), tone: :hero_success }
       ]
     end
 
     def progress_card_attributes
       {
-        eyebrow: "Progress",
-        title: "#{completion_percentage}% complete",
-        description: "Track guided progress while the live preview stays visible beside the editor.",
+        eyebrow: I18n.t("resume_builder.editor_state.progress_card.eyebrow"),
+        title: I18n.t("resume_builder.editor_state.progress_card.title", percent: completion_percentage),
+        description: I18n.t("resume_builder.editor_state.progress_card.description"),
         tone: :default,
         padding: :sm
       }
@@ -78,9 +78,9 @@ module ResumeBuilder
 
     def next_step_card_attributes
       {
-        eyebrow: "Next move",
-        title: next_step&.fetch(:label, nil) || "Finalize",
-        description: next_step.present? ? "Advance when the current fields feel complete and the preview looks right." : "Review settings and export when you are happy with the current content.",
+        eyebrow: I18n.t("resume_builder.editor_state.next_step_card.eyebrow"),
+        title: next_step&.fetch(:label, nil) || I18n.t("resume_builder.editor_state.next_step_card.finalize_title"),
+        description: next_step.present? ? I18n.t("resume_builder.editor_state.next_step_card.with_next_description") : I18n.t("resume_builder.editor_state.next_step_card.finalize_description"),
         tone: :subtle,
         padding: :sm
       }
@@ -129,7 +129,7 @@ module ResumeBuilder
           label: step[:label],
           path: step[:path],
           badge: index + 1,
-          status: step[:current] ? "Current" : step[:completed] ? "Done" : "Open",
+          status: step[:current] ? I18n.t("resume_builder.editor_state.tab_status.current") : step[:completed] ? I18n.t("resume_builder.editor_state.tab_status.done") : I18n.t("resume_builder.editor_state.tab_status.open"),
           current: step[:current],
           completed: step[:completed]
         }
@@ -139,19 +139,19 @@ module ResumeBuilder
     def navigation_actions
       @navigation_actions ||= [
         {
-          label: "Back to workspace",
+          label: I18n.t("resume_builder.editor_state.navigation.back_to_workspace"),
           path: view_context.resumes_path,
           style: :secondary,
           options: { data: { turbo_frame: "_top" } }
         },
         {
-          label: "Preview",
+          label: I18n.t("resume_builder.editor_state.navigation.preview"),
           path: view_context.resume_path(resume, step: current_step_key),
           style: :secondary,
           options: { data: { turbo_frame: "_top" } }
         },
         {
-          label: "Go back",
+          label: I18n.t("resume_builder.editor_state.navigation.go_back"),
           path: go_back_path,
           style: :secondary,
           options: go_back_link_options
@@ -171,7 +171,7 @@ module ResumeBuilder
         return unless next_step_path.present? && next_step.present?
 
         {
-          label: "Next: #{next_step.fetch(:label)}",
+          label: I18n.t("resume_builder.editor_state.navigation.next", step: next_step.fetch(:label)),
           path: next_step_path,
           style: :primary,
           options: {}

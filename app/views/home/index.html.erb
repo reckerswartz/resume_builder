@@ -1,16 +1,16 @@
 <section class="space-y-6">
   <%= render Ui::HeroHeaderComponent.new(
-    eyebrow: "Resume builder",
-    title: "Build a polished resume faster.",
-    description: "Start from scratch or bring in an existing resume, then keep the preview in view while you refine each section.",
+    eyebrow: t("home.index.hero.eyebrow"),
+    title: t("home.index.hero.title"),
+    description: t("home.index.hero.description"),
     badges: [
-      { label: "Guided steps", tone: :hero },
-      { label: "Live preview", tone: :hero },
-      { label: "PDF export", tone: :hero }
+      { label: t("home.index.hero.badges.guided_steps"), tone: :hero },
+      { label: t("home.index.hero.badges.live_preview"), tone: :hero },
+      { label: t("home.index.hero.badges.pdf_export"), tone: :hero }
     ],
     actions: [
-      { label: "Create account", path: new_registration_path, style: :hero_primary },
-      { label: "Sign in", path: new_session_path, style: :hero_secondary }
+      { label: t("home.index.hero.actions.create_account"), path: new_registration_path, style: :hero_primary },
+      { label: t("home.index.hero.actions.sign_in"), path: new_session_path, style: :hero_secondary }
     ]
   ) %>
 
@@ -23,10 +23,10 @@
         <div>
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-            See how it works
+            <%= t("home.index.preview_panel.pill") %>
           </span>
-          <h2 class="mt-3 font-serif text-2xl font-semibold tracking-[-0.03em] text-ink-950">One workspace from first draft to export</h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Keep your content, preview, and layout decisions together so you can move faster without juggling extra tools.</p>
+          <h2 class="mt-3 font-serif text-2xl font-semibold tracking-[-0.03em] text-ink-950"><%= t("home.index.preview_panel.title") %></h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("home.index.preview_panel.description") %></p>
         </div>
 
         <div class="atelier-panel-dark p-5">
@@ -34,28 +34,28 @@
 
           <div class="relative flex items-start justify-between gap-4">
             <div>
-              <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/55">Preview snapshot</p>
-              <h3 class="mt-3 text-2xl font-semibold tracking-tight text-white">Alex Morgan</h3>
-              <p class="mt-1 text-sm text-white/65">Senior Product Designer</p>
+              <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/55"><%= t("home.index.preview_panel.snapshot_label") %></p>
+              <h3 class="mt-3 text-2xl font-semibold tracking-tight text-white"><%= t("home.index.preview_panel.sample_name") %></h3>
+              <p class="mt-1 text-sm text-white/65"><%= t("home.index.preview_panel.sample_role") %></p>
             </div>
-            <span class="<%= ui_badge_classes(:hero) %>">Preview updates live</span>
+            <span class="<%= ui_badge_classes(:hero) %>"><%= t("home.index.preview_panel.live_badge") %></span>
           </div>
 
           <div class="relative mt-6 space-y-3 text-sm text-white/72">
             <div class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4">
-              <p class="font-medium text-white">Summary</p>
-              <p class="mt-2">Product designer with 8 years of experience turning complex workflows into simple, high-converting product journeys.</p>
+              <p class="font-medium text-white"><%= t("home.index.preview_panel.summary_label") %></p>
+              <p class="mt-2"><%= t("home.index.preview_panel.summary_text") %></p>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-2">
               <div class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4">
-                <p class="font-medium text-white">Experience</p>
-                <p class="mt-2">Led redesigns that improved conversion and reduced time to complete core tasks.</p>
+                <p class="font-medium text-white"><%= t("home.index.preview_panel.experience_label") %></p>
+                <p class="mt-2"><%= t("home.index.preview_panel.experience_text") %></p>
               </div>
 
               <div class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4">
-                <p class="font-medium text-white">Skills</p>
-                <p class="mt-2">Product strategy, UX writing, design systems, stakeholder alignment</p>
+                <p class="font-medium text-white"><%= t("home.index.preview_panel.skills_label") %></p>
+                <p class="mt-2"><%= t("home.index.preview_panel.skills_text") %></p>
               </div>
             </div>
           </div>
@@ -65,9 +65,9 @@
 
     <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
       <%= render Ui::DashboardPanelComponent.new(
-        eyebrow: "Start here",
-        title: "Three simple ways to begin",
-        description: "Choose the lightest path for your situation and leave the rest for later.",
+        eyebrow: t("home.index.start_here.eyebrow"),
+        title: t("home.index.start_here.title"),
+        description: t("home.index.start_here.description"),
         padding: :sm,
         density: :compact
       ) do %>
@@ -76,8 +76,8 @@
             <div class="flex items-start gap-3">
               <%= render Ui::GlyphComponent.new(name: :spark, size: :sm, tone: :soft) %>
               <div>
-                <p class="text-sm font-semibold text-ink-950">Start from scratch</p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80">Open a starter draft and work through the guided steps one section at a time.</p>
+                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.start_here.cards.scratch.title") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.start_here.cards.scratch.description") %></p>
               </div>
             </div>
           </div>
@@ -86,8 +86,8 @@
             <div class="flex items-start gap-3">
               <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
               <div>
-                <p class="text-sm font-semibold text-ink-950">Bring an existing resume</p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80">Paste or upload the resume you already have and reshape it inside the builder.</p>
+                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.start_here.cards.existing_resume.title") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.start_here.cards.existing_resume.description") %></p>
               </div>
             </div>
           </div>
@@ -96,8 +96,8 @@
             <div class="flex items-start gap-3">
               <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
               <div>
-                <p class="text-sm font-semibold text-ink-950">Keep the preview in view</p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80">Edit content and watch the layout update before you export the final PDF.</p>
+                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.start_here.cards.keep_preview.title") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.start_here.cards.keep_preview.description") %></p>
               </div>
             </div>
           </div>
@@ -109,32 +109,55 @@
   <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
     <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
       <div>
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Common questions</p>
-        <dl class="mt-4 space-y-4">
-          <div>
-            <dt class="text-sm font-semibold text-ink-950">Do I need design experience?</dt>
-            <dd class="mt-1 text-sm leading-6 text-ink-700/80">No. Choose a template, fill in the sections, and adjust the presentation later if you want to.</dd>
+        <span class="atelier-pill">
+          <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+          <%= t("home.index.common_questions.pill") %>
+        </span>
+        <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t("home.index.common_questions.title") %></h2>
+        <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.description") %></p>
+
+        <div class="mt-4 space-y-3">
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <div class="flex items-start gap-3">
+              <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
+              <div>
+                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.common_questions.questions.design_experience.title") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.design_experience.description") %></p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <dt class="text-sm font-semibold text-ink-950">Can I switch templates later?</dt>
-            <dd class="mt-1 text-sm leading-6 text-ink-700/80">Yes. Your content stays reusable, so changing layouts does not mean starting over.</dd>
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <div class="flex items-start gap-3">
+              <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
+              <div>
+                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.common_questions.questions.switch_templates.title") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.switch_templates.description") %></p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <dt class="text-sm font-semibold text-ink-950">Can I start from an existing resume?</dt>
-            <dd class="mt-1 text-sm leading-6 text-ink-700/80">Yes. After you create your workspace, you can paste text or attach a file before moving into the guided editor.</dd>
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <div class="flex items-start gap-3">
+              <%= render Ui::GlyphComponent.new(name: :spark, size: :sm, tone: :soft) %>
+              <div>
+                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.common_questions.questions.existing_resume.title") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.existing_resume.description") %></p>
+              </div>
+            </div>
           </div>
-        </dl>
+        </div>
       </div>
 
-      <div class="<%= ui_inset_panel_classes(tone: :default) %>">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Quick reassurance</p>
-        <ul class="mt-3 space-y-3 text-sm leading-6 text-ink-700/80">
-          <li>No design tools or formatting knowledge required.</li>
-          <li>Keep one version of your content and reuse it across templates.</li>
-          <li>Export when the preview looks right.</li>
-        </ul>
+      <div class="<%= [ui_inset_panel_classes(tone: :default), 'space-y-3'].join(' ') %>">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("home.index.reassurance.eyebrow") %></p>
+        <p class="text-sm font-semibold text-ink-950"><%= t("home.index.reassurance.title") %></p>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("home.index.reassurance.description") %></p>
+        <div class="flex flex-wrap gap-2">
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("home.index.reassurance.badges.no_design_tools") %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("home.index.reassurance.badges.switch_templates_later") %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("home.index.reassurance.badges.export_when_ready") %></span>
+        </div>
       </div>
     </div>
   <% end %>

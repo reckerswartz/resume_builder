@@ -9,6 +9,14 @@ module Llm
         @provider = provider
       end
 
+      def generate_image_variations(model:, prompt:, images:)
+        raise NotImplementedError, "#{provider.name} does not implement image generation yet."
+      end
+
+      def verify_image_candidate(model:, prompt:, images:)
+        raise NotImplementedError, "#{provider.name} does not implement image verification yet."
+      end
+
       private
         attr_reader :provider
 

@@ -11,7 +11,7 @@ class EntriesController < ApplicationController
     @entry = @section.entries.build(content: normalized_content)
 
     if @entry.save
-      respond_to_success("Entry added.")
+      respond_to_success(I18n.t("resumes.entries_controller.created"))
     else
       respond_to_failure(@entry)
     end
@@ -21,7 +21,7 @@ class EntriesController < ApplicationController
     authorize @resume, :update?
 
     if @entry.update(content: normalized_content)
-      respond_to_success("Entry updated.")
+      respond_to_success(I18n.t("resumes.entries_controller.updated"))
     else
       respond_to_failure(@entry)
     end
@@ -31,14 +31,14 @@ class EntriesController < ApplicationController
     authorize @resume, :update?
 
     @entry.destroy!
-    respond_to_success("Entry removed.")
+    respond_to_success(I18n.t("resumes.entries_controller.destroyed"))
   end
 
   def move
     authorize @resume, :update?
 
     Resumes::PositionMover.new(record: @entry, direction: params[:direction], position: params[:position]).call
-    respond_to_success("Entry order updated.")
+    respond_to_success(I18n.t("resumes.entries_controller.moved"))
   end
 
   def improve
@@ -47,11 +47,11 @@ class EntriesController < ApplicationController
     result = Llm::ResumeSuggestionService.new(user: current_user, entry: @entry).call
 
     if result.success? && @entry.update(content: result.content)
-      respond_to_success("Entry suggestions applied.")
+      respond_to_success(I18n.t("resumes.entries_controller.improved"))
     else
       respond_to do |format|
-        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: result.error_message || "Resume suggestions are unavailable right now.") }
-        format.html { redirect_to edit_resume_path(@resume), alert: result.error_message || "Resume suggestions are unavailable right now." }
+        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: result.error_message || I18n.t("resumes.entries_controller.improve_unavailable")) }
+        format.html { redirect_to edit_resume_path(@resume), alert: result.error_message || I18n.t("resumes.entries_controller.improve_unavailable") }
       end
     end
   end

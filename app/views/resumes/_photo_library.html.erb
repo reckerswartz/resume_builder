@@ -1,0 +1,144 @@
+<% photo_library_state = Resumes::PhotoLibraryState.new(resume: resume, view_context: self) %>
+<% if photo_library_state.enabled? %>
+
+<section class="border-t border-canvas-200/80 px-6 pb-6 pt-1">
+  <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
+    <div class="space-y-1">
+      <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.photo_library.eyebrow") %></p>
+      <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.title") %></h3>
+      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.description") %></p>
+    </div>
+
+    <div class="flex flex-col gap-3 rounded-[1.25rem] border border-canvas-200/80 bg-white/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.create_profile_title") %></p>
+        <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.create_profile_description") %></p>
+      </div>
+
+      <%= button_to t("resumes.editor_personal_details_step.photo_library.create_profile_action"), photo_library_state.create_profile_path, method: :post, class: ui_button_classes(:primary, size: :sm) %>
+    </div>
+
+    <% if photo_library_state.profile_present? %>
+      <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+        <div class="space-y-5">
+          <%= form_with url: photo_library_state.upload_path, scope: :photo_assets, html: { multipart: true }, class: "space-y-4" do |upload_form| %>
+            <div>
+              <%= upload_form.label :files, t("resumes.editor_personal_details_step.photo_library.upload_label"), class: ui_label_classes %>
+              <%= upload_form.file_field :files, multiple: true, accept: PhotoAsset::IMAGE_CONTENT_TYPES.join(","), class: ui_input_classes %>
+              <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.upload_hint") %></p>
+            </div>
+
+            <div>
+              <%= upload_form.submit t("resumes.editor_personal_details_step.photo_library.upload_action"), class: ui_button_classes(:secondary, size: :sm) %>
+            </div>
+          <% end %>
+
+          <% if photo_library_state.asset_cards.any? %>
+            <%= form_with model: resume, url: resume_path(resume, step: "personal_details"), data: { controller: "autosave", autosave_delay_value: 300, action: "change->autosave#queue" }, class: "space-y-4" do |selection_form| %>
+              <%= selection_form.hidden_field :photo_profile_id, value: photo_library_state.profile.id %>
+
+              <div class="space-y-3">
+                <div>
+                  <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.selection_title") %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.selection_description") %></p>
+                </div>
+
+                <label class="flex cursor-pointer items-start gap-3 rounded-[1.1rem] border border-canvas-200/80 bg-white/85 px-4 py-4 transition hover:border-aqua-200/80">
+                  <%= radio_button_tag "resume[selected_headshot_photo_asset_id]", "", photo_library_state.selected_asset_id.blank?, class: "mt-1 #{ui_checkbox_classes}" %>
+                  <span>
+                    <span class="block text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.none_option_title") %></span>
+                    <span class="mt-1 block text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.none_option_description") %></span>
+                  </span>
+                </label>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                  <% photo_library_state.asset_cards.each do |card| %>
+                    <label class="flex cursor-pointer flex-col gap-4 rounded-[1.25rem] border border-canvas-200/80 bg-white/85 p-4 transition hover:border-aqua-200/80">
+                      <div class="flex items-start gap-3">
+                        <%= radio_button_tag "resume[selected_headshot_photo_asset_id]", card.fetch(:id), card.fetch(:selected), class: "mt-1 #{ui_checkbox_classes}" %>
+                        <div class="min-w-0 flex-1">
+                          <div class="flex flex-wrap gap-2">
+                            <% card.fetch(:badges).each do |badge| %>
+                              <span class="<%= ui_badge_classes(:neutral) %>"><%= badge %></span>
+                            <% end %>
+                            <% if card.fetch(:selected) %>
+                              <span class="<%= ui_badge_classes(:success) %>"><%= t("resumes.editor_personal_details_step.photo_library.selected_badge") %></span>
+                            <% end %>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="overflow-hidden rounded-[1rem] border border-canvas-200/80 bg-canvas-50">
+                        <%= image_tag card.fetch(:preview_url), alt: card.fetch(:asset).display_name, class: "h-48 w-full object-cover" %>
+                      </div>
+
+                      <div class="flex flex-wrap gap-2">
+                        <%= link_to t("resumes.editor_personal_details_step.photo_library.actions.delete"), card.fetch(:destroy_path), data: { turbo_method: :delete }, class: ui_button_classes(:secondary, size: :sm) %>
+                        <% if card[:background_remove_path].present? %>
+                          <%= link_to t("resumes.editor_personal_details_step.photo_library.actions.background_remove"), card.fetch(:background_remove_path), data: { turbo_method: :post }, class: ui_button_classes(:secondary, size: :sm) %>
+                        <% end %>
+                        <% if card[:generate_for_template_path].present? %>
+                          <%= link_to t("resumes.editor_personal_details_step.photo_library.actions.generate"), card.fetch(:generate_for_template_path), data: { turbo_method: :post }, class: ui_button_classes(:secondary, size: :sm) %>
+                        <% end %>
+                        <% if card[:verify_path].present? %>
+                          <%= link_to t("resumes.editor_personal_details_step.photo_library.actions.verify"), card.fetch(:verify_path), data: { turbo_method: :post }, class: ui_button_classes(:secondary, size: :sm) %>
+                        <% end %>
+                      </div>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <%= render Ui::EmptyStateComponent.new(
+              title: t("resumes.editor_personal_details_step.photo_library.empty_state.title"),
+              description: t("resumes.editor_personal_details_step.photo_library.empty_state.description")
+            ) %>
+          <% end %>
+        </div>
+
+        <aside class="space-y-4 rounded-[1.25rem] border border-canvas-200/80 bg-white/85 p-4">
+          <div>
+            <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.current_selection_title") %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80">
+              <%= photo_library_state.supports_headshot_template? ? t("resumes.editor_personal_details_step.photo_library.template_support.active") : t("resumes.editor_personal_details_step.photo_library.template_support.fallback") %>
+            </p>
+          </div>
+
+          <% if photo_library_state.selected_asset.present? %>
+            <div class="overflow-hidden rounded-[1rem] border border-canvas-200/80 bg-canvas-50">
+              <%= image_tag url_for(photo_library_state.selected_asset.file), alt: photo_library_state.selected_asset.display_name, class: "h-56 w-full object-cover" %>
+            </div>
+            <p class="text-sm font-medium text-ink-950"><%= photo_library_state.selected_asset.display_name %></p>
+          <% else %>
+            <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.current_selection_empty") %></p>
+          <% end %>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.recent_runs_title") %></p>
+            <% if photo_library_state.recent_runs.any? %>
+              <div class="mt-3 space-y-3">
+                <% photo_library_state.recent_runs.each do |run| %>
+                  <div class="rounded-[1rem] border border-canvas-200/80 bg-canvas-50/70 px-3 py-3">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="text-sm font-medium text-ink-950"><%= photo_library_state.workflow_label(run) %></p>
+                      <span class="<%= ui_badge_classes(run.succeeded? ? :success : run.failed? ? :warning : :neutral) %>"><%= photo_library_state.run_status_label(run) %></span>
+                    </div>
+                    <% if run.error_summary.present? %>
+                      <p class="mt-2 text-sm leading-6 text-rose-700"><%= run.error_summary %></p>
+                    <% elsif run.next_step_guidance.present? %>
+                      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= run.next_step_guidance %></p>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.recent_runs_empty") %></p>
+            <% end %>
+          </div>
+        </aside>
+      </div>
+    <% end %>
+  </div>
+</section>
+<% end %>

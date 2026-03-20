@@ -29,3 +29,39 @@
 
 en:
   hello: "Hello world"
+  resume_builder:
+    step_registry:
+      steps:
+        source:
+          label: "Source"
+          title: "Choose how to start"
+          description: "Start from scratch, paste an existing resume, or upload a source file before moving into the guided builder."
+        heading:
+          label: "Heading"
+          title: "Heading details"
+          description: "Keep this step focused on the name, headline, and contact details employers actually need first."
+        personal_details:
+          label: "Personal details"
+          title: "Personal details"
+          description: "Add profile links, credentials, and optional personal information only when it is relevant for the role or application."
+        experience:
+          label: "Experience"
+          title: "Work history"
+          description: "Start with the most relevant roles and keep each entry easy to scan."
+        education:
+          label: "Education"
+          title: "Education"
+          description: "Add degrees, training, and dates only when they strengthen this resume."
+        skills:
+          label: "Skills"
+          title: "Skills"
+          description: "Group the strongest skills so the preview stays easy to scan."
+        summary:
+          label: "Summary"
+          title: "Professional summary"
+          description: "Write the short narrative that links your experience and skills."
+        finalize:
+          label: "Finalize"
+          title: "Finalize and export"
+          description: "Choose the final layout, review export actions, and manage any extra sections that sit outside the core guided flow."
+

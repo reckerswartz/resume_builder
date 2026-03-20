@@ -1,6 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Resume, type: :model do
+  def create_ready_photo_asset(photo_profile:, filename:, asset_kind: :enhanced)
+    PhotoAsset.new(photo_profile:, asset_kind:, status: :ready).tap do |photo_asset|
+      photo_asset.file.attach(io: StringIO.new('image-bytes'), filename:, content_type: 'image/png')
+      photo_asset.save!
+    end
+  end
+
   describe 'callbacks' do
     it 'assigns the default template and normalizes stored JSON values' do
       template = create(:template)
@@ -202,6 +209,98 @@ RSpec.describe Resume, type: :model do
       resume.source_document.attach(io: StringIO.new('resume source'), filename: 'source.txt', content_type: 'text/plain')
 
       expect(resume.source_step_completed?).to eq(true)
+    end
+  end
+
+  describe 'headshot support' do
+    it 'accepts supported headshot image content types' do
+      resume = create(:resume)
+      resume.headshot.attach(io: StringIO.new('image-bytes'), filename: 'headshot.png', content_type: 'image/png')
+
+      expect(resume).to be_valid
+    end
+
+    it 'rejects unsupported headshot content types' do
+      resume = create(:resume)
+      resume.headshot.attach(io: StringIO.new('not-an-image'), filename: 'headshot.txt', content_type: 'text/plain')
+
+      expect(resume).not_to be_valid
+      expect(resume.errors[:headshot]).to include('must be a JPG, PNG, or WebP image')
+    end
+
+    it 'rejects headshots larger than the maximum allowed size' do
+      resume = create(:resume)
+      resume.headshot.attach(io: StringIO.new('a' * (Resume::MAX_HEADSHOT_SIZE + 1)), filename: 'headshot.png', content_type: 'image/png')
+
+      expect(resume).not_to be_valid
+      expect(resume.errors[:headshot]).to include('must be smaller than 3 MB')
+    end
+
+    it 'treats an attached headshot as completing the personal details step' do
+      resume = create(:resume, personal_details: {}, contact_details: { 'full_name' => 'Pat Kumar', 'email' => 'pat@example.com', 'website' => '', 'linkedin' => '', 'driving_licence' => '' })
+
+      expect(resume.personal_details_step_completed?).to eq(false)
+
+      resume.headshot.attach(io: StringIO.new('image-bytes'), filename: 'headshot.png', content_type: 'image/png')
+
+      expect(resume.personal_details_step_completed?).to eq(true)
+    end
+
+    it 'prefers an active template-specific selected photo asset over the photo profile fallback' do
+      user = create(:user)
+      photo_profile = PhotoProfile.create!(user:, name: 'Pat Kumar Photo Library', status: :active)
+      fallback_asset = create_ready_photo_asset(photo_profile:, filename: 'fallback-headshot.png', asset_kind: :enhanced)
+      selected_asset = create_ready_photo_asset(photo_profile:, filename: 'selected-headshot.png', asset_kind: :source)
+      resume = create(:resume, user:, photo_profile:)
+
+      expect(photo_profile.preferred_headshot_asset).to eq(fallback_asset)
+
+      ResumePhotoSelection.create!(
+        resume:,
+        template: resume.template,
+        photo_asset: selected_asset,
+        slot_name: 'headshot',
+        status: :active
+      )
+
+      expect(resume.selected_headshot_photo_asset).to eq(selected_asset)
+    end
+
+    it 'falls back to the linked photo profile preferred headshot when no template selection exists' do
+      user = create(:user)
+      photo_profile = PhotoProfile.create!(user:, name: 'Pat Kumar Photo Library', status: :active)
+      resume = create(
+        :resume,
+        user:,
+        photo_profile:,
+        personal_details: {},
+        contact_details: {
+          'full_name' => 'Pat Kumar',
+          'email' => 'pat@example.com',
+          'website' => '',
+          'linkedin' => '',
+          'driving_licence' => ''
+        }
+      )
+
+      expect(resume.personal_details_step_completed?).to eq(false)
+
+      fallback_asset = create_ready_photo_asset(photo_profile:, filename: 'profile-headshot.png')
+
+      expect(resume.selected_headshot_photo_asset).to eq(fallback_asset)
+      expect(resume.personal_details_step_completed?).to eq(true)
+    end
+  end
+
+  describe 'photo profile ownership' do
+    it 'requires the selected photo profile to belong to the same user' do
+      user = create(:user)
+      other_user = create(:user)
+      photo_profile = PhotoProfile.create!(user: other_user, name: 'Other User Photo Library', status: :active)
+      resume = build(:resume, user:, photo_profile:)
+
+      expect(resume).not_to be_valid
+      expect(resume.errors[:photo_profile]).to include('must belong to the same user')
     end
   end
 end

@@ -162,6 +162,13 @@ RSpec.describe ResumesHelper, type: :helper do
       expect(helper.entry_editor_metadata(entry, section)).to eq('Lead Engineer · https://example.com')
       expect(helper.entry_editor_supporting_text(entry, section)).to eq('Implemented shared preview rendering')
     end
+
+    it 'falls back to the localized section entry title when an entry is blank' do
+      section = create(:section, section_type: 'projects', title: 'Projects')
+      entry = Entry.new(section: section, content: {})
+
+      expect(helper.entry_editor_title(entry, section)).to eq('Projects entry')
+    end
   end
 
   describe '#resume_source_autofill_status_label' do

@@ -3,17 +3,8 @@ module Resumes
     EXPERIENCE_STEP = "experience"
     STUDENT_STEP = "student"
     SETUP_STEP = "setup"
-    EXPERIENCE_OPTIONS = [
-      { label: "No Experience", value: "no_experience" },
-      { label: "Less than 3 years", value: "less_than_3_years" },
-      { label: "3-5 Years", value: "three_to_five_years" },
-      { label: "5-10 Years", value: "five_to_ten_years" },
-      { label: "10+ Years", value: "ten_plus_years" }
-    ].freeze
-    STUDENT_OPTIONS = [
-      { label: "Yes", value: "student" },
-      { label: "No", value: "not_student" }
-    ].freeze
+    EXPERIENCE_OPTION_VALUES = %w[no_experience less_than_3_years three_to_five_years five_to_ten_years ten_plus_years].freeze
+    STUDENT_OPTION_VALUES = %w[student not_student].freeze
 
     def initialize(resume:, step: nil)
       @resume = resume
@@ -40,11 +31,15 @@ module Resumes
     end
 
     def experience_options
-      EXPERIENCE_OPTIONS
+      EXPERIENCE_OPTION_VALUES.map do |value|
+        { label: I18n.t("resumes.start_flow_state.experience_options.#{value}"), value: value }
+      end
     end
 
     def student_options
-      STUDENT_OPTIONS
+      STUDENT_OPTION_VALUES.map do |value|
+        { label: I18n.t("resumes.start_flow_state.student_options.#{value}"), value: value }
+      end
     end
 
     def selected_experience_level

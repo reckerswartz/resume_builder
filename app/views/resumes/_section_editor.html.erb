@@ -1,4 +1,5 @@
 <% allowed_section_types = local_assigns.fetch(:allowed_section_types, nil) %>
+<% section_label = ResumeBuilder::SectionRegistry.title_for(section.section_type) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <div class="border-b border-canvas-200/80 bg-canvas-50/92 px-5 py-5 sm:px-6">
@@ -11,23 +12,23 @@
         <div>
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-            Section canvas
+            <%= t("resumes.section_editor.pill") %>
           </span>
-          <p class="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-ink-700/70"><%= section.section_type.titleize %></p>
+          <p class="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-ink-700/70"><%= section_label %></p>
           <h4 class="mt-1 text-lg font-semibold text-ink-950"><%= section.title %></h4>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Keep the section label and type tidy here, then use the entry cards below to shape what appears in the shared preview.</p>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.section_editor.description") %></p>
           <div class="mt-4 flex flex-wrap gap-2 text-xs font-medium text-ink-700/70">
-            <span class="<%= ui_badge_classes(:neutral) %>"><%= pluralize(section.ordered_entries.count, "entry") %></span>
-            <span class="<%= ui_badge_classes(:info) %>">Live preview enabled</span>
-            <span class="<%= ui_badge_classes(:neutral) %>">Drag to reorder</span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_editor.entry_count", count: section.ordered_entries.count) %></span>
+            <span class="<%= ui_badge_classes(:info) %>"><%= t("resumes.section_editor.badges.live_preview_enabled") %></span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_editor.badges.drag_to_reorder") %></span>
           </div>
         </div>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <%= button_to "Up", move_resume_section_path(resume, section, direction: :up, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
-        <%= button_to "Down", move_resume_section_path(resume, section, direction: :down, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
-        <%= button_to "Remove", resume_section_path(resume, section, **resume_builder_step_params), method: :delete, class: ui_button_classes(:danger, size: :sm) %>
+        <%= button_to t("resumes.section_editor.actions.up"), move_resume_section_path(resume, section, direction: :up, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= button_to t("resumes.section_editor.actions.down"), move_resume_section_path(resume, section, direction: :down, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= button_to t("resumes.section_editor.actions.remove"), resume_section_path(resume, section, **resume_builder_step_params), method: :delete, class: ui_button_classes(:danger, size: :sm) %>
       </div>
     </div>
   </div>
@@ -36,21 +37,21 @@
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h5 class="text-sm font-semibold text-ink-950">Section settings</h5>
-          <p class="mt-1 text-sm leading-6 text-ink-700/80">Update the section title or swap the type without leaving the current step.</p>
+          <h5 class="text-sm font-semibold text-ink-950"><%= t("resumes.section_editor.settings.title") %></h5>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.section_editor.settings.description") %></p>
         </div>
 
-        <span class="<%= ui_badge_classes(:neutral) %>">Autosave active</span>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_editor.settings.autosave_active") %></span>
       </div>
 
       <%= form_with model: [resume, section], url: resume_section_path(resume, section, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 400, action: "input->autosave#queue change->autosave#queue" }, class: "grid gap-4 sm:grid-cols-2" do |form| %>
         <div>
-          <%= form.label :title, class: ui_label_classes %>
+          <%= form.label :title, t("resumes.section_editor.settings.title_label"), class: ui_label_classes %>
           <%= form.text_field :title, class: ui_input_classes %>
         </div>
 
         <div>
-          <%= form.label :section_type, "Type", class: ui_label_classes %>
+          <%= form.label :section_type, t("resumes.section_editor.settings.type_label"), class: ui_label_classes %>
           <%= form.select :section_type, options_for_select(section_type_options_for_builder(only: allowed_section_types), section.section_type), {}, class: ui_input_classes %>
         </div>
       <% end %>
@@ -65,7 +66,7 @@
       </div>
     <% else %>
       <%= render Ui::EmptyStateComponent.new(
-        description: "No entries yet. Add your first item below.",
+        description: t("resumes.section_editor.empty_state.description"),
         padding: :sm,
         tone: :subtle,
         align: :left

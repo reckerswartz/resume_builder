@@ -11,6 +11,7 @@ class Admin::TemplatesController < Admin::BaseController
 
     scope = policy_scope(Template).matching_query(@query).with_active_filter(@status_filter)
     @total_count = scope.count
+    @template_summary = build_template_summary(scope)
     @total_pages = table_total_pages(total_count: @total_count, per_page: PAGE_SIZE)
     @current_page = table_current_page(total_pages: @total_pages)
     @templates = scope.sorted_for_admin(@sort, @direction).offset((@current_page - 1) * PAGE_SIZE).limit(PAGE_SIZE)
@@ -60,6 +61,18 @@ class Admin::TemplatesController < Admin::BaseController
   private
     def set_template
       @template = policy_scope(Template).find(params[:id])
+    end
+
+    def build_template_summary(scope)
+      summary_templates = scope.select(:id, :active, :layout_config, :name, :slug).to_a
+      normalized_layouts = summary_templates.map(&:normalized_layout_config)
+
+      {
+        active_count: summary_templates.count(&:active?),
+        family_count: normalized_layouts.map { |layout_config| layout_config.fetch("family") }.uniq.count,
+        card_shell_count: normalized_layouts.count { |layout_config| layout_config.fetch("shell_style") == "card" },
+        sidebar_layout_count: normalized_layouts.count { |layout_config| Array(layout_config["sidebar_section_types"]).any? }
+      }
     end
 
     def template_params

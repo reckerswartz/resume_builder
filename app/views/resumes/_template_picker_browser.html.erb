@@ -6,9 +6,9 @@
     <div>
       <span class="atelier-pill">
         <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-        Discover templates
+        <%= t(".discovery_pill") %>
       </span>
-      <p class="mt-3 text-sm leading-6 text-ink-700/80">Filter the gallery by family, density, columns, theme, or layout while keeping the selected template summary in view.</p>
+      <p class="mt-3 text-sm leading-6 text-ink-700/80"><%= t(".discovery_description") %></p>
     </div>
 
     <% if show_results_label %>
@@ -43,7 +43,7 @@
 
   <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem]">
     <div>
-      <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-picker-search">Search</label>
+      <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-picker-search"><%= t(".search_label") %></label>
       <input
         id="template-picker-search"
         type="search"
@@ -57,7 +57,7 @@
     </div>
 
     <div>
-      <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-picker-sort">Sort</label>
+      <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-picker-sort"><%= t(".sort_label") %></label>
       <select
         id="template-picker-sort"
         class="<%= ui_input_classes.delete_prefix("mt-2 ") %>"
@@ -135,7 +135,7 @@
 
           <div class="mt-4 rounded-[1.5rem] border border-mist-200/80 bg-canvas-100/84 p-3 shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
             <div class="mb-3 flex items-center justify-between gap-3 px-1">
-              <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Live sample</p>
+              <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".live_sample_label") %></p>
               <span class="<%= ui_badge_classes(:neutral) %>"><%= template_card.fetch(:short_label) %></span>
             </div>
 
@@ -181,7 +181,7 @@
                       data-selected-classes="<%= card_state.fetch(:supporting_selected_classes) %>"
                       data-unselected-classes="<%= card_state.fetch(:supporting_unselected_classes) %>"><%= card_state.fetch(:accent_label) %></span>
                   </div>
-                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Keep the same resume content reusable if you change layouts later.</p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".accent_description") %></p>
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@
                 data-template-picker-target="badge"
                 data-template-id="<%= template.id %>"
                 data-selected-classes="<%= card_state.fetch(:current_badge_selected_classes) %>"
-                data-unselected-classes="<%= card_state.fetch(:current_badge_unselected_classes) %>">Current only</span>
+                data-unselected-classes="<%= card_state.fetch(:current_badge_unselected_classes) %>"><%= card_state.fetch(:current_only_badge_label) %></span>
             <% end %>
           </div>
         </label>
@@ -201,8 +201,8 @@
 
     <div class="hidden" data-template-picker-target="emptyState">
       <%= render Ui::EmptyStateComponent.new(
-        title: "No templates match those filters",
-        description: "Try a different family, density, column, theme, or layout combination to bring more templates back into the gallery.",
+        title: t(".empty_state.title"),
+        description: t(".empty_state.description"),
         tone: :subtle,
         padding: :sm,
         title_size: :sm

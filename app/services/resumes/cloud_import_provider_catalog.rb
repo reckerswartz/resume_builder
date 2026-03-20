@@ -27,17 +27,17 @@ module Resumes
 
       def launch_feedback(key)
         provider = fetch(key)
-        return { level: :alert, message: "Cloud import provider is not available." } if provider.blank?
+        return { level: :alert, message: I18n.t("resumes.cloud_import_provider_catalog.feedback.provider_unavailable") } if provider.blank?
 
         if provider.fetch(:configured)
           {
             level: :alert,
-            message: "#{provider.fetch(:label)} import is not connected yet. Provider auth handoff is the next rollout step."
+            message: I18n.t("resumes.cloud_import_provider_catalog.feedback.configured", provider: provider.fetch(:label))
           }
         else
           {
             level: :alert,
-            message: "#{provider.fetch(:label)} import is not configured. Add #{provider.fetch(:required_env_vars).to_sentence} to enable this connector."
+            message: I18n.t("resumes.cloud_import_provider_catalog.feedback.setup_required", provider: provider.fetch(:label), env_vars: provider.fetch(:required_env_vars).to_sentence)
           }
         end
       end
@@ -45,6 +45,8 @@ module Resumes
       private
         def hydrate(provider)
           provider.merge(
+            label: I18n.t("resumes.cloud_import_provider_catalog.providers.#{provider.fetch(:key)}.label"),
+            description: I18n.t("resumes.cloud_import_provider_catalog.providers.#{provider.fetch(:key)}.description"),
             configured: provider.fetch(:required_env_vars).all? { |env_var| ENV[env_var].present? }
           )
         end

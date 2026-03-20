@@ -3,6 +3,7 @@
 <% disclosure_default_open = !persisted && section.ordered_entries.none? %>
 <% form_options = persisted ? { data: { controller: "autosave", autosave_delay_value: 350, action: "input->autosave#queue change->autosave#queue" } } : {} %>
 <% entry_url = persisted ? resume_section_entry_path(resume, section, entry, **resume_builder_step_params) : resume_section_entries_path(resume, section, **resume_builder_step_params) %>
+<% section_type_label = ResumeBuilder::SectionRegistry.title_for(section.section_type) %>
 <% card_options = {
   id: persisted ? dom_id(entry, :sortable_item) : dom_id(section, :new_entry),
   data: {
@@ -34,38 +35,38 @@
       <div class="min-w-0">
         <span class="atelier-pill">
           <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-          Entry canvas
+          <%= t("resumes.entry_form.pill") %>
         </span>
 
         <div class="mt-4 flex flex-wrap gap-2 text-xs font-medium text-ink-700/70">
-          <span class="<%= ui_badge_classes(:neutral) %>"><%= persisted ? "Live entry" : "New entry" %></span>
-          <span class="<%= ui_badge_classes(:info) %>"><%= section.section_type.titleize %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= persisted ? t("resumes.entry_form.badges.live_entry") : t("resumes.entry_form.badges.new_entry") %></span>
+          <span class="<%= ui_badge_classes(:info) %>"><%= section_type_label %></span>
           <% if persisted %>
-            <span class="<%= ui_badge_classes(:neutral) %>">Drag to reorder</span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.entry_form.badges.drag_to_reorder") %></span>
           <% end %>
         </div>
 
-        <h5 class="mt-3 break-words text-base font-semibold text-ink-950"><%= persisted ? entry_editor_title(entry, section) : "Add #{section.section_type.singularize.titleize}" %></h5>
+        <h5 class="mt-3 break-words text-base font-semibold text-ink-950"><%= persisted ? entry_editor_title(entry, section) : t("resumes.entry_form.titles.add_entry", section: section_type_label.singularize) %></h5>
         <% if persisted && entry_editor_metadata(entry, section).present? %>
           <p class="mt-1 break-words text-sm text-ink-700/80"><%= entry_editor_metadata(entry, section) %></p>
         <% end %>
 
-        <p class="mt-2 break-words text-sm leading-6 text-ink-700/80"><%= persisted ? entry_editor_supporting_text(entry, section).presence || "#{section.section_type.titleize} details appear in the preview as soon as they save." : (section.ordered_entries.any? ? "Open the form when you’re ready to add another item." : "Add the first item for this section to start filling the preview.") %></p>
+        <p class="mt-2 break-words text-sm leading-6 text-ink-700/80"><%= persisted ? entry_editor_supporting_text(entry, section).presence || t("resumes.entry_form.supporting_text.persisted_fallback", section: section_type_label) : (section.ordered_entries.any? ? t("resumes.entry_form.supporting_text.new_with_existing") : t("resumes.entry_form.supporting_text.new_without_existing")) %></p>
       </div>
 
-      <span class="rounded-full border border-canvas-200/80 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= persisted ? "Expand to edit" : "Open form" %></span>
+      <span class="rounded-full border border-canvas-200/80 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= persisted ? t("resumes.entry_form.disclosure_labels.expand_to_edit") : t("resumes.entry_form.disclosure_labels.open_form") %></span>
     </div>
   </summary>
 
   <div class="border-t border-canvas-200/80 px-4 py-4 sm:px-5 sm:py-5">
     <% if persisted %>
       <div class="mb-4 flex flex-wrap gap-2">
-        <%= button_to "Up", move_resume_section_entry_path(resume, section, entry, direction: :up, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
-        <%= button_to "Down", move_resume_section_entry_path(resume, section, entry, direction: :down, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= button_to t("resumes.entry_form.actions.up"), move_resume_section_entry_path(resume, section, entry, direction: :up, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= button_to t("resumes.entry_form.actions.down"), move_resume_section_entry_path(resume, section, entry, direction: :down, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
         <% if feature_enabled?("resume_suggestions") && llm_role_enabled?(:text_generation) %>
-          <%= button_to "Improve", improve_resume_section_entry_path(resume, section, entry, **resume_builder_step_params), method: :post, class: ui_button_classes(:warning, size: :sm) %>
+          <%= button_to t("resumes.entry_form.actions.improve"), improve_resume_section_entry_path(resume, section, entry, **resume_builder_step_params), method: :post, class: ui_button_classes(:warning, size: :sm) %>
         <% end %>
-        <%= button_to "Remove", resume_section_entry_path(resume, section, entry, **resume_builder_step_params), method: :delete, class: ui_button_classes(:danger, size: :sm) %>
+        <%= button_to t("resumes.entry_form.actions.remove"), resume_section_entry_path(resume, section, entry, **resume_builder_step_params), method: :delete, class: ui_button_classes(:danger, size: :sm) %>
       </div>
     <% end %>
 
@@ -79,7 +80,7 @@
             <div class="mt-2 <%= ui_inset_panel_classes %>">
               <%= hidden_field_tag "#{form.object_name}[content][#{field[:key]}]", false %>
               <label class="flex items-center justify-between gap-4" for="#{form.object_name}_content_#{field[:key]}">
-                <span class="text-sm leading-6 text-ink-700/80">Use this toggle to keep the experience entry aligned with the guided builder flow.</span>
+                <span class="text-sm leading-6 text-ink-700/80"><%= t("resumes.entry_form.checkbox_hint") %></span>
                 <%= check_box_tag "#{form.object_name}[content][#{field[:key]}]", true, entry_field_checked?(entry, field[:key]), id: "#{form.object_name}_content_#{field[:key]}", class: ui_checkbox_classes %>
               </label>
             </div>
@@ -90,8 +91,8 @@
       <% end %>
 
       <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-sm text-ink-700/70"><%= persisted ? "Edits save in place and refresh the shared preview rail without leaving this step." : "Start with the essential details first. You can expand the card again after the new entry is created." %></p>
-        <%= form.submit(persisted ? "Save entry" : "Add entry", class: ui_button_classes(:primary, size: :sm)) %>
+        <p class="text-sm text-ink-700/70"><%= persisted ? t("resumes.entry_form.footer_note.persisted") : t("resumes.entry_form.footer_note.new_entry") %></p>
+        <%= form.submit(persisted ? t("resumes.entry_form.submit.save") : t("resumes.entry_form.submit.add"), class: ui_button_classes(:primary, size: :sm)) %>
       </div>
     <% end %>
   </div>

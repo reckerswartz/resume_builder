@@ -5,34 +5,34 @@
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <%= render Ui::StepHeaderComponent.new(
-    title: "Choose how to start",
-    description: "Start from scratch, paste an existing resume, or upload a source file before moving into the guided builder.",
+    title: current_step.fetch(:title),
+    description: current_step.fetch(:description),
     aside_classes: "grid w-full gap-4 lg:max-w-2xl lg:grid-cols-2"
   ) do %>
       <%= render Ui::WidgetCardComponent.new(
-        eyebrow: "Import status",
+        eyebrow: t("resumes.editor_source_step.import_status.eyebrow"),
         title: autofill_status_label,
         description: autofill_status_message,
         tone: autofill_action_ready ? :success : :subtle,
         padding: :sm
       ) do %>
         <div class="flex flex-wrap gap-2">
-          <span class="<%= ui_badge_classes(resume.source_mode == "paste" ? :success : :neutral) %>">Paste</span>
-          <span class="<%= ui_badge_classes(resume.source_mode == "upload" ? :success : :neutral) %>">Upload</span>
-          <span class="<%= ui_badge_classes(autofill_enabled ? :success : :neutral) %>"><%= autofill_enabled ? "LLM ready" : "LLM unavailable" %></span>
+          <span class="<%= ui_badge_classes(resume.source_mode == "paste" ? :success : :neutral) %>"><%= t("resumes.editor_source_step.import_status.paste_badge") %></span>
+          <span class="<%= ui_badge_classes(resume.source_mode == "upload" ? :success : :neutral) %>"><%= t("resumes.editor_source_step.import_status.upload_badge") %></span>
+          <span class="<%= ui_badge_classes(autofill_enabled ? :success : :neutral) %>"><%= autofill_enabled ? t("resumes.editor_source_step.import_status.llm_ready_badge") : t("resumes.editor_source_step.import_status.llm_unavailable_badge") %></span>
         </div>
       <% end %>
 
       <%= render Ui::WidgetCardComponent.new(
-        eyebrow: "Supported formats",
+        eyebrow: t("resumes.editor_source_step.supported_formats.eyebrow"),
         title: Resumes::SourceTextResolver.supported_upload_formats_label,
-        description: "PDF, DOCX, and text-based uploads can help prepare a starter draft. Legacy DOC files stay attached for reference.",
+        description: t("resumes.editor_source_step.supported_formats.description"),
         tone: :subtle,
         padding: :sm
       ) do %>
         <div class="flex flex-wrap gap-2">
-          <span class="<%= ui_badge_classes(:neutral) %>">Keep the original file attached</span>
-          <span class="<%= ui_badge_classes(:neutral) %>">Autofill the core steps</span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.supported_formats.original_file_badge") %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.supported_formats.autofill_badge") %></span>
         </div>
       <% end %>
   <% end %>
@@ -51,23 +51,23 @@
         <div>
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-            Import guidance
+            <%= t("resumes.editor_source_step.guidance.pill") %>
           </span>
-          <h4 class="mt-4 text-sm font-semibold text-ink-950">Start with the lightest path</h4>
+          <h4 class="mt-4 text-sm font-semibold text-ink-950"><%= t("resumes.editor_source_step.guidance.title") %></h4>
         </div>
 
-        <span class="<%= ui_badge_classes(:neutral) %>">Autofill optional</span>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.guidance.badge") %></span>
       </div>
 
-      <p class="text-sm leading-6 text-ink-700/80">Start from scratch when you want a clean draft. Use paste or upload only when existing content will save time. Once the source feels right, continue into heading and the rest of the guided builder.</p>
+      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_source_step.guidance.description") %></p>
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm text-ink-700/70"><%= autofill_enabled ? "Changes save in place. Autofill becomes available when pasted text or a supported upload is present." : "Changes save in place. Use the stepper or the next button when the source setup feels right." %></p>
+      <p class="text-sm text-ink-700/70"><%= autofill_enabled ? t("resumes.editor_source_step.footer_note_ready") : t("resumes.editor_source_step.footer_note_default") %></p>
       <div class="flex flex-wrap gap-3">
-        <%= form.submit "Save source setup", class: ui_button_classes(:primary) %>
+        <%= form.submit t("resumes.editor_source_step.save_source_setup"), class: ui_button_classes(:primary) %>
         <% if autofill_enabled %>
-          <%= button_tag "Save and autofill", name: "run_autofill", value: true, disabled: !autofill_action_ready, class: autofill_action_ready ? ui_button_classes(:warning) : ui_button_classes(:disabled) %>
+          <%= button_tag t("resumes.editor_source_step.save_and_autofill"), name: "run_autofill", value: true, disabled: !autofill_action_ready, class: autofill_action_ready ? ui_button_classes(:warning) : ui_button_classes(:disabled) %>
         <% end %>
       </div>
     </div>

@@ -9,28 +9,15 @@ class Admin::SettingsController < Admin::BaseController
   def update
     authorize @platform_setting
 
-    success = false
+    result = Admin::SettingsUpdateService.new(
+      platform_setting: @platform_setting,
+      platform_setting_params: platform_setting_params,
+      role_model_ids: llm_role_assignment_params
+    ).call
 
-    ActiveRecord::Base.transaction do
-      @platform_setting.update!(platform_setting_params)
+    return redirect_to admin_settings_path, notice: "Settings updated." if result.success?
 
-      assignment_result = Llm::RoleAssignmentUpdater.new(role_model_ids: llm_role_assignment_params).call
-      unless assignment_result.success?
-        assignment_result.errors.each do |message|
-          @platform_setting.errors.add(:base, message)
-        end
-
-        raise ActiveRecord::Rollback
-      end
-
-      success = true
-    end
-
-    return redirect_to admin_settings_path, notice: "Settings updated." if success
-
-    load_llm_configuration
-    render :show, status: :unprocessable_entity
-  rescue ActiveRecord::RecordInvalid
+    @platform_setting = result.platform_setting
     load_llm_configuration
     render :show, status: :unprocessable_entity
   end

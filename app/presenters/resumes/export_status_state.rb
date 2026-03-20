@@ -10,7 +10,7 @@ module Resumes
 
     def widget_attributes
       {
-        eyebrow: "Export status",
+        eyebrow: I18n.t("resumes.export_status_state.widget.eyebrow"),
         title: view_context.resume_export_status_label(resume),
         description: view_context.resume_export_status_message(resume),
         tone: widget_tone,
@@ -44,7 +44,7 @@ module Resumes
       end
 
       def badge_label
-        resume.export_state.presence&.humanize || "Draft"
+        I18n.t("resumes.export_states.#{resume.export_state}", default: I18n.t("resumes.export_status_state.widget.draft_badge"))
       end
   end
 end

@@ -35,7 +35,7 @@ module Resumes
       @filter_groups ||= [
         build_filter_group(
           key: "family",
-          label: "Family",
+          label: picker_text("filter_groups.family"),
           options: filter_options_for(
             key: "family",
             value_proc: ->(template_card) { template_card.fetch(:family) },
@@ -44,7 +44,7 @@ module Resumes
         ),
         build_filter_group(
           key: "density",
-          label: "Density",
+          label: picker_text("filter_groups.density"),
           options: filter_options_for(
             key: "density",
             value_proc: ->(template_card) { template_card.fetch(:density) },
@@ -53,7 +53,7 @@ module Resumes
         ),
         build_filter_group(
           key: "column_count",
-          label: "Columns",
+          label: picker_text("filter_groups.columns"),
           options: filter_options_for(
             key: "column_count",
             value_proc: ->(template_card) { template_card.fetch(:column_count) },
@@ -62,7 +62,7 @@ module Resumes
         ),
         build_filter_group(
           key: "theme_tone",
-          label: "Theme",
+          label: picker_text("filter_groups.theme"),
           options: filter_options_for(
             key: "theme_tone",
             value_proc: ->(template_card) { template_card.fetch(:theme_tone) },
@@ -71,7 +71,7 @@ module Resumes
         ),
         build_filter_group(
           key: "shell_style",
-          label: "Layout",
+          label: picker_text("filter_groups.layout"),
           options: filter_options_for(
             key: "shell_style",
             value_proc: ->(template_card) { template_card.fetch(:shell_style) },
@@ -86,19 +86,19 @@ module Resumes
     end
 
     def search_placeholder
-      "Search by name, family, or layout details"
+      picker_text("search_placeholder")
     end
 
     def sort_options
       @sort_options ||= begin
         options = [
-          { value: "selected_first", label: "Current first" },
-          { value: "name_asc", label: "Name A–Z" },
-          { value: "family_asc", label: "Family A–Z" },
-          { value: "density_asc", label: "Density" }
+          { value: "selected_first", label: picker_text("sort_options.selected_first") },
+          { value: "name_asc", label: picker_text("sort_options.name_asc") },
+          { value: "family_asc", label: picker_text("sort_options.family_asc") },
+          { value: "density_asc", label: picker_text("sort_options.density_asc") }
         ]
 
-        recommendation_sort_available? ? [ { value: "recommended_first", label: "Recommended first" }, *options ] : options
+        recommendation_sort_available? ? [ { value: "recommended_first", label: picker_text("sort_options.recommended_first") }, *options ] : options
       end
     end
 
@@ -154,12 +154,17 @@ module Resumes
           supporting_text: template.description.presence || template_card.fetch(:summary),
           selection_badges: selection_badges(template_card, recommendation: recommendation),
           show_current_only_badge: !template.active?,
-          accent_label: "Accent #{template_card.fetch(:accent_color)}",
+          current_only_badge_label: picker_text("current_only_badge"),
+          accent_label: picker_text("accent_label", color: template_card.fetch(:accent_color)),
           summary_hidden: !selected,
           summary_aria_hidden: (!selected).to_s,
           summary_card_attributes: summary_card_attributes_for(template, template_card),
           summary_badges: summary_badges(template_card, recommendation: recommendation),
-          summary_detail_text: "#{template_card.fetch(:shell_style_label)} shell · #{template_card.fetch(:section_heading_style_label)} headings",
+          summary_detail_text: picker_text(
+            "summary_detail",
+            shell: template_card.fetch(:shell_style_label),
+            headings: template_card.fetch(:section_heading_style_label)
+          ),
           summary_note: summary_note
         }
       end
@@ -182,7 +187,7 @@ module Resumes
 
       def summary_card_attributes_for(template, template_card)
         {
-          eyebrow: compact? ? "Selected template" : "Selection summary",
+          eyebrow: compact? ? picker_text("summary_card_eyebrows.compact") : picker_text("summary_card_eyebrows.default"),
           title: template.name,
           description: template_card.fetch(:summary),
           tone: :default,
@@ -192,9 +197,9 @@ module Resumes
 
       def summary_note
         if compact?
-          "Start with this look now and switch templates later from finalize without changing the draft content."
+          picker_text("summary_notes.compact")
         else
-          "You can switch templates later from the finalize step without losing the current resume content."
+          picker_text("summary_notes.default")
         end
       end
 
@@ -202,15 +207,15 @@ module Resumes
         badges = []
         badges << recommendation.fetch(:badge_label) if recommendation.present?
         badges.concat([
-          "Density: #{template_card.fetch(:density_label)}",
-          "Columns: #{template_card.fetch(:column_count_label)}",
-          "Theme: #{template_card.fetch(:theme_tone_label)}",
-          "Header: #{template_card.fetch(:header_style_label)}",
-          "Entries: #{template_card.fetch(:entry_style_label)}"
+          picker_text("selection_badges.density", density: template_card.fetch(:density_label)),
+          picker_text("selection_badges.columns", columns: template_card.fetch(:column_count_label)),
+          picker_text("selection_badges.theme", theme: template_card.fetch(:theme_tone_label)),
+          picker_text("selection_badges.header", header: template_card.fetch(:header_style_label)),
+          picker_text("selection_badges.entries", entries: template_card.fetch(:entry_style_label))
         ])
 
         if template_card.fetch(:sidebar_section_labels).any?
-          badges << "Sidebar: #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+          badges << picker_text("selection_badges.sidebar", sections: template_card.fetch(:sidebar_section_labels).to_sentence)
         end
 
         badges
@@ -221,13 +226,13 @@ module Resumes
         badges << recommendation.fetch(:badge_label) if recommendation.present?
         badges.concat([
           template_card.fetch(:family_label),
-          "Columns: #{template_card.fetch(:column_count_label)}",
-          "Theme: #{template_card.fetch(:theme_tone_label)}",
-          "Skills: #{template_card.fetch(:skill_style_label)}"
+          picker_text("summary_badges.columns", columns: template_card.fetch(:column_count_label)),
+          picker_text("summary_badges.theme", theme: template_card.fetch(:theme_tone_label)),
+          picker_text("summary_badges.skills", skills: template_card.fetch(:skill_style_label))
         ])
 
         if template_card.fetch(:sidebar_section_labels).any?
-          badges << "Sidebar: #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+          badges << picker_text("summary_badges.sidebar", sections: template_card.fetch(:sidebar_section_labels).to_sentence)
         end
 
         badges
@@ -238,7 +243,7 @@ module Resumes
           key: key,
           label: label,
           options: [
-            filter_option_state(key: key, value: "all", label: "All", count: template_cards.size, active: true),
+            filter_option_state(key: key, value: "all", label: picker_text("filter_groups.all"), count: template_cards.size, active: true),
             *options
           ]
         }
@@ -275,7 +280,11 @@ module Resumes
       end
 
       def template_count_label(count)
-        count == 1 ? "1 template shown" : "#{count} templates shown"
+        picker_text("template_count", count: count)
+      end
+
+      def picker_text(key, **options)
+        I18n.t("resumes.template_picker_state.#{key}", **options)
       end
 
       def searchable_text_for(template_card)

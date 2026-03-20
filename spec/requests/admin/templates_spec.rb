@@ -23,6 +23,43 @@ RSpec.describe 'Admin::Templates', type: :request do
       expect(response.body).to include('page-header-compact')
     end
 
+    it 'builds summary cards from the full filtered scope, not only the current page' do
+      10.times do |index|
+        create(
+          :template,
+          name: format('Template %02d', index),
+          slug: format('template-%02d', index),
+          active: false,
+          layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+        )
+      end
+      create(
+        :template,
+        name: 'Zulu Sidebar',
+        slug: 'zulu-sidebar',
+        active: true,
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'sidebar-accent')
+      )
+
+      get admin_templates_path
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      matches_card = document.xpath("//article[.//p[normalize-space()='Matches']]").first
+      user_visible_card = document.xpath("//article[.//p[normalize-space()='User-visible']]").first
+      families_card = document.xpath("//article[.//p[normalize-space()='Layout families']]").first
+      sidebar_card = document.xpath("//article[.//p[normalize-space()='Sidebar layouts']]").first
+
+      expect(matches_card.css('p')[1].text.strip).to eq('11')
+      expect(matches_card.at_css('span')&.text&.strip).to eq('10 on this page')
+      expect(user_visible_card.css('p')[1].text.strip).to eq('1')
+      expect(families_card.css('p')[1].text.strip).to eq('2')
+      expect(families_card.at_css('span')&.text&.strip).to eq('1 card shells')
+      expect(sidebar_card.css('p')[1].text.strip).to eq('1')
+      expect(sidebar_card.at_css('span')&.text&.strip).to eq('Varied')
+    end
+
     it 'filters and sorts templates' do
       create(:template, name: 'Alpha Template', slug: 'alpha-template', active: true)
       create(:template, name: 'Classic Template', slug: 'classic-template', active: false)
@@ -51,17 +88,21 @@ RSpec.describe 'Admin::Templates', type: :request do
       response_body = CGI.unescapeHTML(response.body)
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include('page-header-compact')
+      expect(response_body).to include('Review summary')
       expect(response_body).to include('Review this template')
-      expect(response_body).to include('Layout profile')
       expect(response_body).to include('Shared preview')
       expect(response_body).to include('Live sample')
+      expect(response_body).to include('Layout profile')
+      expect(response_body).to include('Layout summary')
+      expect(response_body).to include('Shell profile')
       expect(response_body).to include('Columns')
       expect(response_body).to include('Theme tone')
       expect(response_body).to include('Headshot metadata')
-      expect(response_body).to include('Internal-only planning flag')
       expect(response_body).to include('Preview accent')
       expect(response_body).to include('Configuration')
       expect(response_body).to include('Raw layout config')
+      expect(response_body).to include('Fallback only')
     end
   end
 
@@ -72,13 +113,17 @@ RSpec.describe 'Admin::Templates', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('New template')
+      expect(response.body).to include('page-header-compact')
+      expect(response_body).to include('Template setup')
       expect(response_body).to include('Template identity')
       expect(response_body).to include('Layout system')
       expect(response_body).to include('Availability & preview')
-      expect(response_body).to include('Preview sample')
+      expect(response_body).to include('Preview behavior')
       expect(response_body).to include('Shared preview')
+      expect(response_body).to include('Current renderer sample')
       expect(response_body).to include('Theme tone')
       expect(response_body).to include('Headshot metadata')
+      expect(response_body).to include('Advanced layout metadata')
       expect(response_body).to include('Save behavior')
       expect(response_body).to include('Accent color')
     end
@@ -93,6 +138,8 @@ RSpec.describe 'Admin::Templates', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Edit template')
+      expect(response.body).to include('page-header-compact')
+      expect(response_body).to include('Template setup')
       expect(response_body).to include('Layout system')
       expect(response_body).to include('Availability & preview')
       expect(response_body).to include('Save template')
@@ -100,6 +147,8 @@ RSpec.describe 'Admin::Templates', type: :request do
       expect(response_body).to include('Shared preview')
       expect(response_body).to include('Theme tone')
       expect(response_body).to include('Headshot metadata')
+      expect(response_body).to include('Advanced layout metadata')
+      expect(response_body).to include('Preview behavior')
       expect(response_body).to include('Save behavior')
       expect(response.body).to include('sticky-action-bar-compact')
     end

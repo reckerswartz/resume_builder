@@ -1,12 +1,12 @@
 <div class="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
   <div class="space-y-4">
     <%= render Ui::PageHeaderComponent.new(
-      eyebrow: "Welcome back",
-      title: "Pick up where you left off.",
-      description: "Open your drafts, keep editing, and export when the resume looks right.",
+      eyebrow: t("sessions.new.page_header.eyebrow"),
+      title: t("sessions.new.page_header.title"),
+      description: t("sessions.new.page_header.description"),
       badges: [
-        { label: "Saved drafts", tone: :neutral },
-        { label: "Live preview", tone: :neutral }
+        { label: t("sessions.new.page_header.badges.saved_drafts"), tone: :neutral },
+        { label: t("sessions.new.page_header.badges.live_preview"), tone: :neutral }
       ],
       density: :compact
     ) %>
@@ -14,14 +14,14 @@
     <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm) do %>
       <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
       <div class="relative space-y-3">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">After sign in</p>
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t("sessions.new.after_sign_in_eyebrow") %></p>
 
         <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
           <div class="flex items-start gap-3">
             <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
             <div>
-              <p class="text-sm font-semibold text-ink-950">Return to your drafts</p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80">Keep your content, preview, and template choices in one place.</p>
+              <p class="text-sm font-semibold text-ink-950"><%= t("sessions.new.return_to_drafts.title") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("sessions.new.return_to_drafts.description") %></p>
             </div>
           </div>
         </div>
@@ -30,8 +30,8 @@
           <div class="flex items-start gap-3">
             <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
             <div>
-              <p class="text-sm font-semibold text-ink-950">Switch layouts later</p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80">Your resume content stays reusable, so you can refine the presentation whenever you need to.</p>
+              <p class="text-sm font-semibold text-ink-950"><%= t("sessions.new.switch_layouts.title") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("sessions.new.switch_layouts.description") %></p>
             </div>
           </div>
         </div>
@@ -46,10 +46,10 @@
     <div class="relative mb-6">
       <span class="atelier-pill">
         <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-        Secure sign in
+        <%= t("sessions.new.form.pill") %>
       </span>
-      <h2 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950">Sign in</h2>
-      <p class="mt-3 text-sm leading-6 text-ink-700/80">Use the email and password for your workspace.</p>
+      <h2 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950"><%= t("sessions.new.form.title") %></h2>
+      <p class="mt-3 text-sm leading-6 text-ink-700/80"><%= t("sessions.new.form.description") %></p>
     </div>
 
     <%= form_with url: session_path, class: "relative space-y-5" do |form| %>
@@ -82,19 +82,21 @@
             data-action="password-field#toggle"
             data-password-field-target="toggle"></button>
         </div>
-        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint">Caps lock is on.</p>
+        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint"><%= t("sessions.new.form.caps_lock_hint") %></p>
       </div>
 
       <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-        <p class="text-sm leading-6 text-ink-700/80">Need help getting back in? Use the email address you signed up with, or request a password reset below.</p>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("sessions.new.form.help_text") %></p>
       </div>
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <%= form.submit "Sign in", class: ui_button_classes(:primary) %>
-        <%= link_to "Forgot password?", new_password_path, class: ui_button_classes(:ghost) %>
-      </div>
+      <div class="space-y-3">
+        <%= form.submit t("sessions.new.form.submit"), class: "#{ui_button_classes(:primary)} w-full sm:w-auto" %>
 
-      <p class="text-sm text-ink-700/70">Need an account? <%= link_to "Create one", new_registration_path, class: "font-medium text-ink-950 underline decoration-canvas-300 underline-offset-4" %></p>
+        <div class="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <%= link_to t("sessions.new.form.forgot_password"), new_password_path, class: ui_button_classes(:ghost) %>
+          <p class="text-sm leading-6 text-ink-700/70"><%= t("sessions.new.form.need_account") %> <%= link_to t("sessions.new.form.create_one"), new_registration_path, class: "font-medium text-ink-950 underline decoration-canvas-300 underline-offset-4" %></p>
+        </div>
+      </div>
     <% end %>
   <% end %>
 </div>

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ResumeTemplates::Catalog do
   describe '.families' do
     it 'includes the new phase 2 families' do
-      expect(described_class.families).to include('ats-minimal', 'professional', 'modern-clean', 'sidebar-accent')
+      expect(described_class.families).to include('ats-minimal', 'professional', 'modern-clean', 'sidebar-accent', 'editorial-split')
     end
   end
 
@@ -22,6 +22,20 @@ RSpec.describe ResumeTemplates::Catalog do
         'sidebar_section_types' => %w[skills education]
       )
     end
+
+    it 'returns the editorial split defaults with the editorial sidebar metadata intact' do
+      expect(described_class.default_layout_config(family: 'editorial-split')).to include(
+        'family' => 'editorial-split',
+        'variant' => 'editorial-split',
+        'accent_color' => '#D7F038',
+        'font_scale' => 'sm',
+        'density' => 'compact',
+        'column_count' => 'two_column',
+        'theme_tone' => 'lime',
+        'supports_headshot' => true,
+        'sidebar_section_types' => %w[education skills projects]
+      )
+    end
   end
 
   describe '.component_class_for' do
@@ -30,6 +44,7 @@ RSpec.describe ResumeTemplates::Catalog do
       expect(described_class.component_class_for('professional')).to eq(ResumeTemplates::ProfessionalComponent)
       expect(described_class.component_class_for('modern-clean')).to eq(ResumeTemplates::ModernCleanComponent)
       expect(described_class.component_class_for('sidebar-accent')).to eq(ResumeTemplates::SidebarAccentComponent)
+      expect(described_class.component_class_for('editorial-split')).to eq(ResumeTemplates::EditorialSplitComponent)
     end
   end
 end

@@ -33,10 +33,23 @@
     <tbody class="divide-y divide-canvas-200/80 text-sm text-ink-700/80">
       <% if job_logs.any? %>
         <% job_logs.each do |job_log| %>
+          <% related_error_log = job_log_related_error_log(job_log) %>
+          <% related_error_reference = job_log_related_error_reference(job_log) %>
           <tr class="align-top transition hover:bg-canvas-100/70">
             <td class="px-6 py-4">
               <p class="font-medium text-ink-950"><%= job_log.job_type %></p>
               <p class="mt-1 break-all text-ink-700/80"><%= job_log.active_job_id.presence || "No active job id" %></p>
+              <% if related_error_reference.present? || job_log.failed? %>
+                <div class="mt-2 space-y-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_log&.reference_id || related_error_reference || "No error reference" %></span>
+                    <% if related_error_log.present? %>
+                      <%= link_to "Open related error", admin_error_log_path(related_error_log), class: "text-xs font-medium text-ink-950 transition hover:text-ink-700", data: { turbo_frame: "_top" } %>
+                    <% end %>
+                  </div>
+                  <p class="text-xs leading-5 text-ink-700/70"><%= job_log_related_error_description(job_log) %></p>
+                </div>
+              <% end %>
             </td>
             <td class="px-6 py-4">
               <p class="font-medium text-ink-950"><%= job_log.queue_name %></p>

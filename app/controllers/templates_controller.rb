@@ -37,7 +37,7 @@ class TemplatesController < ApplicationController
       @template = user_visible_templates.find_by(id: params[:id])
       return if @template.present?
 
-      redirect_to templates_path, alert: "Template is not available."
+      redirect_to templates_path, alert: I18n.t("templates.controller.template_unavailable")
     end
 
     def requested_resume_intake_details

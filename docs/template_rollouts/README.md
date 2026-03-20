@@ -1,35 +1,45 @@
 # Template rollout workflow
 
-This directory is the durable tracking home for the reusable Behance-to-template rollout workflow, including the installed Windsurf command, the no-duplicate registry, and the Markdown artifacts that record what has been completed and what is still pending.
+This directory is the durable tracking home for the reusable Behance-to-template rollout workflows, including the installed Windsurf commands, the no-duplicate registry, and the Markdown artifacts that record what has been completed and what is still pending.
 
 ## Current status
 
 ### Completed
 
 - The reusable workflow is installed at `.windsurf/workflows/behance-template-rollout.md`.
+- The downstream implementation workflow is installed at `.windsurf/workflows/behance-template-implementation.md`.
+- The rollout workflow now hands eligible candidates directly into the implementation workflow in the same doc-driven flow.
 - The registry source of truth exists at `docs/template_rollouts/registry.yml`.
 - Reusable Markdown templates exist for per-template tracking and per-run reporting.
 - The first workflow-foundation run log records the setup work completed in this implementation pass.
+- The first real Behance candidate, `resume-cv-template-reuix-studio`, has been captured, documented, implemented as the new `editorial-split` family, advanced through truthful headshot support and utility-rail polish, and verified through focused specs.
 
 ### Pending
 
-- No Behance template candidate has been captured into the registry yet.
-- No raw reference artifacts have been downloaded into `tmp/reference_artifacts/behance/` yet.
-- No candidate has been classified yet as a new family, a variant, or a shared-enhancement-only slice.
-- No template has been advanced to `implemented` or `pixel_perfect` through this workflow yet.
+- Additional Behance candidates still need to be captured and classified.
+- No candidate has been advanced to `pixel_perfect` through this workflow yet.
 
-## Installed workflow
+## Installed workflows
 
 - Slash command: `/behance-template-rollout`
 - Workflow file: `.windsurf/workflows/behance-template-rollout.md`
+- Role: discover and capture new Behance candidates, compare them with the current app, and update rollout tracking before implementation starts
+- Handoff: immediately pass newly eligible candidates, open improvement slices, or materially changed captures into `/behance-template-implementation`
 
-The workflow is designed to:
+- Slash command: `/behance-template-implementation`
+- Workflow file: `.windsurf/workflows/behance-template-implementation.md`
+- Role: consume stored candidate docs and artifact manifests, implement one truthful Rails-native template or improvement slice, and update rollout tracking after verification
+
+Together, the workflows are designed to:
 
 - read the current registry and latest run state before doing any work
 - capture new Behance references with Playwright
 - capture relevant ResumeBuilder.com reference patterns when they inform implementation
+- consume stored candidate docs and artifact manifests before implementation work begins
+- hand off from capture into implementation when a candidate is ready or a tracked template has a valid reopen condition
 - update the durable registry and Markdown tracking docs
 - implement only one net-new template or one open improvement slice by default
+- add truthful architecture uplift when a candidate needs real support for things like image uploads, headshots, or editor capabilities
 - skip duplicates and already-completed work on reruns
 
 ## Source of truth files
@@ -141,3 +151,15 @@ A candidate should only be marked `implemented` when all of the following are tr
 The workflow-foundation implementation run is recorded at:
 
 - `docs/template_rollouts/runs/2026-03-20-workflow-foundation/00-overview.md`
+
+The first real candidate execution is recorded at:
+
+- `docs/template_rollouts/runs/2026-03-20-resume-cv-template-reuix-studio/00-overview.md`
+
+The first reopened improvement slice for that candidate is recorded at:
+
+- `docs/template_rollouts/runs/2026-03-20-resume-cv-template-reuix-studio-headshot-support/00-overview.md`
+
+The next reopened improvement slice for that candidate is recorded at:
+
+- `docs/template_rollouts/runs/2026-03-20-resume-cv-template-reuix-studio-utility-rail-polish/00-overview.md`

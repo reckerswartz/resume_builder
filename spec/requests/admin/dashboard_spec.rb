@@ -10,7 +10,7 @@ RSpec.describe 'Admin::Dashboard', type: :request do
       expect(response).to redirect_to(resumes_path)
     end
 
-    it 'renders successfully for admins' do
+    it 'renders the grouped admin dashboard hub for admins' do
       sign_in_as(create(:user, :admin))
       create(:job_log, :failed, job_type: 'ResumeExportJob')
       create(:error_log, :job, reference_id: 'ERR-SEED-0001')
@@ -23,12 +23,15 @@ RSpec.describe 'Admin::Dashboard', type: :request do
       expect(response.body).to include('Logged errors')
       expect(response.body).to include('Quick links')
       expect(response.body).to include('Jump straight to the area that needs attention')
+      expect(response.body).to include('Investigate')
+      expect(response.body).to include('Needs follow-up')
       expect(response.body).to include('Runtime and queue health')
+      expect(response.body).to include('Operational focus')
       expect(response.body).to include('Recent job activity')
       expect(response.body).to include('Recent error activity')
       expect(response.body).to include('ResumeExportJob')
       expect(response.body).to include('ERR-SEED-0001')
-      expect(response.body).to include('page-header-compact')
+      expect(response.body).to include('atelier-hero-compact')
       expect(response.body).to include('dashboard-panel-compact')
     end
   end

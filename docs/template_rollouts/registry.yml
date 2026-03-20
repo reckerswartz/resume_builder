@@ -1,15 +1,17 @@
 version: 1
-updated_at: "2026-03-20"
+updated_at: "2026-03-20T23:55:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/behance-template-rollout.md"
+  implementation_path: ".windsurf/workflows/behance-template-implementation.md"
+  handoff_mode: "workflow_handoff"
   default_mode: implement-next
   default_batch_size: 1
 tracking:
   overview_path: "docs/template_rollouts/README.md"
   template_doc_template: "docs/template_rollouts/templates/TEMPLATE.md"
   run_doc_template: "docs/template_rollouts/runs/TEMPLATE.md"
-  latest_run: "docs/template_rollouts/runs/2026-03-20-workflow-foundation/00-overview.md"
+  latest_run: "docs/template_rollouts/runs/2026-03-20-resume-cv-template-reuix-studio-utility-rail-polish/00-overview.md"
 sources:
   behance:
     purpose: "resume template layout reference"
@@ -35,4 +37,22 @@ pixel_statuses:
   - in_progress
   - close
   - pixel_perfect
-candidates: []
+candidates:
+  - reference_key: "resume-cv-template-reuix-studio"
+    source_type: "behance"
+    source_url: "https://www.behance.net/gallery/245736819/Resume-Cv-Template?tracking_source=search_projects%7Ccv+template"
+    source_title: "Resume Cv Template"
+    capture_signature: "behance:245736819:resume-cv-template:editorial-split"
+    candidate_status: "implemented"
+    implemented_template_slug: "editorial-split"
+    implemented_family: "editorial-split"
+    pixel_status: "close"
+    artifact_manifest_path: "tmp/reference_artifacts/behance/resume-cv-template-reuix-studio/manifest.json"
+    implementation_doc_path: "docs/template_rollouts/templates/resume-cv-template-reuix-studio.md"
+    duplicate_of:
+    open_improvement_keys: []
+    closed_improvement_keys:
+      - "identity-photo-headshot-support"
+      - "editorial-utility-rail-polish"
+    last_capture_at: "2026-03-20"
+    last_reviewed_at: "2026-03-20"

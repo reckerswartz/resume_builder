@@ -1,7 +1,7 @@
-<% visible_active_count = templates.count(&:active?) %>
-<% visible_family_count = templates.map(&:layout_family).uniq.count %>
-<% visible_card_shell_count = templates.count { |template| template.normalized_layout_config.fetch("shell_style") == "card" } %>
-<% visible_sidebar_layout_count = templates.count { |template| Array(template.normalized_layout_config["sidebar_section_types"]).any? } %>
+<% active_count = template_summary.fetch(:active_count) %>
+<% family_count = template_summary.fetch(:family_count) %>
+<% card_shell_count = template_summary.fetch(:card_shell_count) %>
+<% sidebar_layout_count = template_summary.fetch(:sidebar_layout_count) %>
 <% active_filter_count = [query.presence, status_filter.presence].compact.count %>
 
 <div class="mb-4 space-y-4">
@@ -42,35 +42,35 @@
       eyebrow: "Matches",
       title: total_count.to_s,
       description: "Templates currently returned by the active filter set.",
-      badge: "#{templates.size} visible",
+      badge: "#{templates.size} on this page",
       badge_classes: ui_badge_classes(:neutral),
       title_size: :base
     ) %>
 
     <%= render Ui::WidgetCardComponent.new(
       eyebrow: "User-visible",
-      title: visible_active_count.to_s,
-      description: "Visible templates currently available to signed-in users.",
-      badge: visible_active_count.positive? ? "Live" : "Hidden",
-      badge_classes: ui_badge_classes(visible_active_count.positive? ? :success : :neutral),
+      title: active_count.to_s,
+      description: "Visible templates currently available to signed-in users within the active filter set.",
+      badge: active_count.positive? ? "Live" : "Hidden",
+      badge_classes: ui_badge_classes(active_count.positive? ? :success : :neutral),
       title_size: :base
     ) %>
 
     <%= render Ui::WidgetCardComponent.new(
       eyebrow: "Layout families",
-      title: visible_family_count.to_s,
-      description: "Distinct template families represented in the visible result set.",
-      badge: visible_card_shell_count.positive? ? "#{visible_card_shell_count} card shells" : "Flat only",
+      title: family_count.to_s,
+      description: "Distinct template families represented in the active filter set.",
+      badge: card_shell_count.positive? ? "#{card_shell_count} card shells" : "Flat only",
       badge_classes: ui_badge_classes(:neutral),
       title_size: :base
     ) %>
 
     <%= render Ui::WidgetCardComponent.new(
       eyebrow: "Sidebar layouts",
-      title: visible_sidebar_layout_count.to_s,
-      description: "Visible templates that split secondary sections into a dedicated sidebar.",
-      badge: visible_sidebar_layout_count.positive? ? "Varied" : "Single column",
-      badge_classes: ui_badge_classes(visible_sidebar_layout_count.positive? ? :success : :neutral),
+      title: sidebar_layout_count.to_s,
+      description: "Templates in the active filter set that split secondary sections into a dedicated sidebar.",
+      badge: sidebar_layout_count.positive? ? "Varied" : "Single column",
+      badge_classes: ui_badge_classes(sidebar_layout_count.positive? ? :success : :neutral),
       title_size: :base
     ) %>
   </div>

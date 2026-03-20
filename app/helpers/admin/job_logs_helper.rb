@@ -106,7 +106,24 @@ module Admin::JobLogsHelper
     return if reference.blank?
 
     @job_log_related_error_logs ||= {}
-    @job_log_related_error_logs[reference] ||= ErrorLog.find_by(reference_id: reference)
+    return @job_log_related_error_logs[reference] if @job_log_related_error_logs.key?(reference)
+
+    @job_log_related_error_logs[reference] = ErrorLog.find_by(reference_id: reference)
+  end
+
+  def job_log_related_error_description(job_log)
+    related_error_log = job_log_related_error_log(job_log)
+    related_error_reference = job_log_related_error_reference(job_log)
+
+    if related_error_log.present?
+      "Captured error log is available for full context and backtrace review."
+    elsif related_error_reference.present?
+      "Reference was recorded, but no matching error log is currently available."
+    elsif job_log.failed?
+      "This failed job did not capture a linked error reference."
+    else
+      "No related error reference was captured for this job log."
+    end
   end
 
   def formatted_debug_payload(value)

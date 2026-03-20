@@ -1,12 +1,12 @@
 <div class="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
   <div class="space-y-4">
     <%= render Ui::PageHeaderComponent.new(
-      eyebrow: "Create your workspace",
-      title: "Start with a draft you can shape right away.",
-      description: "New accounts get a starter resume so you can begin editing without extra setup.",
+      eyebrow: t("registrations.new.page_header.eyebrow"),
+      title: t("registrations.new.page_header.title"),
+      description: t("registrations.new.page_header.description"),
       badges: [
-        { label: "Starter draft", tone: :neutral },
-        { label: "Live preview", tone: :neutral }
+        { label: t("registrations.new.page_header.badges.starter_draft"), tone: :neutral },
+        { label: t("registrations.new.page_header.badges.live_preview"), tone: :neutral }
       ],
       density: :compact
     ) %>
@@ -14,14 +14,14 @@
     <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm) do %>
       <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
       <div class="relative space-y-3">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Included on day one</p>
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t("registrations.new.included_eyebrow") %></p>
 
         <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
           <div class="flex items-start gap-3">
             <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
             <div>
-              <p class="text-sm font-semibold text-ink-950">Starter draft included</p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80">You will land in a workspace with a resume draft ready to edit, preview, and refine.</p>
+              <p class="text-sm font-semibold text-ink-950"><%= t("registrations.new.starter_draft.title") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("registrations.new.starter_draft.description") %></p>
             </div>
           </div>
         </div>
@@ -30,8 +30,8 @@
           <div class="flex items-start gap-3">
             <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
             <div>
-              <p class="text-sm font-semibold text-ink-950">Change layouts later</p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80">Your content stays reusable, so you can switch templates without starting over.</p>
+              <p class="text-sm font-semibold text-ink-950"><%= t("registrations.new.change_layouts.title") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("registrations.new.change_layouts.description") %></p>
             </div>
           </div>
         </div>
@@ -46,10 +46,10 @@
     <div class="relative mb-6">
       <span class="atelier-pill">
         <%= render Ui::GlyphComponent.new(name: :swatches, size: :xs, tone: :minimal) %>
-        Workspace setup
+        <%= t("registrations.new.form.pill") %>
       </span>
-      <h2 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950">Create account</h2>
-      <p class="mt-3 text-sm leading-6 text-ink-700/80">Use your email and a secure password to create your workspace.</p>
+      <h2 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950"><%= t("registrations.new.form.title") %></h2>
+      <p class="mt-3 text-sm leading-6 text-ink-700/80"><%= t("registrations.new.form.description") %></p>
     </div>
 
     <%= form_with model: @user, url: registration_path, class: "relative space-y-5" do |form| %>
@@ -82,7 +82,7 @@
             data-action="password-field#toggle"
             data-password-field-target="toggle"></button>
         </div>
-        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint">Caps lock is on.</p>
+        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint"><%= t("registrations.new.form.caps_lock_hint") %></p>
       </div>
 
       <div data-controller="password-field">
@@ -103,16 +103,21 @@
             data-action="password-field#toggle"
             data-password-field-target="toggle"></button>
         </div>
-        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint">Caps lock is on.</p>
+        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint"><%= t("registrations.new.form.caps_lock_hint") %></p>
       </div>
 
-      <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-        <p class="text-sm leading-6 text-ink-700/80">We use your email for sign in and account recovery. You can keep building after signup without any extra setup steps.</p>
+      <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'space-y-3'].join(' ') %>">
+        <p class="text-sm font-semibold text-ink-950"><%= t("registrations.new.form.what_you_get_title") %></p>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("registrations.new.form.what_you_get_description") %></p>
+        <div class="flex flex-wrap gap-2">
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("registrations.new.form.badges.starter_draft_included") %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("registrations.new.form.badges.switch_templates_later") %></span>
+        </div>
       </div>
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <%= form.submit "Create workspace", class: ui_button_classes(:primary) %>
-        <p class="text-sm text-ink-700/70">Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-ink-950 underline decoration-canvas-300 underline-offset-4" %></p>
+      <div class="space-y-3">
+        <%= form.submit t("registrations.new.form.submit"), class: "#{ui_button_classes(:primary)} w-full sm:w-auto" %>
+        <p class="text-sm leading-6 text-ink-700/70"><%= t("registrations.new.form.already_have_account") %> <%= link_to t("registrations.new.form.sign_in"), new_session_path, class: "font-medium text-ink-950 underline decoration-canvas-300 underline-offset-4" %></p>
       </div>
     <% end %>
   <% end %>

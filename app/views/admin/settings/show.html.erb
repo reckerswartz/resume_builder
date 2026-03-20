@@ -17,6 +17,7 @@
      { id: "llm-orchestration", label: "LLM orchestration", caption: "Generation and verification workflows" }
    ] %>
 <% workflow_ready_count = [text_primary_model.present?, vision_primary_model.present?].count(true) %>
+<% save_posture_ready = workflow_ready_count == 2 && configured_cloud_import_provider_count == cloud_import_provider_states.size %>
 
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
@@ -88,11 +89,13 @@
               <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
               Workflow readiness
             </span>
+            <span class="<%= ui_badge_classes(save_posture_ready ? :success : :warning) %>"><%= save_posture_ready ? "Ready to save" : "Follow-up before save" %></span>
             <span class="<%= ui_badge_classes(workflow_ready_count == 2 ? :success : :warning) %>"><%= workflow_ready_count %>/2 workflows assigned</span>
             <span class="<%= ui_badge_classes(configured_cloud_import_provider_count == cloud_import_provider_states.size ? :success : :warning) %>"><%= configured_cloud_import_provider_count %>/<%= cloud_import_provider_states.size %> connectors configured</span>
           </div>
 
           <p class="text-sm leading-6 text-ink-700/80">Use provider and model management pages for registry changes, then return here to wire the active platform workflows and rollout defaults.</p>
+          <p class="text-sm leading-6 text-ink-700/80">Keep save posture light and explicit: review readiness badges here, then use the sticky action bar to apply changes once the grouped controls look right.</p>
         </div>
       <% end %>
 
@@ -347,10 +350,13 @@
       <% end %>
 
       <%= render Ui::StickyActionBarComponent.new(
-        title: "Platform settings",
-        description: "Save changes when you are ready. Feature flags and role assignments update immediately for admin-controlled workflows.",
+        title: "Review save posture",
+        description: "Save changes when the grouped controls look right. Feature flags and role assignments update immediately for admin-controlled workflows.",
         density: :compact
       ) do %>
+        <span class="<%= ui_badge_classes(save_posture_ready ? :success : :warning) %>"><%= save_posture_ready ? "Ready to save" : "Follow-up before save" %></span>
+        <span class="<%= ui_badge_classes(workflow_ready_count == 2 ? :success : :warning) %>"><%= workflow_ready_count %>/2 workflows assigned</span>
+        <span class="<%= ui_badge_classes(configured_cloud_import_provider_count == cloud_import_provider_states.size ? :success : :warning) %>"><%= configured_cloud_import_provider_count %>/<%= cloud_import_provider_states.size %> connectors configured</span>
         <%= link_to "Manage providers", admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
         <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
         <%= form.submit "Save settings", class: ui_button_classes(:primary) %>

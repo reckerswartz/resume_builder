@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_20_125500) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_20_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -155,6 +155,64 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_20_125500) do
     t.index ["slug"], name: "index_llm_providers_on_slug", unique: true
   end
 
+  create_table "photo_assets", force: :cascade do |t|
+    t.string "asset_kind", default: "source", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "photo_profile_id", null: false
+    t.bigint "source_asset_id"
+    t.string "status", default: "uploaded", null: false
+    t.datetime "updated_at", null: false
+    t.index ["photo_profile_id", "asset_kind"], name: "index_photo_assets_on_photo_profile_id_and_asset_kind"
+    t.index ["photo_profile_id"], name: "index_photo_assets_on_photo_profile_id"
+    t.index ["source_asset_id"], name: "index_photo_assets_on_source_asset_id"
+    t.index ["status"], name: "index_photo_assets_on_status"
+  end
+
+  create_table "photo_processing_runs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "error_summary"
+    t.datetime "finished_at"
+    t.jsonb "input_asset_ids", default: [], null: false
+    t.bigint "job_log_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.text "next_step_guidance"
+    t.jsonb "output_asset_ids", default: [], null: false
+    t.bigint "photo_profile_id", null: false
+    t.text "prompt_text"
+    t.jsonb "request_payload", default: {}, null: false
+    t.jsonb "response_payload", default: {}, null: false
+    t.bigint "resume_id"
+    t.jsonb "selected_model_ids", default: [], null: false
+    t.datetime "started_at"
+    t.string "status", default: "queued", null: false
+    t.bigint "template_id"
+    t.datetime "updated_at", null: false
+    t.string "workflow_type", null: false
+    t.index ["created_at"], name: "index_photo_processing_runs_on_created_at"
+    t.index ["job_log_id"], name: "index_photo_processing_runs_on_job_log_id"
+    t.index ["photo_profile_id"], name: "index_photo_processing_runs_on_photo_profile_id"
+    t.index ["resume_id"], name: "index_photo_processing_runs_on_resume_id"
+    t.index ["status"], name: "index_photo_processing_runs_on_status"
+    t.index ["template_id"], name: "index_photo_processing_runs_on_template_id"
+    t.index ["workflow_type"], name: "index_photo_processing_runs_on_workflow_type"
+  end
+
+  create_table "photo_profiles", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.text "notes"
+    t.jsonb "preferences", default: {}, null: false
+    t.bigint "selected_source_photo_asset_id"
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["selected_source_photo_asset_id"], name: "index_photo_profiles_on_selected_source_photo_asset_id"
+    t.index ["status"], name: "index_photo_profiles_on_status"
+    t.index ["user_id", "name"], name: "index_photo_profiles_on_user_id_and_name"
+    t.index ["user_id"], name: "index_photo_profiles_on_user_id"
+  end
+
   create_table "platform_settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.jsonb "feature_flags", default: {}, null: false
@@ -164,12 +222,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_20_125500) do
     t.index ["name"], name: "index_platform_settings_on_name", unique: true
   end
 
+  create_table "resume_photo_selections", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "photo_asset_id", null: false
+    t.bigint "resume_id", null: false
+    t.string "slot_name", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "template_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["photo_asset_id"], name: "index_resume_photo_selections_on_photo_asset_id"
+    t.index ["resume_id", "template_id", "slot_name"], name: "index_resume_photo_selections_on_resume_template_slot", unique: true
+    t.index ["resume_id"], name: "index_resume_photo_selections_on_resume_id"
+    t.index ["template_id"], name: "index_resume_photo_selections_on_template_id"
+  end
+
   create_table "resumes", force: :cascade do |t|
     t.jsonb "contact_details", default: {}, null: false
     t.datetime "created_at", null: false
     t.string "headline"
     t.jsonb "intake_details", default: {}, null: false
     t.jsonb "personal_details", default: {}, null: false
+    t.bigint "photo_profile_id"
     t.jsonb "settings", default: {}, null: false
     t.string "slug", null: false
     t.string "source_mode", default: "scratch", null: false
@@ -179,6 +252,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_20_125500) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["photo_profile_id"], name: "index_resumes_on_photo_profile_id"
     t.index ["template_id"], name: "index_resumes_on_template_id"
     t.index ["user_id", "slug"], name: "index_resumes_on_user_id_and_slug", unique: true
     t.index ["user_id"], name: "index_resumes_on_user_id"
@@ -236,6 +310,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_20_125500) do
   add_foreign_key "llm_interactions", "users"
   add_foreign_key "llm_model_assignments", "llm_models"
   add_foreign_key "llm_models", "llm_providers"
+  add_foreign_key "photo_assets", "photo_assets", column: "source_asset_id"
+  add_foreign_key "photo_assets", "photo_profiles"
+  add_foreign_key "photo_processing_runs", "job_logs"
+  add_foreign_key "photo_processing_runs", "photo_profiles"
+  add_foreign_key "photo_processing_runs", "resumes"
+  add_foreign_key "photo_processing_runs", "templates"
+  add_foreign_key "photo_profiles", "photo_assets", column: "selected_source_photo_asset_id"
+  add_foreign_key "photo_profiles", "users"
+  add_foreign_key "resume_photo_selections", "photo_assets"
+  add_foreign_key "resume_photo_selections", "resumes"
+  add_foreign_key "resume_photo_selections", "templates"
+  add_foreign_key "resumes", "photo_profiles"
   add_foreign_key "resumes", "templates"
   add_foreign_key "resumes", "users"
   add_foreign_key "sections", "resumes"

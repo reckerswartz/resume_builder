@@ -18,6 +18,7 @@ class Admin::JobLogsController < Admin::BaseController
     @total_pages = table_total_pages(total_count: @total_count, per_page: PAGE_SIZE)
     @current_page = table_current_page(total_pages: @total_pages)
     @job_logs = scope.sorted_for_admin(@sort, @direction).offset((@current_page - 1) * PAGE_SIZE).limit(PAGE_SIZE)
+    preload_related_error_logs(@job_logs)
   end
 
   def show
@@ -43,6 +44,14 @@ class Admin::JobLogsController < Admin::BaseController
   private
     def set_job_log
       @job_log = policy_scope(JobLog).find(params[:id])
+    end
+
+    def preload_related_error_logs(job_logs)
+      references = job_logs.filter_map { |job_log| job_log.error_details["reference_id"].presence }.uniq
+      return @job_log_related_error_logs = {} if references.empty?
+
+      loaded_error_logs = policy_scope(ErrorLog).where(reference_id: references).index_by(&:reference_id)
+      @job_log_related_error_logs = references.index_with { |reference| loaded_error_logs[reference] }
     end
 
     def handle_control_result(result)

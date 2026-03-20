@@ -65,14 +65,14 @@ module Admin::TemplatesHelper
   end
 
   def template_headshot_metadata_label(template)
-    template_layout_metadata(template).fetch(:supports_headshot) ? "Enabled" : "Disabled"
+    template_layout_metadata(template).fetch(:supports_headshot) ? "Supported" : "Fallback only"
   end
 
   def template_headshot_metadata_description(template)
     if template_layout_metadata(template).fetch(:supports_headshot)
-      "Internal-only planning flag is on. Public gallery, picker, and renderer flows still do not advertise headshot support until a truthful layout ships."
+      "This template can render an uploaded resume headshot in the live preview and PDF export. Drafts without a photo still fall back safely to the non-photo identity treatment."
     else
-      "Internal-only planning flag is off. Public gallery, picker, and renderer flows continue to omit headshot promises for this template."
+      "This template keeps its non-photo identity treatment even when a resume has a headshot attached."
     end
   end
 

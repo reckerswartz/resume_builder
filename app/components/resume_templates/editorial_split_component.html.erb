@@ -1,0 +1,194 @@
+<div class="mx-auto w-full max-w-5xl text-slate-900">
+  <div class="grid gap-5 lg:grid-cols-[3.25rem_minmax(0,1fr)_5rem]">
+    <aside class="hidden lg:flex flex-col items-center justify-between rounded-[2rem] bg-slate-900 px-2 py-6 text-[0.58rem] font-medium uppercase tracking-[0.45em] text-white">
+      <span class="[writing-mode:vertical-rl] rotate-180 opacity-75">2 pages · A4 &amp; US letter</span>
+      <span class="h-16 w-px bg-white/20"></span>
+      <span class="[writing-mode:vertical-rl] rotate-180"><%= template.name %></span>
+    </aside>
+
+    <div class="rounded-[2rem] bg-slate-100/90 p-4 sm:p-6">
+      <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_4.5rem]">
+        <article class="overflow-hidden rounded-[1.8rem] bg-white px-6 py-6 shadow-[0_20px_65px_rgba(15,23,42,0.08)] sm:px-8 sm:py-8">
+          <p class="sr-only"><%= full_name %></p>
+          <header class="grid gap-6 border-b border-slate-100 pb-6 sm:grid-cols-[7.5rem_minmax(0,1fr)]">
+            <div class="relative flex h-28 w-28 items-end overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-950 p-4 shadow-sm">
+              <% if headshot_attached? %>
+                <%= image_tag headshot_data_url, alt: headshot_alt_text, class: "absolute inset-0 h-full w-full object-cover" %>
+                <span class="absolute inset-y-0 right-0 w-5 bg-slate-950/30"></span>
+                <span class="absolute inset-x-0 top-0 h-1.5" style="background-color: <%= accent_color %>;"></span>
+              <% else %>
+                <span class="absolute inset-y-0 right-0 w-1/2" style="background-color: <%= accent_color %>;"></span>
+                <span class="absolute inset-x-0 top-0 h-1.5" style="background-color: <%= accent_color %>;"></span>
+                <span class="relative text-3xl font-semibold tracking-[0.18em] text-white"><%= identity_initials %></span>
+              <% end %>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500"><%= leading_name.upcase %></p>
+              <div class="mt-2 flex flex-wrap items-end gap-x-3 gap-y-2">
+                <span class="text-3xl font-light uppercase tracking-[0.45em] text-slate-950 sm:text-4xl"><%= accent_name.upcase %></span>
+                <% if trailing_name.present? %>
+                  <span class="text-lg font-light uppercase tracking-[0.35em] text-slate-700"><%= trailing_name.upcase %></span>
+                <% end %>
+              </div>
+
+              <% if resume.headline.present? %>
+                <p class="mt-3 text-[0.68rem] font-medium uppercase tracking-[0.38em] text-slate-400"><%= resume.headline %></p>
+              <% end %>
+
+              <% if header_contact_items.any? %>
+                <div class="mt-4 space-y-1.5">
+                  <% header_contact_items.each do |label, value| %>
+                    <p class="text-sm text-slate-600"><span class="font-semibold uppercase tracking-[0.18em] text-slate-900"><%= label %></span> · <%= value %></p>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </header>
+
+          <div class="grid gap-8 pt-6 sm:grid-cols-[10.5rem_minmax(0,1fr)]">
+            <aside class="space-y-8">
+              <% sidebar_sections.each do |section| %>
+                <% entries = section_entries(section) %>
+                <section>
+                  <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em]" style="color: <%= accent_color %>;"><%= section.title %></h2>
+
+                  <% if section.section_type == "skills" %>
+                    <ul class="mt-3 space-y-2">
+                      <% entries.each do |entry| %>
+                        <li class="text-sm leading-6 text-slate-700">
+                          <span class="font-medium text-slate-900"><%= value_for(entry, "name") %></span>
+                          <% if value_for(entry, "level").present? %>
+                            <span class="text-slate-400"> · <%= value_for(entry, "level") %></span>
+                          <% end %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <div class="mt-3 space-y-4">
+                      <% entries.each do |entry| %>
+                        <% subtitle = entry_subtitle(entry) %>
+                        <% date_range = date_range_for(entry) %>
+                        <% preview_paragraph = entry_body_paragraphs(entry).first %>
+                        <article class="space-y-1.5">
+                          <h3 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900"><%= entry_title(entry) %></h3>
+                          <% if subtitle.present? %>
+                            <p class="text-xs leading-5 text-slate-500"><%= subtitle %></p>
+                          <% end %>
+                          <% if date_range.present? %>
+                            <p class="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-slate-400"><%= date_range %></p>
+                          <% end %>
+                          <% if preview_paragraph.present? %>
+                            <p class="text-sm leading-6 text-slate-700"><%= preview_paragraph %></p>
+                          <% end %>
+                        </article>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </section>
+              <% end %>
+            </aside>
+
+            <div class="space-y-8">
+              <% if resume.summary.present? %>
+                <section>
+                  <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em]" style="color: <%= accent_color %>;">Profile</h2>
+                  <p class="mt-3 text-sm leading-7 text-slate-700"><%= resume.summary %></p>
+                </section>
+              <% end %>
+
+              <% main_sections.each do |section| %>
+                <% entries = section_entries(section) %>
+                <section>
+                  <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em]" style="color: <%= accent_color %>;"><%= section.title %></h2>
+
+                  <div class="mt-3 space-y-5">
+                    <% entries.each do |entry| %>
+                      <% subtitle = entry_subtitle(entry) %>
+                      <% date_range = date_range_for(entry) %>
+                      <% location = entry_location(entry) %>
+                      <% highlights = entry_highlights(entry) %>
+                      <% url = entry_url(entry) %>
+                      <article class="border-t border-slate-100 pt-4 first:border-t-0 first:pt-0">
+                        <% if date_range.present? %>
+                          <p class="text-[0.68rem] font-medium uppercase tracking-[0.32em]" style="color: <%= accent_color %>;"><%= date_range %></p>
+                        <% end %>
+
+                        <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <h3 class="text-base font-semibold uppercase tracking-[0.12em] text-slate-900"><%= entry_title(entry) %></h3>
+                            <% if subtitle.present? %>
+                              <p class="mt-1 text-sm leading-6 text-slate-600"><%= subtitle %></p>
+                            <% end %>
+                          </div>
+
+                          <% if location.present? %>
+                            <p class="text-sm uppercase tracking-[0.24em] text-slate-400 sm:text-right"><%= location %></p>
+                          <% end %>
+                        </div>
+
+                        <% entry_body_paragraphs(entry).each do |paragraph| %>
+                          <p class="mt-3 text-sm leading-7 text-slate-700"><%= paragraph %></p>
+                        <% end %>
+
+                        <% if highlights.any? %>
+                          <ul class="mt-3 space-y-2 text-sm leading-7 text-slate-700">
+                            <% highlights.each do |highlight| %>
+                              <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
+                            <% end %>
+                          </ul>
+                        <% end %>
+
+                        <% if url.present? %>
+                          <p class="mt-3 text-xs uppercase tracking-[0.24em] text-slate-400"><%= url %></p>
+                        <% end %>
+                      </article>
+                    <% end %>
+                  </div>
+                </section>
+              <% end %>
+            </div>
+          </div>
+        </article>
+
+        <aside class="hidden lg:flex flex-col items-center pt-3">
+          <div class="flex flex-col items-center gap-3">
+            <% utility_badges.each do |label, caption| %>
+              <div class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-slate-950 text-white shadow-[0_18px_32px_rgba(15,23,42,0.16)]">
+                <span class="text-base font-semibold uppercase tracking-[0.12em]"><%= label %></span>
+                <span class="mt-1 text-[0.45rem] uppercase tracking-[0.22em] text-white/60"><%= caption %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <% if rail_contact_items.any? %>
+            <span class="mt-5 h-16 w-px bg-slate-300"></span>
+
+            <div class="mt-5 flex flex-col items-center gap-3">
+              <% rail_contact_items.each do |label, _value| %>
+                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white/95 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-[0_10px_18px_rgba(15,23,42,0.08)]"><%= contact_badge_label(label) %></div>
+              <% end %>
+            </div>
+          <% end %>
+        </aside>
+      </div>
+    </div>
+
+    <aside class="flex flex-wrap items-center gap-3 lg:hidden">
+      <% utility_badges.each do |label, caption| %>
+        <div class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-slate-950 text-white shadow-[0_18px_32px_rgba(15,23,42,0.16)]">
+          <span class="text-base font-semibold uppercase tracking-[0.12em]"><%= label %></span>
+          <span class="mt-1 text-[0.45rem] uppercase tracking-[0.22em] text-white/60"><%= caption %></span>
+        </div>
+      <% end %>
+
+      <% if rail_contact_items.any? %>
+        <span class="h-8 w-px bg-slate-300"></span>
+
+        <% rail_contact_items.each do |label, _value| %>
+          <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white/95 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-[0_10px_18px_rgba(15,23,42,0.08)]"><%= contact_badge_label(label) %></div>
+        <% end %>
+      <% end %>
+    </aside>
+  </div>
+</div>

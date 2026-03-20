@@ -2,12 +2,8 @@
   <%= render Ui::PageHeaderComponent.new(
     eyebrow: "Admin",
     title: "New template",
-    description: "Create a template configuration that can be selected in the resume builder.",
+    description: "Register a template and its layout defaults before exposing it in the gallery.",
     density: :compact,
-    badges: [
-      { label: "Shared renderer", tone: :neutral },
-      { label: "Setup flow", tone: :neutral }
-    ],
     actions: [
       { label: "Back to templates", path: admin_templates_path, style: :secondary }
     ]

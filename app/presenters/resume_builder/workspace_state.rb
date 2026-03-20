@@ -8,7 +8,7 @@ module ResumeBuilder
 
     def page_header_attributes
       {
-        eyebrow: "Guided builder",
+        eyebrow: I18n.t("resume_builder.workspace_state.page_header.eyebrow"),
         title: resume.title,
         description: description,
         badges: badges,
@@ -18,20 +18,20 @@ module ResumeBuilder
     end
 
     def description
-      resume.headline.presence || "Work through each step for #{primary_identity} while the preview stays visible."
+      resume.headline.presence || I18n.t("resume_builder.workspace_state.page_header.description", identity: primary_identity)
     end
 
     def badges
       @badges ||= [
         { label: resume.template.name, tone: :neutral },
-        { label: "#{builder_state.completed_steps_count}/#{builder_state.total_steps} steps ready", tone: :neutral }
+        { label: I18n.t("resume_builder.workspace_state.page_header.steps_ready", completed: builder_state.completed_steps_count, total: builder_state.total_steps), tone: :neutral }
       ]
     end
 
     def actions
       @actions ||= [
-        { label: "Back to workspace", path: view_context.resumes_path, style: :secondary },
-        { label: "Open preview", path: view_context.resume_path(resume, step: current_step_key), style: :primary }
+        { label: I18n.t("resume_builder.workspace_state.page_header.back_to_workspace"), path: view_context.resumes_path, style: :secondary },
+        { label: I18n.t("resume_builder.workspace_state.page_header.open_preview"), path: view_context.resume_path(resume, step: current_step_key), style: :primary }
       ]
     end
 

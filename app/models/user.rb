@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :llm_interactions, dependent: :destroy
+  has_many :photo_profiles, dependent: :destroy
+  has_many :photo_assets, through: :photo_profiles
+  has_many :photo_processing_runs, through: :photo_profiles
   has_many :resumes, dependent: :destroy
   has_many :sessions, dependent: :destroy
 

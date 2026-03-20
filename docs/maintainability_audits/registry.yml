@@ -1,0 +1,78 @@
+version: 1
+updated_at: "2026-03-20T23:30:00Z"
+workflow:
+  status: ready
+  path: ".windsurf/workflows/maintainability-audit.md"
+  default_mode: implement-next
+  default_batch_size: 1
+tracking:
+  overview_path: "docs/maintainability_audits/README.md"
+  area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
+  run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-20-admin-settings-update-orchestration/00-overview.md"
+area_statuses:
+  - new
+  - reviewed
+  - in_progress
+  - improved
+  - deferred
+  - closed
+run_modes:
+  - review-only
+  - implement-next
+  - re-review
+  - close-area
+priorities:
+  - high
+  - medium
+  - low
+categories:
+  - controller
+  - model
+  - service
+  - query
+  - presenter
+  - helper
+  - component
+  - view
+  - job
+  - policy
+  - mixed
+areas:
+  - area_key: "resumes-controller-draft-building"
+    title: "Resumes controller builder flow cleanup"
+    path: "app/controllers/resumes_controller.rb"
+    category: "controller"
+    priority: "high"
+    status: "closed"
+    reasons:
+      - "Draft defaults are assembled in more than one controller path."
+      - "The controller already owns a broad resume setup and update surface."
+    recommended_refactor_shape: "reduce_controller_scope"
+    area_doc_path: "docs/maintainability_audits/areas/resumes-controller-draft-building.md"
+    open_follow_up_keys: []
+    closed_follow_up_keys:
+      - "extract-draft-builder-service"
+      - "reduce-update-response-branching"
+      - "centralize-controller-feedback-copy"
+    last_reviewed_at: "2026-03-20T22:59:00Z"
+    last_changed_at: "2026-03-20T22:59:00Z"
+    next_step: "Review Admin::SettingsController#update as the next likely maintainability slice, focusing on transaction/orchestration responsibilities and inline success handling."
+  - area_key: "admin-settings-update-orchestration"
+    title: "Admin settings update orchestration"
+    path: "app/controllers/admin/settings_controller.rb"
+    category: "controller"
+    priority: "high"
+    status: "improved"
+    reasons:
+      - "The update action owns a cross-model transaction and workflow orchestration inline."
+      - "Success and failure handling currently depend on mutable controller-local state and merged errors."
+    recommended_refactor_shape: "extract_service"
+    area_doc_path: "docs/maintainability_audits/areas/admin-settings-update-orchestration.md"
+    open_follow_up_keys:
+      - "extract-settings-page-state"
+    closed_follow_up_keys:
+      - "extract-settings-update-service"
+    last_reviewed_at: "2026-03-20T23:30:00Z"
+    last_changed_at: "2026-03-20T23:30:00Z"
+    next_step: "Reassess whether the heavy inline page-state setup in app/views/admin/settings/show.html.erb should move into a presenter/helper-backed object next."

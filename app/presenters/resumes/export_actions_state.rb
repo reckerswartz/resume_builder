@@ -19,13 +19,13 @@ module Resumes
         if resume.pdf_export.attached?
           [
             {
-              label: "Download PDF",
+              label: I18n.t("resumes.export_actions_state.actions.download_pdf"),
               path: view_context.download_resume_path(resume),
               style: :secondary,
               options: { data: { turbo_frame: "_top" } }
             },
             {
-              label: "Download TXT",
+              label: I18n.t("resumes.export_actions_state.actions.download_text"),
               path: view_context.download_text_resume_path(resume),
               style: :secondary,
               options: { data: { turbo_frame: "_top" } }
@@ -34,13 +34,13 @@ module Resumes
         else
           [
             {
-              label: "Export PDF",
+              label: I18n.t("resumes.export_actions_state.actions.export_pdf"),
               path: view_context.export_resume_path(resume),
               method: :post,
               style: :secondary
             },
             {
-              label: "Download TXT",
+              label: I18n.t("resumes.export_actions_state.actions.download_text"),
               path: view_context.download_text_resume_path(resume),
               style: :secondary,
               options: { data: { turbo_frame: "_top" } }
@@ -52,7 +52,7 @@ module Resumes
       def finalize_actions
         actions = [
           {
-            label: "Export PDF",
+            label: I18n.t("resumes.export_actions_state.actions.export_pdf"),
             path: view_context.export_resume_path(resume, **view_context.resume_builder_step_params("finalize")),
             method: :post,
             style: :secondary
@@ -61,7 +61,7 @@ module Resumes
 
         if resume.pdf_export.attached?
           actions << {
-            label: "Download PDF",
+            label: I18n.t("resumes.export_actions_state.actions.download_pdf"),
             path: view_context.download_resume_path(resume),
             style: :primary,
             options: { data: { turbo_frame: "_top" } }
@@ -69,7 +69,7 @@ module Resumes
         end
 
         actions << {
-          label: "Download TXT",
+          label: I18n.t("resumes.export_actions_state.actions.download_text"),
           path: view_context.download_text_resume_path(resume),
           style: :secondary,
           options: { data: { turbo_frame: "_top" } }

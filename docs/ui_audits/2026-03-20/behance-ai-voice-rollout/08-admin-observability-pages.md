@@ -7,6 +7,7 @@
 - Shared page header, filters, async table shell, badges, and empty states inherit the new white-canvas management style.
 - The job-log registry now uses a tighter filter shell, compact lookup/runtime overview panels, and named `ink/canvas/mist` table rhythm so queue state scans before row actions.
 - Status, queue, and runtime data now stay compact while still surfacing backlog, failed queue rows, and stale-running follow-up.
+- Job rows now keep related error references inline, including linked-error affordances and fallback guidance when failed jobs did not capture a matching error record.
 
 ### Still update / verify
 

@@ -1,7 +1,7 @@
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
   before_action :set_user_by_token, only: %i[ edit update ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: "Try again later." }
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: I18n.t("passwords.controller.rate_limit_exceeded") }
 
   def new
   end
@@ -11,7 +11,7 @@ class PasswordsController < ApplicationController
       PasswordsMailer.reset(user).deliver_later
     end
 
-    redirect_to new_session_path, notice: "If that email is in the system, we sent a reset link."
+    redirect_to new_session_path, notice: I18n.t("passwords.controller.reset_sent")
   end
 
   def edit
@@ -20,9 +20,9 @@ class PasswordsController < ApplicationController
   def update
     if @user.update(params.permit(:password, :password_confirmation))
       @user.sessions.destroy_all
-      redirect_to new_session_path, notice: "Your password has been updated. Sign in to continue."
+      redirect_to new_session_path, notice: I18n.t("passwords.controller.updated")
     else
-      @form_error = @user.errors.full_messages.to_sentence.presence || "Check the password fields and try again."
+      @form_error = @user.errors.full_messages.to_sentence.presence || I18n.t("passwords.controller.invalid_fields")
       render :edit, status: :unprocessable_entity
     end
   end
@@ -31,6 +31,6 @@ class PasswordsController < ApplicationController
     def set_user_by_token
       @user = User.find_by_password_reset_token!(params[:token])
     rescue ActiveSupport::MessageVerifier::InvalidSignature
-      redirect_to new_password_path, alert: "Password reset link is invalid or has expired."
+      redirect_to new_password_path, alert: I18n.t("passwords.controller.invalid_or_expired")
     end
 end

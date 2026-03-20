@@ -2,12 +2,8 @@
   <%= render Ui::PageHeaderComponent.new(
     eyebrow: "Admin",
     title: "Edit template",
-    description: "Adjust the shared template configuration used by preview and export rendering.",
+    description: "Update the layout defaults and gallery visibility for this template.",
     density: :compact,
-    badges: [
-      { label: "Shared renderer", tone: :neutral },
-      { label: "Update flow", tone: :neutral }
-    ],
     actions: [
       { label: "View template", path: admin_template_path(@template), style: :secondary }
     ]

@@ -8,6 +8,7 @@
 - Product-style hero through `Ui::HeroHeaderComponent`.
 - White-canvas preview/support panel through `Ui::SurfaceCardComponent`.
 - Shared `atelier-pill`, `atelier-rule`, and `Ui::GlyphComponent` cues now anchor the support panel and product-cue cards.
+- The lower support area now reads as one grouped pre-start canvas with inset answers and tighter reassurance copy instead of a flatter FAQ block.
 
 ### Still update / verify
 
@@ -29,6 +30,7 @@
 - Main form card now uses the new panel vocabulary and micro-label rhythm.
 - Supporting guidance card inherits the same soft-surface treatment.
 - Support items now use `Ui::GlyphComponent` instead of plain bullet text for a more product-facing auth pattern.
+- The password-recovery and account-creation handoffs now sit below the primary submit action so sign-in remains the dominant decision.
 
 ### Still update / verify
 
@@ -48,6 +50,7 @@
 - Shared page header and white-canvas form treatment.
 - Error state now sits inside the new panel system instead of a default CRUD block.
 - Included-on-day-one support items now share the same glyph-backed auth panel treatment as sign-in.
+- Starter-workspace guidance now stays inside one concise advisory panel, while the sign-in handoff remains visually secondary to account creation.
 
 ### Still update / verify
 
@@ -67,6 +70,7 @@
 - Reset request now uses the same panel and micro-label treatment as the rest of auth.
 - CTA and back-link now inherit shared button tokens.
 - Recovery pill now uses the shared `atelier-pill` plus `Ui::GlyphComponent` for the recovery cue.
+- The action stack now keeps the reset submit primary while the return-to-sign-in path stays visually subordinate below it.
 
 ### Still update / verify
 
@@ -85,6 +89,7 @@
 - Shared recovery card treatment and input styling.
 - Serif headline plus micro-label pattern now matches the new public/auth direction.
 - Recovery heading now shares the same atelier pill and glyph treatment as the request step.
+- The reset-save action now stays primary while the refresh-link remains a lighter fallback beneath it.
 
 ### Still update / verify
 

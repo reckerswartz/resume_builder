@@ -9,6 +9,7 @@
 - Metric cards, report rows, empty states, and action buttons inherit the new token layer.
 - The quick-link area now behaves like a true operational rail, with dark emphasis reserved for navigation handoffs and urgent platform context.
 - Activity feeds now keep recent jobs and errors more skimmable by surfacing reference IDs and timestamps before secondary metadata.
+- Operational metrics now sit inside the compact hero summary, so the mid-page scan order stays focused on the shortcut rail and recent activity instead of a second metric strip.
 
 ### Still update / verify
 
@@ -31,6 +32,7 @@
 - The side rail now behaves like a compact control guide with grouped navigation and light status cues rather than another dense configuration column.
 - Configuration guidance and save posture now sit in dedicated advisory canvases, while the main settings sections stay focused on grouped edits.
 - Dense model-role verification controls now use the named `ink/canvas` palette so scan order stays ahead of decoration.
+- The sticky save surface now keeps readiness badges, grouped management links, and the primary save action together in one explicit but lightweight footer.
 
 ### Still update / verify
 

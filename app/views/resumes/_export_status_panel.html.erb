@@ -4,7 +4,7 @@
 <div id="<%= dom_id(resume, "#{context}_export_status") %>">
   <%= render Ui::WidgetCardComponent.new(**export_status_state.widget_attributes) do %>
     <% if export_status_state.download_available? %>
-      <%= link_to "Download PDF", export_status_state.download_path, data: { turbo_frame: "_top" }, class: ui_button_classes(export_status_state.download_button_style, size: :sm) %>
+      <%= link_to t("resumes.export_status_state.actions.download_pdf"), export_status_state.download_path, data: { turbo_frame: "_top" }, class: ui_button_classes(export_status_state.download_button_style, size: :sm) %>
     <% end %>
   <% end %>
 </div>

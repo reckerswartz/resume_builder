@@ -1,0 +1,148 @@
+en:
+  home:
+    index:
+      hero:
+        eyebrow: "Resume builder"
+        title: "Build a polished resume faster."
+        description: "Start from scratch or bring in an existing resume, then keep the preview in view while you refine each section."
+        badges:
+          guided_steps: "Guided steps"
+          live_preview: "Live preview"
+          pdf_export: "PDF export"
+        actions:
+          create_account: "Create account"
+          sign_in: "Sign in"
+      preview_panel:
+        pill: "See how it works"
+        title: "One workspace from first draft to export"
+        description: "Keep your content, preview, and layout decisions together so you can move faster without juggling extra tools."
+        snapshot_label: "Preview snapshot"
+        sample_name: "Alex Morgan"
+        sample_role: "Senior Product Designer"
+        live_badge: "Preview updates live"
+        summary_label: "Summary"
+        summary_text: "Product designer with 8 years of experience turning complex workflows into simple, high-converting product journeys."
+        experience_label: "Experience"
+        experience_text: "Led redesigns that improved conversion and reduced time to complete core tasks."
+        skills_label: "Skills"
+        skills_text: "Product strategy, UX writing, design systems, stakeholder alignment"
+      start_here:
+        eyebrow: "Start here"
+        title: "Three simple ways to begin"
+        description: "Choose the lightest path for your situation and leave the rest for later."
+        cards:
+          scratch:
+            title: "Start from scratch"
+            description: "Open a starter draft and work through the guided steps one section at a time."
+          existing_resume:
+            title: "Bring an existing resume"
+            description: "Paste or upload the resume you already have and reshape it inside the builder."
+          keep_preview:
+            title: "Keep the preview in view"
+            description: "Edit content and watch the layout update before you export the final PDF."
+      common_questions:
+        pill: "Before you start"
+        title: "Common questions"
+        description: "Create the workspace first, then decide whether to import content, switch layouts, or keep shaping the starter draft."
+        questions:
+          design_experience:
+            title: "Do I need design experience?"
+            description: "No. Choose a template, fill in the sections, and adjust the presentation later if you want to."
+          switch_templates:
+            title: "Can I switch templates later?"
+            description: "Yes. Your content stays reusable, so changing layouts does not mean starting over."
+          existing_resume:
+            title: "Can I start from an existing resume?"
+            description: "Yes. After you create your workspace, you can paste text or attach a file before moving into the guided editor."
+      reassurance:
+        eyebrow: "Quick reassurance"
+        title: "One workspace, preview, and export path."
+        description: "Use the guided builder first, then adjust layout and export settings when the content feels ready."
+        badges:
+          no_design_tools: "No design tools required"
+          switch_templates_later: "Switch templates later"
+          export_when_ready: "Export when ready"
+  sessions:
+    controller:
+      rate_limit_exceeded: "Please wait a moment and try again."
+      invalid_credentials: "Try another email address or password."
+      signed_out: "You are signed out."
+    new:
+      page_header:
+        eyebrow: "Welcome back"
+        title: "Pick up where you left off."
+        description: "Open your drafts, keep editing, and export when the resume looks right."
+        badges:
+          saved_drafts: "Saved drafts"
+          live_preview: "Live preview"
+      after_sign_in_eyebrow: "After sign in"
+      return_to_drafts:
+        title: "Return to your drafts"
+        description: "Keep your content, preview, and template choices in one place."
+      switch_layouts:
+        title: "Switch layouts later"
+        description: "Your resume content stays reusable, so you can refine the presentation whenever you need to."
+      form:
+        pill: "Secure sign in"
+        title: "Sign in"
+        description: "Use the email and password for your workspace."
+        help_text: "Need help getting back in? Use the email address you signed up with, or request a password reset below."
+        submit: "Sign in"
+        forgot_password: "Forgot password?"
+        need_account: "Need an account?"
+        create_one: "Create one"
+        caps_lock_hint: "Caps lock is on."
+  registrations:
+    controller:
+      workspace_ready: "Your workspace is ready."
+    new:
+      page_header:
+        eyebrow: "Create your workspace"
+        title: "Start with a draft you can shape right away."
+        description: "New accounts get a starter resume so you can begin editing without extra setup."
+        badges:
+          starter_draft: "Starter draft"
+          live_preview: "Live preview"
+      included_eyebrow: "Included on day one"
+      starter_draft:
+        title: "Starter draft included"
+        description: "You will land in a workspace with a resume draft ready to edit, preview, and refine."
+      change_layouts:
+        title: "Change layouts later"
+        description: "Your content stays reusable, so you can switch templates without starting over."
+      form:
+        pill: "Workspace setup"
+        title: "Create account"
+        description: "Use your email and a secure password to create your workspace."
+        what_you_get_title: "What you get right away"
+        what_you_get_description: "We use your email for sign in and recovery. After signup, you land in a starter workspace with a draft ready to edit."
+        badges:
+          starter_draft_included: "Starter draft included"
+          switch_templates_later: "Switch templates later"
+        submit: "Create workspace"
+        already_have_account: "Already have an account?"
+        sign_in: "Sign in"
+        caps_lock_hint: "Caps lock is on."
+  passwords:
+    controller:
+      rate_limit_exceeded: "Try again later."
+      reset_sent: "If that email is in the system, we sent a reset link."
+      updated: "Your password has been updated. Sign in to continue."
+      invalid_fields: "Check the password fields and try again."
+      invalid_or_expired: "Password reset link is invalid or has expired."
+    shared:
+      recovery_pill: "Account recovery"
+      caps_lock_hint: "Caps lock is on."
+    new:
+      title: "Reset your password"
+      description: "Enter your email address and we will send you a reset link if an account exists."
+      next_title: "What happens next"
+      next_description: "Use the email address tied to your account. If the message does not arrive right away, check your spam folder or request a fresh link."
+      submit: "Send reset link"
+      back_to_sign_in: "Back to sign in"
+    edit:
+      title: "Choose a new password"
+      description: "Set a new password for your account and then sign in again."
+      help_text: "If this link no longer works, request a fresh reset email and try again from the newest message."
+      submit: "Save password"
+      request_new_link: "Request a new link"

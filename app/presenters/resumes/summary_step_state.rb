@@ -13,7 +13,7 @@ module Resumes
     end
 
     def search_placeholder
-      "Search by job title for pre-written examples"
+      I18n.t("resumes.summary_step_state.search_placeholder")
     end
 
     def related_roles
@@ -37,7 +37,7 @@ module Resumes
           role_title: entry.role_label,
           related_roles_text: entry.related_roles.to_sentence,
           expert_recommended: entry.expert_recommended,
-          expert_badge_label: "Expert Recommended",
+          expert_badge_label: I18n.t("resumes.summary_step_state.expert_badge_label"),
           experience_badge_label: experience_badge_label(entry.experience_levels),
           summary: entry.summary
         }
@@ -45,23 +45,22 @@ module Resumes
     end
 
     def results_label
-      count = results.size
-      count == 1 ? "1 summary example" : "#{count} summary examples"
+      I18n.t("resumes.summary_step_state.results_label", count: results.size)
     end
 
     def empty_state_title
-      "No summary examples match yet"
+      I18n.t("resumes.summary_step_state.empty_state_title")
     end
 
     def empty_state_description
-      "Try a nearby title like Product Designer or Backend Engineer, or write your own summary in the editor."
+      I18n.t("resumes.summary_step_state.empty_state_description")
     end
 
     def guidance_message
       if query.present?
-        "Start from the examples closest to #{query.titleize}, then tailor the language to your own experience and results."
+        I18n.t("resumes.summary_step_state.guidance.with_query", query: query.titleize)
       else
-        "Choose a close-fit example, insert it into the summary field, and personalize the wording before you move to finalize."
+        I18n.t("resumes.summary_step_state.guidance.without_query")
       end
     end
 
@@ -88,11 +87,11 @@ module Resumes
         levels = Array(experience_levels)
 
         if levels.any? { |level| %w[no_experience less_than_3_years].include?(level) } && levels.none? { |level| %w[five_to_ten_years ten_plus_years].include?(level) }
-          "Early career"
+          I18n.t("resumes.summary_step_state.experience_badges.early_career")
         elsif levels.any? { |level| %w[five_to_ten_years ten_plus_years].include?(level) }
-          "Mid to senior"
+          I18n.t("resumes.summary_step_state.experience_badges.mid_to_senior")
         else
-          "Growth stage"
+          I18n.t("resumes.summary_step_state.experience_badges.growth_stage")
         end
       end
 

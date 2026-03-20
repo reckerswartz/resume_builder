@@ -14,9 +14,9 @@ module Ui
 
     def wrapper_classes
       if compact?
-        "sticky sticky-action-bar-compact bottom-3 z-10 rounded-[1.25rem] border border-slate-200 bg-white/95 px-4 py-3 shadow-lg shadow-slate-900/5 backdrop-blur-sm sm:px-5"
+        "sticky sticky-action-bar-compact bottom-3 z-10 rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/96 px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:px-5"
       else
-        "sticky bottom-4 z-10 rounded-[1.5rem] border border-slate-200 bg-white/95 p-4 shadow-lg shadow-slate-900/5 backdrop-blur-sm"
+        "sticky bottom-4 z-10 rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/96 p-4 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm"
       end
     end
 
@@ -29,14 +29,14 @@ module Ui
     end
 
     def title_classes
-      "text-sm font-semibold tracking-tight text-slate-900"
+      "text-sm font-semibold tracking-tight text-ink-950"
     end
 
     def description_classes
       if compact?
-        "mt-1 text-sm leading-5 text-slate-500"
+        "mt-1 text-sm leading-6 text-ink-700/80"
       else
-        "mt-1 text-sm text-slate-500"
+        "mt-1 text-sm leading-6 text-ink-700/80"
       end
     end
 

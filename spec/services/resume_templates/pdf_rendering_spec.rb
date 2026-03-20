@@ -1,7 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe 'Resume template PDF rendering' do
-  def build_resume_for(family:, accent_color:)
+  def create_ready_photo_asset(photo_profile:, filename:, asset_kind: :enhanced)
+    PhotoAsset.new(photo_profile:, asset_kind:, status: :ready).tap do |photo_asset|
+      photo_asset.file.attach(io: StringIO.new('image-bytes'), filename:, content_type: 'image/png')
+      photo_asset.save!
+    end
+  end
+
+  def build_resume_for(family:, accent_color:, attach_headshot: false)
     template = create(
       :template,
       name: ResumeTemplates::Catalog.family_label(family),
@@ -63,6 +70,10 @@ RSpec.describe 'Resume template PDF rendering' do
     skills_section = create(:section, resume: resume, title: 'Skills', section_type: 'skills', position: 2)
     create(:entry, section: skills_section, content: { 'name' => 'Ruby on Rails', 'level' => 'Expert' })
 
+    if attach_headshot
+      resume.headshot.attach(io: StringIO.new('image-bytes'), filename: 'headshot.png', content_type: 'image/png')
+    end
+
     resume
   end
 
@@ -70,7 +81,8 @@ RSpec.describe 'Resume template PDF rendering' do
     'ats-minimal' => '#334155',
     'professional' => '#0F4C81',
     'modern-clean' => '#0F766E',
-    'sidebar-accent' => '#4338CA'
+    'sidebar-accent' => '#4338CA',
+    'editorial-split' => '#D7F038'
   }.each do |family, accent_color|
     it "renders #{family} through the shared PDF template" do
       resume = build_resume_for(family: family, accent_color: accent_color)
@@ -86,5 +98,42 @@ RSpec.describe 'Resume template PDF rendering' do
       expect(html).to include('Ruby on Rails')
       expect(html).to include(accent_color)
     end
+  end
+
+  it 'renders an attached headshot for the editorial split family through the shared PDF template' do
+    resume = build_resume_for(family: 'editorial-split', accent_color: '#D7F038', attach_headshot: true)
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    expect(html).to include('Jordan Rivera headshot')
+    expect(html).to include('data:image/png;base64')
+  end
+
+  it 'renders a selected photo-library headshot for the editorial split family through the shared PDF template' do
+    resume = build_resume_for(family: 'editorial-split', accent_color: '#D7F038')
+    photo_profile = PhotoProfile.create!(user: resume.user, name: 'Jordan Rivera Photo Library', status: :active)
+    selected_asset = create_ready_photo_asset(photo_profile:, filename: 'selected-headshot.png')
+
+    resume.update!(photo_profile:)
+    ResumePhotoSelection.create!(
+      resume:,
+      template: resume.template,
+      photo_asset: selected_asset,
+      slot_name: 'headshot',
+      status: :active
+    )
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    expect(html).to include('Jordan Rivera headshot')
+    expect(html).to include('data:image/png;base64')
   end
 end

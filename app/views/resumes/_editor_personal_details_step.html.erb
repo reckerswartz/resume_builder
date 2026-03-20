@@ -1,19 +1,19 @@
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <%= render Ui::StepHeaderComponent.new(
-    title: "Personal details",
-    description: "Add profile links, credentials, and optional personal information only when it is relevant for the role or application."
+    title: current_step.fetch(:title),
+    description: current_step.fetch(:description)
   ) do %>
     <%= render Ui::WidgetCardComponent.new(
-      eyebrow: "Optional step",
-      title: "Skip anything that does not belong on this resume",
-      description: "Most resumes can leave many of these fields blank. Add them only when a role, country, or application asks for them.",
+      eyebrow: t("resumes.editor_personal_details_step.optional_step.eyebrow"),
+      title: t("resumes.editor_personal_details_step.optional_step.title"),
+      description: t("resumes.editor_personal_details_step.optional_step.description"),
       padding: :sm
     ) do %>
       <div class="flex flex-wrap gap-2">
         <% if next_step_path.present? %>
-          <%= link_to "Skip for now", next_step_path, class: ui_button_classes(:secondary, size: :sm) %>
+          <%= link_to t("resumes.editor_personal_details_step.optional_step.skip_for_now"), next_step_path, class: ui_button_classes(:secondary, size: :sm) %>
         <% end %>
-        <%= link_to "Back to heading", edit_resume_path(resume, step: "heading"), class: ui_button_classes(:secondary, size: :sm) %>
+        <%= link_to t("resumes.editor_personal_details_step.optional_step.back_to_heading"), edit_resume_path(resume, step: "heading"), class: ui_button_classes(:secondary, size: :sm) %>
       </div>
     <% end %>
   <% end %>
@@ -27,67 +27,113 @@
 
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
       <div class="space-y-1">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Profile links and credentials</p>
-        <h3 class="text-base font-semibold text-ink-950">Contact details that may still belong near the top of the resume</h3>
-        <p class="text-sm text-slate-500">Use this area for links and credentials that genuinely help a reviewer contact you or verify your background.</p>
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.profile_links.eyebrow") %></p>
+        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.profile_links.title") %></h3>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.profile_links.description") %></p>
       </div>
 
       <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         <div>
-          <%= label_tag "resume_contact_details_website", "Website", class: ui_label_classes %>
+          <%= label_tag "resume_contact_details_website", t("resumes.editor_personal_details_step.labels.website"), class: ui_label_classes %>
           <%= url_field_tag "resume[contact_details][website]", resume.contact_field("website"), class: ui_input_classes %>
         </div>
 
         <div>
-          <%= label_tag "resume_contact_details_linkedin", "LinkedIn", class: ui_label_classes %>
+          <%= label_tag "resume_contact_details_linkedin", t("resumes.editor_personal_details_step.labels.linkedin"), class: ui_label_classes %>
           <%= url_field_tag "resume[contact_details][linkedin]", resume.contact_field("linkedin"), class: ui_input_classes %>
         </div>
 
         <div>
-          <%= label_tag "resume_contact_details_driving_licence", "Driving licence", class: ui_label_classes %>
+          <%= label_tag "resume_contact_details_driving_licence", t("resumes.editor_personal_details_step.labels.driving_licence"), class: ui_label_classes %>
           <%= text_field_tag "resume[contact_details][driving_licence]", resume.contact_field("driving_licence"), class: ui_input_classes %>
         </div>
       </div>
     </div>
 
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>" data-autosave-ignore="true">
+      <div class="space-y-1">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.headshot.eyebrow") %></p>
+        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.headshot.title") %></h3>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.headshot.description") %></p>
+      </div>
+
+      <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
+        <div>
+          <%= form.label :headshot, t("resumes.editor_personal_details_step.headshot.label"), class: ui_label_classes %>
+          <%= form.file_field :headshot,
+            accept: Resume::HEADSHOT_CONTENT_TYPES.join(","),
+            class: ui_input_classes,
+            data: { action: "change->autosave#submitNow" } %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.headshot.upload_hint") %></p>
+        </div>
+
+        <% if resume.headshot.attached? %>
+          <div class="<%= [ui_inset_panel_classes(tone: :default), 'space-y-3'].join(' ') %>">
+            <div>
+              <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.headshot.current_upload_title") %></p>
+              <p class="mt-1 break-all text-sm leading-6 text-ink-700/80"><%= resume.headshot.filename.to_s %></p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= resume.headshot.blob.content_type.presence || t("resumes.editor_personal_details_step.headshot.unknown_type") %></span>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= number_to_human_size(resume.headshot.byte_size) %></span>
+              <% if resume.template.normalized_layout_config.fetch("supports_headshot") %>
+                <span class="<%= ui_badge_classes(:success) %>"><%= t("resumes.editor_personal_details_step.headshot.template_badges.active") %></span>
+              <% else %>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_personal_details_step.headshot.template_badges.fallback") %></span>
+              <% end %>
+            </div>
+
+            <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.headshot.remove_hint") %></p>
+
+            <div>
+              <%= button_tag t("resumes.editor_personal_details_step.headshot.remove_action"), name: "#{form.object_name}[remove_headshot]", value: true, class: ui_button_classes(:secondary, size: :sm) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
       <div class="space-y-1">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Optional personal information</p>
-        <h3 class="text-base font-semibold text-ink-950">Only add fields you are comfortable sharing</h3>
-        <p class="text-sm text-slate-500">Most resumes do not need these details. Add them only when they are expected for the role or application process.</p>
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.personal_information.eyebrow") %></p>
+        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.personal_information.title") %></h3>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.personal_information.description") %></p>
       </div>
 
       <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <div>
-          <%= label_tag "resume_personal_details_date_of_birth", "Date of Birth", class: ui_label_classes %>
+          <%= label_tag "resume_personal_details_date_of_birth", t("resumes.editor_personal_details_step.labels.date_of_birth"), class: ui_label_classes %>
           <%= date_field_tag "resume[personal_details][date_of_birth]", resume.personal_detail_field("date_of_birth"), class: ui_input_classes %>
         </div>
 
         <div>
-          <%= label_tag "resume_personal_details_nationality", "Nationality", class: ui_label_classes %>
+          <%= label_tag "resume_personal_details_nationality", t("resumes.editor_personal_details_step.labels.nationality"), class: ui_label_classes %>
           <%= text_field_tag "resume[personal_details][nationality]", resume.personal_detail_field("nationality"), class: ui_input_classes %>
         </div>
 
         <div>
-          <%= label_tag "resume_personal_details_marital_status", "Marital Status", class: ui_label_classes %>
+          <%= label_tag "resume_personal_details_marital_status", t("resumes.editor_personal_details_step.labels.marital_status"), class: ui_label_classes %>
           <%= text_field_tag "resume[personal_details][marital_status]", resume.personal_detail_field("marital_status"), class: ui_input_classes %>
         </div>
 
         <div>
-          <%= label_tag "resume_personal_details_visa_status", "Visa Status", class: ui_label_classes %>
+          <%= label_tag "resume_personal_details_visa_status", t("resumes.editor_personal_details_step.labels.visa_status"), class: ui_label_classes %>
           <%= text_field_tag "resume[personal_details][visa_status]", resume.personal_detail_field("visa_status"), class: ui_input_classes %>
         </div>
       </div>
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm text-slate-500">Only keep fields that clearly help this application.</p>
+      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.footer_note") %></p>
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
         <% if next_step_path.present? %>
-          <%= link_to "Skip for now", next_step_path, class: ui_button_classes(:secondary) %>
+          <%= link_to t("resumes.editor_personal_details_step.optional_step.skip_for_now"), next_step_path, class: ui_button_classes(:secondary) %>
         <% end %>
-        <%= form.submit "Save personal details", class: ui_button_classes(:primary) %>
+        <%= form.submit t("resumes.editor_personal_details_step.save_personal_details"), class: ui_button_classes(:primary) %>
       </div>
     </div>
   <% end %>
+
+  <%= render "resumes/photo_library", resume: resume %>
 <% end %>

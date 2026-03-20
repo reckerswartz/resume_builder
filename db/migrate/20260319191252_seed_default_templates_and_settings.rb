@@ -114,6 +114,20 @@ class SeedDefaultTemplatesAndSettings < ActiveRecord::Migration[8.1]
             "sidebar_position" => "left",
             "sidebar_section_types" => %w[skills education]
           }
+        },
+        {
+          name: "Editorial Split",
+          slug: "editorial-split",
+          description: "An asymmetric editorial layout with a narrow supporting column, stretched name band, and utility rail inspired by polished design-portfolio resumes.",
+          layout_config: {
+            "family" => "editorial-split",
+            "variant" => "editorial-split",
+            "accent_color" => "#D7F038",
+            "font_scale" => "sm",
+            "density" => "compact",
+            "supports_headshot" => true,
+            "sidebar_section_types" => %w[education skills projects]
+          }
         }
       ]
     end

@@ -29,7 +29,8 @@ Resume Builder is a conventional Rails 8, server-rendered application for creati
 - Use `docs/pdf_export_flow.md` for the export trigger flow, job pipeline, status broadcasting, attachment handling, and current export-time settings behavior
 - Use `docs/ai_suggestions.md` for the AI-assisted entry improvement flow, feature gating, model/provider orchestration, and interaction logging behavior
 - Use `docs/admin_operations.md` for the admin namespace entry points, dashboard responsibilities, queue/error observability, and operational configuration workflows
-- Use `docs/template_rollouts/README.md` for the reusable Behance template rollout workflow, no-duplicate registry rules, and rollout tracking artifacts
+- Use `docs/template_rollouts/README.md` for the reusable Behance capture and implementation workflows, no-duplicate registry rules, and rollout tracking artifacts
+- Use `docs/maintainability_audits/README.md` for the reusable maintainability audit workflow, hotspot registry rules, and timestamped refactor tracking artifacts
 - Use `docs/job_monitoring_and_recovery.md` for the Active Job lifecycle logging, persistent `JobLog` monitoring record, Solid Queue runtime inspection, and admin recovery controls
 
 ## Local setup
@@ -47,13 +48,13 @@ This repository is configured for Windsurf with project guidance and Rails AI sk
 - `AGENTS.md` provides project-specific Rails and architecture guidance for Cascade
 - `.windsurfrules` keeps the existing project rules active in the workspace
 - `.windsurf/skills/` includes the main `rails_ai_agents` skill pack from `ThibautBaissac/rails_ai_agents`
-- `.windsurf/workflows/` provides Windsurf-native slash commands for the core feature-spec, TDD, review, security, RSpec, and template-rollout flows
+- `.windsurf/workflows/` provides Windsurf-native slash commands for the core feature-spec, TDD, review, security, RSpec, maintainability audit, and Behance template rollout/implementation flows
 
 ## Using the installed Windsurf skills
 
 - Ask naturally for Rails help and Cascade can auto-invoke matching skills
 - Invoke a skill directly with `@skill-name`, such as `@rails-architecture` or `@rspec-agent`
-- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, and `/behance-template-rollout`
+- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/behance-template-rollout`, and `/behance-template-implementation`
 
 ## Notes
 

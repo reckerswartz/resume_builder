@@ -8,12 +8,28 @@ class ApplicationController < ActionController::Base
   stale_when_assets_change if respond_to?(:stale_when_assets_change)
 
   helper_method :current_user, :feature_enabled?, :llm_role_enabled?
+  around_action :switch_locale
   before_action :mark_request_started_at
 
   rescue_from StandardError, with: :handle_internal_error
   rescue_from Pundit::NotAuthorizedError, with: :handle_not_authorized
 
+  def default_url_options
+    current_locale = I18n.locale.to_sym
+    return {} if current_locale == I18n.default_locale.to_sym && params[:locale].blank?
+
+    { locale: current_locale }
+  end
+
   private
+    def switch_locale(&action)
+      I18n.with_locale(requested_locale, &action)
+    end
+
+    def requested_locale
+      params[:locale].presence&.to_sym&.presence_in(I18n.available_locales) || I18n.default_locale
+    end
+
     def current_user
       Current.user
     end

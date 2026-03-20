@@ -23,6 +23,40 @@ RSpec.describe 'Admin::JobLogs', type: :request do
       expect(response.body).to include('page-header-compact')
     end
 
+    it 'renders inline related error summaries for job rows' do
+      linked_job = create(
+        :job_log,
+        :failed,
+        active_job_id: 'job-123',
+        error_details: {
+          'reference_id' => 'ERR-JOB-0001',
+          'message' => 'Something went wrong'
+        }
+      )
+      create(
+        :error_log,
+        :job,
+        reference_id: 'ERR-JOB-0001',
+        context: {
+          'active_job_id' => linked_job.active_job_id,
+          'job_type' => linked_job.job_type,
+          'queue_name' => linked_job.queue_name,
+          'job_log_id' => linked_job.id
+        }
+      )
+      create(:job_log, :failed, active_job_id: 'job-456', error_details: {})
+
+      get admin_job_logs_path
+      response_body = CGI.unescapeHTML(response.body)
+
+      expect(response).to have_http_status(:ok)
+      expect(response_body).to include('ERR-JOB-0001')
+      expect(response_body).to include('Open related error')
+      expect(response_body).to include('Captured error log is available for full context and backtrace review.')
+      expect(response_body).to include('No error reference')
+      expect(response_body).to include('This failed job did not capture a linked error reference.')
+    end
+
     it 'filters and sorts job logs' do
       create(:job_log, job_type: 'AlphaImportJob', queue_name: 'imports', status: 'failed')
       create(:job_log, job_type: 'ResumeExportJob', queue_name: 'exports', status: 'succeeded')

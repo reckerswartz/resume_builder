@@ -5,10 +5,10 @@
   <div class="relative mb-6">
     <span class="atelier-pill">
       <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-      Account recovery
+      <%= t("passwords.shared.recovery_pill") %>
     </span>
-    <h1 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950">Reset your password</h1>
-    <p class="mt-3 text-sm leading-6 text-ink-700/80">Enter your email address and we will send you a reset link if an account exists.</p>
+    <h1 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950"><%= t("passwords.new.title") %></h1>
+    <p class="mt-3 text-sm leading-6 text-ink-700/80"><%= t("passwords.new.description") %></p>
   </div>
 
   <%= form_with url: passwords_path, class: "relative space-y-5" do |form| %>
@@ -18,13 +18,13 @@
     </div>
 
     <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-      <p class="text-sm font-semibold text-ink-950">What happens next</p>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the email address tied to your account. If the message does not arrive right away, check your spam folder or request a fresh link.</p>
+      <p class="text-sm font-semibold text-ink-950"><%= t("passwords.new.next_title") %></p>
+      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("passwords.new.next_description") %></p>
     </div>
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <%= form.submit "Send reset link", class: ui_button_classes(:primary) %>
-      <%= link_to "Back to sign in", new_session_path, class: ui_button_classes(:ghost) %>
+    <div class="space-y-3">
+      <%= form.submit t("passwords.new.submit"), class: "#{ui_button_classes(:primary)} w-full sm:w-auto" %>
+      <%= link_to t("passwords.new.back_to_sign_in"), new_session_path, class: ui_button_classes(:ghost) %>
     </div>
   <% end %>
 <% end %>

@@ -1,5 +1,5 @@
-<% field_label = local_assigns.fetch(:field_label, "Template") %>
-<% picker_description = local_assigns.fetch(:description, "Choose a layout for the live preview and exported PDF. You can switch templates later without losing the current resume content.") %>
+<% field_label = local_assigns.fetch(:field_label, t("resumes.form.template_field_label")) %>
+<% picker_description = local_assigns.fetch(:description, t("resumes.form.template_picker_description")) %>
 <% template_picker_state = local_assigns.fetch(:template_picker_state) do
      resume_template_picker_state(
        resume: resume,

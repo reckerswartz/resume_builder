@@ -157,6 +157,7 @@ RSpec.describe Resumes::TemplatePickerState do
         current_badge_classes: 'badge-hero',
         selection_badges: ['Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Split', 'Entries: Cards'],
         show_current_only_badge: true,
+        current_only_badge_label: 'Current only',
         accent_label: 'Accent #0F172A',
         summary_hidden: false,
         summary_aria_hidden: 'false',

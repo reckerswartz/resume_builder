@@ -1,0 +1,231 @@
+en:
+  resumes:
+    controller:
+      untitled_resume_title: "Untitled Resume"
+      template_unavailable: "Template is not available."
+      choose_experience_level_first: "Choose your experience level first."
+      resume_created: "Resume created successfully."
+      unable_to_create: "Unable to create resume."
+      resume_updated: "Resume updated successfully."
+      resume_deleted: "Resume deleted successfully."
+      review_highlighted_errors: "Review the highlighted fields and try again."
+      source_applied: "Source content applied to the resume draft."
+      pdf_export_started: "PDF export started."
+      pdf_export_started_turbo: "PDF export started. The export panel will update automatically."
+      pdf_export_unavailable: "PDF export is not available yet."
+      template_selection_unavailable_error: "is not available."
+      choose_available_template: "Choose a template that is still available."
+      selected_photo_unavailable: "Selected photo is not available."
+    photo_library:
+      controller:
+        profile_created: "Photo library ready."
+        upload_started:
+          one: "%{count} photo added. Preprocessing started."
+          other: "%{count} photos added. Preprocessing started."
+        duplicates_skipped:
+          one: "%{count} duplicate photo skipped."
+          other: "%{count} duplicate photos skipped."
+        photo_deleted: "Photo deleted."
+        background_removal_started: "Background removal queued."
+        generation_started: "Image generation queued."
+        verification_started: "Photo verification queued."
+        generation_unavailable: "Resume image generation is unavailable right now."
+        verification_unavailable: "Photo verification is unavailable right now."
+        resume_required: "Open this action from a specific resume to continue."
+      selection_service:
+        asset_user_mismatch: "Selected photo does not belong to the same user as the resume."
+    entries_controller:
+      created: "Entry added."
+      updated: "Entry updated."
+      destroyed: "Entry removed."
+      moved: "Entry order updated."
+      improved: "Entry suggestions applied."
+      improve_unavailable: "Resume suggestions are unavailable right now."
+    sections_controller:
+      created: "Section added."
+      updated: "Section updated."
+      destroyed: "Section removed."
+      moved: "Section order updated."
+    template_recommendation_service:
+      badge_label: "Recommended"
+      reasons:
+        early_career: "Best for early-career resumes"
+        student: "Highlights education and skills for student resumes"
+    start_flow_state:
+      experience_options:
+        no_experience: "No Experience"
+        less_than_3_years: "Less than 3 years"
+        three_to_five_years: "3-5 Years"
+        five_to_ten_years: "5-10 Years"
+        ten_plus_years: "10+ Years"
+      student_options:
+        student: "Yes"
+        not_student: "No"
+    new:
+      header_eyebrow: "New resume"
+      header_title: "Start a resume"
+      header_description: "Name the draft, keep the selected template, and jump straight into editing. You can browse more looks only when you need them."
+      back_to_workspace: "Back to workspace"
+    index:
+      header_eyebrow: "Your workspace"
+      header_title: "Resumes"
+      header_description: "Open a draft, start a new resume, or compare templates without extra dashboard noise."
+      badges:
+        resume_count:
+          one: "1 resume"
+          other: "%{count} resumes"
+        ready_to_review:
+          one: "1 ready to review"
+          other: "%{count} ready to review"
+      actions:
+        create_new_resume: "Create new resume"
+        browse_templates: "Browse templates"
+        open_admin: "Open admin"
+      empty_state:
+        title: "No resumes yet"
+        description: "Create your first resume to start editing and previewing live."
+        create_resume: "Create resume"
+      quick_actions:
+        eyebrow: "Quick actions"
+        title: "Keep moving"
+        description: "Use these shortcuts when you need to start fresh or compare layouts, then return to the resume list."
+        counts_summary: "%{ready_count} ready, %{draft_count} in progress"
+        focus_note: "Focus first on drafts missing contact details, a summary, or one clear experience section."
+        create_resume: "Create resume"
+        browse_templates: "Browse templates"
+        open_admin_hub: "Open admin hub"
+    resume_card:
+      canvas_pill: "Resume canvas"
+      summary_status:
+        ready: "Summary ready"
+        needs: "Needs summary"
+      missing_headline: "Add a headline to make the workspace and exported preview more scannable."
+      grouping:
+        eyebrow: "Preview grouping"
+        identity_pending: "Identity details pending"
+        ready_description: "This draft is ready for a fast preview pass and final export checks."
+        incomplete_description: "Finish the summary and identity details before moving into final preview and export review."
+        grouped_badge: "Preview + metadata grouped"
+      metadata_badges:
+        updated_ago: "Updated %{time} ago"
+        source_mode:
+          scratch: "Scratch start"
+          paste: "Paste start"
+          upload: "Upload start"
+          default: "%{mode} start"
+      footer_description: "Jump back into editing, open the preview page, or remove the draft once you no longer need it."
+      actions:
+        edit: "Edit"
+        preview: "Preview"
+        delete: "Delete"
+    start_flow_experience_step:
+      step_badge: "Step 1"
+      title: "How long have you been working?"
+      description: "We’ll find the best templates for your experience level."
+      option_eyebrow: "Experience level"
+      panel_eyebrow: "What happens next"
+      panel_title: "Choose your starting path"
+      panel_description: "We’ll keep the flow lightweight, carry your template selection forward, and open the setup form once you choose your experience level."
+      quick_choices_badge: "5 quick choices"
+      template_carry_through_badge: "Template carry-through"
+      steps:
+        choose_experience: "Pick the experience band that best fits the draft you want to build."
+        review_setup: "Review the fast-create setup form with your selected template already in place."
+        create_draft: "Create the draft shell and continue into the guided builder."
+    start_flow_student_step:
+      step_badge: "Step 2"
+      title: "Are you a student?"
+      description: "This helps us keep the setup flow flexible for early-career resumes without forcing every draft down the same path."
+      option_eyebrow: "Student status"
+      skip_for_now: "Skip for now"
+      panel_eyebrow: "Why we ask"
+      panel_title: "Keep the flow relevant for entry-level resumes"
+      panel_description: "Student status can shape later guidance for internships, coursework, projects, and volunteer work. You can skip it and keep moving."
+      panel_note: "The answer stays lightweight and optional. It only helps us carry better context into the next setup step."
+      optional_question_badge: "Optional question"
+      skip_supported_badge: "Skip supported"
+    form:
+      experience_level_label: "Experience level"
+      title_label: "Title"
+      title_hint: "Start with a working title. You can rename the draft any time from the editor."
+      optional_fields_summary: "Add headline or summary now"
+      optional_badge: "Optional"
+      headline_label: "Headline"
+      summary_label: "Summary"
+      import_badge: "Optional import"
+      import_title: "Add source text or file now"
+      import_description: "Start the draft with pasted text or an attached source file. You can still refine the structure, run autofill later, and keep the original upload attached from the builder."
+      template_field_label: "Template"
+      template_picker_description: "Start with the selected look now. You can switch templates later from finalize without changing the resume content."
+      next_panel_eyebrow: "What happens next"
+      next_panel_title_create: "Create the draft and start editing"
+      next_panel_title_update: "Keep refining the draft"
+      next_panel_description: "We’ll build starter sections for experience, education, skills, and projects, then take you into the guided editor."
+      starter_sections_badge: "Starter sections included"
+      template_switch_later_badge: "Template switch later"
+      steps:
+        build_shell: "Create the draft shell with your starting title and template."
+        guided_builder: "Land in the guided builder with starter sections ready to edit."
+        refine_later: "Refine contact details, entries, and export settings when the content is ready."
+      footer_note: "You can refine contact details, settings, and entries from the editor after creation."
+      create_resume: "Create resume"
+      save_changes: "Save changes"
+    template_picker_state:
+      filter_groups:
+        family: "Family"
+        density: "Density"
+        columns: "Columns"
+        theme: "Theme"
+        layout: "Layout"
+        all: "All"
+      search_placeholder: "Search by name, family, or layout details"
+      sort_options:
+        recommended_first: "Recommended first"
+        selected_first: "Current first"
+        name_asc: "Name A–Z"
+        family_asc: "Family A–Z"
+        density_asc: "Density"
+      template_count:
+        one: "1 template shown"
+        other: "%{count} templates shown"
+      summary_card_eyebrows:
+        compact: "Selected template"
+        default: "Selection summary"
+      summary_notes:
+        compact: "Start with this look now and switch templates later from finalize without changing the draft content."
+        default: "You can switch templates later from the finalize step without losing the current resume content."
+      selection_badges:
+        density: "Density: %{density}"
+        columns: "Columns: %{columns}"
+        theme: "Theme: %{theme}"
+        header: "Header: %{header}"
+        entries: "Entries: %{entries}"
+        sidebar: "Sidebar: %{sections}"
+      summary_badges:
+        columns: "Columns: %{columns}"
+        theme: "Theme: %{theme}"
+        skills: "Skills: %{skills}"
+        sidebar: "Sidebar: %{sections}"
+      accent_label: "Accent %{color}"
+      current_only_badge: "Current only"
+      summary_detail: "%{shell} shell · %{headings} headings"
+    template_picker_browser:
+      discovery_pill: "Discover templates"
+      discovery_description: "Filter the gallery by family, density, columns, theme, or layout while keeping the selected template summary in view."
+      search_label: "Search"
+      sort_label: "Sort"
+      live_sample_label: "Live sample"
+      accent_description: "Keep the same resume content reusable if you change layouts later."
+      empty_state:
+        title: "No templates match those filters"
+        description: "Try a different family, density, column, theme, or layout combination to bring more templates back into the gallery."
+    template_picker_compact:
+      fast_start_pill: "Fast start"
+      fast_start_description: "Start with the selected look now. Open the full browser only if you want to compare more options before editing."
+      open_marketplace: "Open marketplace"
+      recommended_pill: "Recommended for this draft"
+      recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
+      browse_all_templates: "Browse all templates"
+      browse_all_templates_description: "Filter by family, density, columns, theme, or layout"
+    template_picker_summaries:
+      open_full_preview: "Open full preview"

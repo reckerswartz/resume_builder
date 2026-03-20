@@ -10,7 +10,7 @@ class SectionsController < ApplicationController
     @section = @resume.sections.build(section_params)
 
     if @section.save
-      respond_to_success("Section added.")
+      respond_to_success(I18n.t("resumes.sections_controller.created"))
     else
       respond_to_failure(@section)
     end
@@ -20,7 +20,7 @@ class SectionsController < ApplicationController
     authorize @resume, :update?
 
     if @section.update(section_params)
-      respond_to_success("Section updated.")
+      respond_to_success(I18n.t("resumes.sections_controller.updated"))
     else
       respond_to_failure(@section)
     end
@@ -30,14 +30,14 @@ class SectionsController < ApplicationController
     authorize @resume, :update?
 
     @section.destroy!
-    respond_to_success("Section removed.")
+    respond_to_success(I18n.t("resumes.sections_controller.destroyed"))
   end
 
   def move
     authorize @resume, :update?
 
     Resumes::PositionMover.new(record: @section, direction: params[:direction], position: params[:position]).call
-    respond_to_success("Section order updated.")
+    respond_to_success(I18n.t("resumes.sections_controller.moved"))
   end
 
   private

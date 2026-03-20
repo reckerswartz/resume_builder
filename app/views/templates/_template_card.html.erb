@@ -2,17 +2,17 @@
 <% template_card = card_state.present? ? card_state.fetch(:template_card) : local_assigns.fetch(:template_card) %>
 <% template = template_card.fetch(:template) %>
 <% description_text = card_state.present? ? card_state.fetch(:description_text) : template.description.presence || template_card.fetch(:summary) %>
-<% preview_template_path = card_state.present? ? card_state.fetch(:preview_template_path) : template_path(template) %>
+<% preview_template_path = card_state.present? ? card_state.fetch(:preview_template_path) : template_path(id: template) %>
 <% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : new_resume_path(template_id: template.id) %>
 <% badge_labels = if card_state.present?
   card_state.fetch(:badge_labels)
 else
   [
-    "Density: #{template_card.fetch(:density_label)}",
-    "Columns: #{template_card.fetch(:column_count_label)}",
-    "Theme: #{template_card.fetch(:theme_tone_label)}",
-    "Header: #{template_card.fetch(:header_style_label)}",
-    "Entries: #{template_card.fetch(:entry_style_label)}"
+    t(".default_badges.density", density: template_card.fetch(:density_label)),
+    t(".default_badges.columns", columns: template_card.fetch(:column_count_label)),
+    t(".default_badges.theme", theme: template_card.fetch(:theme_tone_label)),
+    t(".default_badges.header", header: template_card.fetch(:header_style_label)),
+    t(".default_badges.entries", entries: template_card.fetch(:entry_style_label))
   ]
 end %>
 <% recommendation_badge_label = card_state.present? ? card_state[:recommendation_badge_label] : nil %>
@@ -20,9 +20,9 @@ end %>
 <% layout_focus_label = if card_state.present?
   card_state.fetch(:layout_focus_label)
 elsif template_card.fetch(:sidebar_section_labels).any?
-  "Sidebar: #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+  t(".layout_focus.sidebar", sections: template_card.fetch(:sidebar_section_labels).to_sentence)
 else
-  "Balanced single-column flow"
+  t(".layout_focus.balanced")
 end %>
 <% html_options = if card_state.present?
   {
@@ -69,7 +69,7 @@ end %>
       <div class="rounded-[1.2rem] border border-canvas-200/80 bg-canvas-100/88 px-3 py-3 text-right shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
         <div class="flex items-center justify-end gap-2">
           <span class="h-3.5 w-3.5 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
-          <span class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Accent</span>
+          <span class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".accent_label") %></span>
         </div>
         <p class="mt-2 text-sm font-semibold text-ink-950"><%= template_card.fetch(:accent_color) %></p>
       </div>
@@ -77,7 +77,7 @@ end %>
 
     <div class="mt-5 rounded-[1.75rem] border border-mist-200/80 bg-canvas-100/84 p-3 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
       <div class="mb-3 flex items-center justify-between gap-3 px-1">
-        <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Live sample</p>
+        <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".live_sample_label") %></p>
         <span class="<%= ui_badge_classes(:neutral) %>"><%= template_card.fetch(:short_label) %></span>
       </div>
 
@@ -91,7 +91,7 @@ end %>
         <div class="flex items-start gap-3">
           <%= render Ui::GlyphComponent.new(name: layout_icon_name, size: :sm, tone: :soft) %>
           <div>
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Layout focus</p>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t(".layout_focus_label") %></p>
             <p class="mt-2 text-sm font-semibold text-ink-950"><%= layout_focus_label %></p>
           </div>
         </div>
@@ -101,9 +101,9 @@ end %>
         <div class="flex items-start gap-3">
           <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
           <div>
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Shell style</p>
-            <p class="mt-2 text-sm font-semibold text-ink-950"><%= template_card.fetch(:shell_style_label) %> shell</p>
-            <p class="mt-1 text-sm leading-6 text-ink-700/80">Keep the same resume content reusable if you switch layouts later.</p>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t(".shell_style_label") %></p>
+            <p class="mt-2 text-sm font-semibold text-ink-950"><%= t(".shell_style_value", shell: template_card.fetch(:shell_style_label)) %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".shell_style_description") %></p>
           </div>
         </div>
       </div>
@@ -116,8 +116,8 @@ end %>
     </div>
 
     <div class="mt-6 flex flex-wrap gap-3">
-      <%= link_to "Preview template", preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
-      <%= link_to "Use template", use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center" %>
+      <%= link_to t(".preview_template"), preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
+      <%= link_to t(".use_template"), use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center" %>
     </div>
   </div>
 <% end %>

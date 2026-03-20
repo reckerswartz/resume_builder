@@ -26,16 +26,16 @@ module Templates
 
     def page_header_attributes
       {
-        eyebrow: "Template marketplace",
-        title: "Browse templates",
-        description: "Compare layouts quickly, open a live sample when one stands out, and start a draft with the look you want.",
+        eyebrow: I18n.t("templates.marketplace_state.page_header.eyebrow"),
+        title: I18n.t("templates.marketplace_state.page_header.title"),
+        description: I18n.t("templates.marketplace_state.page_header.description"),
         badges: [
           { label: template_badge_label(template_cards.count), tone: :neutral },
           { label: family_badge_label, tone: :neutral }
         ],
         actions: [
-          { label: "Start a resume", path: start_resume_path, style: :primary },
-          { label: "Back to workspace", path: view_context.resumes_path, style: :secondary }
+          { label: I18n.t("templates.marketplace_state.page_header.start_resume"), path: start_resume_path, style: :primary },
+          { label: I18n.t("templates.marketplace_state.page_header.back_to_workspace"), path: view_context.resumes_path, style: :secondary }
         ]
       }
     end
@@ -55,7 +55,7 @@ module Templates
       @filter_groups ||= [
         build_filter_group(
           key: "family",
-          label: "Family",
+          label: I18n.t("templates.marketplace_state.filter_groups.family"),
           selected_value: family_filter,
           options: filter_options_for(
             key: "family",
@@ -65,7 +65,7 @@ module Templates
         ),
         build_filter_group(
           key: "density",
-          label: "Density",
+          label: I18n.t("templates.marketplace_state.filter_groups.density"),
           selected_value: density_filter,
           options: filter_options_for(
             key: "density",
@@ -75,7 +75,7 @@ module Templates
         ),
         build_filter_group(
           key: "column_count",
-          label: "Columns",
+          label: I18n.t("templates.marketplace_state.filter_groups.columns"),
           selected_value: column_count_filter,
           options: filter_options_for(
             key: "column_count",
@@ -85,7 +85,7 @@ module Templates
         ),
         build_filter_group(
           key: "theme_tone",
-          label: "Theme",
+          label: I18n.t("templates.marketplace_state.filter_groups.theme"),
           selected_value: theme_tone_filter,
           options: filter_options_for(
             key: "theme_tone",
@@ -95,7 +95,7 @@ module Templates
         ),
         build_filter_group(
           key: "shell_style",
-          label: "Layout",
+          label: I18n.t("templates.marketplace_state.filter_groups.layout"),
           selected_value: shell_style_filter,
           options: filter_options_for(
             key: "shell_style",
@@ -116,29 +116,29 @@ module Templates
 
     def active_filter_badges
       badges = []
-      badges << { label: %(Query: "#{query}"), tone: :neutral } if query.present?
+      badges << { label: I18n.t("templates.marketplace_state.active_badges.query", query: query), tone: :neutral } if query.present?
       badges << { label: ResumeTemplates::Catalog.family_label(family_filter), tone: :neutral } if family_filter.present?
       badges << { label: density_filter.to_s.titleize, tone: :neutral } if density_filter.present?
       badges << { label: ResumeTemplates::Catalog.column_count_label(column_count_filter), tone: :neutral } if column_count_filter.present?
       badges << { label: ResumeTemplates::Catalog.theme_tone_label(theme_tone_filter), tone: :neutral } if theme_tone_filter.present?
       badges << { label: shell_style_filter.to_s.titleize, tone: :neutral } if shell_style_filter.present?
-      badges << { label: "Sort: #{selected_sort_label}", tone: :neutral } if sort_active?
+      badges << { label: I18n.t("templates.marketplace_state.active_badges.sort", sort: selected_sort_label), tone: :neutral } if sort_active?
       badges
     end
 
     def search_placeholder
-      "Search by name, family, or layout details"
+      I18n.t("templates.marketplace_state.search_placeholder")
     end
 
     def sort_options
       @sort_options ||= begin
         options = [
-          { value: "family_asc", label: "Layout family" },
-          { value: "name_asc", label: "Name A–Z" },
-          { value: "density_asc", label: "Density" }
+          { value: "family_asc", label: I18n.t("templates.marketplace_state.sort_options.family_asc") },
+          { value: "name_asc", label: I18n.t("templates.marketplace_state.sort_options.name_asc") },
+          { value: "density_asc", label: I18n.t("templates.marketplace_state.sort_options.density_asc") }
         ]
 
-        recommendation_sort_available? ? [ { value: "recommended_first", label: "Recommended first" }, *options ] : options
+        recommendation_sort_available? ? [ { value: "recommended_first", label: I18n.t("templates.marketplace_state.sort_options.recommended_first") }, *options ] : options
       end
     end
 
@@ -202,7 +202,7 @@ module Templates
       end
 
       def family_badge_label
-        family_count == 1 ? "1 layout family" : "#{family_count} layout families"
+        I18n.t("templates.marketplace_state.family_badge", count: family_count)
       end
 
       def build_filter_group(key:, label:, selected_value:, options:)
@@ -210,7 +210,7 @@ module Templates
           key: key,
           label: label,
           options: [
-            filter_option_state(key: key, value: "all", label: "All", count: filter_template_cards.size, active: selected_value.blank?),
+            filter_option_state(key: key, value: "all", label: I18n.t("templates.marketplace_state.filter_groups.all"), count: filter_template_cards.size, active: selected_value.blank?),
             *options.map do |option|
               filter_option_state(
                 key: key,
@@ -334,17 +334,17 @@ module Templates
 
       def badge_labels(template_card, recommendation_badge_label: nil)
         badges = [
-          "Density: #{template_card.fetch(:density_label)}",
-          "Columns: #{template_card.fetch(:column_count_label)}",
-          "Theme: #{template_card.fetch(:theme_tone_label)}",
-          "Header: #{template_card.fetch(:header_style_label)}",
-          "Entries: #{template_card.fetch(:entry_style_label)}"
+          I18n.t("templates.marketplace_state.card_badges.density", density: template_card.fetch(:density_label)),
+          I18n.t("templates.marketplace_state.card_badges.columns", columns: template_card.fetch(:column_count_label)),
+          I18n.t("templates.marketplace_state.card_badges.theme", theme: template_card.fetch(:theme_tone_label)),
+          I18n.t("templates.marketplace_state.card_badges.header", header: template_card.fetch(:header_style_label)),
+          I18n.t("templates.marketplace_state.card_badges.entries", entries: template_card.fetch(:entry_style_label))
         ]
 
         badges.unshift(recommendation_badge_label) if recommendation_badge_label.present?
 
         if template_card.fetch(:sidebar_section_labels).any?
-          badges << "Sidebar: #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+          badges << I18n.t("templates.marketplace_state.card_badges.sidebar", sections: template_card.fetch(:sidebar_section_labels).to_sentence)
         end
 
         badges
@@ -352,18 +352,18 @@ module Templates
 
       def layout_focus_label(template_card)
         if template_card.fetch(:sidebar_section_labels).any?
-          "Sidebar: #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+          I18n.t("templates.marketplace_state.layout_focus.sidebar", sections: template_card.fetch(:sidebar_section_labels).to_sentence)
         else
-          "Balanced single-column flow"
+          I18n.t("templates.marketplace_state.layout_focus.balanced")
         end
       end
 
       def template_badge_label(count)
-        count == 1 ? "1 template in view" : "#{count} templates in view"
+        I18n.t("templates.marketplace_state.template_badge", count: count)
       end
 
       def template_results_label(count)
-        count == 1 ? "1 template shown" : "#{count} templates shown"
+        I18n.t("templates.marketplace_state.results_label", count: count)
       end
 
       def use_template_path_for(template)

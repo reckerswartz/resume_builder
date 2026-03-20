@@ -7,15 +7,20 @@
   data-controller="source-upload"
   data-source-upload-supported-extensions-value="<%= Resumes::SourceTextResolver.supported_upload_extensions.join(",") %>"
   data-source-upload-supported-content-types-value="<%= Resumes::SourceTextResolver.supported_upload_content_types.join(",") %>"
-  data-source-upload-supported-formats-label-value="<%= Resumes::SourceTextResolver.supported_upload_formats_label %>">
+  data-source-upload-supported-formats-label-value="<%= Resumes::SourceTextResolver.supported_upload_formats_label %>"
+  data-source-upload-autofill-supported-label-value="<%= t('resumes.helper.source_upload_review.ready_for_ai_import.badge_label') %>"
+  data-source-upload-reference-only-label-value="<%= t('resumes.helper.source_upload_review.reference_file_only.badge_label') %>"
+  data-source-upload-pending-supported-message-value="<%= t('resumes.helper.source_upload_review.ready_for_ai_import.message') %>"
+  data-source-upload-pending-reference-message-template-value="<%= t('resumes.helper.source_autofill.messages.upload_reference_only', formats: '%{formats}') %>"
+  data-source-upload-unknown-type-label-value="<%= t('resumes.helper.source_upload_review.unknown_type') %>">
   <div class="grid gap-4 lg:grid-cols-3">
     <% scratch_selected = current_source_mode == "scratch" %>
     <label for="resume_source_mode_scratch" class="<%= ui_selectable_card_classes(selected: scratch_selected, tone: :subtle) %>">
       <span class="flex items-start gap-3">
         <%= form.radio_button :source_mode, "scratch", id: "resume_source_mode_scratch", class: "mt-1 h-4 w-4 border-canvas-300 text-ink-950 focus:ring-mist-300", data: { source_upload_target: "modeInput", action: "change->source-upload#syncMode" } %>
         <span>
-          <span class="block text-sm font-semibold">Start from scratch</span>
-          <span class="mt-1 block text-sm <%= ui_selectable_supporting_text_classes(selected: scratch_selected) %>">Use the starter sections and write directly in the guided builder.</span>
+          <span class="block text-sm font-semibold"><%= t("resumes.source_import_fields.modes.scratch.title") %></span>
+          <span class="mt-1 block text-sm <%= ui_selectable_supporting_text_classes(selected: scratch_selected) %>"><%= t("resumes.source_import_fields.modes.scratch.description") %></span>
         </span>
       </span>
     </label>
@@ -25,8 +30,8 @@
       <span class="flex items-start gap-3">
         <%= form.radio_button :source_mode, "paste", id: "resume_source_mode_paste", class: "mt-1 h-4 w-4 border-canvas-300 text-ink-950 focus:ring-mist-300", data: { source_upload_target: "modeInput", action: "change->source-upload#syncMode" } %>
         <span>
-          <span class="block text-sm font-semibold">Paste existing resume text</span>
-          <span class="mt-1 block text-sm <%= ui_selectable_supporting_text_classes(selected: paste_selected) %>">Drop the raw content here first, then reshape it across the guided steps.</span>
+          <span class="block text-sm font-semibold"><%= t("resumes.source_import_fields.modes.paste.title") %></span>
+          <span class="mt-1 block text-sm <%= ui_selectable_supporting_text_classes(selected: paste_selected) %>"><%= t("resumes.source_import_fields.modes.paste.description") %></span>
         </span>
       </span>
     </label>
@@ -36,8 +41,8 @@
       <span class="flex items-start gap-3">
         <%= form.radio_button :source_mode, "upload", id: "resume_source_mode_upload", class: "mt-1 h-4 w-4 border-canvas-300 text-ink-950 focus:ring-mist-300", data: { source_upload_target: "modeInput", action: "change->source-upload#syncMode" } %>
         <span>
-          <span class="block text-sm font-semibold">Attach a source file</span>
-          <span class="mt-1 block text-sm <%= ui_selectable_supporting_text_classes(selected: upload_selected) %>">Keep the original file nearby while you rebuild or import the draft.</span>
+          <span class="block text-sm font-semibold"><%= t("resumes.source_import_fields.modes.upload.title") %></span>
+          <span class="mt-1 block text-sm <%= ui_selectable_supporting_text_classes(selected: upload_selected) %>"><%= t("resumes.source_import_fields.modes.upload.description") %></span>
         </span>
       </span>
     </label>
@@ -45,15 +50,15 @@
 
   <div class="hidden space-y-4" data-source-upload-target="pastePanel">
     <div>
-      <%= form.label :source_text, "Pasted resume text", class: ui_label_classes %>
-      <%= form.text_area :source_text, rows: 14, placeholder: "Paste an existing resume here if you want the original content close by while editing.", class: ui_input_classes %>
-      <p class="mt-2 text-sm text-ink-700/70"><%= autofill_enabled ? "Paste what you have and we can use it to prepare a starter draft for the main sections." : "Keep the original text here for reference while you rebuild the resume in a cleaner structure." %></p>
+      <%= form.label :source_text, t("resumes.source_import_fields.paste.label"), class: ui_label_classes %>
+      <%= form.text_area :source_text, rows: 14, placeholder: t("resumes.source_import_fields.paste.placeholder"), class: ui_input_classes %>
+      <p class="mt-2 text-sm text-ink-700/70"><%= autofill_enabled ? t("resumes.source_import_fields.paste.helper_ready") : t("resumes.source_import_fields.paste.helper_default") %></p>
     </div>
   </div>
 
   <div class="hidden space-y-4" data-source-upload-target="uploadPanel">
     <div>
-      <%= form.label :source_document, "Source document", class: ui_label_classes %>
+      <%= form.label :source_document, t("resumes.source_import_fields.upload.label"), class: ui_label_classes %>
 
       <div
         class="<%= [ui_inset_panel_classes(tone: :subtle), 'mt-2 cursor-pointer border-2 border-dashed border-canvas-300 bg-canvas-50/70 transition hover:border-aqua-200/80 hover:bg-canvas-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/50'].join(' ') %>"
@@ -63,19 +68,19 @@
         data-action="click->source-upload#openPicker keydown.enter->source-upload#openPicker keydown.space->source-upload#openPicker dragenter->source-upload#dragEnter dragover->source-upload#dragOver dragleave->source-upload#dragLeave drop->source-upload#drop">
         <div class="space-y-3 text-left">
           <div>
-            <p class="text-sm font-semibold text-ink-950">Drop a file here or browse</p>
-            <p class="mt-1 text-sm leading-6 text-ink-700/80">Upload PDF, DOC, DOCX, TXT, Markdown, HTML, or RTF. PDF, DOCX, and text-based uploads can power autofill while legacy DOC files stay attached for reference.</p>
+            <p class="text-sm font-semibold text-ink-950"><%= t("resumes.source_import_fields.upload.dropzone_title") %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.source_import_fields.upload.dropzone_description") %></p>
           </div>
 
           <div class="flex flex-wrap gap-2">
-            <span class="<%= ui_button_classes(:secondary, size: :sm) %>">Browse files</span>
-            <span class="<%= ui_badge_classes(:neutral) %>">File picker fallback</span>
+            <span class="<%= ui_button_classes(:secondary, size: :sm) %>"><%= t("resumes.source_import_fields.upload.browse_files") %></span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.source_import_fields.upload.file_picker_fallback") %></span>
           </div>
 
           <div class="hidden <%= ui_inset_panel_classes(tone: :default) %>" data-source-upload-target="pendingReview">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p class="font-semibold text-ink-950">Ready to attach</p>
+                <p class="font-semibold text-ink-950"><%= t("resumes.source_import_fields.upload.pending_title") %></p>
                 <p class="mt-1 break-all text-ink-700/80" data-source-upload-target="pendingFilename"></p>
               </div>
               <span
@@ -86,12 +91,12 @@
 
             <dl class="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
-                <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">File type</dt>
+                <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.source_import_fields.upload.file_type") %></dt>
                 <dd class="mt-1 text-sm text-ink-700/80" data-source-upload-target="pendingContentType"></dd>
               </div>
 
               <div>
-                <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">Size</dt>
+                <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.source_import_fields.upload.size") %></dt>
                 <dd class="mt-1 text-sm text-ink-700/80" data-source-upload-target="pendingFileSize"></dd>
               </div>
             </dl>
@@ -105,7 +110,7 @@
         accept: ".pdf,.doc,.docx,.txt,.text,.md,.markdown,.rtf,.html,.htm",
         class: ui_input_classes,
         data: { source_upload_target: "input", action: "change->source-upload#selectFromInput" } %>
-      <p class="mt-2 text-sm text-ink-700/70"><%= autofill_enabled ? "Use the fallback picker if drag-and-drop is unavailable. Supported uploads can also help prefill the main sections." : "Use the fallback picker if drag-and-drop is unavailable while you attach a source file for reference." %></p>
+      <p class="mt-2 text-sm text-ink-700/70"><%= autofill_enabled ? t("resumes.source_import_fields.upload.picker_helper_ready") : t("resumes.source_import_fields.upload.picker_helper_default") %></p>
     </div>
 
     <% if upload_review_state.present? %>
@@ -120,12 +125,12 @@
 
         <dl class="mt-3 grid gap-3 sm:grid-cols-2">
           <div>
-            <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">File type</dt>
+            <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.source_import_fields.upload.file_type") %></dt>
             <dd class="mt-1 text-sm text-ink-700/80"><%= upload_review_state.fetch(:content_type) %></dd>
           </div>
 
           <div>
-            <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">Size</dt>
+            <dt class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.source_import_fields.upload.size") %></dt>
             <dd class="mt-1 text-sm text-ink-700/80"><%= upload_review_state.fetch(:file_size) %></dd>
           </div>
         </dl>
@@ -134,7 +139,7 @@
       </div>
     <% else %>
       <%= render Ui::EmptyStateComponent.new(
-        description: "No source file attached yet. Drop a file here or browse. Supported import formats: #{Resumes::SourceTextResolver.supported_upload_formats_label}.",
+        description: t("resumes.source_import_fields.upload.empty_state_description", formats: Resumes::SourceTextResolver.supported_upload_formats_label),
         padding: :sm,
         tone: :subtle,
         align: :left
@@ -145,12 +150,12 @@
   <div class="hidden <%= [ui_inset_panel_classes(tone: :subtle), 'space-y-4'].join(' ') %>" data-source-upload-target="cloudPanel">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">Cloud import connectors</p>
-        <h4 class="mt-2 text-sm font-semibold tracking-tight text-ink-950">Bring a file from Google Drive or Dropbox</h4>
-        <p class="mt-1 text-sm leading-6 text-ink-700/80">Cloud import is planned next. For now, upload files from your device.</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.source_import_fields.cloud.eyebrow") %></p>
+        <h4 class="mt-2 text-sm font-semibold tracking-tight text-ink-950"><%= t("resumes.source_import_fields.cloud.title") %></h4>
+        <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.source_import_fields.cloud.description") %></p>
       </div>
 
-      <span class="<%= ui_badge_classes(:neutral) %>">Coming soon</span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.source_import_fields.cloud.coming_soon") %></span>
     </div>
 
     <% cloud_import_provider_states.each do |provider_state| %>

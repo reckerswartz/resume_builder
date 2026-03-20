@@ -40,7 +40,22 @@ RSpec.describe 'Entries', type: :request do
       end.to change { section.entries.count }.by(1)
 
       expect(response).to redirect_to(edit_resume_path(resume))
+      expect(flash[:notice]).to eq(I18n.t('resumes.entries_controller.created'))
       expect(section.entries.last.highlights).to eq(['improved search quality', 'scaled internal tooling'])
+    end
+
+    it 'preserves locale query params on successful create redirects' do
+      post resume_section_entries_path(resume, section, locale: :en), params: {
+        entry: {
+          content: {
+            title: 'Senior Engineer',
+            organization: 'Acme'
+          }
+        }
+      }
+
+      expect(response).to redirect_to(edit_resume_path(resume, locale: :en))
+      expect(flash[:notice]).to eq(I18n.t('resumes.entries_controller.created'))
     end
 
     it 'normalizes guided experience fields into the preview-friendly JSON shape' do
@@ -75,6 +90,7 @@ RSpec.describe 'Entries', type: :request do
       post improve_resume_section_entry_path(resume, section, entry)
 
       expect(response).to redirect_to(edit_resume_path(resume))
+      expect(flash[:notice]).to eq(I18n.t('resumes.entries_controller.improved'))
       expect(entry.reload.highlights).to eq(['Delivered improved search quality'])
 
       interaction = resume.reload.llm_interactions.last
@@ -84,6 +100,23 @@ RSpec.describe 'Entries', type: :request do
       expect(interaction.role).to eq('text_generation')
       expect(entry.reload.highlights.first).to start_with('Delivered')
       expect(resume.llm_interactions.last).to be_succeeded
+    end
+
+    it 'uses the localized fallback alert when suggestions are unavailable' do
+      entry = create(:entry, section:, content: { 'title' => 'Engineer', 'organization' => 'Acme' })
+      failed_result = Llm::ResumeSuggestionService::Result.new(
+        success: false,
+        content: entry.content,
+        interactions: [],
+        error_message: nil
+      )
+
+      allow(Llm::ResumeSuggestionService).to receive(:new).with(user: user, entry: entry).and_return(instance_double(Llm::ResumeSuggestionService, call: failed_result))
+
+      post improve_resume_section_entry_path(resume, section, entry, locale: :en)
+
+      expect(response).to redirect_to(edit_resume_path(resume, locale: :en))
+      expect(flash[:alert]).to eq(I18n.t('resumes.entries_controller.improve_unavailable'))
     end
   end
 
@@ -100,6 +133,7 @@ RSpec.describe 'Entries', type: :request do
       expect(first_entry.reload.position).to eq(1)
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :preview)}"))
+      expect(response.body).to include(I18n.t('resumes.entries_controller.moved'))
     end
   end
 end

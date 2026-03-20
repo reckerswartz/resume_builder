@@ -9,9 +9,9 @@
 
   <div class="xl:hidden">
     <%= render Ui::DashboardPanelComponent.new(
-      eyebrow: "Preview page",
-      title: "Open the full preview when you need more space",
-      description: "On smaller screens the live preview rail moves below the editor. Use the preview page when you want export actions and the rendered page together.",
+      eyebrow: t("resumes.edit.mobile_preview_panel.eyebrow"),
+      title: t("resumes.edit.mobile_preview_panel.title"),
+      description: t("resumes.edit.mobile_preview_panel.description"),
       padding: :sm,
       density: :compact
     ) do %>

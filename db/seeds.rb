@@ -8,6 +8,9 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+require "base64"
+require "stringio"
+
 seed_templates = [
   {
     name: "Modern",
@@ -106,14 +109,38 @@ seed_templates = [
       "sidebar_position" => "left",
       "sidebar_section_types" => %w[skills education]
     }
+  },
+  {
+    name: "Editorial Split",
+    slug: "editorial-split",
+    description: "An asymmetric editorial layout with a narrow supporting column, stretched name band, and utility rail inspired by polished design-portfolio resumes.",
+    active: true,
+    layout_config: {
+      "family" => "editorial-split",
+      "variant" => "editorial-split",
+      "accent_color" => "#D7F038",
+      "font_scale" => "sm",
+      "density" => "compact",
+      "column_count" => "two_column",
+      "theme_tone" => "lime",
+      "supports_headshot" => true,
+      "shell_style" => "flat",
+      "header_style" => "split",
+      "section_heading_style" => "rule",
+      "skill_style" => "inline",
+      "entry_style" => "list",
+      "sidebar_section_types" => %w[education skills projects]
+    }
   }
-]
+].freeze
 
 seed_platform_setting = {
   feature_flags: {
     "llm_access" => false,
     "resume_suggestions" => false,
-    "autofill_content" => false
+    "autofill_content" => false,
+    "photo_processing" => !Rails.env.production?,
+    "resume_image_generation" => false
   },
   preferences: {
     "default_template_slug" => "modern",
@@ -214,6 +241,10 @@ seed_users = if Rails.env.development? || Rails.env.test?
   Faker::Config.random = seed_random
   Faker::UniqueGenerator.clear
 
+  seed_headshot_png = Base64.decode64(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2Z7mQAAAAASUVORK5CYII="
+  )
+
   city_and_state = -> { "#{Faker::Address.city}, #{Faker::Address.state_abbr}" }
   sentence = ->(word_count: 8) { Faker::Lorem.sentence(word_count:) }
   paragraph = ->(sentence_count: 2) { Faker::Lorem.paragraph(sentence_count:) }
@@ -227,9 +258,76 @@ seed_users = if Rails.env.development? || Rails.env.test?
   end
   skill_level = -> { ["Expert", "Advanced", "Advanced"].sample(random: seed_random) }
 
+  find_or_create_seed_photo_asset = lambda do |photo_profile:, asset_kind:, filename:, source_asset: nil|
+    existing_asset = photo_profile.photo_assets
+      .where(asset_kind: asset_kind.to_s, source_asset: source_asset)
+      .detect { |asset| asset.display_name == filename || asset.file.filename.to_s == filename }
+
+    if existing_asset.present?
+      unless existing_asset.file.attached?
+        existing_asset.file.attach(io: StringIO.new(seed_headshot_png), filename: filename, content_type: "image/png")
+      end
+
+      existing_asset.update!(status: :ready)
+      existing_asset.attach_metadata!(
+        "seeded" => true,
+        "display_name" => filename,
+        "content_type" => existing_asset.file.blob.content_type,
+        "byte_size" => existing_asset.file.blob.byte_size,
+        "checksum" => existing_asset.file.blob.checksum
+      )
+      existing_asset
+    else
+      Photos::AssetBuilder.new(
+        photo_profile: photo_profile,
+        source_asset: source_asset,
+        asset_kind: asset_kind,
+        file_io: StringIO.new(seed_headshot_png),
+        filename: filename,
+        content_type: "image/png",
+        metadata: { "seeded" => true },
+        status: :ready
+      ).call
+    end
+  end
+
+  seed_photo_library_for_resume = lambda do |user:, resume:, photo_seed:|
+    return if photo_seed.blank?
+
+    photo_profile = user.photo_profiles.find_or_initialize_by(name: photo_seed.fetch(:profile_name))
+    photo_profile.assign_attributes(status: :active)
+    photo_profile.save!
+
+    source_asset = find_or_create_seed_photo_asset.call(
+      photo_profile: photo_profile,
+      asset_kind: :source,
+      filename: photo_seed.fetch(:source_filename)
+    )
+    preferred_asset = find_or_create_seed_photo_asset.call(
+      photo_profile: photo_profile,
+      source_asset: source_asset,
+      asset_kind: photo_seed.fetch(:preferred_asset_kind, :enhanced),
+      filename: photo_seed.fetch(:preferred_filename)
+    )
+
+    if photo_profile.selected_source_photo_asset_id != source_asset.id
+      photo_profile.update!(selected_source_photo_asset: source_asset)
+    end
+
+    resume.update!(photo_profile: photo_profile) if resume.photo_profile_id != photo_profile.id
+
+    selection = resume.resume_photo_selections.find_or_initialize_by(
+      template: resume.template,
+      slot_name: "headshot"
+    )
+    selection.photo_asset = photo_seed.fetch(:template_selection, "preferred") == "source" ? source_asset : preferred_asset
+    selection.status = :active
+    selection.save!
+  end
+
   build_seed_resume = lambda do |
     email_address:, template_slug:, accent_color:, primary_title:, secondary_title:, focus:, project_name:,
-    project_role:, skills:, driving_licence:, personal_details:|
+    project_role:, skills:, driving_licence:, personal_details:, photo_seed:|
     full_name = Faker::Name.name
     current_company = Faker::Company.name
     previous_company = Faker::Company.name
@@ -260,6 +358,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
         "driving_licence" => driving_licence
       },
       personal_details: personal_details,
+      photo_seed: photo_seed,
       settings: {
         "accent_color" => accent_color,
         "show_contact_icons" => true,
@@ -339,7 +438,8 @@ seed_users = if Rails.env.development? || Rails.env.test?
 
   build_seed_user = lambda do |
     label:, role:, email_address:, password:, template_slug:, accent_color:, primary_title:,
-    secondary_title:, focus:, project_name:, project_role:, skills:, driving_licence:, personal_details:|
+    secondary_title:, focus:, project_name:, project_role:, skills:, driving_licence:, personal_details:,
+    photo_seed:|
     {
       label:,
       role:,
@@ -357,7 +457,8 @@ seed_users = if Rails.env.development? || Rails.env.test?
           project_role:,
           skills:,
           driving_licence:,
-          personal_details:
+          personal_details:,
+          photo_seed:
         )
       ]
     }
@@ -383,7 +484,8 @@ seed_users = if Rails.env.development? || Rails.env.test?
         "nationality" => "Indian",
         "marital_status" => "",
         "visa_status" => "Authorized to work in India"
-      }
+      },
+      photo_seed: nil
     ),
     build_seed_user.call(
       label: "Demo User",
@@ -404,9 +506,38 @@ seed_users = if Rails.env.development? || Rails.env.test?
         "nationality" => "United States",
         "marital_status" => "",
         "visa_status" => "U.S. citizen"
+      },
+      photo_seed: nil
+    )
+  ].tap do |users|
+    users << build_seed_user.call(
+      label: "Demo User with Photo",
+      role: :user,
+      email_address: "demo-with-photo@resume-builder.local",
+      password: "password123!",
+      template_slug: "editorial-split",
+      accent_color: "#D7F038",
+      primary_title: "Design Director",
+      secondary_title: "Senior Product Designer",
+      focus: "Editorial Systems",
+      project_name: "Portfolio Studio Refresh",
+      project_role: "Design Lead",
+      skills: ["Product Design", "Design Systems", "Art Direction"],
+      driving_licence: "Class C",
+      personal_details: {
+        "date_of_birth" => "",
+        "nationality" => "United States",
+        "marital_status" => "",
+        "visa_status" => "U.S. citizen"
+      },
+      photo_seed: {
+        profile_name: "Demo User Photo Library",
+        source_filename: "demo-user-source-headshot.png",
+        preferred_filename: "demo-user-enhanced-headshot.png",
+        template_selection: "preferred"
       }
     )
-  ]
+  end
 else
   []
 end
@@ -462,6 +593,12 @@ ApplicationRecord.transaction do
           template: template
         )
         resume.save!
+
+        seed_photo_library_for_resume.call(
+          user: user,
+          resume: resume,
+          photo_seed: resume_definition.fetch(:photo_seed, nil)
+        )
 
         resume.sections.destroy_all
 

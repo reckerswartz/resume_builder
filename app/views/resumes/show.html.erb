@@ -15,10 +15,10 @@
           <div>
             <span class="atelier-pill">
               <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-              Live preview
+              <%= t("resumes.show.preview_pill") %>
             </span>
-            <h2 class="mt-4 text-xl font-semibold tracking-tight text-ink-950">Review before you export</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80">Check the latest layout, confirm the details you care about, and then download or keep editing.</p>
+            <h2 class="mt-4 text-xl font-semibold tracking-tight text-ink-950"><%= t("resumes.show.preview_title") %></h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.show.preview_description") %></p>
           </div>
 
           <div class="flex flex-wrap gap-2">
@@ -30,9 +30,9 @@
 
         <div class="xl:hidden">
           <%= render Ui::DashboardPanelComponent.new(
-            eyebrow: "Quick actions",
-            title: "Export or keep editing",
-            description: "Use these actions before you scroll through the preview on smaller screens.",
+            eyebrow: t("resumes.show.mobile_actions.eyebrow"),
+            title: t("resumes.show.mobile_actions.title"),
+            description: t("resumes.show.mobile_actions.description"),
             padding: :sm,
             density: :compact
           ) do %>
@@ -56,16 +56,16 @@
 
     <aside class="hidden space-y-4 xl:sticky xl:top-6 xl:block">
       <%= render Ui::DashboardPanelComponent.new(
-        eyebrow: "Preview actions",
-        title: "Download or go back to editing",
-        description: "Keep the current preview in view while you export, download, or return to the editor.",
+        eyebrow: t("resumes.show.desktop_actions.eyebrow"),
+        title: t("resumes.show.desktop_actions.title"),
+        description: t("resumes.show.desktop_actions.description"),
         padding: :sm,
         density: :compact
       ) do %>
         <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
           <div class="space-y-2">
-            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">What this shows</p>
-            <p class="text-sm leading-6 text-ink-700/80">Use this preview to make sure the layout, content, and export status look right before you download the file.</p>
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.show.what_this_shows.eyebrow") %></p>
+            <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.show.what_this_shows.description") %></p>
           </div>
 
           <%= render "export_actions", resume: @resume, context: :show, export_actions_state: show_state.export_actions_state %>

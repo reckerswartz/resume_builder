@@ -4,18 +4,26 @@ class Resume < ApplicationRecord
   EXPERIENCE_LEVELS = %w[no_experience less_than_3_years three_to_five_years five_to_ten_years ten_plus_years].freeze
   STUDENT_STATUSES = %w[student not_student].freeze
   PERSONAL_DETAIL_FIELDS = %w[date_of_birth nationality marital_status visa_status].freeze
+  HEADSHOT_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
+  MAX_HEADSHOT_SIZE = 3.megabytes
 
   belongs_to :template
   belongs_to :user
+  belongs_to :photo_profile, optional: true
 
   has_one_attached :pdf_export
   has_one_attached :source_document
+  has_one_attached :headshot
   has_many :llm_interactions, dependent: :destroy
+  has_many :resume_photo_selections, dependent: :destroy
   has_many :sections, -> { order(position: :asc, created_at: :asc) }, dependent: :destroy, inverse_of: :resume
 
   validates :slug, presence: true, uniqueness: { scope: :user_id }
   validates :source_mode, inclusion: { in: SOURCE_MODES }
   validates :title, presence: true
+  validate :headshot_content_type
+  validate :headshot_file_size
+  validate :photo_profile_belongs_to_user
 
   before_validation :assign_template
   before_validation :normalize_json_attributes
@@ -87,7 +95,22 @@ class Resume < ApplicationRecord
     self[:personal_details] = normalize_personal_details_payload(value)
   end
 
+  def selected_headshot_photo_asset
+    selected_photo_asset_for("headshot")
+  end
+
+  def selected_photo_asset_for(slot_name, template: self.template)
+    template_identifier = template&.id || template_id
+    selection_scope = resume_photo_selections.active.for_slot(slot_name)
+    selection = template_identifier.present? ? selection_scope.find_by(template_id: template_identifier) : nil
+
+    selection&.photo_asset || fallback_photo_asset_for(slot_name)
+  end
+
   def personal_details_step_completed?
+    return true if selected_headshot_photo_asset.present?
+    return true if headshot.attached?
+
     PERSONAL_DETAIL_FIELDS.any? { |field| personal_detail_field(field).present? } ||
       %w[website linkedin driving_licence].any? { |field| contact_field(field).present? }
   end
@@ -213,5 +236,32 @@ class Resume < ApplicationRecord
     PERSONAL_DETAIL_FIELDS.index_with do |field|
       raw_details[field].to_s.strip
     end
+  end
+
+  def fallback_photo_asset_for(slot_name)
+    return unless slot_name.to_s == "headshot"
+
+    PhotoProfile.find_by(id: photo_profile_id)&.preferred_headshot_asset
+  end
+
+  def photo_profile_belongs_to_user
+    return if photo_profile.blank?
+    return if photo_profile.user_id == user_id
+
+    errors.add(:photo_profile, "must belong to the same user")
+  end
+
+  def headshot_content_type
+    return unless headshot.attached?
+    return if HEADSHOT_CONTENT_TYPES.include?(headshot.blob.content_type)
+
+    errors.add(:headshot, "must be a JPG, PNG, or WebP image")
+  end
+
+  def headshot_file_size
+    return unless headshot.attached?
+    return if headshot.blob.byte_size <= MAX_HEADSHOT_SIZE
+
+    errors.add(:headshot, "must be smaller than 3 MB")
   end
 end

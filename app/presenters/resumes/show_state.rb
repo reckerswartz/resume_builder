@@ -8,9 +8,9 @@ module Resumes
 
     def page_header_attributes
       {
-        eyebrow: "Preview",
+        eyebrow: I18n.t("resumes.show_state.page_header.eyebrow"),
         title: resume.title,
-        description: "Review the latest preview, check export status, and decide whether to download or keep editing.",
+        description: I18n.t("resumes.show_state.page_header.description"),
         badges: badges,
         actions: actions,
         density: :compact
@@ -20,22 +20,22 @@ module Resumes
     def badges
       @badges ||= [
         { label: resume.template.name, tone: :neutral },
-        { label: "#{builder_state.completion_percentage}% complete", tone: :neutral },
-        { label: resume.export_state.humanize, tone: export_badge_tone }
+        { label: I18n.t("resumes.show_state.page_header.completion_badge", percent: builder_state.completion_percentage), tone: :neutral },
+        { label: export_state_label, tone: export_badge_tone }
       ]
     end
 
     def actions
       @actions ||= [
-        { label: "Back to workspace", path: view_context.resumes_path, style: :secondary, size: :sm },
-        { label: "Edit resume", path: view_context.edit_resume_path(resume, step: current_step_key), style: :primary, size: :sm }
+        { label: I18n.t("resumes.show_state.page_header.back_to_workspace"), path: view_context.resumes_path, style: :secondary, size: :sm },
+        { label: I18n.t("resumes.show_state.page_header.edit_resume"), path: view_context.edit_resume_path(resume, step: current_step_key), style: :primary, size: :sm }
       ]
     end
 
     def artifact_badges
       @artifact_badges ||= [
         { label: resume.template.name, tone: :neutral },
-        { label: resume.export_state.humanize, tone: export_badge_tone }
+        { label: export_state_label, tone: export_badge_tone }
       ]
     end
 
@@ -57,6 +57,10 @@ module Resumes
 
     private
       attr_reader :builder_state, :resume, :view_context
+
+      def export_state_label
+        I18n.t("resumes.export_states.#{resume.export_state}", default: resume.export_state.to_s.humanize.presence || I18n.t("resumes.export_states.draft"))
+      end
 
       def current_step_key
         builder_state.current_step.fetch(:key)

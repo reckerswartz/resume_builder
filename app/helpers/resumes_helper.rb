@@ -265,7 +265,7 @@ module ResumesHelper
   end
 
   def entry_editor_title(entry, section)
-    fallback = "#{section.section_type.titleize} entry"
+    fallback = I18n.t("resumes.entry_form.titles.entry_fallback", section: ResumeBuilder::SectionRegistry.title_for(section.section_type))
 
     case section.section_type
     when "experience"
@@ -306,30 +306,30 @@ module ResumesHelper
   def resume_export_status_label(resume)
     case resume.export_state
     when "queued"
-      "Queued for export"
+      I18n.t("resumes.helper.export_status.labels.queued")
     when "running"
-      "Generating now"
+      I18n.t("resumes.helper.export_status.labels.running")
     when "failed"
-      "Export failed"
+      I18n.t("resumes.helper.export_status.labels.failed")
     when "ready"
-      "PDF ready"
+      I18n.t("resumes.helper.export_status.labels.ready")
     else
-      "Draft only"
+      I18n.t("resumes.helper.export_status.labels.draft_only")
     end
   end
 
   def resume_export_status_message(resume)
     case resume.export_state
     when "queued"
-      resume.pdf_export.attached? ? "A fresh PDF has been queued. The current download stays available while the new export is prepared." : "Your PDF export has been queued and will appear here automatically when it finishes."
+      resume.pdf_export.attached? ? I18n.t("resumes.helper.export_status.messages.queued.with_download") : I18n.t("resumes.helper.export_status.messages.queued.without_download")
     when "running"
-      resume.pdf_export.attached? ? "A fresh PDF is generating now. You can still download the latest completed export while it runs." : "Your PDF export is generating now. This panel updates automatically when the file is ready."
+      resume.pdf_export.attached? ? I18n.t("resumes.helper.export_status.messages.running.with_download") : I18n.t("resumes.helper.export_status.messages.running.without_download")
     when "failed"
-      resume.pdf_export.attached? ? "The latest export attempt failed. You can still download the previous PDF or start a fresh export." : "The latest export attempt did not finish. Start a new export when you are ready."
+      resume.pdf_export.attached? ? I18n.t("resumes.helper.export_status.messages.failed.with_download") : I18n.t("resumes.helper.export_status.messages.failed.without_download")
     when "ready"
-      "The latest PDF export is attached and ready to download."
+      I18n.t("resumes.helper.export_status.messages.ready")
     else
-      "No PDF export has been generated yet."
+      I18n.t("resumes.helper.export_status.messages.draft_only")
     end
   end
 
@@ -365,14 +365,14 @@ module ResumesHelper
         key: provider.fetch(:key),
         label: provider.fetch(:label),
         description: provider.fetch(:description),
-        status_label: configured ? "Configured" : "Setup required",
+        status_label: configured ? I18n.t("resumes.helper.source_cloud_import.status.configured") : I18n.t("resumes.helper.source_cloud_import.status.setup_required"),
         status_tone: configured ? :neutral : :warning,
-        action_label: configured ? "Connect soon" : "See setup",
+        action_label: configured ? I18n.t("resumes.helper.source_cloud_import.actions.connect_soon") : I18n.t("resumes.helper.source_cloud_import.actions.see_setup"),
         action_path: resume_source_import_path(provider.fetch(:key), return_to: return_to.presence, resume_id: resume_id),
         message: if configured
-          "Environment credentials are present, but the OAuth handoff and remote file chooser are not wired in this rollout yet."
+          I18n.t("resumes.helper.source_cloud_import.messages.configured")
         else
-          "Add #{provider.fetch(:required_env_vars).to_sentence} to enable this connector safely."
+          I18n.t("resumes.helper.source_cloud_import.messages.setup_required", env_vars: provider.fetch(:required_env_vars).to_sentence)
         end
       }
     end
@@ -383,78 +383,79 @@ module ResumesHelper
 
     attachment = resume.source_document
     supported_upload = resume_source_document_autofill_supported?(resume)
+    content_type = attachment.blob.content_type.presence || I18n.t("resumes.helper.source_upload_review.unknown_type")
 
     if supported_upload && autofill_enabled
       {
-        title: "Ready for AI import",
-        badge_label: "Autofill supported",
+        title: I18n.t("resumes.helper.source_upload_review.ready_for_ai_import.title"),
+        badge_label: I18n.t("resumes.helper.source_upload_review.ready_for_ai_import.badge_label"),
         badge_tone: :success,
         panel_tone: :success,
         filename: attachment.filename.to_s,
-        content_type: attachment.blob.content_type.presence || "Unknown type",
+        content_type: content_type,
         file_size: number_to_human_size(attachment.byte_size),
-        message: "This upload can be converted into source text during autofill while the original file stays attached to the draft."
+        message: I18n.t("resumes.helper.source_upload_review.ready_for_ai_import.message")
       }
     elsif supported_upload
       {
-        title: "Supported upload attached",
-        badge_label: "Autofill supported",
+        title: I18n.t("resumes.helper.source_upload_review.supported_upload_attached.title"),
+        badge_label: I18n.t("resumes.helper.source_upload_review.supported_upload_attached.badge_label"),
         badge_tone: :neutral,
         panel_tone: :default,
         filename: attachment.filename.to_s,
-        content_type: attachment.blob.content_type.presence || "Unknown type",
+        content_type: content_type,
         file_size: number_to_human_size(attachment.byte_size),
-        message: "This file type supports AI import when autofill is available. The original file stays attached to the draft for reference."
+        message: I18n.t("resumes.helper.source_upload_review.supported_upload_attached.message")
       }
     else
       {
-        title: "Reference file only",
-        badge_label: "Reference only",
+        title: I18n.t("resumes.helper.source_upload_review.reference_file_only.title"),
+        badge_label: I18n.t("resumes.helper.source_upload_review.reference_file_only.badge_label"),
         badge_tone: :neutral,
         panel_tone: :default,
         filename: attachment.filename.to_s,
-        content_type: attachment.blob.content_type.presence || "Unknown type",
+        content_type: content_type,
         file_size: number_to_human_size(attachment.byte_size),
-        message: "Keep this file attached for reference while you manually rebuild the draft. Use pasted text or a supported upload if you want AI to draft the core sections right now."
+        message: I18n.t("resumes.helper.source_upload_review.reference_file_only.message")
       }
     end
   end
 
   def resume_source_autofill_status_label(resume, autofill_enabled:)
-    return "AI import unavailable" unless autofill_enabled
+    return I18n.t("resumes.helper.source_autofill.labels.unavailable") unless autofill_enabled
 
     case resume.source_mode
     when "paste"
-      resume.source_text.to_s.squish.present? ? "Paste import ready" : "Paste text required"
+      resume.source_text.to_s.squish.present? ? I18n.t("resumes.helper.source_autofill.labels.paste_ready") : I18n.t("resumes.helper.source_autofill.labels.paste_required")
     when "upload"
-      return "Attach a file" unless resume.source_document.attached?
+      return I18n.t("resumes.helper.source_autofill.labels.attach_file") unless resume.source_document.attached?
 
-      resume_source_document_autofill_supported?(resume) ? "Upload import ready" : "Reference file only"
+      resume_source_document_autofill_supported?(resume) ? I18n.t("resumes.helper.source_autofill.labels.upload_ready") : I18n.t("resumes.helper.source_autofill.labels.reference_file_only")
     else
-      "Choose an import path"
+      I18n.t("resumes.helper.source_autofill.labels.choose_import_path")
     end
   end
 
   def resume_source_autofill_status_message(resume, autofill_enabled:)
-    return "Enable the autofill feature and a request-ready text generation model to let AI prepare the first draft." unless autofill_enabled
+    return I18n.t("resumes.helper.source_autofill.messages.unavailable") unless autofill_enabled
 
     case resume.source_mode
     when "paste"
       if resume.source_text.to_s.squish.present?
-        "Pasted text can be structured into the heading, summary, and core resume sections."
+        I18n.t("resumes.helper.source_autofill.messages.paste_ready")
       else
-        "Switch to paste mode and add source text before running autofill."
+        I18n.t("resumes.helper.source_autofill.messages.paste_required")
       end
     when "upload"
-      return "Attach a source document before running autofill." unless resume.source_document.attached?
+      return I18n.t("resumes.helper.source_autofill.messages.attach_document") unless resume.source_document.attached?
 
       if resume_source_document_autofill_supported?(resume)
-        "This upload can be converted into source text for AI autofill while staying attached to the draft."
+        I18n.t("resumes.helper.source_autofill.messages.upload_ready")
       else
-        "This file stays attached for reference. AI autofill currently reads #{Resumes::SourceTextResolver.supported_upload_formats_label} uploads."
+        I18n.t("resumes.helper.source_autofill.messages.upload_reference_only", formats: Resumes::SourceTextResolver.supported_upload_formats_label)
       end
     else
-      "Scratch mode keeps the builder manual. Choose paste or upload if you want AI to draft the core sections first."
+      I18n.t("resumes.helper.source_autofill.messages.scratch_mode")
     end
   end
 

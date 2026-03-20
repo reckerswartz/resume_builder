@@ -20,6 +20,19 @@ RSpec.describe 'Sections', type: :request do
       end.to change { resume.sections.count }.by(1)
 
       expect(response).to redirect_to(edit_resume_path(resume))
+      expect(flash[:notice]).to eq(I18n.t('resumes.sections_controller.created'))
+    end
+
+    it 'preserves locale query params on successful create redirects' do
+      post resume_sections_path(resume, locale: :en), params: {
+        section: {
+          title: 'Projects',
+          section_type: 'projects'
+        }
+      }
+
+      expect(response).to redirect_to(edit_resume_path(resume, locale: :en))
+      expect(flash[:notice]).to eq(I18n.t('resumes.sections_controller.created'))
     end
   end
 
@@ -31,6 +44,7 @@ RSpec.describe 'Sections', type: :request do
       patch move_resume_section_path(resume, second_section, direction: :up)
 
       expect(response).to redirect_to(edit_resume_path(resume))
+      expect(flash[:notice]).to eq(I18n.t('resumes.sections_controller.moved'))
       expect(second_section.reload.position).to eq(0)
       expect(first_section.reload.position).to eq(1)
     end
@@ -47,6 +61,7 @@ RSpec.describe 'Sections', type: :request do
       expect(first_section.reload.position).to eq(1)
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
+      expect(response.body).to include(I18n.t('resumes.sections_controller.moved'))
     end
   end
 end

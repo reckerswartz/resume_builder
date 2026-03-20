@@ -1,7 +1,5 @@
 module Resumes
   class TemplateRecommendationService
-    RECOMMENDED_BADGE_LABEL = "Recommended"
-
     def initialize(resume:, template_cards:)
       @resume = resume
       @template_cards = Array(template_cards)
@@ -16,7 +14,7 @@ module Resumes
       if early_career_template.present? && early_career_resume?
         recommendations << build_recommendation(
           early_career_template,
-          reason: "Best for early-career resumes"
+          reason: I18n.t("resumes.template_recommendation_service.reasons.early_career")
         )
       end
 
@@ -26,7 +24,7 @@ module Resumes
         if student_template.present?
           recommendations << build_recommendation(
             student_template,
-            reason: "Highlights education and skills for student resumes"
+            reason: I18n.t("resumes.template_recommendation_service.reasons.student")
           )
         end
       end
@@ -63,7 +61,7 @@ module Resumes
       def build_recommendation(template_card, reason:)
         {
           template_id: template_card.fetch(:template).id,
-          badge_label: RECOMMENDED_BADGE_LABEL,
+          badge_label: I18n.t("resumes.template_recommendation_service.badge_label"),
           reason: reason
         }
       end

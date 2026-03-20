@@ -13,6 +13,7 @@ module Resumes
           source_mode: attributes[:source_mode].presence || "scratch",
           source_text: attributes[:source_text].to_s,
           source_document: attributes[:source_document],
+          headshot: attributes[:headshot],
           contact_details: default_contact_details.merge(attributes[:contact_details] || {}),
           intake_details: attributes[:intake_details] || {},
           personal_details: attributes[:personal_details] || {},

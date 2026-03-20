@@ -2,21 +2,20 @@ module ResumeBuilder
   class SectionRegistry
     SECTION_DEFINITIONS = {
       "experience" => {
-        title: "Experience",
         builder_step: "experience",
         core: true,
         fields: [
-          { key: "title", label: "Job title *" },
-          { key: "organization", label: "Employer" },
-          { key: "location", label: "Location" },
-          { key: "remote", label: "Remote", as: :checkbox },
-          { key: "start_month", label: "Start month" },
-          { key: "start_year", label: "Start year" },
-          { key: "end_month", label: "End month" },
-          { key: "end_year", label: "End year" },
-          { key: "current_role", label: "I currently work here", as: :checkbox },
-          { key: "summary", label: "Summary", as: :textarea },
-          { key: "highlights_text", label: "Highlights", as: :textarea }
+          { key: "title" },
+          { key: "organization" },
+          { key: "location" },
+          { key: "remote", as: :checkbox },
+          { key: "start_month" },
+          { key: "start_year" },
+          { key: "end_month" },
+          { key: "end_year" },
+          { key: "current_role", as: :checkbox },
+          { key: "summary", as: :textarea },
+          { key: "highlights_text", as: :textarea }
         ],
         starter_entries: [
           {
@@ -34,16 +33,15 @@ module ResumeBuilder
         ]
       },
       "education" => {
-        title: "Education",
         builder_step: "education",
         core: true,
         fields: [
-          { key: "institution", label: "Institution" },
-          { key: "degree", label: "Degree" },
-          { key: "location", label: "Location" },
-          { key: "start_date", label: "Start date" },
-          { key: "end_date", label: "End date" },
-          { key: "details", label: "Details", as: :textarea }
+          { key: "institution" },
+          { key: "degree" },
+          { key: "location" },
+          { key: "start_date" },
+          { key: "end_date" },
+          { key: "details", as: :textarea }
         ],
         starter_entries: [
           {
@@ -57,12 +55,11 @@ module ResumeBuilder
         ]
       },
       "skills" => {
-        title: "Skills",
         builder_step: "skills",
         core: true,
         fields: [
-          { key: "name", label: "Skill" },
-          { key: "level", label: "Level" }
+          { key: "name" },
+          { key: "level" }
         ],
         starter_entries: [
           { "name" => "Ruby on Rails", "level" => "Expert" },
@@ -71,15 +68,14 @@ module ResumeBuilder
         ]
       },
       "projects" => {
-        title: "Projects",
         builder_step: "finalize",
         core: false,
         fields: [
-          { key: "name", label: "Project" },
-          { key: "role", label: "Role" },
-          { key: "url", label: "URL" },
-          { key: "summary", label: "Summary", as: :textarea },
-          { key: "highlights_text", label: "Highlights", as: :textarea }
+          { key: "name" },
+          { key: "role" },
+          { key: "url" },
+          { key: "summary", as: :textarea },
+          { key: "highlights_text", as: :textarea }
         ],
         starter_entries: [
           {
@@ -98,7 +94,9 @@ module ResumeBuilder
 
     class << self
       def all
-        SECTION_DEFINITIONS
+        SECTION_DEFINITIONS.each_with_object({}) do |(section_type, definition), localized_definitions|
+          localized_definitions[section_type] = localized_definition(section_type, definition)
+        end
       end
 
       def types
@@ -110,11 +108,12 @@ module ResumeBuilder
       end
 
       def fetch(section_type)
-        SECTION_DEFINITIONS.fetch(section_type.to_s)
+        key = section_type.to_s
+        localized_definition(key, SECTION_DEFINITIONS.fetch(key))
       end
 
       def title_for(section_type)
-        SECTION_DEFINITIONS.dig(section_type.to_s, :title) || section_type.to_s.titleize
+        fetch(section_type).fetch(:title)
       end
 
       def fields_for(section_type)
@@ -137,11 +136,21 @@ module ResumeBuilder
         SECTION_DEFINITIONS.filter_map do |section_type, definition|
           {
             section_type: section_type,
-            title: definition.fetch(:title),
+            title: title_for(section_type),
             entries: definition.fetch(:starter_entries).deep_dup
           }
         end
       end
+
+      private
+        def localized_definition(section_type, definition)
+          definition.merge(
+            title: I18n.t("resume_builder.section_registry.sections.#{section_type}.title"),
+            fields: definition.fetch(:fields).map do |field|
+              field.merge(label: I18n.t("resume_builder.section_registry.sections.#{section_type}.fields.#{field.fetch(:key)}"))
+            end
+          )
+        end
     end
   end
 end

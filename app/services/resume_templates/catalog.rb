@@ -2,6 +2,7 @@ module ResumeTemplates
   class Catalog
     ACCENT_COLOR_PATTERN = /\A#(?:\h{3}|\h{6})\z/
     BOOLEAN_TYPE = ActiveModel::Type::Boolean.new
+    PHOTO_SLOT_NAMES = %w[headshot].freeze
 
     FONT_SCALES = {
       "sm" => {
@@ -76,7 +77,8 @@ module ResumeTemplates
       "slate" => "Slate",
       "blue" => "Blue",
       "teal" => "Teal",
-      "indigo" => "Indigo"
+      "indigo" => "Indigo",
+      "lime" => "Lime"
     }.freeze
 
     FAMILY_DEFINITIONS = {
@@ -195,6 +197,34 @@ module ResumeTemplates
           "sidebar_position" => "left",
           "sidebar_section_types" => %w[skills education]
         }
+      },
+      "editorial-split" => {
+        label: "Editorial Split",
+        component_class_name: "ResumeTemplates::EditorialSplitComponent",
+        defaults: {
+          "family" => "editorial-split",
+          "variant" => "editorial-split",
+          "accent_color" => "#D7F038",
+          "font_scale" => "sm",
+          "density" => "compact",
+          "column_count" => "two_column",
+          "theme_tone" => "lime",
+          "supports_headshot" => true,
+          "photo_slots" => {
+            "headshot" => {
+              "portrait_shape" => "rounded_square",
+              "crop_style" => "cover",
+              "background_style" => "studio_clean"
+            }
+          },
+          "shell_style" => "flat",
+          "header_style" => "split",
+          "section_heading_style" => "rule",
+          "skill_style" => "inline",
+          "entry_style" => "list",
+          "sidebar_position" => "left",
+          "sidebar_section_types" => %w[education skills projects]
+        }
       }
     }.freeze
 
@@ -261,6 +291,7 @@ module ResumeTemplates
         normalized["column_count"] = normalize_option(config["column_count"], COLUMN_COUNTS.keys, defaults.fetch("column_count"))
         normalized["theme_tone"] = normalize_option(config["theme_tone"], THEME_TONES.keys, defaults.fetch("theme_tone"))
         normalized["supports_headshot"] = BOOLEAN_TYPE.cast(config.key?("supports_headshot") ? config["supports_headshot"] : defaults.fetch("supports_headshot"))
+        normalized["photo_slots"] = normalize_photo_slots(config["photo_slots"], defaults.fetch("photo_slots", {}))
         normalized["shell_style"] = normalize_option(config["shell_style"], SHELL_STYLES, defaults.fetch("shell_style"))
         normalized["header_style"] = normalize_option(config["header_style"], HEADER_STYLES, defaults.fetch("header_style"))
         normalized["section_heading_style"] = normalize_option(config["section_heading_style"], SECTION_HEADING_STYLES, defaults.fetch("section_heading_style"))
@@ -322,6 +353,21 @@ module ResumeTemplates
 
         def normalize_option(value, allowed_values, fallback)
           value.to_s.presence_in(allowed_values) || fallback
+        end
+
+        def normalize_photo_slots(value, fallback)
+          raw_slots = value.is_a?(Hash) ? value.deep_stringify_keys : fallback.deep_stringify_keys
+
+          PHOTO_SLOT_NAMES.each_with_object({}) do |slot_name, slots|
+            next unless raw_slots.key?(slot_name)
+
+            slot_config = raw_slots.fetch(slot_name, {}).deep_stringify_keys
+            slots[slot_name] = {
+              "portrait_shape" => slot_config["portrait_shape"].presence || "rounded_square",
+              "crop_style" => slot_config["crop_style"].presence || "cover",
+              "background_style" => slot_config["background_style"].presence || "studio_clean"
+            }
+          end
         end
     end
   end

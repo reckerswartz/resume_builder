@@ -12,7 +12,7 @@ class ResumeSourceImportsController < ApplicationController
       @provider = Resumes::CloudImportProviderCatalog.fetch(params[:provider])
       return if @provider.present?
 
-      redirect_to fallback_path, alert: "Cloud import provider is not available."
+      redirect_to fallback_path, alert: I18n.t("resumes.resume_source_imports_controller.provider_unavailable")
     end
 
     def authorize_launch_context
@@ -22,7 +22,7 @@ class ResumeSourceImportsController < ApplicationController
         @resume = policy_scope(Resume).find_by(id: params[:resume_id])
 
         if @resume.blank?
-          redirect_to resumes_path, alert: "Resume is not available."
+          redirect_to resumes_path, alert: I18n.t("resumes.resume_source_imports_controller.resume_unavailable")
           return
         end
 

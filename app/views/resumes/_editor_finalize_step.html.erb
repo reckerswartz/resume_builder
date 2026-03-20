@@ -1,10 +1,10 @@
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <%= render Ui::StepHeaderComponent.new(
-    title: "Finalize and export",
-    description: "Choose the final layout, review export actions, and manage any extra sections that sit outside the core guided flow.",
+    title: current_step.fetch(:title),
+    description: current_step.fetch(:description),
     aside_classes: "flex flex-wrap gap-2"
   ) do %>
-    <%= link_to "Preview", resume_path(resume, **resume_builder_step_params("finalize")), data: { turbo_frame: "_top" }, class: ui_button_classes(:secondary, size: :sm) %>
+    <%= link_to t("resumes.editor_finalize_step.preview_action"), resume_path(resume, **resume_builder_step_params("finalize")), data: { turbo_frame: "_top" }, class: ui_button_classes(:secondary, size: :sm) %>
     <%= render "resumes/export_actions", resume: resume, context: :finalize, export_actions_state: resume_export_actions_state(resume, context: :finalize) %>
   <% end %>
 
@@ -20,15 +20,15 @@
         <div>
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-            Preview actions
+            <%= t("resumes.editor_finalize_step.preview_actions.pill") %>
           </span>
-          <h4 class="mt-4 text-sm font-semibold text-ink-950">Keep the last decisions lightweight</h4>
+          <h4 class="mt-4 text-sm font-semibold text-ink-950"><%= t("resumes.editor_finalize_step.preview_actions.title") %></h4>
         </div>
 
-        <span class="<%= ui_badge_classes(:neutral) %>">Export stays ready</span>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.preview_actions.badge") %></span>
       </div>
 
-      <p class="text-sm leading-6 text-ink-700/80">Choose a template first, then open extra output settings only if you need them. Export and download actions stay close while you make the last adjustments.</p>
+      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.preview_actions.description") %></p>
     </div>
 
     <div class="space-y-5">
@@ -39,8 +39,8 @@
           template_picker_state: resume_template_picker_state(
             resume: resume,
             form_object_name: form.object_name,
-            field_label: "Template",
-            description: "Switch the look without changing the saved resume content. Active templates stay available here, and a legacy template remains selectable if this resume already uses it."
+            field_label: t("resumes.editor_finalize_step.template_field_label"),
+            description: t("resumes.editor_finalize_step.template_picker_description")
           ) %>
       </div>
 
@@ -52,26 +52,26 @@
         <summary class="cursor-pointer list-none">
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70">Output settings</p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80">Open link, page-size, color, and contact-display controls only when you need them.</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= t("resumes.editor_finalize_step.output_settings.eyebrow") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.description") %></p>
             </div>
-            <span class="<%= ui_badge_classes(:neutral) %>">Optional</span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.output_settings.optional_badge") %></span>
           </div>
         </summary>
 
         <div class="mt-4 grid gap-5 sm:grid-cols-2">
           <div>
-            <%= form.label :slug, "Resume link", class: ui_label_classes %>
+            <%= form.label :slug, t("resumes.editor_finalize_step.output_settings.resume_link"), class: ui_label_classes %>
             <%= form.text_field :slug, class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "resume_settings_page_size", "Page size", class: ui_label_classes %>
+            <%= label_tag "resume_settings_page_size", t("resumes.editor_finalize_step.output_settings.page_size"), class: ui_label_classes %>
             <%= select_tag "resume[settings][page_size]", options_for_select([["A4", "A4"], ["Letter", "Letter"]], resume.settings.fetch("page_size", "A4")), class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "resume_settings_accent_color", "Accent color", class: ui_label_classes %>
+            <%= label_tag "resume_settings_accent_color", t("resumes.editor_finalize_step.output_settings.accent_color"), class: ui_label_classes %>
             <%= color_field_tag "resume[settings][accent_color]", resume.settings.fetch("accent_color", "#0F172A"), class: "#{ui_input_classes} h-12 px-2 py-2" %>
           </div>
 
@@ -79,8 +79,8 @@
             <%= hidden_field_tag "resume[settings][show_contact_icons]", false %>
             <label class="flex items-center justify-between gap-4">
               <span>
-                <span class="block <%= ui_label_classes %>">Show contact icons</span>
-                <span class="mt-1 block text-sm text-ink-700/80">Keep contact info compact in the preview and exported PDF.</span>
+                <span class="block <%= ui_label_classes %>"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons") %></span>
+                <span class="mt-1 block text-sm text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons_description") %></span>
               </span>
               <%= check_box_tag "resume[settings][show_contact_icons]", true, resume.settings.fetch("show_contact_icons", true), class: ui_checkbox_classes %>
             </label>
@@ -90,8 +90,8 @@
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm text-ink-700/70">Changes save in place here, so you can export from the builder once the shared preview looks right.</p>
-      <%= form.submit "Save finalize settings", class: ui_button_classes(:primary) %>
+      <p class="text-sm text-ink-700/70"><%= t("resumes.editor_finalize_step.footer_note") %></p>
+      <%= form.submit t("resumes.editor_finalize_step.save_finalize_settings"), class: ui_button_classes(:primary) %>
     </div>
   <% end %>
 <% end %>
@@ -104,15 +104,15 @@
       <div class="relative space-y-3">
         <span class="atelier-pill">
           <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-          Additional sections
+          <%= t("resumes.editor_finalize_step.additional_sections.pill") %>
         </span>
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h3 class="text-xl font-semibold tracking-tight text-ink-950">Additional sections</h3>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80">Projects and custom sections remain available here while the main builder flow stays focused on heading, experience, education, skills, and summary.</p>
+            <h3 class="text-xl font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.additional_sections.title") %></h3>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.additional_sections.description") %></p>
           </div>
 
-          <span class="<%= ui_badge_classes(:neutral) %>">White-canvas editor</span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.additional_sections.badge") %></span>
         </div>
       </div>
     </div>
@@ -128,8 +128,8 @@
     </div>
   <% else %>
     <%= render Ui::EmptyStateComponent.new(
-      title: "No additional sections yet",
-      description: "Add projects or other custom sections here once the core guided steps feel complete."
+      title: t("resumes.editor_finalize_step.empty_state.title"),
+      description: t("resumes.editor_finalize_step.empty_state.description")
     ) %>
   <% end %>
 

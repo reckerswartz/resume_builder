@@ -21,8 +21,11 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include('Use template')
       expect(response.body).to include('data-controller="template-gallery"')
       expect(response.body).to include('Compare faster')
-      expect(response.body).to include('Use search first, then open extra filters only when you need them.')
-      expect(response.body).to include('Filters')
+      expect(response.body).to include('Search by name or layout details first, then narrow the gallery only when you need tighter comparison.')
+      expect(response.body).to include('Search and sort')
+      expect(response.body).to include('Quick choices')
+      expect(response.body).to include('Full filter tray')
+      expect(response.body).to include('Narrow the gallery without opening every filter')
       expect(response.body).to include('Layout family')
       expect(response.body).to include('Columns')
       expect(response.body).to include('Theme')
@@ -31,6 +34,18 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include('data-template-gallery-target="sortSelect"')
       expect(response.body).to include('page-header-compact')
       expect(response.body).to include('data-controller="disclosure"')
+    end
+
+    it 'preserves locale query params through marketplace actions and card links' do
+      template = create(:template, name: 'Modern Slate')
+
+      get templates_path(locale: :en)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('href="/resumes/new?locale=en"')
+      expect(response.body).to include('href="/resumes?locale=en"')
+      expect(response.body).to include(%(href="/templates/#{template.id}?locale=en"))
+      expect(response.body).to include(%(href="/resumes/new?locale=en&amp;template_id=#{template.id}"))
     end
 
     it 'renders sort-aware marketplace state and orders cards by the selected sort mode' do
@@ -68,7 +83,7 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include(%(value="recommended_first" selected))
       expect(response.body.index('ATS Minimal')).to be < response.body.index('Sidebar Indigo')
       expect(response.body.index('Sidebar Indigo')).to be < response.body.index('Modern Slate')
-      expect(response.body).to include(ERB::Util.html_escape(template_path(ats_template, resume: { intake_details: { experience_level: 'less_than_3_years', student_status: 'student' } })))
+      expect(response.body).to include(ERB::Util.html_escape(template_path(id: ats_template, resume: { intake_details: { experience_level: 'less_than_3_years', student_status: 'student' } })))
       expect(response.body).to include(ERB::Util.html_escape(new_resume_path(template_id: ats_template.id, resume: { intake_details: { experience_level: 'less_than_3_years', student_status: 'student' } })))
       expect(response.body).to include(ERB::Util.html_escape(new_resume_path(template_id: sidebar_template.id, resume: { intake_details: { experience_level: 'less_than_3_years', student_status: 'student' } })))
       expect(response.body).to include(ERB::Util.html_escape(new_resume_path(template_id: modern_template.id, resume: { intake_details: { experience_level: 'less_than_3_years', student_status: 'student' } })))
@@ -110,7 +125,12 @@ RSpec.describe 'Templates', type: :request do
 
   describe 'GET /templates/:id' do
     it 'renders the template detail page with the shared sample renderer' do
-      template = create(:template, name: 'Modern Slate')
+      template = create(
+        :template,
+        name: 'Editorial Split Lime',
+        slug: 'editorial-split-lime',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'editorial-split')
+      )
       create(:template, name: 'Classic Ivory', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
       create(
         :template,
@@ -119,28 +139,42 @@ RSpec.describe 'Templates', type: :request do
         layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'sidebar-accent')
       )
 
-      get template_path(template)
+      get template_path(id: template)
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Template detail')
-      expect(response.body).to include('Modern Slate')
+      expect(response.body).to include('Editorial Split Lime')
       expect(response.body).to include('page-header-compact')
       expect(response.body).to include('Preview the full layout')
       expect(response.body).to include('Quick take')
       expect(response.body).to include('Live sample')
       expect(response.body).to include('Try it in the builder')
+      expect(response.body).to include('Builder carry-through')
+      expect(response.body).to include('Keep supporting choices secondary to the preview')
       expect(response.body).to include('Layout focus')
-      expect(response.body).to include('Columns: 1 column')
-      expect(response.body).to include('Theme: Slate')
+      expect(response.body).to include('Columns: 2 columns')
+      expect(response.body).to include('Theme: Lime')
       expect(response.body).to include('Jordan Lee')
       expect(response.body).to include('Lead Product Engineer')
+      expect(response.body).to include('Paper size')
+      expect(response.body).to include('Letter size')
       expect(response.body).to include(new_resume_path(template_id: template.id))
+    end
+
+    it 'preserves locale query params through template detail actions' do
+      template = create(:template, name: 'Modern Slate')
+
+      get template_path(id: template, locale: :en)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(href="/resumes/new?locale=en&amp;template_id=#{template.id}"))
+      expect(response.body).to include('href="/templates?locale=en"')
     end
 
     it 'preserves intake context through template detail actions' do
       template = create(:template, name: 'ATS Minimal', slug: 'ats-minimal', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'ats-minimal'))
 
-      get template_path(template), params: {
+      get template_path(id: template), params: {
         resume: {
           intake_details: {
             experience_level: 'less_than_3_years',
@@ -158,7 +192,7 @@ RSpec.describe 'Templates', type: :request do
       create(:template, name: 'Modern Slate')
       hidden_template = create(:template, name: 'Legacy Hidden', active: false)
 
-      get template_path(hidden_template)
+      get template_path(id: hidden_template)
 
       expect(response).to redirect_to(templates_path)
       follow_redirect!

@@ -15,9 +15,9 @@
           <div>
             <span class="atelier-pill">
               <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-              Live sample
+              <%= t("resumes.preview.live_sample") %>
             </span>
-            <p class="mt-3 text-sm leading-6 text-ink-700/80">Use this rail to compare edits, spot layout issues, and open the preview page when you need more room.</p>
+            <p class="mt-3 text-sm leading-6 text-ink-700/80"><%= t("resumes.preview.description") %></p>
           </div>
 
           <div>

@@ -8,6 +8,7 @@
 - Filters, summary cards, async table shell, and empty states inherit shared tokens.
 - The filter shell now uses the same `atelier-pill` discovery cue and result badge language as the signed-in marketplace, while keeping admin controls operational.
 - Template rows now surface family, density, shell, and visibility context with the named `ink/canvas` palette instead of flatter generic table styling.
+- Summary cards now read from the full filtered registry scope so visibility, family coverage, and sidebar-layout counts stay accurate across pagination.
 
 ### Still update / verify
 

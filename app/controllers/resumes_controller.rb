@@ -13,26 +13,15 @@ class ResumesController < ApplicationController
 
   def new
     initial_template = requested_new_template
-    flash.now[:alert] = "Template is not available." if params[:template_id].present? && initial_template.blank?
+    flash.now[:alert] = controller_message(:template_unavailable) if params[:template_id].present? && initial_template.blank?
 
-    @resume = current_user.resumes.build(
-      title: "Untitled Resume",
+    @resume = build_resume_draft(
       template: initial_template || builder_default_template,
-      source_mode: "scratch",
-      source_text: "",
-      contact_details: {
-        "full_name" => current_user.display_name,
-        "email" => current_user.email_address
-      },
-      intake_details: requested_new_intake_details,
-      personal_details: {},
-      settings: {
-        "accent_color" => "#0F172A",
-        "show_contact_icons" => true,
-        "page_size" => "A4"
+      attributes: {
+        intake_details: requested_new_intake_details
       }
     )
-    flash.now[:alert] = "Choose your experience level first." if params[:step].to_s == "student" && @resume.experience_level != "less_than_3_years"
+    flash.now[:alert] = controller_message(:choose_experience_level_first) if params[:step].to_s == "student" && @resume.experience_level != "less_than_3_years"
     authorize @resume
   end
 
@@ -47,11 +36,11 @@ class ResumesController < ApplicationController
     return render_unavailable_template_selection_on_create unless template.present?
 
     @resume = Resumes::Bootstrapper.new(user: current_user).call(create_resume_params(template: template))
-    redirect_to edit_resume_path(@resume, step: "source"), notice: "Resume created successfully."
+    redirect_to edit_resume_path(@resume, step: "source"), notice: controller_message(:resume_created)
   rescue ActiveRecord::RecordInvalid
     @resume = build_new_resume_from_params
     authorize @resume
-    flash.now[:alert] = "Unable to create resume."
+    flash.now[:alert] = controller_message(:unable_to_create)
     render :new, status: :unprocessable_entity
   end
 
@@ -62,17 +51,27 @@ class ResumesController < ApplicationController
     return render_unavailable_template_selection_on_update unless template.present?
 
     if @resume.update(update_resume_params(template: template))
+      selection_success, selection_error_message = persist_headshot_selection
+      unless selection_success
+        @resume.errors.add(:base, selection_error_message)
+        respond_to do |format|
+          format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: selection_error_message) }
+          format.html { render :edit, status: :unprocessable_entity }
+        end
+        return
+      end
+
+      purge_headshot_if_requested
+      @resume.reload
+
       return respond_to_autofill if run_autofill_requested?
 
       respond_to do |format|
-        format.turbo_stream { render_builder_update(@resume, notice: "Resume updated.") }
-        format.html { redirect_to edit_resume_path(@resume, **builder_step_redirect_params), notice: "Resume updated." }
+        format.turbo_stream { render_builder_update(@resume, notice: controller_message(:resume_updated)) }
+        format.html { redirect_to edit_resume_path(@resume, **builder_step_redirect_params), notice: controller_message(:resume_updated) }
       end
     else
-      respond_to do |format|
-        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: "Please review the highlighted errors.") }
-        format.html { render :edit, status: :unprocessable_entity }
-      end
+      respond_to_failed_update
     end
   end
 
@@ -80,7 +79,7 @@ class ResumesController < ApplicationController
     authorize @resume
 
     @resume.destroy!
-    redirect_to resumes_path, notice: "Resume deleted.", status: :see_other
+    redirect_to resumes_path, notice: controller_message(:resume_deleted), status: :see_other
   end
 
   def export
@@ -89,8 +88,8 @@ class ResumesController < ApplicationController
     ResumeExportJob.perform_later(@resume.id, current_user.id)
 
     respond_to do |format|
-      format.turbo_stream { render_builder_update(@resume, notice: "PDF export started. Refresh in a moment to download the latest file.") }
-      format.html { redirect_to edit_resume_path(@resume, **builder_step_redirect_params), notice: "PDF export started." }
+      format.turbo_stream { render_builder_update(@resume, notice: controller_message(:pdf_export_started_turbo)) }
+      format.html { redirect_to edit_resume_path(@resume, **builder_step_redirect_params), notice: controller_message(:pdf_export_started) }
     end
   end
 
@@ -100,7 +99,7 @@ class ResumesController < ApplicationController
     if @resume.pdf_export.attached?
       redirect_to rails_blob_path(@resume.pdf_export, disposition: "attachment")
     else
-      redirect_to edit_resume_path(@resume), alert: "No PDF export is available yet."
+      redirect_to edit_resume_path(@resume), alert: controller_message(:pdf_export_unavailable)
     end
   end
 
@@ -117,7 +116,9 @@ class ResumesController < ApplicationController
 
   private
     def set_resume
-      @resume = policy_scope(Resume).includes(sections: :entries).find(params[:id])
+      @resume = policy_scope(Resume)
+        .includes(:photo_profile, { resume_photo_selections: :photo_asset }, { sections: :entries })
+        .find(params[:id])
     end
 
     def respond_to_autofill
@@ -125,8 +126,8 @@ class ResumesController < ApplicationController
 
       respond_to do |format|
         if result.success?
-          format.turbo_stream { render_builder_update(result.resume, notice: "Source text applied to the draft.") }
-          format.html { redirect_to edit_resume_path(result.resume, **builder_step_redirect_params), notice: "Source text applied to the draft." }
+          format.turbo_stream { render_builder_update(result.resume, notice: controller_message(:source_applied)) }
+          format.html { redirect_to edit_resume_path(result.resume, **builder_step_redirect_params), notice: controller_message(:source_applied) }
         else
           format.turbo_stream { render_builder_update(@resume.reload, alert: result.error_message) }
           format.html { redirect_to edit_resume_path(@resume, **builder_step_redirect_params), alert: result.error_message }
@@ -135,38 +136,70 @@ class ResumesController < ApplicationController
     end
 
     def create_resume_params(template:)
-      permitted_resume_params.slice(:title, :headline, :summary, :source_mode, :source_text, :source_document, :intake_details, :personal_details).merge(template: template)
+      draft_resume_attributes.merge(template: template)
     end
 
     def update_resume_params(template:)
-      permitted_resume_params.except(:template_id).merge(template: template)
+      permitted_resume_params.except(:template_id, :remove_headshot, :selected_headshot_photo_asset_id).merge(template: template)
+    end
+
+    def update_resume(template:)
+      return false unless @resume.update(update_resume_params(template: template))
+
+      purge_headshot_if_requested
+      true
+    end
+
+    def respond_to_successful_update
+      return respond_to_autofill if run_autofill_requested?
+
+      respond_to do |format|
+        format.turbo_stream { render_builder_update(@resume, notice: controller_message(:resume_updated)) }
+        format.html { redirect_to edit_resume_path(@resume, **builder_step_redirect_params), notice: controller_message(:resume_updated) }
+      end
+    end
+
+    def respond_to_failed_update
+      respond_to do |format|
+        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: controller_message(:review_highlighted_errors)) }
+        format.html { render :edit, status: :unprocessable_entity }
+      end
     end
 
     def build_new_resume_from_params
-      current_user.resumes.build(
-        title: permitted_resume_params[:title].presence || "Untitled Resume",
-        headline: permitted_resume_params[:headline],
-        summary: permitted_resume_params[:summary],
-        source_mode: permitted_resume_params[:source_mode].presence || "scratch",
-        source_text: permitted_resume_params[:source_text].to_s,
-        source_document: permitted_resume_params[:source_document],
+      build_resume_draft(
         template: create_selected_template || builder_default_template,
-        contact_details: {
-          "full_name" => current_user.display_name,
-          "email" => current_user.email_address
-        },
-        intake_details: permitted_resume_params[:intake_details] || {},
-        personal_details: permitted_resume_params[:personal_details] || {},
-        settings: {
-          "accent_color" => "#0F172A",
-          "show_contact_icons" => true,
-          "page_size" => "A4"
-        }
+        attributes: draft_resume_attributes
       )
     end
 
+    def draft_resume_attributes
+      permitted_resume_params.slice(:title, :headline, :summary, :source_mode, :source_text, :source_document, :headshot, :intake_details, :personal_details)
+    end
+
+    def build_resume_draft(template:, attributes: {})
+      Resumes::DraftBuilder.new(user: current_user, template: template, attributes: attributes).call
+    end
+
     def permitted_resume_params
-      permitted = params.require(:resume).permit(:title, :headline, :summary, :slug, :template_id, :source_mode, :source_text, :source_document, contact_details: {}, settings: {}, intake_details: %i[experience_level student_status], personal_details: Resume::PERSONAL_DETAIL_FIELDS.map(&:to_sym))
+      permitted = params.require(:resume).permit(
+        :title,
+        :headline,
+        :summary,
+        :slug,
+        :template_id,
+        :photo_profile_id,
+        :selected_headshot_photo_asset_id,
+        :source_mode,
+        :source_text,
+        :source_document,
+        :headshot,
+        :remove_headshot,
+        contact_details: {},
+        settings: {},
+        intake_details: %i[experience_level student_status],
+        personal_details: Resume::PERSONAL_DETAIL_FIELDS.map(&:to_sym)
+      )
       permitted[:contact_details] = permitted[:contact_details].to_h if permitted[:contact_details]
       permitted[:settings] = permitted[:settings].to_h if permitted[:settings]
       permitted[:intake_details] = permitted[:intake_details].to_h if permitted[:intake_details]
@@ -184,18 +217,48 @@ class ResumesController < ApplicationController
       ActiveModel::Type::Boolean.new.cast(params[:run_autofill])
     end
 
+    def remove_headshot_requested?
+      ActiveModel::Type::Boolean.new.cast(permitted_resume_params[:remove_headshot])
+    end
+
+    def persist_headshot_selection
+      raw_resume_params = params.fetch(:resume, {})
+      selected_asset_param_present = raw_resume_params.respond_to?(:key?) && raw_resume_params.key?(:selected_headshot_photo_asset_id)
+      return [ true, nil ] unless selected_asset_param_present
+
+      selected_asset_id = permitted_resume_params[:selected_headshot_photo_asset_id].presence
+      selected_photo_asset = selected_asset_id.present? ? policy_scope(PhotoAsset).find_by(id: selected_asset_id) : nil
+      return [ false, I18n.t("resumes.controller.selected_photo_unavailable") ] if selected_asset_id.present? && selected_photo_asset.blank?
+
+      selection_result = Photos::SelectionService.new(
+        resume: @resume,
+        photo_asset: selected_photo_asset,
+        template: @resume.template
+      ).call
+      [ selection_result.success?, selection_result.error_message ]
+    end
+
+    def purge_headshot_if_requested
+      return unless remove_headshot_requested?
+      return unless permitted_resume_params[:headshot].blank?
+      return unless @resume.headshot.attached?
+
+      @resume.headshot.purge
+      @resume.reload
+    end
+
     def selected_template
       template_id = permitted_resume_params[:template_id]
       return @resume.template if template_id.blank? || template_id.to_s == @resume.template_id.to_s
 
-      selectable_template_scope.find_by(id: template_id)
+      selectable_template_for_selection(template_id)
     end
 
     def create_selected_template
       template_id = permitted_resume_params[:template_id]
       return builder_default_template if template_id.blank?
 
-      selectable_template_scope.find_by(id: template_id)
+      selectable_template_for_selection(template_id)
     end
 
     def selectable_template_scope
@@ -210,7 +273,11 @@ class ResumesController < ApplicationController
       template_id = params[:template_id].presence
       return if template_id.blank?
 
-      selectable_template_scope.find_by(id: template_id)
+      selectable_template_for_selection(template_id)
+    end
+
+    def selectable_template_for_selection(template_id)
+      Template.active.find_by(id: template_id)
     end
 
     def requested_new_intake_details
@@ -225,18 +292,22 @@ class ResumesController < ApplicationController
 
     def render_unavailable_template_selection_on_create
       @resume = build_new_resume_from_params
-      @resume.errors.add(:template, "is not available.")
+      @resume.errors.add(:template, controller_message(:template_selection_unavailable_error))
       authorize @resume
-      flash.now[:alert] = "Choose a template that is still available."
+      flash.now[:alert] = controller_message(:choose_available_template)
       render :new, status: :unprocessable_entity
     end
 
     def render_unavailable_template_selection_on_update
-      @resume.errors.add(:template, "is not available.")
+      @resume.errors.add(:template, controller_message(:template_selection_unavailable_error))
 
       respond_to do |format|
-        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: "Choose a template that is still available.") }
+        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: controller_message(:choose_available_template)) }
         format.html { render :edit, status: :unprocessable_entity }
       end
+    end
+
+    def controller_message(key)
+      I18n.t("resumes.controller.#{key}")
     end
 end

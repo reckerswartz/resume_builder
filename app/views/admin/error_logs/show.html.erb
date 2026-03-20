@@ -34,108 +34,120 @@
      { id: "captured-context", label: "Captured context", caption: "Structured request or job metadata" },
      { id: "backtrace", label: "Backtrace", caption: "Captured stack frames and debugging trail" }
    ] %>
-<% source_widget_tone = @error_log.job? ? :default : :subtle %>
-<% correlation_widget_tone = related_job_log.present? ? :success : :subtle %>
-<% backtrace_widget_tone = @error_log.backtrace_lines.any? ? :success : :subtle %>
+<% triage_tone = related_job_log.present? ? :success : :neutral %>
+<% triage_title = if related_job_log.present?
+     "Correlation available"
+   elsif @error_log.backtrace_lines.blank?
+     "Structured context only"
+   else
+     "Review incident context"
+   end %>
 
 <section class="space-y-6">
-  <%= render Ui::HeroHeaderComponent.new(
-    eyebrow: "Error detail",
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Error log",
     title: @error_log.reference_id,
-    description: @error_log.error_class,
-    avatar_text: @error_log.reference_id.to_s.split("-").last.to_s.first(2).upcase,
+    description: "Review source, message, timing, and correlation before opening raw context or backtrace.",
     badges: [
       { label: error_log_source_label(@error_log), tone: error_log_source_badge_tone(@error_log) },
-      (related_job_log.present? ? { label: "Linked job", tone: :hero_success } : nil),
-      (@error_log.backtrace_lines.any? ? { label: pluralize(@error_log.backtrace_lines.size, "frame"), tone: :hero } : { label: "No backtrace", tone: :hero })
+      (related_job_log.present? ? { label: "Linked job", tone: :success } : nil),
+      (@error_log.backtrace_lines.any? ? { label: pluralize(@error_log.backtrace_lines.size, "frame"), tone: :neutral } : { label: "No backtrace", tone: :neutral }),
+      { label: error_log_duration_label(@error_log), tone: :neutral }
     ].compact,
     actions: [
-      { label: "Back to error logs", path: admin_error_logs_path, style: :hero_secondary },
-      (related_job_log.present? ? { label: "Open related job log", path: admin_job_log_path(related_job_log), style: :hero_secondary } : nil),
-      (@error_log.job? ? { label: "Job logs", path: admin_job_logs_path, style: :hero_secondary } : nil)
+      { label: "Back to error logs", path: admin_error_logs_path, style: :secondary },
+      (related_job_log.present? ? { label: "Open related job log", path: admin_job_log_path(related_job_log), style: :secondary } : nil),
+      (@error_log.job? ? { label: "Job logs", path: admin_job_logs_path, style: :secondary } : nil)
     ].compact,
-    metrics: [
-      {
-        label: "Source",
-        value: error_log_source_label(@error_log),
-        description: error_log_source_description(@error_log)
-      },
-      {
-        label: @error_log.job? ? "Active job" : "Request",
-        value: primary_reference_label,
-        description: primary_reference_description
-      },
-      {
-        label: "Occurred",
-        value: l(@error_log.occurred_at, format: :short),
-        description: error_log_duration_label(@error_log)
-      },
-      {
-        label: "Related job",
-        value: error_log_related_job_label(@error_log),
-        description: related_job_log.present? ? "Linked job log record is available." : "No linked job log record available."
-      }
-    ]
+    density: :compact
   ) %>
 
-  <div class="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">
-    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
-      <%= render Ui::DashboardPanelComponent.new(
-        eyebrow: "Error hub",
-        title: "Review this error",
-        description: "Move between the incident summary, structured context, and backtrace while keeping related job-log navigation close by.",
-        action_label: related_job_log.present? ? "Open related job log" : "Back to error logs",
-        action_path: related_job_log.present? ? admin_job_log_path(related_job_log) : admin_error_logs_path,
-        action_style: :secondary,
-        padding: :sm,
-        density: :compact
-      ) do %>
-        <div class="space-y-3">
-          <% section_links.each do |section| %>
-            <%= render Ui::SectionLinkCardComponent.new(
-              label: section.fetch(:label),
-              caption: section.fetch(:caption),
-              path: "##{section.fetch(:id)}"
-            ) %>
-          <% end %>
+  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+    <div class="space-y-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
+            Fast triage
+          </span>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Review this error</h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80">Start with the captured message, source, and related job context before opening raw context or stack frames.</p>
         </div>
-      <% end %>
 
-      <%= render Ui::WidgetCardComponent.new(
-        eyebrow: "Source",
-        title: error_log_source_label(@error_log),
-        description: error_log_source_description(@error_log),
-        tone: source_widget_tone,
-        badge: @error_log.error_class,
-        badge_classes: ui_badge_classes(error_log_source_badge_tone(@error_log)),
-        title_size: :base
-      ) %>
+        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
+      </div>
 
-      <%= render Ui::WidgetCardComponent.new(
-        eyebrow: "Correlation",
-        title: primary_reference_label,
-        description: primary_reference_description,
-        tone: correlation_widget_tone,
-        badge: related_job_log.present? ? "Linked job" : (@error_log.job? ? "Job context" : "Request context"),
-        badge_classes: ui_badge_classes(related_job_log.present? ? :success : :neutral),
-        title_size: :base
-      ) do %>
-        <% if related_job_log.present? %>
-          <div class="pt-2">
-            <%= link_to "Open related job log", admin_job_log_path(related_job_log), class: ui_button_classes(:secondary, size: :sm) %>
+      <div class="flex flex-wrap gap-2">
+        <span class="<%= ui_badge_classes(error_log_source_badge_tone(@error_log)) %>"><%= error_log_source_label(@error_log) %></span>
+        <span class="<%= ui_badge_classes(related_job_log.present? ? :success : :neutral) %>"><%= related_job_log.present? ? "Linked job" : @error_log.job? ? "Job context" : "Request context" %></span>
+        <span class="<%= ui_badge_classes(@error_log.backtrace_lines.any? ? :neutral : :warning) %>"><%= @error_log.backtrace_lines.any? ? pluralize(@error_log.backtrace_lines.size, "frame") : "No backtrace" %></span>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= error_log_duration_label(@error_log) %></span>
+      </div>
+
+      <div class="<%= ui_inset_panel_classes(tone: :danger, padding: :lg) %>">
+        <p class="text-sm font-medium text-rose-700">Message</p>
+        <p class="mt-2 text-sm text-rose-900"><%= @error_log.message %></p>
+      </div>
+
+      <div class="space-y-3">
+        <% guidance_items.each do |item| %>
+          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
+              </div>
+
+              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
+                <%= item.fetch(:tone) == :success ? "Linked" : item.fetch(:tone) == :warning ? "Attention" : item.fetch(:tone) == :info ? "Source" : "Noted" %>
+              </span>
+            </div>
           </div>
         <% end %>
-      <% end %>
+      </div>
+    </div>
+  <% end %>
 
-      <%= render Ui::WidgetCardComponent.new(
-        eyebrow: "Backtrace",
-        title: @error_log.backtrace_lines.any? ? pluralize(@error_log.backtrace_lines.size, "frame") : "No backtrace",
-        description: @error_log.backtrace_lines.any? ? "Captured stack frames are available below for debugging." : "No stack frames were stored for this incident.",
-        tone: backtrace_widget_tone,
-        badge: error_log_duration_label(@error_log),
-        badge_classes: ui_badge_classes(:neutral),
-        title_size: :base
-      ) %>
+  <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+        <div class="space-y-4">
+          <div>
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+              Error sections
+            </span>
+            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to details</h2>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80">Move between quick facts, structured context, and backtrace detail without re-scanning the whole incident page.</p>
+          </div>
+
+          <div class="space-y-3">
+            <% section_links.each do |section| %>
+              <%= render Ui::SectionLinkCardComponent.new(
+                label: section.fetch(:label),
+                caption: section.fetch(:caption),
+                path: "##{section.fetch(:id)}"
+              ) %>
+            <% end %>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: related_job_log.present? ? :success : :subtle) %>">
+            <p class="text-sm font-medium text-ink-950">Correlation</p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= primary_reference_description %></p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="<%= ui_badge_classes(related_job_log.present? ? :success : :neutral) %>"><%= primary_reference_label %></span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <% if related_job_log.present? %>
+              <%= link_to "Open related job log", admin_job_log_path(related_job_log), class: ui_button_classes(:secondary, size: :sm) %>
+            <% else %>
+              <%= link_to "Back to error logs", admin_error_logs_path, class: ui_button_classes(:secondary, size: :sm) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </aside>
 
     <div class="space-y-6">
@@ -150,11 +162,6 @@
         ]
       ) do %>
         <div class="space-y-4">
-          <div class="<%= ui_inset_panel_classes(tone: :danger, padding: :lg) %>">
-            <p class="text-sm font-medium text-rose-700">Message</p>
-            <p class="mt-2 text-sm text-rose-900"><%= @error_log.message %></p>
-          </div>
-
           <div class="grid gap-4 sm:grid-cols-2">
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
               <p class="text-sm font-medium text-ink-700/80">Error class</p>
@@ -188,23 +195,6 @@
               <p class="text-sm font-medium text-ink-700/80">Correlation summary</p>
               <p class="mt-2 text-sm leading-6 text-ink-950"><%= primary_reference_description %></p>
             </div>
-          </div>
-
-          <div class="space-y-3">
-            <% guidance_items.each do |item| %>
-              <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
-                    <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
-                  </div>
-
-                  <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                    <%= item.fetch(:tone) == :success ? "Linked" : item.fetch(:tone) == :warning ? "Attention" : item.fetch(:tone) == :info ? "Source" : "Noted" %>
-                  </span>
-                </div>
-              </div>
-            <% end %>
           </div>
         </div>
       <% end %>
@@ -242,12 +232,27 @@
             </div>
           </div>
 
-          <%= render Ui::CodeBlockComponent.new(
-            title: "Context",
-            description: "Structured payload recorded when the error log was captured.",
-            body: JSON.pretty_generate(@error_log.context),
-            wrap: true
-          ) %>
+          <details class="overflow-hidden rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92">
+            <summary class="cursor-pointer px-5 py-4">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm font-medium text-ink-950">Structured context</p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Open the raw captured payload only when the quick facts above are not enough for triage.</p>
+                </div>
+
+                <span class="<%= ui_badge_classes(:neutral) %>">Reference only</span>
+              </div>
+            </summary>
+
+            <div class="border-t border-canvas-200/80 px-5 py-5">
+              <%= render Ui::CodeBlockComponent.new(
+                title: "Context",
+                description: "Structured payload recorded when the error log was captured.",
+                body: JSON.pretty_generate(@error_log.context),
+                wrap: true
+              ) %>
+            </div>
+          </details>
         </div>
       <% end %>
 
@@ -261,14 +266,41 @@
           { label: error_log_duration_label(@error_log), tone: :neutral }
         ]
       ) do %>
-        <div class="min-w-0">
-          <%= render Ui::CodeBlockComponent.new(
-            title: "Backtrace",
-            description: @error_log.backtrace_lines.any? ? "Captured stack frames for this incident." : "No backtrace captured.",
-            body: @error_log.backtrace_lines.any? ? @error_log.backtrace_lines.join("\n") : "No backtrace captured.",
-            wrap: true,
-            tone: @error_log.backtrace_lines.any? ? :default : :danger
-          ) %>
+        <div class="min-w-0 space-y-4">
+          <% if @error_log.backtrace_lines.any? %>
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-sm font-medium text-ink-950">Captured frames are available</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">Open the raw stack frames only when the incident summary and structured context are not enough for debugging.</p>
+            </div>
+
+            <details class="overflow-hidden rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92">
+              <summary class="cursor-pointer px-5 py-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-ink-950">Backtrace</p>
+                    <p class="mt-1 text-sm leading-6 text-ink-700/80">Captured stack frames for this incident.</p>
+                  </div>
+
+                  <span class="<%= ui_badge_classes(:neutral) %>">Deep detail</span>
+                </div>
+              </summary>
+
+              <div class="border-t border-canvas-200/80 px-5 py-5">
+                <%= render Ui::CodeBlockComponent.new(
+                  title: "Backtrace",
+                  description: "Captured stack frames for this incident.",
+                  body: @error_log.backtrace_lines.join("\n"),
+                  wrap: true,
+                  tone: :default
+                ) %>
+              </div>
+            </details>
+          <% else %>
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-sm font-medium text-ink-950">No backtrace</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">No stack frames were stored for this incident. Use the captured context above to continue the investigation.</p>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>

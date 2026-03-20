@@ -9,7 +9,17 @@ RSpec.describe 'Sessions', type: :request do
       expect(response.body).to include('Secure sign in')
       expect(response.body).to include('Pick up where you left off.')
       expect(response.body).to include('Return to your drafts')
+      expect(response.body).to include('Forgot password?')
+      expect(response.body).to include('Need an account?')
       expect(response.body).to include('atelier-pill')
+    end
+
+    it 'preserves locale query params through sign-in recovery links' do
+      get new_session_path(locale: :en)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(href="#{new_password_path(locale: :en)}"))
+      expect(response.body).to include(%(href="#{new_registration_path(locale: :en)}"))
     end
   end
 
@@ -34,7 +44,7 @@ RSpec.describe 'Sessions', type: :request do
       }
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.body).to include('Try another email address or password.')
+      expect(response.body).to include(I18n.t('sessions.controller.invalid_credentials'))
       expect(response.body).to include('Caps lock is on.')
     end
   end

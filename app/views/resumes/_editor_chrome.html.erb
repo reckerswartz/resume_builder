@@ -9,7 +9,7 @@
 
     <div class="relative flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
       <div class="space-y-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">Guided builder</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60"><%= t("resumes.editor_chrome.eyebrow") %></p>
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
           <div class="flex h-14 w-14 items-center justify-center rounded-[1.5rem] bg-white/10 text-base font-semibold tracking-[0.18em] text-white shadow-inner shadow-white/10">
@@ -46,7 +46,7 @@
 
   <div class="border-t border-canvas-200/80 bg-canvas-50/92 px-4 py-4 sm:px-6">
     <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
-      <%= render Ui::SectionTabsComponent.new(items: builder_state.builder_tab_items, label: "Builder steps") %>
+      <%= render Ui::SectionTabsComponent.new(items: builder_state.builder_tab_items, label: t("resumes.editor_chrome.builder_steps_label")) %>
 
       <div class="flex flex-wrap gap-2 xl:justify-end">
         <% builder_state.navigation_actions.each do |action| %>

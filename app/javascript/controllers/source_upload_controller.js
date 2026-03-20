@@ -97,9 +97,9 @@ export default class extends Controller {
     this.pendingFilenameTarget.textContent = file.name
     this.pendingContentTypeTarget.textContent = contentType
     this.pendingFileSizeTarget.textContent = this.formatFileSize(file.size)
-    this.pendingStatusBadgeTarget.textContent = supported ? "Autofill supported" : "Reference only"
+    this.pendingStatusBadgeTarget.textContent = supported ? this.autofillSupportedLabelValue : this.referenceOnlyLabelValue
     this.pendingStatusBadgeTarget.className = supported ? this.pendingStatusBadgeTarget.dataset.supportedClasses : this.pendingStatusBadgeTarget.dataset.referenceClasses
-    this.pendingMessageTarget.textContent = supported ? "This file can be converted into source text during autofill while the original file stays attached to the draft." : `This file will stay attached for reference. AI autofill currently reads ${this.supportedFormatsLabelValue} uploads.`
+    this.pendingMessageTarget.textContent = supported ? this.pendingSupportedMessageValue : this.pendingReferenceMessageTemplateValue.replace("%{formats}", this.supportedFormatsLabelValue)
     this.pendingReviewTarget.classList.remove("hidden")
   }
 
@@ -144,7 +144,7 @@ export default class extends Controller {
     if (extension === "doc") return "application/msword"
     if (extension === "docx") return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
-    return "Unknown type"
+    return this.unknownTypeLabelValue
   }
 
   formatFileSize(size) {
@@ -174,5 +174,25 @@ export default class extends Controller {
 
   get supportedFormatsLabelValue() {
     return this.element.dataset.sourceUploadSupportedFormatsLabelValue || "supported"
+  }
+
+  get autofillSupportedLabelValue() {
+    return this.element.dataset.sourceUploadAutofillSupportedLabelValue || "Autofill supported"
+  }
+
+  get referenceOnlyLabelValue() {
+    return this.element.dataset.sourceUploadReferenceOnlyLabelValue || "Reference only"
+  }
+
+  get pendingSupportedMessageValue() {
+    return this.element.dataset.sourceUploadPendingSupportedMessageValue || ""
+  }
+
+  get pendingReferenceMessageTemplateValue() {
+    return this.element.dataset.sourceUploadPendingReferenceMessageTemplateValue || ""
+  }
+
+  get unknownTypeLabelValue() {
+    return this.element.dataset.sourceUploadUnknownTypeLabelValue || "Unknown type"
   }
 }

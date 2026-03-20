@@ -1,12 +1,28 @@
-<% quick_links = [
-     [ "Manage templates", admin_templates_path ],
-     [ "Manage LLM providers", admin_llm_providers_path ],
-     [ "Manage LLM models", admin_llm_models_path ],
-     [ "Feature settings", admin_settings_path ],
-     [ "Job logs", admin_job_logs_path ],
-     [ "Error logs", admin_error_logs_path ],
-     [ "Back to resumes", resumes_path ]
+<% quick_link_groups = [
+     {
+       label: "Investigate",
+       links: [
+         [ "Job logs", admin_job_logs_path ],
+         [ "Error logs", admin_error_logs_path ]
+       ]
+     },
+     {
+       label: "Configure",
+       links: [
+         [ "Feature settings", admin_settings_path ],
+         [ "Manage templates", admin_templates_path ],
+         [ "Manage LLM providers", admin_llm_providers_path ],
+         [ "Manage LLM models", admin_llm_models_path ]
+       ]
+     },
+     {
+       label: "Return",
+       links: [
+         [ "Back to resumes", resumes_path ]
+       ]
+     }
    ] %>
+<% shortcut_count = quick_link_groups.sum { |group| group.fetch(:links).size } %>
 <% healthy_processes = [ @queue_overview.processes - @queue_overview.stale_processes, 0 ].max %>
 <% operational_metrics = [
      {
@@ -33,111 +49,119 @@
 <% attention_required = @queue_overview.unavailable? || @queue_overview.stale_processes.positive? || @job_log_stats.failed.positive? %>
 
 <section class="space-y-6">
-  <%= render Ui::PageHeaderComponent.new(
+  <%= render Ui::HeroHeaderComponent.new(
     eyebrow: "Admin hub",
     title: "Dashboard",
     description: "Review queue health, recent background work, and captured application errors from one place.",
     badges: [
-      { label: "#{@active_templates_count} active template#{"s" unless @active_templates_count == 1}", tone: :neutral },
-      { label: "Logged errors: #{@error_logs_count}", tone: :neutral }
+      { label: "#{@active_templates_count} active template#{"s" unless @active_templates_count == 1}", tone: :hero },
+      { label: "Logged errors: #{@error_logs_count}", tone: :hero }
     ],
     actions: [
-      { label: "Manage templates", path: admin_templates_path, style: :primary },
-      { label: "Manage models", path: admin_llm_models_path, style: :secondary },
-      { label: "Feature settings", path: admin_settings_path, style: :secondary }
+      { label: "Manage templates", path: admin_templates_path, style: :hero_primary, size: :sm },
+      { label: "Manage models", path: admin_llm_models_path, style: :hero_secondary, size: :sm },
+      { label: "Feature settings", path: admin_settings_path, style: :hero_secondary, size: :sm }
     ],
+    metrics: operational_metrics,
     density: :compact
   ) %>
 
-  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg, extra_classes: "relative overflow-hidden") do %>
-    <div class="absolute -right-10 top-4 h-20 w-20 rounded-full atelier-glow opacity-25"></div>
+  <div class="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)] xl:items-start">
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Quick links",
+        title: "Jump straight to the area that needs attention",
+        description: "Use grouped shortcuts for investigation or registry changes after the dashboard signals what matters.",
+        tone: :brand,
+        padding: :sm,
+        density: :compact
+      ) do %>
+        <div class="space-y-4">
+          <div class="flex flex-wrap gap-2">
+            <span class="<%= ui_badge_classes(attention_required ? :hero : :hero_success) %>"><%= attention_required ? "Needs follow-up" : "Stable now" %></span>
+            <span class="<%= ui_badge_classes(:hero) %>"><%= shortcut_count %> shortcuts</span>
+          </div>
 
-    <div class="relative space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+          <% quick_link_groups.each do |group| %>
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60"><%= group.fetch(:label) %></p>
+              <div class="flex flex-wrap gap-2">
+                <% group.fetch(:links).each_with_index do |(label, path), index| %>
+                  <%= link_to label, path, class: ui_button_classes(group.fetch(:label) == "Investigate" && index.zero? ? :hero_primary : :hero_secondary, size: :sm) %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </aside>
+
+    <%= render Ui::DashboardPanelComponent.new(
+      eyebrow: "Platform snapshot",
+      title: "Runtime and queue health",
+      description: "Check backlog, running jobs, failures, and worker health before opening the detailed logs.",
+      padding: :sm,
+      tone: :subtle,
+      density: :compact
+    ) do %>
+      <div class="space-y-4">
+        <div class="flex flex-wrap gap-2">
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-            Quick links
+            Operational focus
           </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump straight to the area that needs attention</h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the dashboard for signals first, then open the detail pages only when a setting, queue, or incident needs a closer look.</p>
+          <span class="<%= ui_badge_classes(@queue_overview.unavailable? ? :warning : :neutral) %>"><%= @queue_overview.unavailable? ? "Queue unavailable" : "#{@queue_overview.running} running" %></span>
+          <span class="<%= ui_badge_classes(@job_log_stats.failed.positive? ? :warning : :success) %>"><%= pluralize(@job_log_stats.failed, "failure") %></span>
         </div>
 
-        <span class="<%= ui_badge_classes(attention_required ? :warning : :success) %>"><%= attention_required ? "Needs follow-up" : "Stable now" %></span>
+        <div class="grid gap-3 lg:grid-cols-3">
+          <%= render Ui::WidgetCardComponent.new(
+            eyebrow: "Job throughput",
+            title: throughput_label(@job_log_stats.completed_last_hour),
+            description: "#{pluralize(@job_log_stats.stale_running, "stale running job")} and #{pluralize(@job_log_stats.failed, "failed job")} currently tracked.",
+            badge: number_to_percentage(@job_log_stats.failure_rate, precision: 0),
+            badge_classes: ui_badge_classes(@job_log_stats.failed.positive? ? :warning : :success),
+            padding: :sm,
+            title_size: :base
+          ) %>
+
+          <% if @queue_overview.unavailable? %>
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Queue runtime",
+              title: "Unavailable",
+              description: @queue_overview.error_message,
+              badge: "Queue",
+              badge_classes: ui_badge_classes(:warning),
+              padding: :sm,
+              title_size: :base
+            ) %>
+          <% else %>
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Queue backlog",
+              title: @queue_overview.backlog,
+              description: "#{@queue_overview.queued} ready, #{@queue_overview.scheduled} scheduled, #{@queue_overview.blocked} blocked.",
+              badge: "#{@queue_overview.running} running",
+              badge_classes: ui_badge_classes(:neutral),
+              padding: :sm,
+              title_size: :xl
+            ) %>
+
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Worker health",
+              title: "#{healthy_processes}/#{@queue_overview.processes}",
+              description: "#{pluralize(@queue_overview.failed, "queue failure")} and #{pluralize(@queue_overview.stale_processes, "stale worker")} currently visible.",
+              badge: @queue_overview.stale_processes.zero? ? "Healthy" : "#{pluralize(@queue_overview.stale_processes, "stale")}",
+              badge_classes: ui_badge_classes(@queue_overview.stale_processes.zero? ? :success : :warning),
+              padding: :sm,
+              title_size: :xl
+            ) %>
+          <% end %>
+        </div>
       </div>
-
-      <div class="flex flex-wrap gap-2">
-        <% quick_links.each_with_index do |(label, path), index| %>
-          <%= link_to label, path, class: ui_button_classes(index.zero? ? :primary : :secondary, size: :sm) %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-
-  <%= render Ui::DashboardPanelComponent.new(
-    eyebrow: "Platform snapshot",
-    title: "Runtime and queue health",
-    description: "Check backlog, running jobs, failures, and worker health before opening the detailed logs.",
-    padding: :sm,
-    tone: :subtle,
-    density: :compact
-  ) do %>
-    <div class="grid gap-3 lg:grid-cols-3">
-      <%= render Ui::WidgetCardComponent.new(
-        eyebrow: "Job throughput",
-        title: throughput_label(@job_log_stats.completed_last_hour),
-        description: "#{pluralize(@job_log_stats.stale_running, "stale running job")} and #{pluralize(@job_log_stats.failed, "failed job")} currently tracked.",
-        badge: number_to_percentage(@job_log_stats.failure_rate, precision: 0),
-        badge_classes: ui_badge_classes(@job_log_stats.failed.positive? ? :warning : :success),
-        padding: :sm,
-        title_size: :base
-      ) %>
-
-      <% if @queue_overview.unavailable? %>
-        <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Queue runtime",
-          title: "Unavailable",
-          description: @queue_overview.error_message,
-          badge: "Queue",
-          badge_classes: ui_badge_classes(:warning),
-          padding: :sm,
-          title_size: :base
-        ) %>
-      <% else %>
-        <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Queue backlog",
-          title: @queue_overview.backlog,
-          description: "#{@queue_overview.queued} ready, #{@queue_overview.scheduled} scheduled, #{@queue_overview.blocked} blocked.",
-          badge: "#{@queue_overview.running} running",
-          badge_classes: ui_badge_classes(:neutral),
-          padding: :sm,
-          title_size: :xl
-        ) %>
-
-        <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Worker health",
-          title: "#{healthy_processes}/#{@queue_overview.processes}",
-          description: "#{pluralize(@queue_overview.failed, "queue failure")} and #{pluralize(@queue_overview.stale_processes, "stale worker")} currently visible.",
-          badge: @queue_overview.stale_processes.zero? ? "Healthy" : "#{pluralize(@queue_overview.stale_processes, "stale")}",
-          badge_classes: ui_badge_classes(@queue_overview.stale_processes.zero? ? :success : :warning),
-          padding: :sm,
-          title_size: :xl
-        ) %>
-      <% end %>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 
   <div class="space-y-6">
-    <div class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
-      <% operational_metrics.each do |metric| %>
-        <%= render Ui::MetricCardComponent.new(
-          label: metric.fetch(:label),
-          value: metric.fetch(:value),
-          description: metric.fetch(:description)
-        ) %>
-      <% end %>
-    </div>
-
     <div class="grid gap-6 2xl:grid-cols-2">
       <%= render Ui::DashboardPanelComponent.new(
         eyebrow: "Background jobs",

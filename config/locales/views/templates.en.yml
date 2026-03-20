@@ -1,0 +1,136 @@
+en:
+  templates:
+    controller:
+      template_unavailable: "Template is not available."
+    marketplace_state:
+      page_header:
+        eyebrow: "Template marketplace"
+        title: "Browse templates"
+        description: "Compare layouts quickly, open a live sample when one stands out, and start a draft with the look you want."
+        start_resume: "Start a resume"
+        back_to_workspace: "Back to workspace"
+      filter_groups:
+        family: "Family"
+        density: "Density"
+        columns: "Columns"
+        theme: "Theme"
+        layout: "Layout"
+        all: "All"
+      active_badges:
+        query: 'Query: "%{query}"'
+        sort: "Sort: %{sort}"
+      search_placeholder: "Search by name, family, or layout details"
+      sort_options:
+        recommended_first: "Recommended first"
+        family_asc: "Layout family"
+        name_asc: "Name A–Z"
+        density_asc: "Density"
+      family_badge:
+        one: "1 layout family"
+        other: "%{count} layout families"
+      template_badge:
+        one: "1 template in view"
+        other: "%{count} templates in view"
+      results_label:
+        one: "1 template shown"
+        other: "%{count} templates shown"
+      card_badges:
+        density: "Density: %{density}"
+        columns: "Columns: %{columns}"
+        theme: "Theme: %{theme}"
+        header: "Header: %{header}"
+        entries: "Entries: %{entries}"
+        sidebar: "Sidebar: %{sections}"
+      layout_focus:
+        balanced: "Balanced single-column flow"
+        sidebar: "Sidebar: %{sections}"
+    index:
+      compare_pill: "Compare faster"
+      compare_description: "Search by name or layout details first, then narrow the gallery only when you need tighter comparison."
+      clear_filters: "Clear filters"
+      recommended_pill: "Recommended for this draft"
+      recommended_description: "Use the intake signals as a starting point, then open the strongest candidates in the full preview."
+      search_and_sort_eyebrow: "Search and sort"
+      search_and_sort_description: "Keep the gallery light here, then reach for the quick choices or full tray only when the shortlist needs more control."
+      search_label: "Search"
+      sort_label: "Sort"
+      full_filter_tray_eyebrow: "Full filter tray"
+      full_filter_tray_description: "Open columns, theme, and the rest of the layout filters only when the quick choices are not enough."
+      filter_tray_active_label: "%{count} active"
+      optional_badge: "Optional"
+      quick_choices_eyebrow: "Quick choices"
+      quick_choices_title: "Narrow the gallery without opening every filter"
+      quick_choices_description: "Use the common pivots first. Open the full tray only when you need columns or theme control."
+      active_controls_badge:
+        one: "1 active control"
+        other: "%{count} active controls"
+      search_led_browsing_badge: "Search-led browsing"
+      full_tray_note_title: "Open the full filter tray for columns and theme"
+      full_tray_note_description: "Keep the gallery light by using the deeper tray only when you need tighter side-by-side comparison control."
+      js_empty_state:
+        title: "No templates match those filters"
+        description: "Try a different family, density, column, theme, layout, or search term to bring more templates back into view."
+      empty_state:
+        filtered_title: "No templates match the current filters"
+        filtered_description: "Try a broader query or clear the active family, density, column, theme, or layout filters to explore the full gallery again."
+        available_title: "No templates available"
+        available_description: "Active templates will appear here as soon as the template catalog is ready for signed-in users."
+        back_to_workspace: "Back to workspace"
+    template_card:
+      default_badges:
+        density: "Density: %{density}"
+        columns: "Columns: %{columns}"
+        theme: "Theme: %{theme}"
+        header: "Header: %{header}"
+        entries: "Entries: %{entries}"
+      layout_focus:
+        balanced: "Balanced single-column flow"
+        sidebar: "Sidebar: %{sections}"
+      accent_label: "Accent"
+      live_sample_label: "Live sample"
+      layout_focus_label: "Layout focus"
+      shell_style_label: "Shell style"
+      shell_style_value: "%{shell} shell"
+      shell_style_description: "Keep the same resume content reusable if you switch layouts later."
+      preview_template: "Preview template"
+      use_template: "Use template"
+    show:
+      sidebar_positions:
+        left: "Left"
+        right: "Right"
+      sidebar_summary: "%{position} sidebar for %{sections}"
+      balanced_flow: "Balanced single-column section flow"
+      page_header:
+        eyebrow: "Template detail"
+        columns_badge: "Columns: %{columns}"
+        theme_badge: "Theme: %{theme}"
+        use_template: "Use this template"
+        back_to_templates: "Back to templates"
+      preview_panel:
+        eyebrow: "Live sample"
+        title: "Preview the full layout"
+        description: "Open the live sample and decide whether this page balance fits your story."
+        sample_pill: "Live sample"
+        sample_description: "Use the preview to decide whether this layout deserves a closer look in the builder."
+        columns_badge: "Columns: %{columns}"
+      quick_take:
+        eyebrow: "Quick take"
+        title: "Use this layout if the page balance feels right"
+        description: "Start with this look now or keep browsing. You can still switch layouts later without rebuilding the draft."
+        layout_profile_label: "Layout profile"
+        columns_badge: "Columns: %{columns}"
+        theme_badge: "Theme: %{theme}"
+        density_badge: "Density: %{density}"
+        try_in_builder_title: "Try it in the builder"
+        try_in_builder_description: "Use this layout now, then keep refining copy, sections, and accent decisions inside the live editor."
+        use_template: "Use this template"
+        browse_all_templates: "Browse all templates"
+      carry_through:
+        pill: "Builder carry-through"
+        title: "Keep supporting choices secondary to the preview"
+        description: "Use these notes to confirm the layout fit, then let the live sample stay ahead of secondary styling details."
+        accent_label: "Accent color"
+        preview_accent: "Preview accent"
+        accent_description: "Treat this as the starting visual cue for the builder, not a locked brand decision."
+        layout_focus_label: "Layout focus"
+        layout_description: "Balanced layouts suit broad experience storytelling, while sidebar-heavy layouts keep secondary sections grouped and quieter."

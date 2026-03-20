@@ -1,0 +1,586 @@
+en:
+  resume_builder:
+    step_registry:
+      steps:
+        source:
+          label: "Source"
+          title: "Choose how to start"
+          description: "Start from scratch, paste an existing resume, or upload a source file before moving into the guided builder."
+        heading:
+          label: "Heading"
+          title: "Heading details"
+          description: "Keep this step focused on the name, headline, and contact details employers actually need first."
+        personal_details:
+          label: "Personal details"
+          title: "Personal details"
+          description: "Add profile links, credentials, and optional personal information only when it is relevant for the role or application."
+        experience:
+          label: "Experience"
+          title: "Work history"
+          description: "Start with the most relevant roles and keep each entry easy to scan."
+        education:
+          label: "Education"
+          title: "Education"
+          description: "Add degrees, training, and dates only when they strengthen this resume."
+        skills:
+          label: "Skills"
+          title: "Skills"
+          description: "Group the strongest skills so the preview stays easy to scan."
+        summary:
+          label: "Summary"
+          title: "Professional summary"
+          description: "Write the short narrative that links your experience and skills."
+        finalize:
+          label: "Finalize"
+          title: "Finalize and export"
+          description: "Choose the final layout, review export actions, and manage any extra sections that sit outside the core guided flow."
+    section_registry:
+      sections:
+        experience:
+          title: "Experience"
+          fields:
+            title: "Job title *"
+            organization: "Employer"
+            location: "Location"
+            remote: "Remote"
+            start_month: "Start month"
+            start_year: "Start year"
+            end_month: "End month"
+            end_year: "End year"
+            current_role: "I currently work here"
+            summary: "Summary"
+            highlights_text: "Highlights"
+        education:
+          title: "Education"
+          fields:
+            institution: "Institution"
+            degree: "Degree"
+            location: "Location"
+            start_date: "Start date"
+            end_date: "End date"
+            details: "Details"
+        skills:
+          title: "Skills"
+          fields:
+            name: "Skill"
+            level: "Level"
+        projects:
+          title: "Projects"
+          fields:
+            name: "Project"
+            role: "Role"
+            url: "URL"
+            summary: "Summary"
+            highlights_text: "Highlights"
+    workspace_state:
+      page_header:
+        eyebrow: "Guided builder"
+        description: "Work through each step for %{identity} while the preview stays visible."
+        steps_ready: "%{completed}/%{total} steps ready"
+        back_to_workspace: "Back to workspace"
+        open_preview: "Open preview"
+    editor_state:
+      hero_badges:
+        template: "%{template} template"
+        steps_complete: "%{completed}/%{total} core steps complete"
+      progress_card:
+        eyebrow: "Progress"
+        title: "%{percent}% complete"
+        description: "Track guided progress while the live preview stays visible beside the editor."
+      next_step_card:
+        eyebrow: "Next move"
+        finalize_title: "Finalize"
+        with_next_description: "Advance when the current fields feel complete and the preview looks right."
+        finalize_description: "Review settings and export when you are happy with the current content."
+      tab_status:
+        current: "Current"
+        done: "Done"
+        open: "Open"
+      navigation:
+        back_to_workspace: "Back to workspace"
+        preview: "Preview"
+        go_back: "Go back"
+        next: "Next: %{step}"
+    preview_state:
+      panel:
+        eyebrow: "Live preview"
+        title: "Check the page as you edit"
+        description: "Use this rail to compare changes without leaving the builder."
+        completion_badge: "%{percent}% complete"
+      sync_card:
+        eyebrow: "Save status"
+        title: "Autosave on"
+        description: "Field changes save in place while the live preview refreshes."
+      actions:
+        open_preview: "Open preview"
+  resumes:
+    helper:
+      export_status:
+        labels:
+          queued: "Queued for export"
+          running: "Generating now"
+          failed: "Export failed"
+          ready: "PDF ready"
+          draft_only: "Draft only"
+        messages:
+          queued:
+            with_download: "A fresh PDF has been queued. The current download stays available while the new export is prepared."
+            without_download: "Your PDF export has been queued and will appear here automatically when it finishes."
+          running:
+            with_download: "A fresh PDF is generating now. You can still download the latest completed export while it runs."
+            without_download: "Your PDF export is generating now. This panel updates automatically when the file is ready."
+          failed:
+            with_download: "The latest export attempt failed. You can still download the previous PDF or start a fresh export."
+            without_download: "The latest export attempt did not finish. Start a new export when you are ready."
+          ready: "The latest PDF export is attached and ready to download."
+          draft_only: "No PDF export has been generated yet."
+      source_cloud_import:
+        status:
+          configured: "Configured"
+          setup_required: "Setup required"
+        actions:
+          connect_soon: "Connect soon"
+          see_setup: "See setup"
+        messages:
+          configured: "Environment credentials are present, but the OAuth handoff and remote file chooser are not wired in this rollout yet."
+          setup_required: "Add %{env_vars} to enable this connector safely."
+      source_upload_review:
+        unknown_type: "Unknown type"
+        ready_for_ai_import:
+          title: "Ready for AI import"
+          badge_label: "Autofill supported"
+          message: "This upload can be converted into source text during autofill while the original file stays attached to the draft."
+        supported_upload_attached:
+          title: "Supported upload attached"
+          badge_label: "Autofill supported"
+          message: "This file type supports AI import when autofill is available. The original file stays attached to the draft for reference."
+        reference_file_only:
+          title: "Reference file only"
+          badge_label: "Reference only"
+          message: "Keep this file attached for reference while you manually rebuild the draft. Use pasted text or a supported upload if you want AI to draft the core sections right now."
+      source_autofill:
+        labels:
+          unavailable: "AI import unavailable"
+          paste_ready: "Paste import ready"
+          paste_required: "Paste text required"
+          attach_file: "Attach a file"
+          upload_ready: "Upload import ready"
+          reference_file_only: "Reference file only"
+          choose_import_path: "Choose an import path"
+        messages:
+          unavailable: "Enable the autofill feature and a request-ready text generation model to let AI prepare the first draft."
+          paste_ready: "Pasted text can be structured into the heading, summary, and core resume sections."
+          paste_required: "Switch to paste mode and add source text before running autofill."
+          attach_document: "Attach a source document before running autofill."
+          upload_ready: "This upload can be converted into source text for AI autofill while staying attached to the draft."
+          upload_reference_only: "This file stays attached for reference. AI autofill currently reads %{formats} uploads."
+          scratch_mode: "Scratch mode keeps the builder manual. Choose paste or upload if you want AI to draft the core sections first."
+    cloud_import_provider_catalog:
+      providers:
+        google_drive:
+          label: "Google Drive"
+          description: "Browse a Drive file after provider auth is wired and keep the imported file attached to the draft."
+        dropbox:
+          label: "Dropbox"
+          description: "Choose a Dropbox file after provider auth is wired and keep the imported file attached to the draft."
+      feedback:
+        provider_unavailable: "Cloud import provider is not available."
+        configured: "%{provider} import is not connected yet. Provider auth handoff is the next rollout step."
+        setup_required: "%{provider} import is not configured. Add %{env_vars} to enable this connector."
+    resume_source_imports_controller:
+      provider_unavailable: "Cloud import provider is not available."
+      resume_unavailable: "Resume is not available."
+    export_actions_state:
+      actions:
+        export_pdf: "Export PDF"
+        download_pdf: "Download PDF"
+        download_text: "Download TXT"
+    export_status_state:
+      widget:
+        eyebrow: "Export status"
+        draft_badge: "Draft"
+      actions:
+        download_pdf: "Download PDF"
+    export_states:
+      draft: "Draft"
+      queued: "Queued"
+      running: "Running"
+      failed: "Failed"
+      ready: "Ready"
+    show_state:
+      page_header:
+        eyebrow: "Preview"
+        description: "Review the latest preview, check export status, and decide whether to download or keep editing."
+        completion_badge: "%{percent}% complete"
+        back_to_workspace: "Back to workspace"
+        edit_resume: "Edit resume"
+    edit:
+      mobile_preview_panel:
+        eyebrow: "Preview page"
+        title: "Open the full preview when you need more space"
+        description: "On smaller screens the live preview rail moves below the editor. Use the preview page when you want export actions and the rendered page together."
+    editor_chrome:
+      eyebrow: "Guided builder"
+      builder_steps_label: "Builder steps"
+    editor_heading_step:
+      optional_next_step:
+        eyebrow: "Optional next step"
+        title: "Move extras out of the way"
+        description: "Website, LinkedIn, driving licence, and other optional personal details live in the next step when they matter for the role or locale."
+        open_personal_details: "Open personal details"
+      labels:
+        title: "Title"
+        headline: "Headline"
+        first_name: "First name"
+        surname: "Surname"
+        email_required: "Email *"
+        phone: "Phone"
+        city: "City"
+        country: "Country"
+        pin_code: "Pin code"
+      footer_note: "Changes save in place and keep the preview in sync while you move between guided steps."
+      save_heading: "Save heading"
+    editor_personal_details_step:
+      optional_step:
+        eyebrow: "Optional step"
+        title: "Skip anything that does not belong on this resume"
+        description: "Most resumes can leave many of these fields blank. Add them only when a role, country, or application asks for them."
+        skip_for_now: "Skip for now"
+        back_to_heading: "Back to heading"
+      profile_links:
+        eyebrow: "Profile links and credentials"
+        title: "Contact details that may still belong near the top of the resume"
+        description: "Use this area for links and credentials that genuinely help a reviewer contact you or verify your background."
+      headshot:
+        eyebrow: "Headshot"
+        title: "Add a profile photo only when it strengthens the application"
+        description: "Templates with truthful headshot support can render this image in preview and PDF export. Other templates keep their non-photo fallback."
+        label: "Headshot"
+        upload_hint: "Upload a JPG, PNG, or WebP image under 3 MB. Saving a new image replaces the current one."
+        current_upload_title: "Current upload"
+        unknown_type: "Unknown type"
+        remove_hint: "Remove the photo at any time to return supported templates to their text-only identity block."
+        remove_action: "Remove photo"
+        template_badges:
+          active: "Active in this template"
+          fallback: "Fallback in this template"
+      photo_library:
+        eyebrow: "Shared photo library"
+        title: "Upload reusable portrait options for this resume and future templates"
+        description: "Store multiple portraits once, let preprocessing create reusable derivatives, and choose the best headshot per resume without replacing the original uploads."
+        create_profile_title: "Create your reusable photo library"
+        create_profile_description: "Start a user-owned photo library once, then keep adding and reusing portrait options across resume drafts."
+        create_profile_action: "Create photo library"
+        upload_label: "Add photos"
+        upload_hint: "Upload up to 6 JPG, PNG, or WebP images at a time. New uploads queue normalization automatically and keep the originals untouched."
+        upload_action: "Upload photos"
+        selection_title: "Choose the headshot for this resume"
+        selection_description: "The selected image is used by headshot-capable templates first, while non-photo templates keep their text-only fallback."
+        none_option_title: "Do not use a shared headshot here"
+        none_option_description: "Clear the current shared-photo selection for this resume and fall back to the template's non-photo identity block."
+        selected_badge: "Selected"
+        asset_badges:
+          asset_kind:
+            source: "Original"
+            normalized: "Normalized"
+            cutout: "Cutout"
+            enhanced: "Enhanced"
+            generated: "Generated"
+            variation: "Variation"
+            template_composite: "Template composite"
+            rejected: "Rejected"
+          status:
+            uploaded: "Uploaded"
+            ready: "Ready"
+            archived: "Archived"
+            failed: "Failed"
+          dimensions: "%{width}×%{height}"
+        current_selection_title: "Current shared selection"
+        current_selection_empty: "No shared photo is selected yet for this resume."
+        recent_runs_title: "Recent processing activity"
+        recent_runs_empty: "Uploads and queued processing runs will appear here as they finish."
+        recent_runs:
+          workflow_types:
+            normalize: "Normalize"
+            background_remove: "Background removal"
+            enhance: "Enhance"
+            generate_for_template: "Generate for template"
+            verify_candidate: "Verify candidate"
+          statuses:
+            queued: "Queued"
+            running: "Running"
+            succeeded: "Succeeded"
+            failed: "Failed"
+            cancelled: "Cancelled"
+        template_support:
+          active: "This template can render a selected shared headshot in preview and PDF export."
+          fallback: "This template keeps its non-photo fallback even if you store shared headshots for later use."
+        actions:
+          delete: "Delete"
+          background_remove: "Remove background"
+          generate: "Generate variants"
+          verify: "Verify"
+        empty_state:
+          title: "No shared photos yet"
+          description: "Upload portraits once to build a reusable headshot library for this and future resume drafts."
+      personal_information:
+        eyebrow: "Optional personal information"
+        title: "Only add fields you are comfortable sharing"
+        description: "Most resumes do not need these details. Add them only when they are expected for the role or application process."
+      labels:
+        website: "Website"
+        linkedin: "LinkedIn"
+        driving_licence: "Driving licence"
+        date_of_birth: "Date of Birth"
+        nationality: "Nationality"
+        marital_status: "Marital Status"
+        visa_status: "Visa Status"
+      footer_note: "Only keep fields that clearly help this application."
+      save_personal_details: "Save personal details"
+    editor_summary_step:
+      guidance_card:
+        eyebrow: "Guided summary step"
+        title: "Keep the pitch focused"
+        description: "Search a nearby role, review a curated draft, and insert a plain-text summary without losing autosave or preview updates."
+      library:
+        eyebrow: "Curated summary library"
+        title: "Search by job title"
+        description: "Start from a curated summary, then refine it in your own voice before moving on."
+      search_label: "Search by job title"
+      search_summaries: "Search summaries"
+      clear_search: "Clear search"
+      related_roles: "Related roles"
+      suggestions_title: "Curated suggestions"
+      insert_summary: "Insert this summary"
+      related_roles_text: "Related roles: %{roles}"
+      summary_label: "Professional summary"
+      footer_note: "Aim for three or four lines that help the preview feel complete before you move into the final review step."
+      save_summary: "Save summary"
+    summary_step_state:
+      search_placeholder: "Search by job title for pre-written examples"
+      expert_badge_label: "Expert Recommended"
+      results_label:
+        one: "1 summary example"
+        other: "%{count} summary examples"
+      empty_state_title: "No summary examples match yet"
+      empty_state_description: "Try a nearby title like Product Designer or Backend Engineer, or write your own summary in the editor."
+      guidance:
+        with_query: "Start from the examples closest to %{query}, then tailor the language to your own experience and results."
+        without_query: "Choose a close-fit example, insert it into the summary field, and personalize the wording before you move to finalize."
+      experience_badges:
+        early_career: "Early career"
+        mid_to_senior: "Mid to senior"
+        growth_stage: "Growth stage"
+    editor_source_step:
+      import_status:
+        eyebrow: "Import status"
+        paste_badge: "Paste"
+        upload_badge: "Upload"
+        llm_ready_badge: "LLM ready"
+        llm_unavailable_badge: "LLM unavailable"
+      supported_formats:
+        eyebrow: "Supported formats"
+        description: "PDF, DOCX, and text-based uploads can help prepare a starter draft. Legacy DOC files stay attached for reference."
+        original_file_badge: "Keep the original file attached"
+        autofill_badge: "Autofill the core steps"
+      guidance:
+        pill: "Import guidance"
+        title: "Start with the lightest path"
+        badge: "Autofill optional"
+        description: "Start from scratch when you want a clean draft. Use paste or upload only when existing content will save time. Once the source feels right, continue into heading and the rest of the guided builder."
+      footer_note_ready: "Changes save in place. Autofill becomes available when pasted text or a supported upload is present."
+      footer_note_default: "Changes save in place. Use the stepper or the next button when the source setup feels right."
+      save_source_setup: "Save source setup"
+      save_and_autofill: "Save and autofill"
+    source_import_fields:
+      modes:
+        scratch:
+          title: "Start from scratch"
+          description: "Use the starter sections and write directly in the guided builder."
+        paste:
+          title: "Paste existing resume text"
+          description: "Drop the raw content here first, then reshape it across the guided steps."
+        upload:
+          title: "Attach a source file"
+          description: "Keep the original file nearby while you rebuild or import the draft."
+      paste:
+        label: "Pasted resume text"
+        placeholder: "Paste an existing resume here if you want the original content close by while editing."
+        helper_ready: "Paste what you have and we can use it to prepare a starter draft for the main sections."
+        helper_default: "Keep the original text here for reference while you rebuild the resume in a cleaner structure."
+      upload:
+        label: "Source document"
+        dropzone_title: "Drop a file here or browse"
+        dropzone_description: "Upload PDF, DOC, DOCX, TXT, Markdown, HTML, or RTF. PDF, DOCX, and text-based uploads can power autofill while legacy DOC files stay attached for reference."
+        browse_files: "Browse files"
+        file_picker_fallback: "File picker fallback"
+        pending_title: "Ready to attach"
+        file_type: "File type"
+        size: "Size"
+        picker_helper_ready: "Use the fallback picker if drag-and-drop is unavailable. Supported uploads can also help prefill the main sections."
+        picker_helper_default: "Use the fallback picker if drag-and-drop is unavailable while you attach a source file for reference."
+        empty_state_description: "No source file attached yet. Drop a file here or browse. Supported import formats: %{formats}."
+      cloud:
+        eyebrow: "Cloud import connectors"
+        title: "Bring a file from Google Drive or Dropbox"
+        description: "Cloud import is planned next. For now, upload files from your device."
+        coming_soon: "Coming soon"
+    editor_finalize_step:
+      preview_action: "Preview"
+      preview_actions:
+        pill: "Preview actions"
+        title: "Keep the last decisions lightweight"
+        badge: "Export stays ready"
+        description: "Choose a template first, then open extra output settings only if you need them. Export and download actions stay close while you make the last adjustments."
+      template_field_label: "Template"
+      template_picker_description: "Switch the look without changing the saved resume content. Active templates stay available here, and a legacy template remains selectable if this resume already uses it."
+      output_settings:
+        eyebrow: "Output settings"
+        description: "Open link, page-size, color, and contact-display controls only when you need them."
+        optional_badge: "Optional"
+        resume_link: "Resume link"
+        page_size: "Page size"
+        accent_color: "Accent color"
+        show_contact_icons: "Show contact icons"
+        show_contact_icons_description: "Keep contact info compact in the preview and exported PDF."
+      footer_note: "Changes save in place here, so you can export from the builder once the shared preview looks right."
+      save_finalize_settings: "Save finalize settings"
+      additional_sections:
+        pill: "Additional sections"
+        title: "Additional sections"
+        description: "Projects and custom sections remain available here while the main builder flow stays focused on heading, experience, education, skills, and summary."
+        badge: "White-canvas editor"
+      empty_state:
+        title: "No additional sections yet"
+        description: "Add projects or other custom sections here once the core guided steps feel complete."
+    editor_section_step:
+      current_step:
+        eyebrow: "Current step"
+        title: "Keep this section focused"
+        description: "Only the entries for this step stay visible here so you can edit faster without losing the preview."
+        preview_sync_badge: "Preview stays in sync"
+        open_examples: "Open examples"
+        next_step: "Next step"
+      experience_guidance:
+        pill: "Experience guidance"
+        title: "Examples that still count"
+        description: "Relevant experience can include paid roles, internships, volunteering, teaching help, tutoring, and adjacent project work."
+        badge: "Early-career friendly"
+        helper_text: "Use nearby examples when the category feels too narrow. The goal is to show credible work, not to force one job-title pattern."
+        internships: "Internships"
+        volunteering: "Volunteering"
+        teaching_assistant: "Teaching assistant"
+        tutor: "Tutor"
+      empty_state:
+        title: "No %{step} entries yet"
+        description: "Create the first section for this step and then add your entries below it."
+    section_form:
+      title: "Add section"
+      description: "Create a new section and then add entries to it without leaving the guided workspace."
+      pill: "Section setup"
+      add_flow_badge: "White-canvas add flow"
+      title_label: "Title"
+      title_placeholder: "Awards"
+      type_label: "Type"
+      submit: "Add section"
+    section_editor:
+      pill: "Section canvas"
+      description: "Keep the section label and type tidy here, then use the entry cards below to shape what appears in the shared preview."
+      entry_count:
+        one: "1 entry"
+        other: "%{count} entries"
+      badges:
+        live_preview_enabled: "Live preview enabled"
+        drag_to_reorder: "Drag to reorder"
+      actions:
+        up: "Up"
+        down: "Down"
+        remove: "Remove"
+      settings:
+        title: "Section settings"
+        description: "Update the section title or swap the type without leaving the current step."
+        autosave_active: "Autosave active"
+        title_label: "Title"
+        type_label: "Type"
+      empty_state:
+        description: "No entries yet. Add your first item below."
+    entry_form:
+      pill: "Entry canvas"
+      badges:
+        live_entry: "Live entry"
+        new_entry: "New entry"
+        drag_to_reorder: "Drag to reorder"
+      titles:
+        entry_fallback: "%{section} entry"
+        add_entry: "Add %{section}"
+      supporting_text:
+        persisted_fallback: "%{section} details appear in the preview as soon as they save."
+        new_with_existing: "Open the form when you’re ready to add another item."
+        new_without_existing: "Add the first item for this section to start filling the preview."
+      disclosure_labels:
+        expand_to_edit: "Expand to edit"
+        open_form: "Open form"
+      actions:
+        up: "Up"
+        down: "Down"
+        improve: "Improve"
+        remove: "Remove"
+      checkbox_hint: "Use this toggle to keep the experience entry aligned with the guided builder flow."
+      footer_note:
+        persisted: "Edits save in place and refresh the shared preview rail without leaving this step."
+        new_entry: "Start with the essential details first. You can expand the card again after the new entry is created."
+      submit:
+        save: "Save entry"
+        add: "Add entry"
+    preview:
+      live_sample: "Live sample"
+      description: "Use this rail to compare edits, spot layout issues, and open the preview page when you need more room."
+    show:
+      preview_pill: "Live preview"
+      preview_title: "Review before you export"
+      preview_description: "Check the latest layout, confirm the details you care about, and then download or keep editing."
+      mobile_actions:
+        eyebrow: "Quick actions"
+        title: "Export or keep editing"
+        description: "Use these actions before you scroll through the preview on smaller screens."
+      desktop_actions:
+        eyebrow: "Preview actions"
+        title: "Download or go back to editing"
+        description: "Keep the current preview in view while you export, download, or return to the editor."
+      what_this_shows:
+        eyebrow: "What this shows"
+        description: "Use this preview to make sure the layout, content, and export status look right before you download the file."
+    resume_source_imports:
+      show:
+        status:
+          configured: "Configured"
+          setup_required: "Setup required"
+        page_header:
+          eyebrow: "Cloud import"
+          title: "%{provider} connector"
+          safe_scaffold_badge: "Safe scaffold"
+        actions:
+          back_to_source_step: "Back to source step"
+          back_to_resume_setup: "Back to resume setup"
+          open_draft: "Open draft"
+          resume_setup: "Resume setup"
+        rollout_status:
+          eyebrow: "Current rollout status"
+          description: "This step only confirms provider availability and setup state. OAuth handoff, remote file selection, and secure attachment import still need a dedicated implementation slice."
+        what_works_now:
+          eyebrow: "What works now"
+          provider_registry: "Provider registry and environment checks"
+          signed_in_launch: "Signed-in launch path with safe return handling"
+          setup_guidance: "Setup guidance before any OAuth work"
+        still_deferred:
+          eyebrow: "Still deferred"
+          oauth_handoff: "OAuth authorization handoff"
+          remote_file_chooser: "Remote file chooser and review step"
+          server_pipeline: "Server-side import/download pipeline"
+        provider_state:
+          eyebrow: "Provider state"
+          return_destination: "Return destination"
+          resume_context: "Resume context"
+          existing_draft: "Existing draft"
+          new_resume_setup: "New resume setup"
+        required_env_vars: "Required environment variables"

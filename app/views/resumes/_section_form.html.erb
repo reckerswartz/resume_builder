@@ -1,32 +1,32 @@
 <% allowed_section_types = local_assigns.fetch(:allowed_section_types, nil) %>
 
 <%= render Ui::DashboardPanelComponent.new(
-  title: "Add section",
-  description: "Create a new section and then add entries to it without leaving the guided workspace.",
+  title: t("resumes.section_form.title"),
+  description: t("resumes.section_form.description"),
   padding: :sm
 ) do %>
   <div class="space-y-4">
     <div class="flex flex-wrap gap-2">
       <span class="atelier-pill">
         <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-        Section setup
+        <%= t("resumes.section_form.pill") %>
       </span>
-      <span class="<%= ui_badge_classes(:neutral) %>">White-canvas add flow</span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_form.add_flow_badge") %></span>
     </div>
 
     <%= form_with model: [resume, Section.new], url: resume_sections_path(resume, **resume_builder_step_params), class: "grid gap-4 sm:grid-cols-[1fr_200px_auto] sm:items-end" do |form| %>
       <div>
-        <%= form.label :title, class: ui_label_classes %>
-        <%= form.text_field :title, placeholder: "Awards", class: ui_input_classes %>
+        <%= form.label :title, t("resumes.section_form.title_label"), class: ui_label_classes %>
+        <%= form.text_field :title, placeholder: t("resumes.section_form.title_placeholder"), class: ui_input_classes %>
       </div>
 
       <div>
-        <%= form.label :section_type, "Type", class: ui_label_classes %>
+        <%= form.label :section_type, t("resumes.section_form.type_label"), class: ui_label_classes %>
         <%= form.select :section_type, options_for_select(section_type_options_for_builder(only: allowed_section_types)), {}, class: ui_input_classes %>
       </div>
 
       <div>
-        <%= form.submit "Add section", class: ui_button_classes(:primary) %>
+        <%= form.submit t("resumes.section_form.submit"), class: ui_button_classes(:primary) %>
       </div>
     <% end %>
   </div>

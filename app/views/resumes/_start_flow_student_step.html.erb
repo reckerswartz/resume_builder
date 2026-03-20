@@ -2,10 +2,10 @@
   <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
     <div class="space-y-6">
       <div class="space-y-3">
-        <span class="atelier-pill">Step 2</span>
+        <span class="atelier-pill"><%= t(".step_badge") %></span>
         <div class="space-y-2">
-          <h2 class="text-2xl font-semibold tracking-tight text-ink-950">Are you a student?</h2>
-          <p class="text-sm leading-6 text-ink-700/80">This helps us keep the setup flow flexible for early-career resumes without forcing every draft down the same path.</p>
+          <h2 class="text-2xl font-semibold tracking-tight text-ink-950"><%= t(".title") %></h2>
+          <p class="text-sm leading-6 text-ink-700/80"><%= t(".description") %></p>
         </div>
       </div>
 
@@ -23,7 +23,7 @@
               ),
               class: [ui_inset_panel_classes(tone: :subtle), "block transition hover:border-canvas-300 hover:bg-canvas-50/92 focus:outline-none focus:ring-2 focus:ring-ink-400/30"].join(" ") do %>
             <div class="space-y-2">
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70">Student status</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".option_eyebrow") %></p>
               <p class="text-base font-semibold tracking-tight text-ink-950"><%= option.fetch(:label) %></p>
             </div>
           <% end %>
@@ -31,7 +31,7 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <%= link_to "Skip for now",
+        <%= link_to t(".skip_for_now"),
           new_resume_path(
             step: "setup",
             template_id: start_flow_state.selected_template_id,
@@ -47,18 +47,18 @@
     </div>
 
     <%= render Ui::DashboardPanelComponent.new(
-      eyebrow: "Why we ask",
-      title: "Keep the flow relevant for entry-level resumes",
-      description: "Student status can shape later guidance for internships, coursework, projects, and volunteer work. You can skip it and keep moving.",
+      eyebrow: t(".panel_eyebrow"),
+      title: t(".panel_title"),
+      description: t(".panel_description"),
       tone: :subtle,
       padding: :md,
       density: :compact
     ) do %>
       <div class="space-y-3 text-sm leading-6 text-ink-700/80">
-        <p>The answer stays lightweight and optional. It only helps us carry better context into the next setup step.</p>
+        <p><%= t(".panel_note") %></p>
         <div class="flex flex-wrap gap-2">
-          <span class="<%= ui_badge_classes(:neutral) %>">Optional question</span>
-          <span class="<%= ui_badge_classes(:neutral) %>">Skip supported</span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".optional_question_badge") %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".skip_supported_badge") %></span>
         </div>
       </div>
     <% end %>

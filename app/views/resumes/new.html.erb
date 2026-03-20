@@ -2,11 +2,11 @@
 
 <section class="space-y-5">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "New resume",
-    title: "Start a resume",
-    description: "Name the draft, keep the selected template, and jump straight into editing. You can browse more looks only when you need them.",
+    eyebrow: t(".header_eyebrow"),
+    title: t(".header_title"),
+    description: t(".header_description"),
     actions: [
-      { label: "Back to workspace", path: resumes_path, style: :secondary }
+      { label: t(".back_to_workspace"), path: resumes_path, style: :secondary }
     ],
     density: :compact
   ) %>

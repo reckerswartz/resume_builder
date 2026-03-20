@@ -1,3 +1,5 @@
+require "base64"
+
 module ResumeTemplates
   class BaseComponent < ApplicationComponent
     BOOLEAN_TYPE = ActiveModel::Type::Boolean.new
@@ -123,6 +125,31 @@ module ResumeTemplates
       contact_value("full_name").presence || resume.user.display_name
     end
 
+    def supports_headshot?
+      layout_config.fetch("supports_headshot")
+    end
+
+    def headshot_attached?
+      supports_headshot? && resolved_headshot_attachment&.attached?
+    end
+
+    def headshot_data_url
+      return unless headshot_attached?
+
+      @headshot_data_url ||= begin
+        encoded_image = Base64.strict_encode64(resolved_headshot_attachment.download)
+        "data:#{resolved_headshot_attachment.blob.content_type};base64,#{encoded_image}"
+      end
+    end
+
+    def headshot_alt_text
+      "#{full_name} headshot"
+    end
+
+    def photo_slot_config(slot_name)
+      layout_config.fetch("photo_slots", {}).fetch(slot_name.to_s, {})
+    end
+
     def section_entries(section)
       section.ordered_entries
     end
@@ -185,6 +212,16 @@ module ResumeTemplates
 
       def contact_value(key)
         resume.contact_field(key)
+      end
+
+      def resolved_headshot_attachment
+        return @resolved_headshot_attachment if defined?(@resolved_headshot_attachment)
+
+        @resolved_headshot_attachment = if resume.selected_headshot_photo_asset&.file&.attached?
+          resume.selected_headshot_photo_asset.file
+        elsif resume.headshot.attached?
+          resume.headshot
+        end
       end
   end
 end

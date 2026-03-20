@@ -8,9 +8,9 @@ module ResumeBuilder
 
     def panel_attributes
       {
-        eyebrow: "Live preview",
-        title: "Check the page as you edit",
-        description: "Use this rail to compare changes without leaving the builder.",
+        eyebrow: I18n.t("resume_builder.preview_state.panel.eyebrow"),
+        title: I18n.t("resume_builder.preview_state.panel.title"),
+        description: I18n.t("resume_builder.preview_state.panel.description"),
         padding: :sm,
         density: :compact
       }
@@ -19,22 +19,22 @@ module ResumeBuilder
     def badges
       @badges ||= [
         { label: resume.template.name, tone: :neutral },
-        { label: "#{builder_state.completion_percentage}% complete", tone: :neutral }
+        { label: I18n.t("resume_builder.preview_state.panel.completion_badge", percent: builder_state.completion_percentage), tone: :neutral }
       ]
     end
 
     def sync_card_attributes
       {
-        eyebrow: "Save status",
-        title: "Autosave on",
-        description: "Field changes save in place while the live preview refreshes.",
+        eyebrow: I18n.t("resume_builder.preview_state.sync_card.eyebrow"),
+        title: I18n.t("resume_builder.preview_state.sync_card.title"),
+        description: I18n.t("resume_builder.preview_state.sync_card.description"),
         padding: :sm
       }
     end
 
     def preview_page_action
       {
-        label: "Open preview",
+        label: I18n.t("resume_builder.preview_state.actions.open_preview"),
         path: view_context.resume_path(resume, step: current_step_key),
         style: :secondary,
         size: :sm,

@@ -18,6 +18,18 @@ module Admin::SettingsHelper
         label: "Autofill content",
         description: "Allow structured autofill flows to use configured LLM roles when source content is available.",
         enabled: platform_setting.feature_enabled?("autofill_content")
+      },
+      {
+        key: "photo_processing",
+        label: "Photo library",
+        description: "Enable the shared photo library, reusable upload pipeline, and headshot selection flows in the resume builder.",
+        enabled: platform_setting.feature_enabled?("photo_processing")
+      },
+      {
+        key: "resume_image_generation",
+        label: "Resume image generation",
+        description: "Allow background removal, template-specific portrait generation, and verification actions when compatible vision roles are assigned.",
+        enabled: platform_setting.feature_enabled?("resume_image_generation")
       }
     ]
   end

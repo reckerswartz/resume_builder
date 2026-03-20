@@ -27,10 +27,13 @@
 - `Ui::PageHeaderComponent` now supplies the white-canvas entry header.
 - Shared form tokens and template picker tokens inherit the updated class system.
 - The compact setup picker now uses `atelier-pill` discovery cues, stronger selected-summary framing, and a richer recommendation callout instead of reading like a plain radio list.
+- The experience and student gates now use lighter step cues and advisory rails so the start flow feels product-led without turning into wizard chrome.
+- The setup form now keeps experience carry-through, optional import, and next-step guidance inside the named `ink/canvas` palette while leaving template selection as the primary decision.
 
 ### Still update / verify
 
 - Validation messaging should stay inside white-canvas surfaces.
+- If more intake questions are added later, keep them in the current light advisory rhythm instead of introducing denser step chrome.
 
 ### Where to apply style
 
@@ -50,10 +53,12 @@
 - The finalize-step additional sections area and add-section panel now share the same light product-editor vocabulary as the guided section steps.
 - Builder progress and next-step guidance now sit inside lighter advisory cards, while the dark shell stays focused on the primary step frame and navigation context.
 - Source import and finalize guidance now use white-canvas advisory panels plus named palette copy, with stronger emphasis reserved for actionable AI-import-ready or export-ready states.
+- Heading, personal-details, and summary steps now keep autosave guidance, optional-field framing, and curated helper copy on the same lighter product-editor rhythm.
 
 ### Still update / verify
 
 - If more import or export states are added later, reserve dark-shell emphasis for blocking or high-priority status changes instead of default guidance copy.
+- If more intro-step guidance or summary tooling is added later, keep it inside grouped white canvases and preserve the current terse footer guidance.
 
 ### Where to apply style
 

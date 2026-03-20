@@ -1,3 +1,15 @@
+<% summary_ready = resume.summary.present? %>
+<% source_mode_badge_label = case resume.source_mode.to_s
+when "scratch"
+  t("resumes.resume_card.metadata_badges.source_mode.scratch")
+when "paste"
+  t("resumes.resume_card.metadata_badges.source_mode.paste")
+when "upload"
+  t("resumes.resume_card.metadata_badges.source_mode.upload")
+else
+  t("resumes.resume_card.metadata_badges.source_mode.default", mode: resume.source_mode.to_s.humanize)
+end %>
+
 <%= render Ui::SurfaceCardComponent.new(
   tag: :article,
   padding: :none,
@@ -8,19 +20,19 @@
       <div class="min-w-0">
         <span class="atelier-pill">
           <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-          Resume canvas
+          <%= t("resumes.resume_card.canvas_pill") %>
         </span>
 
         <div class="mt-4 flex flex-wrap gap-2 text-xs font-medium text-ink-700/70">
           <span class="<%= "#{ui_badge_classes(:neutral)} uppercase tracking-[0.18em]" %>"><%= resume.template.name %></span>
-          <span class="<%= ui_badge_classes(resume.summary.present? ? :success : :warning) %>"><%= resume.summary.present? ? "Summary ready" : "Needs summary" %></span>
+          <span class="<%= ui_badge_classes(summary_ready ? :success : :warning) %>"><%= summary_ready ? t("resumes.resume_card.summary_status.ready") : t("resumes.resume_card.summary_status.needs") %></span>
         </div>
 
         <h2 class="mt-4 text-xl font-semibold tracking-tight text-ink-950"><%= resume.title %></h2>
         <% if resume.headline.present? %>
           <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= resume.headline %></p>
         <% else %>
-          <p class="mt-1 text-sm leading-6 text-ink-700/80">Add a headline to make the workspace and exported preview more scannable.</p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.resume_card.missing_headline") %></p>
         <% end %>
       </div>
 
@@ -34,28 +46,28 @@
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-3' ].join(' ') %>">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Preview grouping</p>
-          <p class="mt-2 text-sm font-semibold text-ink-950"><%= resume.contact_field("full_name").presence || "Identity details pending" %></p>
-          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= resume.summary.present? ? "This draft is ready for a fast preview pass and final export checks." : "Finish the summary and identity details before moving into final preview and export review." %></p>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.resume_card.grouping.eyebrow") %></p>
+          <p class="mt-2 text-sm font-semibold text-ink-950"><%= resume.contact_field("full_name").presence || t("resumes.resume_card.grouping.identity_pending") %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= summary_ready ? t("resumes.resume_card.grouping.ready_description") : t("resumes.resume_card.grouping.incomplete_description") %></p>
         </div>
 
-        <span class="<%= ui_badge_classes(:info) %>">Preview + metadata grouped</span>
+        <span class="<%= ui_badge_classes(:info) %>"><%= t("resumes.resume_card.grouping.grouped_badge") %></span>
       </div>
 
       <div class="flex flex-wrap gap-2 text-xs font-medium text-ink-700/70">
         <span class="<%= ui_badge_classes(:neutral) %>"><%= resume.slug %></span>
-        <span class="<%= ui_badge_classes(:neutral) %>">Updated <%= time_ago_in_words(resume.updated_at) %> ago</span>
-        <span class="<%= ui_badge_classes(:neutral) %>"><%= resume.source_mode.to_s.humanize %> start</span>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.resume_card.metadata_badges.updated_ago", time: time_ago_in_words(resume.updated_at)) %></span>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= source_mode_badge_label %></span>
       </div>
     </div>
 
     <div class="flex flex-col gap-3 border-t border-canvas-200/80 pt-4 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm leading-6 text-ink-700/80">Jump back into editing, open the preview page, or remove the draft once you no longer need it.</p>
+      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.resume_card.footer_description") %></p>
 
       <div class="flex flex-wrap gap-2">
-        <%= link_to "Edit", edit_resume_path(resume), class: ui_button_classes(:primary, size: :sm) %>
-        <%= link_to "Preview", resume_path(resume), class: ui_button_classes(:secondary, size: :sm) %>
-        <%= button_to "Delete", resume_path(resume), method: :delete, form: { class: "inline-flex" }, class: ui_button_classes(:danger, size: :sm) %>
+        <%= link_to t("resumes.resume_card.actions.edit"), edit_resume_path(resume), class: ui_button_classes(:primary, size: :sm) %>
+        <%= link_to t("resumes.resume_card.actions.preview"), resume_path(resume), class: ui_button_classes(:secondary, size: :sm) %>
+        <%= button_to t("resumes.resume_card.actions.delete"), resume_path(resume), method: :delete, form: { class: "inline-flex" }, class: ui_button_classes(:danger, size: :sm) %>
       </div>
     </div>
   </div>

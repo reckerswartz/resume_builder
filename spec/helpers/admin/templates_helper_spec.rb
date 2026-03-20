@@ -12,32 +12,32 @@ require 'rails_helper'
 # end
 RSpec.describe Admin::TemplatesHelper, type: :helper do
   describe '#template_headshot_metadata_label' do
-    it 'returns Enabled when the internal headshot flag is on' do
+    it 'returns Supported when the headshot flag is on' do
       template = build_stubbed(:template, layout_config: ResumeTemplates::Catalog.default_layout_config.merge('supports_headshot' => true))
 
-      expect(helper.template_headshot_metadata_label(template)).to eq('Enabled')
+      expect(helper.template_headshot_metadata_label(template)).to eq('Supported')
     end
 
-    it 'returns Disabled when the internal headshot flag is off' do
+    it 'returns Fallback only when the headshot flag is off' do
       template = build_stubbed(:template)
 
-      expect(helper.template_headshot_metadata_label(template)).to eq('Disabled')
+      expect(helper.template_headshot_metadata_label(template)).to eq('Fallback only')
     end
   end
 
   describe '#template_headshot_metadata_description' do
-    it 'explains enabled headshot metadata as internal-only' do
+    it 'explains enabled headshot metadata as renderer support' do
       template = build_stubbed(:template, layout_config: ResumeTemplates::Catalog.default_layout_config.merge('supports_headshot' => true))
 
-      expect(helper.template_headshot_metadata_description(template)).to include('Internal-only planning flag is on')
-      expect(helper.template_headshot_metadata_description(template)).to include('do not advertise headshot support')
+      expect(helper.template_headshot_metadata_description(template)).to include('uploaded resume headshot')
+      expect(helper.template_headshot_metadata_description(template)).to include('live preview and PDF export')
     end
 
-    it 'explains disabled headshot metadata as internal-only' do
+    it 'explains disabled headshot metadata as fallback-only behavior' do
       template = build_stubbed(:template)
 
-      expect(helper.template_headshot_metadata_description(template)).to include('Internal-only planning flag is off')
-      expect(helper.template_headshot_metadata_description(template)).to include('omit headshot promises')
+      expect(helper.template_headshot_metadata_description(template)).to include('non-photo identity treatment')
+      expect(helper.template_headshot_metadata_description(template)).to include('headshot attached')
     end
   end
 
