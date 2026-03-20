@@ -1,0 +1,10 @@
+<% current_step = builder_state.current_step %>
+
+<div id="<%= dom_id(resume, :editor_step_content) %>" class="space-y-6">
+  <%= render "resumes/#{builder_state.step_partial}",
+    resume: resume,
+    current_step: current_step,
+    next_step_path: builder_state.next_step_path,
+    step_sections: builder_state.step_sections,
+    add_section_types: builder_state.add_section_types %>
+</div>

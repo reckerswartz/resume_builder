@@ -1,0 +1,38 @@
+version: 1
+updated_at: "2026-03-20"
+workflow:
+  status: ready
+  path: ".windsurf/workflows/behance-template-rollout.md"
+  default_mode: implement-next
+  default_batch_size: 1
+tracking:
+  overview_path: "docs/template_rollouts/README.md"
+  template_doc_template: "docs/template_rollouts/templates/TEMPLATE.md"
+  run_doc_template: "docs/template_rollouts/runs/TEMPLATE.md"
+  latest_run: "docs/template_rollouts/runs/2026-03-20-workflow-foundation/00-overview.md"
+sources:
+  behance:
+    purpose: "resume template layout reference"
+    artifact_cache_root: "tmp/reference_artifacts/behance"
+    asset_policy: "reference_only"
+  resumebuilder:
+    purpose: "interaction and template-marketplace reference patterns"
+    docs_root: "docs/references/resumebuilder"
+    asset_policy: "reference_patterns_only"
+deduplication:
+  primary_keys:
+    - source_url
+    - capture_signature
+candidate_statuses:
+  - new
+  - duplicate
+  - planned
+  - implemented
+  - superseded
+  - rejected
+pixel_statuses:
+  - not_started
+  - in_progress
+  - close
+  - pixel_perfect
+candidates: []

@@ -1,10 +1,10 @@
 class TemplatePolicy < ApplicationPolicy
   def index?
-    admin?
+    authenticated?
   end
 
   def show?
-    admin?
+    authenticated?
   end
 
   def create?
@@ -24,7 +24,8 @@ class TemplatePolicy < ApplicationPolicy
       return scope.none unless user
       return scope.all if user.admin?
 
-      scope.active
+      active_scope = scope.active
+      active_scope.exists? ? active_scope : scope.all
     end
   end
 end

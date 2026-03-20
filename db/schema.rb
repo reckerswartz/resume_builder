@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_19_191252) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_20_125500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_191252) do
     t.index ["section_id"], name: "index_entries_on_section_id"
   end
 
+  create_table "error_logs", force: :cascade do |t|
+    t.jsonb "backtrace_lines", default: [], null: false
+    t.jsonb "context", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.string "error_class", null: false
+    t.text "message", null: false
+    t.datetime "occurred_at", null: false
+    t.string "reference_id", null: false
+    t.string "source", null: false
+    t.datetime "updated_at", null: false
+    t.index ["error_class"], name: "index_error_logs_on_error_class"
+    t.index ["occurred_at"], name: "index_error_logs_on_occurred_at"
+    t.index ["reference_id"], name: "index_error_logs_on_reference_id", unique: true
+    t.index ["source"], name: "index_error_logs_on_source"
+  end
+
   create_table "job_logs", force: :cascade do |t|
     t.string "active_job_id"
     t.datetime "created_at", null: false
@@ -76,19 +93,66 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_191252) do
     t.text "error_message"
     t.string "feature_name", null: false
     t.integer "latency_ms"
+    t.bigint "llm_model_id"
+    t.bigint "llm_provider_id"
     t.jsonb "metadata", default: {}, null: false
     t.text "prompt"
     t.text "response"
     t.bigint "resume_id", null: false
+    t.string "role"
     t.string "status", null: false
     t.jsonb "token_usage", default: {}, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["created_at"], name: "index_llm_interactions_on_created_at"
     t.index ["feature_name"], name: "index_llm_interactions_on_feature_name"
+    t.index ["llm_model_id"], name: "index_llm_interactions_on_llm_model_id"
+    t.index ["llm_provider_id"], name: "index_llm_interactions_on_llm_provider_id"
     t.index ["resume_id"], name: "index_llm_interactions_on_resume_id"
+    t.index ["role"], name: "index_llm_interactions_on_role"
     t.index ["status"], name: "index_llm_interactions_on_status"
     t.index ["user_id"], name: "index_llm_interactions_on_user_id"
+  end
+
+  create_table "llm_model_assignments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "llm_model_id", null: false
+    t.integer "position", default: 0, null: false
+    t.string "role", null: false
+    t.datetime "updated_at", null: false
+    t.index ["llm_model_id", "role"], name: "index_llm_model_assignments_on_llm_model_id_and_role", unique: true
+    t.index ["llm_model_id"], name: "index_llm_model_assignments_on_llm_model_id"
+    t.index ["role", "position"], name: "index_llm_model_assignments_on_role_and_position"
+  end
+
+  create_table "llm_models", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "identifier", null: false
+    t.bigint "llm_provider_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name", null: false
+    t.jsonb "settings", default: {}, null: false
+    t.boolean "supports_text", default: true, null: false
+    t.boolean "supports_vision", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_llm_models_on_active"
+    t.index ["llm_provider_id", "identifier"], name: "index_llm_models_on_llm_provider_id_and_identifier", unique: true
+    t.index ["llm_provider_id"], name: "index_llm_models_on_llm_provider_id"
+  end
+
+  create_table "llm_providers", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "adapter", null: false
+    t.string "api_key_env_var"
+    t.string "base_url", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.jsonb "settings", default: {}, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_llm_providers_on_active"
+    t.index ["slug"], name: "index_llm_providers_on_slug", unique: true
   end
 
   create_table "platform_settings", force: :cascade do |t|
@@ -104,8 +168,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_191252) do
     t.jsonb "contact_details", default: {}, null: false
     t.datetime "created_at", null: false
     t.string "headline"
+    t.jsonb "intake_details", default: {}, null: false
+    t.jsonb "personal_details", default: {}, null: false
     t.jsonb "settings", default: {}, null: false
     t.string "slug", null: false
+    t.string "source_mode", default: "scratch", null: false
+    t.text "source_text"
     t.text "summary", default: "", null: false
     t.bigint "template_id", null: false
     t.string "title", null: false
@@ -162,8 +230,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_191252) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "entries", "sections"
+  add_foreign_key "llm_interactions", "llm_models"
+  add_foreign_key "llm_interactions", "llm_providers"
   add_foreign_key "llm_interactions", "resumes"
   add_foreign_key "llm_interactions", "users"
+  add_foreign_key "llm_model_assignments", "llm_models"
+  add_foreign_key "llm_models", "llm_providers"
   add_foreign_key "resumes", "templates"
   add_foreign_key "resumes", "users"
   add_foreign_key "sections", "resumes"

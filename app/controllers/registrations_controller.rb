@@ -12,7 +12,7 @@ class RegistrationsController < ApplicationController
     if @user.save
       Resumes::Bootstrapper.new(user: @user).call if @user.resumes.empty?
       start_new_session_for(@user)
-      redirect_to resumes_path, notice: "Welcome to Resume Builder."
+      redirect_to resumes_path, notice: "Your workspace is ready."
     else
       render :new, status: :unprocessable_entity
     end

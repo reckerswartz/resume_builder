@@ -1,0 +1,12 @@
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "Edit LLM provider",
+    description: "Update the endpoint, credentials, and request behavior for this provider.",
+    actions: [
+      { label: "View provider", path: admin_llm_provider_path(@llm_provider), style: :secondary }
+    ]
+  ) %>
+
+  <%= render "form", llm_provider: @llm_provider %>
+</section>

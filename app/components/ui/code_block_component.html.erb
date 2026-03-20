@@ -1,0 +1,7 @@
+<section class="<%= wrapper_classes %>">
+  <h2 class="<%= title_classes %>"><%= title %></h2>
+  <% if description.present? %>
+    <p class="<%= description_classes %>"><%= description %></p>
+  <% end %>
+  <pre class="<%= block_classes %>"><%= body %></pre>
+</section>

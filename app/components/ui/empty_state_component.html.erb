@@ -1,0 +1,21 @@
+<%= content_tag tag_name, class: wrapper_classes do %>
+  <% if title.present? %>
+    <h3 class="<%= title_classes %>"><%= title %></h3>
+  <% end %>
+
+  <% if description.present? %>
+    <p class="<%= description_classes %>"><%= description %></p>
+  <% end %>
+
+  <% if action? %>
+    <div class="<%= action_wrapper_classes %>">
+      <%= link_to action_label, action_path, class: action_classes %>
+    </div>
+  <% end %>
+
+  <% if content? %>
+    <div class="<%= content_classes %>">
+      <%= content %>
+    </div>
+  <% end %>
+<% end %>

@@ -7,6 +7,10 @@ RSpec.describe 'Home', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Create account')
+      expect(response.body).to include('See how it works')
+      expect(response.body).to include('Three simple ways to begin')
+      expect(response.body).to include('Common questions')
+      expect(response.body).to include('atelier-pill')
     end
 
     it 'redirects authenticated users to resumes' do

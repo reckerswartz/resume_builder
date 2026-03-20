@@ -1,0 +1,213 @@
+<% marketplace_state = template_marketplace_state(
+  templates: @templates,
+  filter_templates: @filter_templates,
+  query: @query,
+  family_filter: @family_filter,
+  density_filter: @density_filter,
+  column_count_filter: @column_count_filter,
+  theme_tone_filter: @theme_tone_filter,
+  shell_style_filter: @shell_style_filter,
+  sort: @sort,
+  resume: @recommendation_resume
+) %>
+<% recommended_cards = marketplace_state.card_states.select { |card_state| card_state.fetch(:recommended) } %>
+
+<section class="space-y-5" data-controller="template-gallery">
+  <%= render Ui::PageHeaderComponent.new(**marketplace_state.page_header_attributes, density: :compact) %>
+
+  <%= render Ui::SurfaceCardComponent.new(padding: :lg, extra_classes: "relative overflow-hidden") do %>
+    <div class="absolute -right-14 top-6 h-32 w-32 rounded-full atelier-glow opacity-45"></div>
+    <div class="absolute inset-x-6 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+    <div class="relative space-y-5">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="max-w-3xl">
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+            Compare faster
+          </span>
+          <p class="mt-3 text-sm leading-6 text-ink-700/80">Use search first, then open extra filters only when you need them.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <% if marketplace_state.filters_active? %>
+            <%= link_to "Clear filters", marketplace_state.clear_filters_path, class: ui_button_classes(:secondary, size: :sm) %>
+          <% end %>
+          <span class="<%= ui_badge_classes(:neutral) %>" data-template-gallery-target="resultsLabel"><%= marketplace_state.results_label %></span>
+        </div>
+      </div>
+
+      <% if recommended_cards.any? %>
+        <div class="<%= [ui_inset_panel_classes(tone: :subtle, padding: :lg), 'relative overflow-hidden'].join(' ') %>">
+          <div class="absolute -right-8 top-2 h-20 w-20 rounded-full atelier-glow opacity-30"></div>
+
+          <div class="relative">
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+              Recommended for this draft
+            </span>
+            <p class="mt-3 text-sm leading-6 text-ink-700/80">Use the intake signals as a starting point, then open the strongest candidates in the full preview.</p>
+
+            <div class="mt-4 grid gap-3 lg:grid-cols-2">
+              <% recommended_cards.each do |card_state| %>
+                <div class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-semibold tracking-tight text-ink-950"><%= card_state.fetch(:template).name %></p>
+                      <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= card_state.fetch(:recommendation_reason) %></p>
+                    </div>
+                    <span class="<%= ui_badge_classes(:info) %>"><%= card_state.fetch(:recommendation_badge_label) %></span>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="grid gap-4 lg:grid-cols-3">
+        <% marketplace_state.filter_groups.each do |filter_group| %>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= filter_group.fetch(:label) %></p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <% filter_group.fetch(:options).each do |option| %>
+                <button
+                  type="button"
+                  class="<%= option.fetch(:button_classes) %>"
+                  data-action="click->template-gallery#setFilter"
+                  data-template-gallery-target="filterButton"
+                  data-filter-group="<%= option.fetch(:key) %>"
+                  data-filter-value="<%= option.fetch(:value) %>"
+                  data-selected-classes="<%= option.fetch(:button_selected_classes) %>"
+                  data-unselected-classes="<%= option.fetch(:button_unselected_classes) %>"
+                  aria-pressed="<%= option.fetch(:aria_pressed) %>">
+                  <span><%= option.fetch(:label) %></span>
+                  <span class="ml-1 opacity-70"><%= option.fetch(:count) %></span>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem]">
+        <div>
+          <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-gallery-search">Search</label>
+          <input
+            id="template-gallery-search"
+            type="search"
+            value="<%= @query %>"
+            placeholder="<%= marketplace_state.search_placeholder %>"
+            class="<%= ui_input_classes.delete_prefix("mt-2 ") %>"
+            autocomplete="off"
+            data-action="input->template-gallery#updateSearch"
+            data-template-gallery-target="searchInput">
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-gallery-sort">Sort</label>
+          <select
+            id="template-gallery-sort"
+            class="<%= ui_input_classes.delete_prefix("mt-2 ") %>"
+            data-action="change->template-gallery#updateSort"
+            data-template-gallery-target="sortSelect">
+            <% marketplace_state.sort_options.each do |option| %>
+              <option value="<%= option.fetch(:value) %>" <%= "selected" if option.fetch(:value) == marketplace_state.selected_sort_value %>><%= option.fetch(:label) %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+      <details
+        class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)]"
+        data-controller="disclosure"
+        data-disclosure-storage-key-value="template-gallery-filters"
+        data-disclosure-default-open-value="<%= marketplace_state.filters_active? %>"
+        data-action="toggle->disclosure#remember"
+        <%= "open" if marketplace_state.filters_active? %>>
+        <summary class="cursor-pointer list-none">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70">Filters</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">Open layout, density, and theme filters only when you need more control.</p>
+            </div>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= marketplace_state.filters_active? ? "Filters active" : "Optional" %></span>
+          </div>
+        </summary>
+
+        <div class="mt-4 grid gap-4 lg:grid-cols-3">
+          <% marketplace_state.filter_groups.each do |filter_group| %>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= filter_group.fetch(:label) %></p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <% filter_group.fetch(:options).each do |option| %>
+                  <button
+                    type="button"
+                    class="<%= option.fetch(:button_classes) %>"
+                    data-action="click->template-gallery#setFilter"
+                    data-template-gallery-target="filterButton"
+                    data-filter-group="<%= option.fetch(:key) %>"
+                    data-filter-value="<%= option.fetch(:value) %>"
+                    data-selected-classes="<%= option.fetch(:button_selected_classes) %>"
+                    data-unselected-classes="<%= option.fetch(:button_unselected_classes) %>"
+                    aria-pressed="<%= option.fetch(:aria_pressed) %>">
+                    <span><%= option.fetch(:label) %></span>
+                    <span class="ml-1 opacity-70"><%= option.fetch(:count) %></span>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </details>
+
+      <% if marketplace_state.active_filter_badges.any? %>
+        <div class="flex flex-wrap gap-2">
+          <% marketplace_state.active_filter_badges.each do |badge| %>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= badge.fetch(:label) %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if marketplace_state.card_states.any? %>
+    <div class="space-y-4">
+      <div class="grid gap-5 lg:grid-cols-2 xl:grid-cols-3" data-template-gallery-target="cardGrid">
+        <% marketplace_state.card_states.each do |card_state| %>
+          <%= render "template_card", card_state: card_state %>
+        <% end %>
+      </div>
+
+      <div class="hidden" data-template-gallery-target="emptyState">
+        <%= render Ui::EmptyStateComponent.new(
+          title: "No templates match those filters",
+          description: "Try a different family, density, column, theme, layout, or search term to bring more templates back into view.",
+          tone: :subtle,
+          padding: :sm,
+          title_size: :sm
+        ) %>
+      </div>
+    </div>
+  <% else %>
+    <% if marketplace_state.filters_active? %>
+      <%= render Ui::EmptyStateComponent.new(
+        title: "No templates match the current filters",
+        description: "Try a broader query or clear the active family, density, column, theme, or layout filters to explore the full gallery again.",
+        action_label: "Clear filters",
+        action_path: marketplace_state.clear_filters_path,
+        padding: :lg,
+        title_size: :lg
+      ) %>
+    <% else %>
+      <%= render Ui::EmptyStateComponent.new(
+        title: "No templates available",
+        description: "Active templates will appear here as soon as the template catalog is ready for signed-in users.",
+        action_label: "Back to workspace",
+        action_path: resumes_path,
+        padding: :lg,
+        title_size: :lg
+      ) %>
+    <% end %>
+  <% end %>
+</section>

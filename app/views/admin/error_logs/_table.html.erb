@@ -1,0 +1,77 @@
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-canvas-200/80">
+    <thead class="bg-canvas-50/72 text-left text-sm font-medium text-ink-700/70">
+      <tr>
+        <th class="px-6 py-4">
+          <%= link_to admin_error_logs_path(table_sort_params(column: "reference_id", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Reference</span>
+            <%= table_sort_indicator("reference_id", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_error_logs_path(table_sort_params(column: "source", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Source</span>
+            <%= table_sort_indicator("source", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_error_logs_path(table_sort_params(column: "error_class", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Error</span>
+            <%= table_sort_indicator("error_class", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_error_logs_path(table_sort_params(column: "occurred_at", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Occurred</span>
+            <%= table_sort_indicator("occurred_at", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-canvas-200/80 text-sm text-ink-700/70">
+      <% if error_logs.any? %>
+        <% error_logs.each do |error_log| %>
+          <% primary_reference_label = error_log_primary_reference_label(error_log) %>
+          <% primary_reference_description = error_log_primary_reference_description(error_log) %>
+          <tr class="align-top transition hover:bg-canvas-100/70">
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= error_log.reference_id %></p>
+              <p class="mt-1 break-all text-ink-700/80"><%= primary_reference_label %></p>
+              <% if primary_reference_description.present? %>
+                <p class="mt-1 text-xs leading-5 text-ink-700/70"><%= primary_reference_description %></p>
+              <% end %>
+            </td>
+            <td class="px-6 py-4">
+              <span class="<%= ui_badge_classes(error_log_source_badge_tone(error_log)) %>"><%= error_log_source_label(error_log) %></span>
+              <p class="mt-2 text-xs leading-5 text-ink-700/80"><%= error_log_source_description(error_log) %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= error_log.error_class %></p>
+              <p class="mt-1 text-ink-700/70"><%= truncate(error_log.message, length: 100) %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= l(error_log.occurred_at, format: :short) %></p>
+              <p class="mt-1 text-ink-700/70"><%= error_log_duration_label(error_log) %></p>
+            </td>
+            <td class="px-6 py-4 text-right"><%= link_to "Inspect", admin_error_log_path(error_log), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %></td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="5" class="px-6 py-6">
+            <%= render Ui::EmptyStateComponent.new(
+              title: "No error logs match the current filters.",
+              description: "Try broadening the search or clearing the current filters.",
+              action_label: "Clear filters",
+              action_path: admin_error_logs_path,
+              action_style: :secondary,
+              padding: :sm,
+              tone: :subtle
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

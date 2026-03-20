@@ -1,0 +1,97 @@
+<div class="<%= shell_classes %>">
+  <header class="border-b <%= header_padding_class %>" style="border-color: <%= accent_color_with_alpha("22") %>;">
+    <div class="h-1.5 w-20 rounded-full" style="background-color: <%= accent_color %>;"></div>
+
+    <div class="mt-5 grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+      <div>
+        <h1 class="<%= [name_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>"><%= full_name %></h1>
+        <% if resume.headline.present? %>
+          <p class="<%= ["mt-2", headline_text_class, "text-slate-600"].join(" ") %>"><%= resume.headline %></p>
+        <% end %>
+      </div>
+
+      <% if contact_items.any? %>
+        <div class="space-y-2 sm:text-right">
+          <% contact_items.each do |label, value| %>
+            <p class="<%= [meta_text_class, "text-slate-600"].join(" ") %>"><span class="font-semibold text-slate-900"><%= label %></span> <span class="text-slate-400">·</span> <%= value %></p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if resume.summary.present? %>
+      <div class="<%= [summary_margin_top_class, "rounded-2xl border px-4 py-4"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("08") %>;">
+        <p class="<%= [body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
+      </div>
+    <% end %>
+  </header>
+
+  <div class="<%= section_stack_classes %>">
+    <% resume.ordered_sections.each do |section| %>
+      <% entries = section_entries(section) %>
+      <section>
+        <h2 class="<%= [section_heading_spacing_class, section_title_text_class, "border-b pb-2 font-semibold uppercase tracking-[0.18em]"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("33") %>; color: <%= accent_color %>;"><%= section.title %></h2>
+
+        <% if section.section_type == "skills" %>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <% entries.each do |entry| %>
+              <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <span class="<%= [body_text_class, "font-medium text-slate-900"].join(" ") %>"><%= value_for(entry, "name") %></span>
+                <% if value_for(entry, "level").present? %>
+                  <span class="<%= [meta_text_class, "text-slate-500"].join(" ") %>"><%= value_for(entry, "level") %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="<%= entry_stack_classes %>">
+            <% entries.each do |entry| %>
+              <% subtitle = entry_subtitle(entry) %>
+              <% date_range = date_range_for(entry) %>
+              <% location = entry_location(entry) %>
+              <% highlights = entry_highlights(entry) %>
+              <% url = entry_url(entry) %>
+              <article class="border-l-2 pl-4" style="border-color: <%= accent_color_with_alpha("44") %>;">
+                <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_11rem] sm:items-start">
+                  <div>
+                    <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
+                    <% if subtitle.present? %>
+                      <p class="<%= ["mt-1", meta_text_class, "text-slate-600"].join(" ") %>"><%= subtitle %></p>
+                    <% end %>
+                  </div>
+
+                  <% if date_range.present? || location.present? %>
+                    <div class="<%= [meta_text_class, "text-slate-500 sm:text-right"].join(" ") %>">
+                      <% if date_range.present? %>
+                        <div><%= date_range %></div>
+                      <% end %>
+                      <% if location.present? %>
+                        <div class="mt-1"><%= location %></div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+
+                <% entry_body_paragraphs(entry).each do |paragraph| %>
+                  <p class="<%= [entry_body_spacing_class, body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= paragraph %></p>
+                <% end %>
+
+                <% if highlights.any? %>
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, "space-y-2 leading-6 text-slate-700"].join(" ") %>">
+                    <% highlights.each do |highlight| %>
+                      <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
+                    <% end %>
+                  </ul>
+                <% end %>
+
+                <% if url.present? %>
+                  <p class="<%= [entry_body_spacing_class, meta_text_class, "text-slate-600"].join(" ") %>"><%= url %></p>
+                <% end %>
+              </article>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

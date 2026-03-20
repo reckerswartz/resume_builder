@@ -1,0 +1,96 @@
+<% provider_label = @provider.fetch(:label) %>
+<% configured = @provider.fetch(:configured) %>
+<% status_label = configured ? "Configured" : "Setup required" %>
+<% status_tone = configured ? :neutral : :warning %>
+<% return_label = @resume.present? ? "Back to source step" : "Back to resume setup" %>
+
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Cloud import",
+    title: "#{provider_label} connector",
+    description: @provider.fetch(:description),
+    badges: [
+      { label: status_label, tone: status_tone },
+      { label: "Safe scaffold", tone: :neutral }
+    ],
+    actions: [
+      { label: return_label, path: @return_path, style: :secondary }
+    ],
+    density: :compact
+  ) %>
+
+  <%= render Ui::SurfaceCardComponent.new(padding: :lg) do %>
+    <div class="space-y-6">
+      <div class="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)]">
+        <div class="space-y-4">
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70">Current rollout status</p>
+            <p class="mt-2 text-base font-medium tracking-tight text-ink-950"><%= @launch_feedback.fetch(:message) %></p>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80">This step only confirms provider availability and setup state. OAuth handoff, remote file selection, and secure attachment import still need a dedicated implementation slice.</p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70">What works now</p>
+              <ul class="mt-3 space-y-2 text-sm leading-6 text-ink-700/80">
+                <li>Provider registry and environment checks</li>
+                <li>Signed-in launch path with safe return handling</li>
+                <li>Setup guidance before any OAuth work</li>
+              </ul>
+            </div>
+
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70">Still deferred</p>
+              <ul class="mt-3 space-y-2 text-sm leading-6 text-ink-700/80">
+                <li>OAuth authorization handoff</li>
+                <li>Remote file chooser and review step</li>
+                <li>Server-side import/download pipeline</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="<%= ui_inset_panel_classes(tone: :default) %>">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70">Provider state</p>
+                <p class="mt-2 text-base font-medium tracking-tight text-ink-950"><%= provider_label %></p>
+              </div>
+              <span class="<%= ui_badge_classes(status_tone) %>"><%= status_label %></span>
+            </div>
+
+            <dl class="mt-4 space-y-3 text-sm">
+              <div>
+                <dt class="font-medium text-ink-950">Return destination</dt>
+                <dd class="mt-1 text-ink-700/80"><%= @return_path %></dd>
+              </div>
+              <div>
+                <dt class="font-medium text-ink-950">Resume context</dt>
+                <dd class="mt-1 text-ink-700/80"><%= @resume.present? ? @resume.title.presence || "Existing draft" : "New resume setup" %></dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70">Required environment variables</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <% @provider.fetch(:required_env_vars).each do |env_var| %>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= env_var %></span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <%= link_to return_label, @return_path, class: ui_button_classes(:secondary) %>
+        <% if @resume.present? %>
+          <%= link_to "Open draft", edit_resume_path(@resume, step: "source"), class: ui_button_classes(:secondary, size: :sm) %>
+        <% else %>
+          <%= link_to "Resume setup", new_resume_path(step: "setup"), class: ui_button_classes(:secondary, size: :sm) %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</section>

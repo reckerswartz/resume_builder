@@ -1,0 +1,62 @@
+<div class="<%= [ui_inset_panel_classes(tone: :subtle), "space-y-4 template-picker-compact-summary"].join(" ") %>">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <span class="atelier-pill">
+        <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+        Fast start
+      </span>
+      <p class="mt-3 text-sm leading-6 text-ink-700/80">Start with the selected look now. Open the full browser only if you want to compare more options before editing.</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <%= link_to "Open marketplace", templates_path, class: ui_button_classes(:secondary, size: :sm) %>
+      <span class="<%= ui_badge_classes(:neutral) %>" data-template-picker-target="resultsLabel"><%= template_picker_state.results_label %></span>
+    </div>
+  </div>
+
+  <%= render "resumes/template_picker_summaries",
+    template_picker_state: template_picker_state,
+    preview_size: :compact,
+    wrapper_classes: "grid gap-4" %>
+
+  <% if template_picker_state.recommended_card_states.any? %>
+    <div class="<%= [ui_inset_panel_classes(tone: :default), "space-y-3"].join(" ") %>">
+      <div>
+        <span class="atelier-pill">
+          <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+          Recommended for this draft
+        </span>
+        <p class="mt-3 text-sm leading-6 text-ink-700/80">Based on the experience details you chose, these templates are likely to fit best.</p>
+      </div>
+
+      <div class="space-y-2">
+        <% template_picker_state.recommended_card_states.each do |card_state| %>
+          <div class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-3 shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold tracking-tight text-ink-950"><%= card_state.fetch(:template).name %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= card_state.fetch(:recommendation_reason) %></p>
+              </div>
+              <span class="<%= ui_badge_classes(:info) %>"><%= card_state.fetch(:recommendation_badge_label) %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<details class="<%= [ui_inset_panel_classes(tone: :default), "group template-picker-disclosure"].join(" ") %>">
+  <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-tight text-ink-950 [&::-webkit-details-marker]:hidden">
+    <span>Browse all templates</span>
+    <span class="text-xs font-medium uppercase tracking-[0.2em] text-ink-700/70">Filter by family, density, columns, theme, or layout</span>
+  </summary>
+
+  <div class="mt-4">
+    <%= render "resumes/template_picker_browser",
+      template_picker_state: template_picker_state,
+      form: form,
+      wrapper_classes: "space-y-4",
+      show_results_label: false %>
+  </div>
+</details>

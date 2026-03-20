@@ -1,0 +1,18 @@
+<nav class="<%= grid_classes %>" aria-label="<%= label %>">
+  <% items.each do |item| %>
+    <%= link_to item.fetch(:path), **link_options(item) do %>
+      <span class="flex items-center gap-3">
+        <% if item[:badge].present? %>
+          <span class="<%= badge_classes(item) %>"><%= item[:badge] %></span>
+        <% end %>
+
+        <span>
+          <span class="block text-sm font-semibold"><%= item.fetch(:label) %></span>
+          <% if item[:status].present? %>
+            <span class="mt-1 block text-xs uppercase tracking-[0.18em] <%= status_classes(item) %>"><%= item[:status] %></span>
+          <% end %>
+        </span>
+      </span>
+    <% end %>
+  <% end %>
+</nav>

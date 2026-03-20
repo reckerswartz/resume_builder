@@ -1,49 +1,119 @@
-<div class="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+<div class="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
   <div class="space-y-4">
-    <span class="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">Create your workspace</span>
-    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">Start with a resume that is already structured for editing.</h1>
-    <p class="text-base leading-7 text-slate-600">New accounts get a starter resume, default sections, and a template so you can begin editing immediately.</p>
-    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <ul class="space-y-3 text-sm text-slate-600">
-        <li>Split-screen editing and preview</li>
-        <li>Structured experience, education, skills, and projects</li>
-        <li>Template switching and tracked PDF export</li>
-      </ul>
-    </div>
+    <%= render Ui::PageHeaderComponent.new(
+      eyebrow: "Create your workspace",
+      title: "Start with a draft you can shape right away.",
+      description: "New accounts get a starter resume so you can begin editing without extra setup.",
+      badges: [
+        { label: "Starter draft", tone: :neutral },
+        { label: "Live preview", tone: :neutral }
+      ],
+      density: :compact
+    ) %>
+
+    <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm) do %>
+      <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
+      <div class="relative space-y-3">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Included on day one</p>
+
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <div class="flex items-start gap-3">
+            <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
+            <div>
+              <p class="text-sm font-semibold text-ink-950">Starter draft included</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">You will land in a workspace with a resume draft ready to edit, preview, and refine.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <div class="flex items-start gap-3">
+            <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
+            <div>
+              <p class="text-sm font-semibold text-ink-950">Change layouts later</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">Your content stays reusable, so you can switch templates without starting over.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 
-  <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
-    <div class="mb-6">
-      <h2 class="text-2xl font-semibold text-slate-900">Create account</h2>
-      <p class="mt-2 text-sm text-slate-600">Use your email and a secure password to create your workspace.</p>
+  <%= render Ui::SurfaceCardComponent.new(padding: :lg, extra_classes: "relative") do %>
+    <div class="absolute -right-8 top-6 h-24 w-24 rounded-full atelier-glow opacity-45"></div>
+    <div class="absolute inset-x-6 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+    <div class="relative mb-6">
+      <span class="atelier-pill">
+        <%= render Ui::GlyphComponent.new(name: :swatches, size: :xs, tone: :minimal) %>
+        Workspace setup
+      </span>
+      <h2 class="mt-4 font-serif text-3xl font-semibold tracking-[-0.03em] text-ink-950">Create account</h2>
+      <p class="mt-3 text-sm leading-6 text-ink-700/80">Use your email and a secure password to create your workspace.</p>
     </div>
 
-    <%= form_with model: @user, url: registration_path, class: "space-y-5" do |form| %>
+    <%= form_with model: @user, url: registration_path, class: "relative space-y-5" do |form| %>
       <% if @user.errors.any? %>
-        <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          <%= @user.errors.full_messages.to_sentence %>
+        <div class="<%= ui_inset_panel_classes(tone: :danger) %>">
+          <p class="text-sm text-rose-700"><%= @user.errors.full_messages.to_sentence %></p>
         </div>
       <% end %>
 
       <div>
-        <%= form.label :email_address, class: "text-sm font-medium text-slate-700" %>
-        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+        <%= form.label :email_address, class: ui_label_classes %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", class: ui_input_classes %>
       </div>
 
-      <div>
-        <%= form.label :password, class: "text-sm font-medium text-slate-700" %>
-        <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      <div data-controller="password-field">
+        <%= form.label :password, class: ui_label_classes %>
+        <div class="relative mt-2">
+          <%= form.password_field :password,
+            required: true,
+            autocomplete: "new-password",
+            maxlength: 72,
+            class: "#{ui_input_classes.delete_prefix("mt-2 ")} pr-20",
+            data: {
+              password_field_target: "input",
+              action: "keyup->password-field#updateCapsState keydown->password-field#updateCapsState blur->password-field#hideCapsHint"
+            } %>
+          <button
+            type="button"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-700 transition hover:text-ink-950"
+            data-action="password-field#toggle"
+            data-password-field-target="toggle"></button>
+        </div>
+        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint">Caps lock is on.</p>
       </div>
 
-      <div>
-        <%= form.label :password_confirmation, class: "text-sm font-medium text-slate-700" %>
-        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      <div data-controller="password-field">
+        <%= form.label :password_confirmation, class: ui_label_classes %>
+        <div class="relative mt-2">
+          <%= form.password_field :password_confirmation,
+            required: true,
+            autocomplete: "new-password",
+            maxlength: 72,
+            class: "#{ui_input_classes.delete_prefix("mt-2 ")} pr-20",
+            data: {
+              password_field_target: "input",
+              action: "keyup->password-field#updateCapsState keydown->password-field#updateCapsState blur->password-field#hideCapsHint"
+            } %>
+          <button
+            type="button"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-700 transition hover:text-ink-950"
+            data-action="password-field#toggle"
+            data-password-field-target="toggle"></button>
+        </div>
+        <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint">Caps lock is on.</p>
+      </div>
+
+      <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+        <p class="text-sm leading-6 text-ink-700/80">We use your email for sign in and account recovery. You can keep building after signup without any extra setup steps.</p>
       </div>
 
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <%= form.submit "Create workspace", class: "inline-flex justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
-        <p class="text-sm text-slate-500">Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-slate-900 underline decoration-slate-300 underline-offset-4" %></p>
+        <%= form.submit "Create workspace", class: ui_button_classes(:primary) %>
+        <p class="text-sm text-ink-700/70">Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-ink-950 underline decoration-canvas-300 underline-offset-4" %></p>
       </div>
     <% end %>
-  </div>
+  <% end %>
 </div>

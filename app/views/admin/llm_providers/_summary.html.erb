@@ -1,0 +1,73 @@
+<% visible_ready_count = llm_providers.count(&:configured_for_requests?) %>
+<% visible_attention_count = llm_providers.count { |provider| !provider.configured_for_requests? || provider.sync_status == :error } %>
+<% visible_synced_count = llm_providers.count { |provider| provider.sync_status == :synced } %>
+<% active_filter_count = [query.presence, status_filter.presence, adapter_filter.presence].compact.count %>
+
+<div class="mb-4 space-y-4">
+  <%= render Ui::DashboardPanelComponent.new(
+    eyebrow: "Provider registry",
+    title: "Provider index snapshot",
+    description: active_filter_count.positive? ? "Showing #{pluralize(total_count, "provider")} matching the current filters." : "Review provider readiness, sync state, and credential setup across the registry.",
+    action_label: active_filter_count.positive? ? "Clear filters" : "Platform settings",
+    action_path: active_filter_count.positive? ? admin_llm_providers_path : admin_settings_path,
+    action_style: :secondary,
+    padding: :sm,
+    density: :compact
+  ) do %>
+    <div class="flex flex-wrap gap-2">
+      <% if query.present? %>
+        <span class="<%= ui_badge_classes(:neutral) %>">Query: <%= query %></span>
+      <% end %>
+      <% if status_filter.present? %>
+        <span class="<%= ui_badge_classes(:neutral) %>">Status: <%= status_filter.humanize %></span>
+      <% end %>
+      <% if adapter_filter.present? %>
+        <span class="<%= ui_badge_classes(:neutral) %>">Adapter: <%= adapter_filter.humanize %></span>
+      <% end %>
+      <% if active_filter_count.zero? %>
+        <p class="w-full text-sm leading-6 text-ink-700/80">Use search, status, and adapter filters to isolate providers that still need setup or sync follow-up.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Matches",
+      title: total_count.to_s,
+      description: "Providers currently returned by the active filter set.",
+      badge: "#{llm_providers.size} visible",
+      badge_classes: ui_badge_classes(:neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Ready for requests",
+      title: visible_ready_count.to_s,
+      description: "Visible providers already configured for live orchestration.",
+      tone: visible_ready_count.positive? ? :success : :subtle,
+      badge: visible_ready_count.positive? ? "Healthy" : "None visible",
+      badge_classes: ui_badge_classes(visible_ready_count.positive? ? :success : :neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Needs attention",
+      title: visible_attention_count.to_s,
+      description: "Visible providers with request-readiness or sync follow-up.",
+      tone: visible_attention_count.positive? ? :default : :subtle,
+      badge: visible_attention_count.positive? ? "Review" : "Clear",
+      badge_classes: ui_badge_classes(visible_attention_count.positive? ? :warning : :success),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Catalog sync",
+      title: visible_synced_count.to_s,
+      description: "Visible providers with a completed catalog sync.",
+      tone: visible_synced_count.positive? ? :default : :subtle,
+      badge: visible_synced_count.positive? ? "Synced" : "Pending",
+      badge_classes: ui_badge_classes(visible_synced_count.positive? ? :success : :neutral),
+      title_size: :base
+    ) %>
+  </div>
+</div>

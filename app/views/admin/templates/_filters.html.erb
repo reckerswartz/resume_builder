@@ -1,0 +1,39 @@
+<%= form_with url: admin_templates_path, method: :get, class: "border-b border-canvas-200/80 bg-canvas-50/80 px-6 py-5", data: { controller: "autosave" } do |form| %>
+  <%= form.hidden_field :sort, value: sort %>
+  <%= form.hidden_field :direction, value: direction %>
+
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <span class="atelier-pill">
+          <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+          Filter templates
+        </span>
+        <p class="mt-3 text-sm leading-6 text-ink-700/80">Search by name, slug, or description, then narrow the list by activation state.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <% if query.present? || status_filter.present? %>
+          <%= link_to "Clear filters", admin_templates_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <% end %>
+        <%= form.submit "Apply", class: ui_button_classes(:primary, size: :sm) %>
+      </div>
+    </div>
+
+    <div class="grid flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_14rem_auto] md:items-end">
+      <div class="space-y-2">
+        <%= form.label :query, "Search templates", class: ui_label_classes %>
+        <%= form.search_field :query, value: query, placeholder: "Search by name, slug, or description", class: ui_input_classes, data: { action: "input->autosave#queue search->autosave#queue" } %>
+      </div>
+
+      <div class="space-y-2">
+        <%= form.label :status, "Status", class: ui_label_classes %>
+        <%= form.select :status, options_for_select([["All statuses", ""], ["Active", "active"], ["Inactive", "inactive"]], status_filter), {}, class: ui_input_classes, data: { action: "change->autosave#queue" } %>
+      </div>
+
+      <div class="pb-1 md:text-right">
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= pluralize(total_count, "template") %></span>
+      </div>
+    </div>
+  </div>
+<% end %>

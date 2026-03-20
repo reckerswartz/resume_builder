@@ -1,0 +1,12 @@
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "Edit LLM model",
+    description: "Update capabilities and runtime defaults for this model.",
+    actions: [
+      { label: "View model", path: admin_llm_model_path(@llm_model), style: :secondary }
+    ]
+  ) %>
+
+  <%= render "form", llm_model: @llm_model, llm_providers: @llm_providers %>
+</section>

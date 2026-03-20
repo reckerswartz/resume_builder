@@ -2,24 +2,129 @@
 
 @source "../../../app";
 
+@theme {
+  --color-ink-950: #060b16;
+  --color-ink-900: #08101f;
+  --color-ink-800: #101827;
+  --color-ink-700: #1b2740;
+  --color-canvas-50: #f8fbfd;
+  --color-canvas-100: #eff4f8;
+  --color-canvas-200: #dde7ef;
+  --color-canvas-300: #cad7e3;
+  --color-mist-100: #f1f5f9;
+  --color-mist-200: #e2e8f0;
+  --color-mist-300: #d3dce7;
+  --color-aqua-100: #dff7ff;
+  --color-aqua-200: #bae6fd;
+  --color-aqua-300: #7dd3fc;
+}
+
 @layer base {
+  body {
+    @apply antialiased;
+  }
+
   h1 {
     @apply text-3xl;
   }
+
   h2 {
     @apply text-2xl;
+  }
+
+  ::selection {
+    background: rgba(147, 197, 253, 0.32);
+    color: rgb(15 23 42);
   }
 }
 
 @layer components {
-  .btn-blue {
-    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+  .atelier-shell {
+    background:
+      radial-gradient(circle at top left, rgba(125, 211, 252, 0.12), transparent 24%),
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 18%),
+      linear-gradient(180deg, #08101f 0%, #060b16 100%);
+  }
+
+  .atelier-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      radial-gradient(circle at 18% 12%, rgba(125, 211, 252, 0.12), transparent 18%),
+      radial-gradient(circle at 82% 10%, rgba(255, 255, 255, 0.05), transparent 14%);
+    background-size: 40px 40px, 40px 40px, auto, auto;
+    opacity: 0.9;
+    z-index: 0;
+  }
+
+  .atelier-panel {
+    @apply relative overflow-hidden rounded-[2rem] border border-canvas-200/80 bg-canvas-50/92 text-ink-950 backdrop-blur-sm;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.14);
+  }
+
+  .atelier-panel-subtle {
+    @apply relative overflow-hidden rounded-[2rem] border border-mist-200/80 bg-canvas-100/88 text-ink-800 backdrop-blur-sm;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+  }
+
+  .atelier-panel-dark {
+    @apply relative overflow-hidden rounded-[2rem] border border-white/10 bg-ink-950/84 text-white backdrop-blur-xl;
+    box-shadow: 0 28px 80px rgba(2, 6, 23, 0.5);
+  }
+
+  .atelier-panel-dark::before,
+  .atelier-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(125, 211, 252, 0.18), transparent 20%),
+      radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.08), transparent 16%),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    opacity: 0.9;
+  }
+
+  .atelier-hero {
+    @apply relative overflow-hidden rounded-[2rem] border border-white/10 bg-ink-950/90 text-white backdrop-blur-xl;
+    box-shadow: 0 32px 96px rgba(2, 6, 23, 0.58);
+  }
+
+  .atelier-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-aqua-100 bg-canvas-50/90 px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-800 shadow-[0_10px_30px_rgba(15,23,42,0.08)];
   }
 }
 
 @layer utilities {
-  .custom-utility {
-    @apply text-lg;
+  .atelier-halftone {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.42) 0.75px, transparent 0.95px);
+    background-size: 6px 6px;
+  }
+
+  .atelier-halftone-ink {
+    background-image: radial-gradient(circle, rgba(15, 23, 42, 0.16) 0.75px, transparent 0.95px);
+    background-size: 6px 6px;
+  }
+
+  .atelier-rule {
+    background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 14%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0.14) 86%, transparent 100%);
+  }
+
+  .atelier-rule-ink {
+    background-image: linear-gradient(90deg, transparent 0%, rgba(15, 23, 42, 0.08) 16%, rgba(15, 23, 42, 0.22) 50%, rgba(15, 23, 42, 0.08) 84%, transparent 100%);
+  }
+
+  .atelier-glow {
+    background: radial-gradient(circle, rgba(125, 211, 252, 0.28) 0%, rgba(125, 211, 252, 0.12) 36%, transparent 70%);
+  }
+
+  .atelier-bloom {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.28) 34%, transparent 72%);
   }
 }
-

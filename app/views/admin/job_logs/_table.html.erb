@@ -1,0 +1,87 @@
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-canvas-200/80">
+    <thead class="bg-canvas-50/72 text-left text-sm font-medium text-ink-700/70">
+      <tr>
+        <th class="px-6 py-4">
+          <%= link_to admin_job_logs_path(table_sort_params(column: "job_type", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Job</span>
+            <%= table_sort_indicator("job_type", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_job_logs_path(table_sort_params(column: "queue_name", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Queue</span>
+            <%= table_sort_indicator("queue_name", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_job_logs_path(table_sort_params(column: "status", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Status</span>
+            <%= table_sort_indicator("status", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">Runtime</th>
+        <th class="px-6 py-4">
+          <%= link_to admin_job_logs_path(table_sort_params(column: "created_at", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Created</span>
+            <%= table_sort_indicator("created_at", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-canvas-200/80 text-sm text-ink-700/80">
+      <% if job_logs.any? %>
+        <% job_logs.each do |job_log| %>
+          <tr class="align-top transition hover:bg-canvas-100/70">
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= job_log.job_type %></p>
+              <p class="mt-1 break-all text-ink-700/80"><%= job_log.active_job_id.presence || "No active job id" %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= job_log.queue_name %></p>
+              <p class="mt-1 text-ink-700/80"><%= pluralize(job_log.output.keys.size, "output key") %></p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="<%= ui_badge_classes(job_log_status_badge_tone(job_log)) %>"><%= job_log.status.humanize %></span>
+              <% if job_log.stale? %>
+                <p class="mt-2 text-xs font-medium text-amber-700">Running longer than 15 minutes.</p>
+              <% end %>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= job_duration_label(job_log.duration_seconds) %></p>
+              <p class="mt-1 text-ink-700/80">
+                <% if job_log.finished_at.present? %>
+                  Finished <%= l(job_log.finished_at, format: :short) %>
+                <% elsif job_log.started_at.present? %>
+                  Started <%= l(job_log.started_at, format: :short) %>
+                <% else %>
+                  Waiting to start
+                <% end %>
+              </p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= l(job_log.created_at, format: :short) %></p>
+              <p class="mt-1 text-ink-700/70"><%= time_ago_in_words(job_log.created_at) %> ago</p>
+            </td>
+            <td class="px-6 py-4 text-right"><%= link_to "Inspect", admin_job_log_path(job_log), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %></td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="6" class="px-6 py-6">
+            <%= render Ui::EmptyStateComponent.new(
+              title: "No job logs match the current filters.",
+              description: "Try broadening the search or clearing the current filters.",
+              action_label: "Clear filters",
+              action_path: admin_job_logs_path,
+              action_style: :secondary,
+              padding: :sm,
+              tone: :subtle
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

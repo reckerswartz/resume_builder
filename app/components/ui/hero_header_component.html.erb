@@ -1,0 +1,54 @@
+<section class="<%= section_classes %>">
+  <div class="<%= inner_classes %>">
+    <div class="<%= primary_glow_classes %>"></div>
+    <div class="<%= secondary_glow_classes %>"></div>
+    <div class="<%= divider_classes %>"></div>
+    <div class="<%= dot_pattern_classes %>"></div>
+
+    <div class="<%= layout_classes %>">
+      <div class="<%= identity_classes %>">
+        <% if avatar_text.present? %>
+          <div class="<%= avatar_classes %>">
+            <%= avatar_text %>
+          </div>
+        <% end %>
+
+        <div>
+          <p class="<%= eyebrow_classes %>"><%= eyebrow %></p>
+          <h1 class="<%= title_classes %>"><%= title %></h1>
+          <% if description.present? %>
+            <p class="<%= description_classes %>"><%= description %></p>
+          <% end %>
+
+          <% if badges.any? %>
+            <div class="<%= badges_classes %>">
+              <% badges.each do |badge| %>
+                <span class="<%= helpers.ui_badge_classes(badge.fetch(:tone, :hero)) %>"><%= badge.fetch(:label) %></span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if actions.any? %>
+        <div class="<%= actions_classes %>">
+          <% actions.each do |action| %>
+            <% if action[:method].present? && action[:method].to_sym != :get %>
+              <%= button_to action.fetch(:label), action.fetch(:path), method: action.fetch(:method), form_class: "inline-flex", class: helpers.ui_button_classes(action.fetch(:style, :hero_secondary), size: action.fetch(:size, :md)) %>
+            <% else %>
+              <%= link_to action.fetch(:label), action.fetch(:path), class: helpers.ui_button_classes(action.fetch(:style, :hero_secondary), size: action.fetch(:size, :md)) %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if metrics.any? %>
+      <div class="<%= metrics_wrapper_classes %>">
+        <% metrics.each do |metric| %>
+          <%= render Ui::MetricCardComponent.new(label: metric.fetch(:label), value: metric.fetch(:value), description: metric.fetch(:description), tone: :hero) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>

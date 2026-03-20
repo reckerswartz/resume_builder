@@ -3,14 +3,7 @@ class Section < ApplicationRecord
 
   has_many :entries, -> { order(position: :asc, created_at: :asc) }, dependent: :destroy, inverse_of: :section
 
-  enum :section_type,
-       {
-         education: "education",
-         experience: "experience",
-         skills: "skills",
-         projects: "projects"
-       },
-       validate: true
+  enum :section_type, ResumeBuilder::SectionRegistry.enum_values, validate: true
 
   before_validation :assign_position, on: :create
   before_validation :default_title
@@ -31,7 +24,7 @@ class Section < ApplicationRecord
     end
 
     def default_title
-      self.title = section_type.to_s.titleize if title.blank? && section_type.present?
+      self.title = ResumeBuilder::SectionRegistry.title_for(section_type) if title.blank? && section_type.present?
     end
 
     def normalize_settings

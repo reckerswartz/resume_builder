@@ -13,11 +13,25 @@ export default class extends Controller {
     this.clear()
   }
 
-  queue() {
+  queue(event) {
+    if (this.ignoredTarget(event?.target)) {
+      return
+    }
+
+    if (this.immediateSubmitTarget(event?.target)) {
+      this.submitNow()
+      return
+    }
+
     this.clear()
     this.timeout = window.setTimeout(() => {
       this.element.requestSubmit()
     }, this.delayValue)
+  }
+
+  submitNow() {
+    this.clear()
+    this.element.requestSubmit()
   }
 
   clear() {
@@ -25,5 +39,13 @@ export default class extends Controller {
       window.clearTimeout(this.timeout)
       this.timeout = null
     }
+  }
+
+  immediateSubmitTarget(target) {
+    return target?.name === "resume[template_id]"
+  }
+
+  ignoredTarget(target) {
+    return target?.closest("[data-autosave-ignore='true']") !== null
   }
 }

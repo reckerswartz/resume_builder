@@ -1,0 +1,12 @@
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "New LLM model",
+    description: "Register a model and its runtime defaults before assigning it from settings.",
+    actions: [
+      { label: "Back to models", path: admin_llm_models_path, style: :secondary }
+    ]
+  ) %>
+
+  <%= render "form", llm_model: @llm_model, llm_providers: @llm_providers %>
+</section>

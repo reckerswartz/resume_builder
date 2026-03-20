@@ -13,6 +13,38 @@ RSpec.describe Template, type: :model do
 
       expect(template.slug).to eq('modern-resume')
     end
+
+    it 'normalizes layout config into a renderable family-based shape' do
+      template = described_class.create!(
+        name: 'Legacy Classic',
+        slug: 'legacy-classic',
+        description: 'Description',
+        active: true,
+        layout_config: {
+          variant: 'classic',
+          accent_color: '#abc',
+          font_scale: 'invalid',
+          density: 'invalid'
+        }
+      )
+
+      expect(template.layout_family).to eq('classic')
+      expect(template.layout_config).to include(
+        'family' => 'classic',
+        'variant' => 'classic',
+        'accent_color' => '#aabbcc',
+        'font_scale' => 'sm',
+        'density' => 'compact',
+        'column_count' => 'single_column',
+        'theme_tone' => 'blue',
+        'supports_headshot' => false,
+        'shell_style' => 'flat',
+        'header_style' => 'rule',
+        'section_heading_style' => 'rule',
+        'skill_style' => 'inline',
+        'entry_style' => 'list'
+      )
+    end
   end
 
   describe '.default!' do

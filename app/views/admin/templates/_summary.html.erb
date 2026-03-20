@@ -1,0 +1,77 @@
+<% visible_active_count = templates.count(&:active?) %>
+<% visible_family_count = templates.map(&:layout_family).uniq.count %>
+<% visible_card_shell_count = templates.count { |template| template.normalized_layout_config.fetch("shell_style") == "card" } %>
+<% visible_sidebar_layout_count = templates.count { |template| Array(template.normalized_layout_config["sidebar_section_types"]).any? } %>
+<% active_filter_count = [query.presence, status_filter.presence].compact.count %>
+
+<div class="mb-4 space-y-4">
+  <%= render Ui::DashboardPanelComponent.new(
+    eyebrow: "Template registry",
+    title: "Template index snapshot",
+    description: active_filter_count.positive? ? "Showing #{pluralize(total_count, "template")} matching the current filters." : "Review template visibility, family coverage, and layout variety across the template registry.",
+    action_label: active_filter_count.positive? ? "Clear filters" : "Template gallery",
+    action_path: active_filter_count.positive? ? admin_templates_path : templates_path,
+    action_style: :secondary
+  ) do %>
+    <div class="space-y-3">
+      <div class="flex flex-wrap gap-2">
+        <% if query.present? %>
+          <span class="<%= ui_badge_classes(:neutral) %>">Query: <%= query %></span>
+        <% end %>
+        <% if status_filter.present? %>
+          <span class="<%= ui_badge_classes(:neutral) %>">Status: <%= status_filter.humanize %></span>
+        <% end %>
+      </div>
+
+      <% if active_filter_count.zero? %>
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <div class="flex items-start gap-3">
+            <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
+            <div>
+              <p class="text-sm font-semibold text-ink-950">Filter by live visibility or cleanup targets</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">Use search and status filters to isolate user-visible templates, archived records, or catalog coverage gaps before changing layout settings.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Matches",
+      title: total_count.to_s,
+      description: "Templates currently returned by the active filter set.",
+      badge: "#{templates.size} visible",
+      badge_classes: ui_badge_classes(:neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "User-visible",
+      title: visible_active_count.to_s,
+      description: "Visible templates currently available to signed-in users.",
+      badge: visible_active_count.positive? ? "Live" : "Hidden",
+      badge_classes: ui_badge_classes(visible_active_count.positive? ? :success : :neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Layout families",
+      title: visible_family_count.to_s,
+      description: "Distinct template families represented in the visible result set.",
+      badge: visible_card_shell_count.positive? ? "#{visible_card_shell_count} card shells" : "Flat only",
+      badge_classes: ui_badge_classes(:neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Sidebar layouts",
+      title: visible_sidebar_layout_count.to_s,
+      description: "Visible templates that split secondary sections into a dedicated sidebar.",
+      badge: visible_sidebar_layout_count.positive? ? "Varied" : "Single column",
+      badge_classes: ui_badge_classes(visible_sidebar_layout_count.positive? ? :success : :neutral),
+      title_size: :base
+    ) %>
+  </div>
+</div>

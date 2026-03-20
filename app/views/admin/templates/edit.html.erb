@@ -1,9 +1,17 @@
 <section class="space-y-6">
-  <div>
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Admin</p>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Edit template</h1>
-    <p class="mt-2 text-sm text-slate-600">Adjust the shared template configuration used by preview and export rendering.</p>
-  </div>
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "Edit template",
+    description: "Adjust the shared template configuration used by preview and export rendering.",
+    density: :compact,
+    badges: [
+      { label: "Shared renderer", tone: :neutral },
+      { label: "Update flow", tone: :neutral }
+    ],
+    actions: [
+      { label: "View template", path: admin_template_path(@template), style: :secondary }
+    ]
+  ) %>
 
   <%= render "form", template: @template %>
 </section>

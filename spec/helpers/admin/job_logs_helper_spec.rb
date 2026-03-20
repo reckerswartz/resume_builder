@@ -11,5 +11,22 @@ require 'rails_helper'
 #   end
 # end
 RSpec.describe Admin::JobLogsHelper, type: :helper do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe '#job_duration_label' do
+    it 'formats a duration in seconds' do
+      expect(helper.job_duration_label(1.25)).to eq('1.25 seconds')
+    end
+
+    it 'returns N/A when no duration is present' do
+      expect(helper.job_duration_label(nil)).to eq('N/A')
+    end
+  end
+
+  describe '#formatted_debug_payload' do
+    it 'serializes hashes with string keys' do
+      payload = helper.formatted_debug_payload(resume_id: 12, nested: { status: 'ok' })
+
+      expect(payload).to include('"resume_id": 12')
+      expect(payload).to include('"status": "ok"')
+    end
+  end
 end

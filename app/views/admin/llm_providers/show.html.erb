@@ -1,0 +1,327 @@
+<% llm_models = @llm_provider.llm_models.order(:name, :identifier) %>
+<% section_links = [
+     { id: "connection-runtime", label: "Connection & runtime", caption: "Endpoint, timeout, and credential reference" },
+     { id: "request-readiness", label: "Request readiness", caption: "Live orchestration and sync blockers" },
+     { id: "registered-models", label: "Registered models", caption: "Current provider catalog" }
+   ] %>
+<% readiness_items = [] %>
+<% unless @llm_provider.active? %>
+  <% readiness_items << {
+       label: "Activate this provider",
+       detail: "Inactive providers stay registered, but their models are not selected for live orchestration or ready-model resolution.",
+       tone: :neutral
+     } %>
+<% end %>
+<% if @llm_provider.nvidia_build? && @llm_provider.api_key_reference.blank? %>
+  <% readiness_items << {
+       label: "Add an API key reference",
+       detail: "Use an environment variable name such as NVIDIA_API_KEY so sync and live requests can authenticate safely.",
+       tone: :warning
+     } %>
+<% elsif @llm_provider.nvidia_build? && @llm_provider.api_key_reference_type == "env_var" && @llm_provider.api_key.blank? %>
+  <% readiness_items << {
+       label: "Resolve #{@llm_provider.api_key_reference}",
+       detail: "The current environment cannot resolve this variable yet, so sync and provider requests will fail until it is available.",
+       tone: :warning
+     } %>
+<% elsif @llm_provider.nvidia_build? && @llm_provider.api_key_reference_type == "direct_token" %>
+  <% readiness_items << {
+       label: "Rotate to an env var when convenient",
+       detail: "A direct token works for requests, but an environment variable reference is safer for long-running operations and credential rotation.",
+       tone: :warning
+     } %>
+<% end %>
+<% if @llm_provider.last_sync_error.present? %>
+  <% readiness_items << {
+       label: "Review the last sync issue",
+       detail: @llm_provider.last_sync_error,
+       tone: :warning
+     } %>
+<% elsif @llm_provider.last_synced_at.blank? %>
+  <% readiness_items << {
+       label: "Run the first catalog sync",
+       detail: "Sync models after saving connection details so admins can assign orchestration roles from the settings hub.",
+       tone: :neutral
+     } %>
+<% end %>
+<% if readiness_items.empty? %>
+  <% readiness_items << {
+       label: "Ready for live requests",
+       detail: "This provider is active, authenticated, and has the minimum configuration required for sync and orchestration.",
+       tone: :success
+     } %>
+<% end %>
+<% readiness_widget_tone = if readiness_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
+     :dark
+   elsif readiness_items.any? { |item| item.fetch(:tone, :neutral) == :success }
+     :success
+   else
+     :subtle
+   end %>
+<% sync_widget_tone = if @llm_provider.sync_status == :synced
+     :success
+   elsif @llm_provider.sync_status == :error
+     :default
+   else
+     :subtle
+   end %>
+<% blocking_items = readiness_items.reject { |item| item.fetch(:tone, :neutral) == :success } %>
+<% triage_tone = if blocking_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
+     :warning
+   elsif blocking_items.any?
+     :neutral
+   else
+     :success
+   end %>
+<% triage_title = case triage_tone
+   when :warning
+     "Needs setup before live requests"
+   when :neutral
+     "Still needs follow-up"
+   else
+     "Configured for requests"
+   end %>
+
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "LLM provider",
+    title: @llm_provider.name,
+    description: "Review provider readiness, sync health, and registered models from one place.",
+    badges: [
+      { label: llm_provider_adapter_label(@llm_provider), tone: :neutral },
+      { label: @llm_provider.active? ? "Active" : "Inactive", tone: @llm_provider.active? ? :success : :neutral },
+      { label: llm_provider_sync_label(@llm_provider), tone: llm_provider_sync_tone(@llm_provider) }
+    ],
+    actions: [
+      { label: "Back to providers", path: admin_llm_providers_path, style: :secondary },
+      { label: "Sync models", path: sync_models_admin_llm_provider_path(@llm_provider), style: :secondary, method: :post },
+      { label: "Edit provider", path: edit_admin_llm_provider_path(@llm_provider), style: :primary }
+    ],
+    density: :compact
+  ) %>
+
+  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+    <div class="space-y-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
+            Triage first
+          </span>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Review this provider</h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80">Start with live-request blockers and sync issues, then open connection details or the model catalog only when you need deeper reference.</p>
+        </div>
+
+        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
+      </div>
+
+      <div class="space-y-3">
+        <% readiness_items.each do |item| %>
+          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
+              </div>
+
+              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
+                <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+        <div class="space-y-4">
+          <div>
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+              Provider sections
+            </span>
+            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to details</h2>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80">Move between connection detail, operational status, and the registered-model catalog.</p>
+          </div>
+
+          <div class="space-y-3">
+            <% section_links.each do |section| %>
+              <%= render Ui::SectionLinkCardComponent.new(
+                label: section.fetch(:label),
+                caption: section.fetch(:caption),
+                path: "##{section.fetch(:id)}"
+              ) %>
+            <% end %>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+          </div>
+        </div>
+      <% end %>
+    </aside>
+
+    <div class="space-y-6">
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Connection & runtime",
+        anchor: "connection-runtime",
+        eyebrow: "Provider configuration",
+        description: "Review the endpoint, adapter, timeout, and credential reference used when the orchestration layer contacts this provider.",
+        badges: [
+          { label: llm_provider_adapter_label(@llm_provider), tone: :neutral },
+          { label: @llm_provider.active? ? "Active" : "Inactive", tone: @llm_provider.active? ? :success : :neutral }
+        ]
+      ) do %>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Slug</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_provider.slug %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Base URL</p>
+            <p class="mt-2 break-all text-base font-medium text-ink-950"><%= @llm_provider.base_url %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: @llm_provider.configured_for_requests? ? :success : :default) %>">
+            <p class="text-sm font-medium text-ink-700/80">Configured for requests</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(llm_provider_request_status_tone(@llm_provider)) %>"><%= llm_provider_request_badge_label(@llm_provider) %></span>
+              <span class="text-sm text-ink-700/80"><%= llm_provider_request_status_label(@llm_provider) %></span>
+            </div>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: llm_provider_credential_status_tone(@llm_provider) == :success ? :success : :default) %>">
+            <p class="text-sm font-medium text-ink-700/80">Credential reference</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(llm_provider_credential_status_tone(@llm_provider)) %>"><%= llm_provider_credential_status_label(@llm_provider) %></span>
+              <span class="text-sm text-ink-700/80"><%= llm_provider_credential_summary(@llm_provider) %></span>
+            </div>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Request timeout</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_provider.request_timeout_seconds %> seconds</p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: @llm_provider.sync_status == :synced ? :success : :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Catalog sync state</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(llm_provider_sync_tone(@llm_provider)) %>"><%= llm_provider_sync_label(@llm_provider) %></span>
+              <span class="text-sm text-ink-700/80"><%= llm_provider_sync_summary(@llm_provider) %></span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Request readiness",
+        anchor: "request-readiness",
+        eyebrow: "Operational status",
+        description: "Surface the follow-ups required before this provider is reliable for live orchestration and catalog sync.",
+        badges: [
+          { label: llm_provider_request_badge_label(@llm_provider), tone: llm_provider_request_status_tone(@llm_provider) },
+          { label: llm_provider_credential_status_label(@llm_provider), tone: llm_provider_credential_status_tone(@llm_provider) }
+        ]
+      ) do %>
+        <div class="space-y-4">
+          <div class="grid gap-4 lg:grid-cols-3">
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Request readiness",
+              title: llm_provider_request_badge_label(@llm_provider),
+              description: llm_provider_request_status_label(@llm_provider),
+              tone: readiness_widget_tone,
+              badge: @llm_provider.active? ? "Active" : "Inactive",
+              badge_classes: ui_badge_classes(@llm_provider.active? ? :success : :neutral),
+              padding: :sm,
+              title_size: :base
+            ) %>
+
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Credential mode",
+              title: llm_provider_credential_status_label(@llm_provider),
+              description: llm_provider_credential_summary(@llm_provider),
+              tone: llm_provider_credential_status_tone(@llm_provider) == :success ? :success : :subtle,
+              badge: llm_provider_adapter_label(@llm_provider),
+              badge_classes: ui_badge_classes(:neutral),
+              padding: :sm,
+              title_size: :base
+            ) %>
+
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Catalog sync",
+              title: llm_provider_sync_label(@llm_provider),
+              description: llm_provider_sync_summary(@llm_provider),
+              tone: sync_widget_tone,
+              badge: @llm_provider.last_synced_model_count.present? ? pluralize(@llm_provider.last_synced_model_count, "model") : "Catalog pending",
+              badge_classes: ui_badge_classes(llm_provider_sync_tone(@llm_provider)),
+              padding: :sm,
+              title_size: :base
+            ) %>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <%= button_to "Sync models", sync_models_admin_llm_provider_path(@llm_provider), method: :post, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+            <%= link_to "Edit provider", edit_admin_llm_provider_path(@llm_provider), class: ui_button_classes(:primary, size: :sm) %>
+            <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Registered models",
+        anchor: "registered-models",
+        eyebrow: "Provider catalog",
+        description: "Inspect the models currently registered for this provider and jump into model-level editing when needed.",
+        badges: [
+          { label: pluralize(llm_models.size, "model"), tone: llm_models.any? ? :success : :neutral },
+          { label: llm_provider_sync_label(@llm_provider), tone: llm_provider_sync_tone(@llm_provider) }
+        ]
+      ) do %>
+        <div class="flex items-center justify-between gap-3 border-b border-canvas-200/80 pb-4">
+          <p class="text-sm leading-6 text-ink-700/80">Catalog and assignment follow-up for <%= @llm_provider.name %>.</p>
+          <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:ghost, size: :sm) %>
+        </div>
+
+        <% if llm_models.any? %>
+          <%= render Ui::SurfaceCardComponent.new(tag: :details, padding: :none, extra_classes: "mt-4 overflow-hidden") do %>
+            <summary class="cursor-pointer border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-5">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm font-medium text-ink-950">Catalog and assignment follow-up</p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Open the current model list when you need to inspect provider coverage or jump into model-level editing.</p>
+                </div>
+
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= pluralize(llm_models.size, "model") %></span>
+              </div>
+            </summary>
+
+            <div class="px-6 py-6 space-y-3">
+              <% llm_models.each do |llm_model| %>
+                <%= render Ui::ReportRowComponent.new(
+                  title: llm_model.name,
+                  subtitle: llm_model_metadata_summary(llm_model),
+                  badges: [
+                    { label: llm_model_catalog_label(llm_model), classes: llm_model_source_badge_classes(llm_model) },
+                    { label: llm_model.active? ? "Active" : "Inactive", classes: llm_provider_model_badge_classes(llm_model) }
+                  ],
+                  path: admin_llm_model_path(llm_model)
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <%= render Ui::EmptyStateComponent.new(
+            description: "No models have been registered for this provider yet.",
+            padding: :sm,
+            tone: :subtle,
+            align: :left
+          ) %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</section>

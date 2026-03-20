@@ -1,36 +1,117 @@
-<div class="mx-auto w-full max-w-3xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
+<% start_flow_state = local_assigns[:start_flow_state] %>
+<% autofill_enabled = feature_enabled?("autofill_content") && llm_role_enabled?(:text_generation) %>
+
+<%= render Ui::SurfaceCardComponent.new(padding: :lg, extra_classes: "resume-create-fast-path mx-auto w-full max-w-5xl shadow-xl shadow-slate-200/60") do %>
   <%= form_with model: resume, class: "space-y-6" do |form| %>
+    <% if start_flow_state&.setup_step? %>
+      <%= hidden_field_tag :step, start_flow_state.current_step %>
+    <% end %>
+
+    <% if start_flow_state&.selected_experience_level.present? %>
+      <%= hidden_field_tag "#{form.object_name}[intake_details][experience_level]", start_flow_state.selected_experience_level %>
+    <% end %>
+
+    <% if start_flow_state&.selected_experience_level == "less_than_3_years" %>
+      <%= hidden_field_tag "#{form.object_name}[intake_details][student_status]", start_flow_state.selected_student_status %>
+    <% end %>
+
     <% if resume.errors.any? %>
-      <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
         <%= resume.errors.full_messages.to_sentence %>
       </div>
     <% end %>
 
-    <div class="grid gap-5 sm:grid-cols-2">
-      <div class="sm:col-span-2">
-        <%= form.label :title, class: "text-sm font-medium text-slate-700" %>
-        <%= form.text_field :title, required: true, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
+      <div class="space-y-6">
+        <% if start_flow_state&.selected_experience_option.present? %>
+          <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'resume-start-flow-selection'].join(' ') %>">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Experience level</p>
+            <p class="mt-2 text-sm font-semibold tracking-tight text-slate-900"><%= start_flow_state.selected_experience_option.fetch(:label) %></p>
+          </div>
+        <% end %>
+
+        <div>
+          <%= form.label :title, class: ui_label_classes %>
+          <%= form.text_field :title, required: true, class: ui_input_classes %>
+          <p class="mt-2 text-sm text-slate-500">Start with a working title. You can rename the draft any time from the editor.</p>
+        </div>
+
+        <details class="<%= [ui_inset_panel_classes(tone: :subtle), 'resume-create-optional-fields group'].join(' ') %>" <%= 'open' if resume.headline.present? || resume.summary.present? %>>
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-tight text-slate-900 [&::-webkit-details-marker]:hidden">
+            <span>Add headline or summary now</span>
+            <span class="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Optional</span>
+          </summary>
+
+          <div class="mt-4 grid gap-5 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <%= form.label :headline, class: ui_label_classes %>
+              <%= form.text_field :headline, class: ui_input_classes %>
+            </div>
+
+            <div class="sm:col-span-2">
+              <%= form.label :summary, class: ui_label_classes %>
+              <%= form.text_area :summary, rows: 4, class: ui_input_classes %>
+            </div>
+          </div>
+        </details>
+
+        <div class="space-y-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Optional import</p>
+            <h3 class="mt-2 text-base font-semibold tracking-tight text-slate-900">Add source text or file now</h3>
+            <p class="mt-1 text-sm text-slate-600">Start the draft with pasted text or an attached source file. You can still refine the structure, run autofill later, and keep the original upload attached from the builder.</p>
+          </div>
+
+          <%= render "resumes/source_import_fields", form: form, resume: resume, autofill_enabled: autofill_enabled %>
+        </div>
+
+        <%= render "resumes/template_picker",
+          form: form,
+          resume: resume,
+          template_picker_state: resume_template_picker_state(
+            resume: resume,
+            form_object_name: form.object_name,
+            field_label: "Template",
+            description: "Start with the selected look now. You can switch templates later from finalize without changing the resume content.",
+            mode: :compact
+          ) %>
       </div>
 
-      <div class="sm:col-span-2">
-        <%= form.label :headline, class: "text-sm font-medium text-slate-700" %>
-        <%= form.text_field :headline, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
-      </div>
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "What happens next",
+        title: resume.persisted? ? "Keep refining the draft" : "Create the draft and start editing",
+        description: "We’ll build starter sections for experience, education, skills, and projects, then take you into the guided editor.",
+        tone: :subtle,
+        padding: :md,
+        density: :compact
+      ) do %>
+        <div class="space-y-3">
+          <div class="flex flex-wrap gap-2">
+            <span class="<%= ui_badge_classes(:neutral) %>">Starter sections included</span>
+            <span class="<%= ui_badge_classes(:neutral) %>">Template switch later</span>
+          </div>
 
-      <div class="sm:col-span-2">
-        <%= form.label :summary, class: "text-sm font-medium text-slate-700" %>
-        <%= form.text_area :summary, rows: 5, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
-      </div>
-
-      <div class="sm:col-span-2">
-        <%= form.label :template_id, "Template", class: "text-sm font-medium text-slate-700" %>
-        <%= form.select :template_id, options_for_select(template_options_for_builder, resume.template_id), {}, class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
-      </div>
+          <ol class="space-y-2 text-sm text-slate-600">
+            <li class="flex items-start gap-2">
+              <span class="mt-0.5 inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-900 text-[0.65rem] font-semibold text-white">1</span>
+              <span>Create the draft shell with your starting title and template.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-0.5 inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-900 text-[0.65rem] font-semibold text-white">2</span>
+              <span>Land in the guided builder with starter sections ready to edit.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-0.5 inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-900 text-[0.65rem] font-semibold text-white">3</span>
+              <span>Refine contact details, entries, and export settings when the content is ready.</span>
+            </li>
+          </ol>
+        </div>
+      <% end %>
     </div>
 
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
       <p class="text-sm text-slate-500">You can refine contact details, settings, and entries from the editor after creation.</p>
-      <%= form.submit(resume.persisted? ? "Save changes" : "Create resume", class: "inline-flex justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700") %>
+      <%= form.submit(resume.persisted? ? "Save changes" : "Create resume", class: ui_button_classes(:primary)) %>
     </div>
   <% end %>
-</div>
+<% end %>

@@ -1,0 +1,74 @@
+<% visible_ready_count = llm_models.count { |llm_model| llm_model.active? && llm_model.llm_provider.configured_for_requests? } %>
+<% visible_assigned_count = llm_models.count { |llm_model| llm_model.llm_model_assignments.any? } %>
+<% visible_attention_count = llm_models.count { |llm_model| !llm_model.active? || !llm_model.llm_provider.configured_for_requests? } %>
+<% visible_synced_count = llm_models.count(&:provider_synced?) %>
+<% active_filter_count = [query.presence, status_filter.presence, capability_filter.presence].compact.count %>
+
+<div class="mb-4 space-y-4">
+  <%= render Ui::DashboardPanelComponent.new(
+    eyebrow: "Model registry",
+    title: "Model index snapshot",
+    description: active_filter_count.positive? ? "Showing #{pluralize(total_count, "model")} matching the current filters." : "Review model readiness, assignment coverage, and catalog source across the registry.",
+    action_label: active_filter_count.positive? ? "Clear filters" : "Platform settings",
+    action_path: active_filter_count.positive? ? admin_llm_models_path : admin_settings_path,
+    action_style: :secondary,
+    padding: :sm,
+    density: :compact
+  ) do %>
+    <div class="flex flex-wrap gap-2">
+      <% if query.present? %>
+        <span class="<%= ui_badge_classes(:neutral) %>">Query: <%= query %></span>
+      <% end %>
+      <% if status_filter.present? %>
+        <span class="<%= ui_badge_classes(:neutral) %>">Status: <%= status_filter.humanize %></span>
+      <% end %>
+      <% if capability_filter.present? %>
+        <span class="<%= ui_badge_classes(:neutral) %>">Capability: <%= capability_filter.humanize %></span>
+      <% end %>
+      <% if active_filter_count.zero? %>
+        <p class="w-full text-sm leading-6 text-ink-700/80">Use search, status, and capability filters to isolate models that are ready for assignment or still blocked by provider setup.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Matches",
+      title: total_count.to_s,
+      description: "Models currently returned by the active filter set.",
+      badge: "#{llm_models.size} visible",
+      badge_classes: ui_badge_classes(:neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Ready for orchestration",
+      title: visible_ready_count.to_s,
+      description: "Visible models with an active record and a request-ready provider.",
+      tone: visible_ready_count.positive? ? :success : :subtle,
+      badge: visible_ready_count.positive? ? "Ready" : "None visible",
+      badge_classes: ui_badge_classes(visible_ready_count.positive? ? :success : :neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Assigned roles",
+      title: visible_assigned_count.to_s,
+      description: "Visible models already connected to one or more orchestration roles.",
+      tone: visible_assigned_count.positive? ? :success : :subtle,
+      badge: visible_assigned_count.positive? ? "In use" : "Unassigned",
+      badge_classes: ui_badge_classes(visible_assigned_count.positive? ? :success : :neutral),
+      title_size: :base
+    ) %>
+
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Needs attention",
+      title: visible_attention_count.to_s,
+      description: "Visible models blocked by inactive state or provider readiness follow-up.",
+      tone: visible_attention_count.positive? ? :default : :subtle,
+      badge: visible_synced_count.positive? ? "#{visible_synced_count} synced" : "Catalog pending",
+      badge_classes: ui_badge_classes(visible_attention_count.positive? ? :warning : :success),
+      title_size: :base
+    ) %>
+  </div>
+</div>

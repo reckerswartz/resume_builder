@@ -1,0 +1,75 @@
+<% autofill_enabled = feature_enabled?("autofill_content") && llm_role_enabled?(:text_generation) %>
+<% autofill_action_ready = resume_source_autofill_action_ready?(resume, autofill_enabled:) %>
+<% autofill_status_label = resume_source_autofill_status_label(resume, autofill_enabled:) %>
+<% autofill_status_message = resume_source_autofill_status_message(resume, autofill_enabled:) %>
+
+<%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
+  <%= render Ui::StepHeaderComponent.new(
+    title: "Choose how to start",
+    description: "Start from scratch, paste an existing resume, or upload a source file before moving into the guided builder.",
+    aside_classes: "grid w-full gap-4 lg:max-w-2xl lg:grid-cols-2"
+  ) do %>
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Import status",
+        title: autofill_status_label,
+        description: autofill_status_message,
+        tone: autofill_action_ready ? :success : :subtle,
+        padding: :sm
+      ) do %>
+        <div class="flex flex-wrap gap-2">
+          <span class="<%= ui_badge_classes(resume.source_mode == "paste" ? :success : :neutral) %>">Paste</span>
+          <span class="<%= ui_badge_classes(resume.source_mode == "upload" ? :success : :neutral) %>">Upload</span>
+          <span class="<%= ui_badge_classes(autofill_enabled ? :success : :neutral) %>"><%= autofill_enabled ? "LLM ready" : "LLM unavailable" %></span>
+        </div>
+      <% end %>
+
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Supported formats",
+        title: Resumes::SourceTextResolver.supported_upload_formats_label,
+        description: "PDF, DOCX, and text-based uploads can help prepare a starter draft. Legacy DOC files stay attached for reference.",
+        tone: :subtle,
+        padding: :sm
+      ) do %>
+        <div class="flex flex-wrap gap-2">
+          <span class="<%= ui_badge_classes(:neutral) %>">Keep the original file attached</span>
+          <span class="<%= ui_badge_classes(:neutral) %>">Autofill the core steps</span>
+        </div>
+      <% end %>
+  <% end %>
+
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
+    <% if resume.errors.any? %>
+      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
+        <%= resume.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <%= render "resumes/source_import_fields", form: form, resume: resume, autofill_enabled: autofill_enabled %>
+
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+            Import guidance
+          </span>
+          <h4 class="mt-4 text-sm font-semibold text-ink-950">Start with the lightest path</h4>
+        </div>
+
+        <span class="<%= ui_badge_classes(:neutral) %>">Autofill optional</span>
+      </div>
+
+      <p class="text-sm leading-6 text-ink-700/80">Start from scratch when you want a clean draft. Use paste or upload only when existing content will save time. Once the source feels right, continue into heading and the rest of the guided builder.</p>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-ink-700/70"><%= autofill_enabled ? "Changes save in place. Autofill becomes available when pasted text or a supported upload is present." : "Changes save in place. Use the stepper or the next button when the source setup feels right." %></p>
+      <div class="flex flex-wrap gap-3">
+        <%= form.submit "Save source setup", class: ui_button_classes(:primary) %>
+        <% if autofill_enabled %>
+          <%= button_tag "Save and autofill", name: "run_autofill", value: true, disabled: !autofill_action_ready, class: autofill_action_ready ? ui_button_classes(:warning) : ui_button_classes(:disabled) %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

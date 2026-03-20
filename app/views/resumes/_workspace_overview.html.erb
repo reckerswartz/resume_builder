@@ -1,0 +1,5 @@
+<% workspace_state = local_assigns.fetch(:workspace_state) { resume_builder_workspace_state(resume) } %>
+
+<section id="<%= dom_id(resume, :workspace_overview) %>">
+  <%= render Ui::PageHeaderComponent.new(**workspace_state.page_header_attributes) %>
+</section>

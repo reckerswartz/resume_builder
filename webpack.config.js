@@ -27,6 +27,7 @@ module.exports = (_env, argv = {}) => {
     },
     output: {
       filename: "[name].js",
+      chunkFilename: "[name]-[contenthash].digested.js",
       sourceMapFilename: "[file].map",
       path: path.resolve(__dirname, "app/assets/builds"),
       clean: {

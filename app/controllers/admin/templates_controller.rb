@@ -1,8 +1,19 @@
 class Admin::TemplatesController < Admin::BaseController
+  PAGE_SIZE = 10
+
   before_action :set_template, only: %i[ show edit update destroy ]
 
   def index
-    @templates = policy_scope(Template).order(:name)
+    @query = params[:query].to_s.strip
+    @status_filter = params[:status].presence_in(%w[active inactive]).to_s
+    @sort = Template.admin_sort_column(params[:sort])
+    @direction = table_direction(default: "asc")
+
+    scope = policy_scope(Template).matching_query(@query).with_active_filter(@status_filter)
+    @total_count = scope.count
+    @total_pages = table_total_pages(total_count: @total_count, per_page: PAGE_SIZE)
+    @current_page = table_current_page(total_pages: @total_pages)
+    @templates = scope.sorted_for_admin(@sort, @direction).offset((@current_page - 1) * PAGE_SIZE).limit(PAGE_SIZE)
   end
 
   def show
@@ -10,7 +21,7 @@ class Admin::TemplatesController < Admin::BaseController
   end
 
   def new
-    @template = Template.new(active: true, layout_config: { "variant" => "modern", "accent_color" => "#0F172A", "font_scale" => "base" })
+    @template = Template.new(active: true, layout_config: ResumeTemplates::Catalog.default_layout_config)
     authorize @template
   end
 

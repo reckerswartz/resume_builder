@@ -1,0 +1,212 @@
+<% wrapper_classes = local_assigns.fetch(:wrapper_classes, "space-y-4") %>
+<% show_results_label = local_assigns.fetch(:show_results_label, true) %>
+
+<div class="<%= wrapper_classes %>">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <span class="atelier-pill">
+        <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+        Discover templates
+      </span>
+      <p class="mt-3 text-sm leading-6 text-ink-700/80">Filter the gallery by family, density, columns, theme, or layout while keeping the selected template summary in view.</p>
+    </div>
+
+    <% if show_results_label %>
+      <span class="<%= ui_badge_classes(:neutral) %>" data-template-picker-target="resultsLabel"><%= template_picker_state.results_label %></span>
+    <% end %>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    <% template_picker_state.filter_groups.each do |filter_group| %>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= filter_group.fetch(:label) %></p>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <% filter_group.fetch(:options).each do |option| %>
+            <button
+              type="button"
+              class="<%= option.fetch(:button_classes) %>"
+              data-action="click->template-picker#setFilter"
+              data-template-picker-target="filterButton"
+              data-filter-group="<%= option.fetch(:key) %>"
+              data-filter-value="<%= option.fetch(:value) %>"
+              data-selected-classes="<%= option.fetch(:button_selected_classes) %>"
+              data-unselected-classes="<%= option.fetch(:button_unselected_classes) %>"
+              aria-pressed="<%= option.fetch(:aria_pressed) %>">
+              <span><%= option.fetch(:label) %></span>
+              <span class="ml-1 opacity-70"><%= option.fetch(:count) %></span>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem]">
+    <div>
+      <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-picker-search">Search</label>
+      <input
+        id="template-picker-search"
+        type="search"
+        value=""
+        placeholder="<%= template_picker_state.search_placeholder %>"
+        class="<%= ui_input_classes.delete_prefix("mt-2 ") %>"
+        autocomplete="off"
+        data-autosave-ignore="true"
+        data-action="input->template-picker#updateSearch"
+        data-template-picker-target="searchInput">
+    </div>
+
+    <div>
+      <label class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" for="template-picker-sort">Sort</label>
+      <select
+        id="template-picker-sort"
+        class="<%= ui_input_classes.delete_prefix("mt-2 ") %>"
+        data-autosave-ignore="true"
+        data-action="change->template-picker#updateSort"
+        data-template-picker-target="sortSelect">
+        <% template_picker_state.sort_options.each do |option| %>
+          <option value="<%= option.fetch(:value) %>" <%= "selected" if option.fetch(:value) == template_picker_state.default_sort_value %>><%= option.fetch(:label) %></option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    <div class="grid gap-4 md:grid-cols-2" data-template-picker-target="cardGrid">
+      <% template_picker_state.card_states.each do |card_state| %>
+        <% template = card_state.fetch(:template) %>
+        <% template_card = card_state.fetch(:template_card) %>
+        <% layout_icon_name = template_card.fetch(:sidebar_section_labels).any? ? :layers : :preview %>
+
+        <label
+          for="<%= card_state.fetch(:card_id) %>"
+          class="<%= card_state.fetch(:card_classes) %>"
+          data-template-picker-target="card"
+          data-template-id="<%= template.id %>"
+          data-family="<%= card_state.fetch(:filter_family) %>"
+          data-density="<%= card_state.fetch(:filter_density) %>"
+          data-column-count="<%= card_state.fetch(:filter_column_count) %>"
+          data-theme-tone="<%= card_state.fetch(:filter_theme_tone) %>"
+          data-shell-style="<%= card_state.fetch(:filter_shell_style) %>"
+          data-search-text="<%= card_state.fetch(:search_text) %>"
+          data-sort-name="<%= card_state.fetch(:sort_name) %>"
+          data-sort-family="<%= card_state.fetch(:sort_family) %>"
+          data-sort-density-rank="<%= card_state.fetch(:sort_density_rank) %>"
+          data-sort-recommendation-rank="<%= card_state.fetch(:sort_recommendation_rank) %>"
+          data-selected-classes="<%= card_state.fetch(:card_selected_classes) %>"
+          data-unselected-classes="<%= card_state.fetch(:card_unselected_classes) %>">
+          <%= form.radio_button :template_id,
+            template.id,
+            id: card_state.fetch(:card_id),
+            checked: card_state.fetch(:selected),
+            class: "sr-only",
+            data: { action: "change->template-picker#update", template_picker_target: "input" } %>
+
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(15,23,42,0.08)] <%= card_state.fetch(:selected) ? ["border-white/10", "bg-white/8", card_state.fetch(:eyebrow_selected_classes)].join(' ') : ["border-aqua-100", "bg-canvas-50/90", card_state.fetch(:eyebrow_unselected_classes)].join(' ') %>"
+                  data-template-picker-target="eyebrow"
+                  data-template-id="<%= template.id %>"
+                  data-selected-classes="<%= ["border-white/10", "bg-white/8", card_state.fetch(:eyebrow_selected_classes)].join(' ') %>"
+                  data-unselected-classes="<%= ["border-aqua-100", "bg-canvas-50/90", card_state.fetch(:eyebrow_unselected_classes)].join(' ') %>">
+                  <%= render Ui::GlyphComponent.new(name: layout_icon_name, size: :xs, tone: :minimal) %>
+                  <%= template_card.fetch(:family_label) %>
+                </span>
+
+                <% if card_state.fetch(:recommended) %>
+                  <span class="<%= ui_badge_classes(:info) %>"><%= card_state.fetch(:recommendation_badge_label) %></span>
+                <% end %>
+              </div>
+
+              <h3 class="mt-4 text-lg font-semibold tracking-tight"><%= template.name %></h3>
+            </div>
+
+            <span
+              class="<%= card_state.fetch(:indicator_classes) %> inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold"
+              data-template-picker-target="indicator"
+              data-template-id="<%= template.id %>"
+              data-selected-classes="<%= card_state.fetch(:indicator_selected_classes) %>"
+              data-unselected-classes="<%= card_state.fetch(:indicator_unselected_classes) %>"
+              data-selected-text="<%= card_state.fetch(:indicator_selected_text) %>"
+              data-unselected-text="<%= card_state.fetch(:indicator_unselected_text) %>"><%= card_state.fetch(:indicator_text) %></span>
+          </div>
+
+          <div class="mt-4 rounded-[1.5rem] border border-mist-200/80 bg-canvas-100/84 p-3 shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
+            <div class="mb-3 flex items-center justify-between gap-3 px-1">
+              <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Live sample</p>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= template_card.fetch(:short_label) %></span>
+            </div>
+
+            <%= render "resumes/template_picker_preview", template_card: template_card %>
+          </div>
+
+          <p
+            class="mt-3 text-sm leading-6 <%= card_state.fetch(:supporting_classes) %>"
+            data-template-picker-target="supporting"
+            data-template-id="<%= template.id %>"
+            data-selected-classes="<%= card_state.fetch(:supporting_selected_classes) %>"
+            data-unselected-classes="<%= card_state.fetch(:supporting_unselected_classes) %>"><%= card_state.fetch(:supporting_text) %></p>
+
+          <% if card_state.fetch(:recommended) %>
+            <div class="mt-4 <%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= card_state.fetch(:recommendation_badge_label) %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= card_state.fetch(:recommendation_reason) %></p>
+            </div>
+          <% end %>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <% card_state.fetch(:selection_badges).each do |badge_label| %>
+              <span
+                class="<%= card_state.fetch(:badge_classes) %>"
+                data-template-picker-target="badge"
+                data-template-id="<%= template.id %>"
+                data-selected-classes="<%= card_state.fetch(:badge_selected_classes) %>"
+                data-unselected-classes="<%= card_state.fetch(:badge_unselected_classes) %>"><%= badge_label %></span>
+            <% end %>
+          </div>
+
+          <div class="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <div class="flex items-start gap-3">
+                <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
+                <div>
+                  <div class="flex items-center gap-3">
+                    <span class="h-3 w-3 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
+                    <span
+                      class="text-sm <%= card_state.fetch(:supporting_classes) %>"
+                      data-template-picker-target="supporting"
+                      data-template-id="<%= template.id %>"
+                      data-selected-classes="<%= card_state.fetch(:supporting_selected_classes) %>"
+                      data-unselected-classes="<%= card_state.fetch(:supporting_unselected_classes) %>"><%= card_state.fetch(:accent_label) %></span>
+                  </div>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Keep the same resume content reusable if you change layouts later.</p>
+                </div>
+              </div>
+            </div>
+
+            <% if card_state.fetch(:show_current_only_badge) %>
+              <span
+                class="<%= card_state.fetch(:current_badge_classes) %>"
+                data-template-picker-target="badge"
+                data-template-id="<%= template.id %>"
+                data-selected-classes="<%= card_state.fetch(:current_badge_selected_classes) %>"
+                data-unselected-classes="<%= card_state.fetch(:current_badge_unselected_classes) %>">Current only</span>
+            <% end %>
+          </div>
+        </label>
+      <% end %>
+    </div>
+
+    <div class="hidden" data-template-picker-target="emptyState">
+      <%= render Ui::EmptyStateComponent.new(
+        title: "No templates match those filters",
+        description: "Try a different family, density, column, theme, or layout combination to bring more templates back into the gallery.",
+        tone: :subtle,
+        padding: :sm,
+        title_size: :sm
+      ) %>
+    </div>
+  </div>
+</div>

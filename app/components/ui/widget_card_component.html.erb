@@ -1,0 +1,25 @@
+<article class="<%= wrapper_classes %>">
+  <div class="flex items-start justify-between gap-3">
+    <div class="min-w-0 flex-1">
+      <% if eyebrow.present? %>
+        <p class="text-xs font-medium uppercase tracking-[0.2em] <%= eyebrow_classes %>"><%= eyebrow %></p>
+      <% end %>
+
+      <p class="mt-2 <%= title_classes %>"><%= title %></p>
+    </div>
+
+    <% if badge.present? %>
+      <span class="<%= resolved_badge_classes %>"><%= badge %></span>
+    <% end %>
+  </div>
+
+  <% if description.present? %>
+    <p class="mt-1 text-sm <%= description_classes %>"><%= description %></p>
+  <% end %>
+
+  <% if content? %>
+    <div class="<%= body_spacing_classes %>">
+      <%= content %>
+    </div>
+  <% end %>
+</article>

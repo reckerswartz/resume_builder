@@ -1,30 +1,65 @@
-<section class="space-y-8">
-  <div class="flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Your workspace</p>
-      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Resumes</h1>
-      <p class="mt-2 text-sm text-slate-600">Create a new resume or continue editing an existing one with live preview and PDF export.</p>
-    </div>
+<% resume_count = @resumes.size %>
+<% ready_count = @resumes.count { |resume| resume.summary.present? && resume.contact_field("email").present? } %>
+<% draft_count = resume_count - ready_count %>
 
-    <div class="flex flex-wrap gap-3">
-      <%= link_to "Create new resume", new_resume_path, class: "rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
-      <% if current_user.admin? %>
-        <%= link_to "Open admin", admin_root_path, class: "rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
-      <% end %>
-    </div>
+<section class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
+  <div class="space-y-6">
+    <%= render Ui::PageHeaderComponent.new(
+      eyebrow: "Your workspace",
+      title: "Resumes",
+      description: "Open a draft, start a new resume, or compare templates without extra dashboard noise.",
+      badges: [
+        { label: "#{resume_count} resume#{"s" unless resume_count == 1}", tone: :neutral },
+        { label: "#{ready_count} ready to review", tone: :neutral }
+      ],
+      actions: [
+        { label: "Create new resume", path: new_resume_path, style: :primary },
+        { label: "Browse templates", path: templates_path, style: :secondary },
+        (current_user.admin? ? { label: "Open admin", path: admin_root_path, style: :secondary } : nil)
+      ].compact,
+      density: :compact
+    ) %>
+
+    <% if @resumes.any? %>
+      <div class="grid gap-5 xl:grid-cols-2">
+        <% @resumes.each do |resume| %>
+          <%= render "resume_card", resume: resume %>
+        <% end %>
+      </div>
+    <% else %>
+      <%= render Ui::EmptyStateComponent.new(
+        title: "No resumes yet",
+        description: "Create your first resume to start editing and previewing live.",
+        action_label: "Create resume",
+        action_path: new_resume_path,
+        padding: :lg,
+        title_size: :lg
+      ) %>
+    <% end %>
   </div>
 
-  <% if @resumes.any? %>
-    <div class="grid gap-5 xl:grid-cols-2">
-      <% @resumes.each do |resume| %>
-        <%= render "resume_card", resume: resume %>
-      <% end %>
-    </div>
-  <% else %>
-    <div class="rounded-[2rem] border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
-      <h2 class="text-xl font-semibold text-slate-900">No resumes yet</h2>
-      <p class="mt-2 text-sm text-slate-600">Create your first resume to start editing and previewing live.</p>
-      <%= link_to "Create resume", new_resume_path, class: "mt-5 inline-flex rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
-    </div>
-  <% end %>
+  <aside class="space-y-4 xl:sticky xl:top-6">
+    <%= render Ui::DashboardPanelComponent.new(
+      eyebrow: "Quick actions",
+      title: "Keep moving",
+      description: "Use these shortcuts when you need to start fresh or compare layouts, then return to the resume list.",
+      padding: :sm,
+      density: :compact
+    ) do %>
+      <div class="space-y-3">
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <p class="text-sm font-semibold text-ink-950"><%= "#{ready_count} ready, #{draft_count} in progress" %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80">Focus first on drafts missing contact details, a summary, or one clear experience section.</p>
+        </div>
+
+        <div class="flex flex-col gap-2 text-sm">
+          <%= link_to "Create resume", new_resume_path, class: "#{ui_button_classes(:secondary)} w-full justify-start" %>
+          <%= link_to "Browse templates", templates_path, class: "#{ui_button_classes(:secondary)} w-full justify-start" %>
+          <% if current_user.admin? %>
+            <%= link_to "Open admin hub", admin_root_path, class: "#{ui_button_classes(:secondary)} w-full justify-start" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </aside>
 </section>

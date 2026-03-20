@@ -1,0 +1,90 @@
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-canvas-200/80">
+    <thead class="bg-canvas-50/80 text-left text-sm font-medium text-ink-700/70">
+      <tr>
+        <th class="px-6 py-4">
+          <%= link_to admin_templates_path(table_sort_params(column: "name", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Template</span>
+            <%= table_sort_indicator("name", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_templates_path(table_sort_params(column: "slug", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Slug</span>
+            <%= table_sort_indicator("slug", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">Family</th>
+        <th class="px-6 py-4">
+          <%= link_to admin_templates_path(table_sort_params(column: "active", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Status</span>
+            <%= table_sort_indicator("active", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_templates_path(table_sort_params(column: "updated_at", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Updated</span>
+            <%= table_sort_indicator("updated_at", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-canvas-200/80 text-sm text-ink-700/90">
+      <% if templates.any? %>
+        <% templates.each do |template| %>
+          <% layout_metadata = template_layout_metadata(template) %>
+          <tr class="align-top transition hover:bg-canvas-50/70">
+            <td class="px-6 py-4">
+              <div class="max-w-sm">
+                <p class="font-medium text-ink-950"><%= template.name %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template.description.presence || "No description" %></p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <span class="<%= ui_badge_classes(:neutral) %>">Density: <%= layout_metadata.fetch(:density_label) %></span>
+                  <span class="<%= ui_badge_classes(:neutral) %>">Shell: <%= layout_metadata.fetch(:shell_style_label) %></span>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-mono text-sm font-medium text-ink-950"><%= template.slug %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= layout_metadata.fetch(:family_label) %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_layout_focus_summary(template) %></p>
+            </td>
+            <td class="px-6 py-4">
+              <div class="space-y-2">
+                <span class="<%= ui_badge_classes(template_status_badge_tone(template)) %>"><%= template_status_label(template) %></span>
+                <p class="text-sm text-ink-700/80"><%= template_visibility_label(template) %></p>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= l(template.updated_at, format: :short) %></p>
+              <p class="mt-1 text-ink-700/70"><%= time_ago_in_words(template.updated_at) %> ago</p>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="inline-flex flex-wrap justify-end gap-2">
+                <%= link_to "View", admin_template_path(template), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %>
+                <%= link_to "Edit", edit_admin_template_path(template), class: ui_button_classes(:primary, size: :sm), data: { turbo_frame: "_top" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="6" class="px-6 py-6">
+            <%= render Ui::EmptyStateComponent.new(
+              title: "No templates match the current filters.",
+              description: "Try broadening the search or clearing the current status filter.",
+              action_label: "Clear filters",
+              action_path: admin_templates_path,
+              action_style: :secondary,
+              padding: :sm,
+              tone: :subtle
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

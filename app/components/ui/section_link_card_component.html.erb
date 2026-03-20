@@ -1,0 +1,6 @@
+<%= link_to path, class: wrapper_classes do %>
+  <span class="block text-sm font-semibold text-ink-950"><%= label %></span>
+  <% if caption.present? %>
+    <span class="mt-1 block text-xs text-ink-700/70"><%= caption %></span>
+  <% end %>
+<% end %>

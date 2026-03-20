@@ -1,0 +1,90 @@
+<% backtrace_count = error_log_stats.fetch(:with_backtrace_count) %>
+<% total_count = error_log_stats.fetch(:total) %>
+<% source_scope_label = source_filter.present? ? source_filter.humanize : "All sources" %>
+
+<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+  <%= render Ui::MetricCardComponent.new(
+    label: "Errors in scope",
+    value: total_count,
+    description: "Captured incidents matching the current search and source filters."
+  ) %>
+
+  <%= render Ui::MetricCardComponent.new(
+    label: "Request failures",
+    value: error_log_stats.fetch(:request_count),
+    description: "Request-cycle errors with request-safe metadata attached when available."
+  ) %>
+
+  <%= render Ui::MetricCardComponent.new(
+    label: "Job failures",
+    value: error_log_stats.fetch(:job_count),
+    description: "Background job errors enriched with queue or active job context when available."
+  ) %>
+
+  <%= render Ui::MetricCardComponent.new(
+    label: "Backtrace coverage",
+    value: "#{backtrace_count}/#{total_count}",
+    description: total_count.positive? ? "Logs with at least one captured stack frame in the current scope." : "No error logs are currently in scope."
+  ) %>
+</div>
+
+<div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+  <%= render Ui::SurfaceCardComponent.new(padding: :md) do %>
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-ink-700/70">Correlation guide</p>
+        <h2 class="mt-2 text-xl font-semibold tracking-tight text-ink-950">Search by reference or runtime IDs</h2>
+        <p class="mt-2 text-sm text-ink-700/80">Use the search box to jump between error references, request IDs, active job IDs, error classes, or message text without leaving the table view.</p>
+      </div>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= source_scope_label %></span>
+    </div>
+
+    <% if query.present? %>
+      <div class="mt-4 <%= ui_inset_panel_classes(tone: :success) %>">
+        <p class="text-sm font-medium text-ink-950">Current query</p>
+        <p class="mt-1 break-all text-sm text-ink-700/80"><%= query %></p>
+        <p class="mt-3 text-sm text-ink-700/80">The filtered table below keeps broader matches visible while you narrow to the exact incident you want.</p>
+      </div>
+    <% else %>
+      <div class="mt-4">
+        <%= render Ui::EmptyStateComponent.new(
+          description: "Search by `ERR-...`, request ID, or active job ID when you need to pivot quickly between request and background failure trails.",
+          padding: :sm,
+          tone: :subtle,
+          align: :left
+        ) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render Ui::SurfaceCardComponent.new(padding: :md) do %>
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-ink-700/70">Source mix</p>
+        <h2 class="mt-2 text-xl font-semibold tracking-tight text-ink-950">Request and job signals</h2>
+        <p class="mt-2 text-sm text-ink-700/80">Use the source filter to isolate request-cycle incidents from background execution failures before drilling into individual records.</p>
+      </div>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= pluralize(total_count, "log") %></span>
+    </div>
+
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Request context",
+        title: error_log_stats.fetch(:request_count),
+        description: "Look for request IDs, methods, paths, or users when following HTTP-cycle failures.",
+        tone: error_log_stats.fetch(:request_count).positive? ? :subtle : :success,
+        padding: :sm,
+        title_size: :base
+      ) %>
+
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Job context",
+        title: error_log_stats.fetch(:job_count),
+        description: "Look for active job IDs, queue names, and linked job logs when following background failures.",
+        tone: error_log_stats.fetch(:job_count).positive? ? :subtle : :success,
+        padding: :sm,
+        title_size: :base
+      ) %>
+    </div>
+  <% end %>
+</div>

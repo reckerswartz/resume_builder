@@ -1,0 +1,123 @@
+<% card_state = local_assigns[:card_state] %>
+<% template_card = card_state.present? ? card_state.fetch(:template_card) : local_assigns.fetch(:template_card) %>
+<% template = template_card.fetch(:template) %>
+<% description_text = card_state.present? ? card_state.fetch(:description_text) : template.description.presence || template_card.fetch(:summary) %>
+<% preview_template_path = card_state.present? ? card_state.fetch(:preview_template_path) : template_path(template) %>
+<% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : new_resume_path(template_id: template.id) %>
+<% badge_labels = if card_state.present?
+  card_state.fetch(:badge_labels)
+else
+  [
+    "Density: #{template_card.fetch(:density_label)}",
+    "Columns: #{template_card.fetch(:column_count_label)}",
+    "Theme: #{template_card.fetch(:theme_tone_label)}",
+    "Header: #{template_card.fetch(:header_style_label)}",
+    "Entries: #{template_card.fetch(:entry_style_label)}"
+  ]
+end %>
+<% recommendation_badge_label = card_state.present? ? card_state[:recommendation_badge_label] : nil %>
+<% layout_icon_name = template_card.fetch(:sidebar_section_labels).any? ? :layers : :preview %>
+<% layout_focus_label = if card_state.present?
+  card_state.fetch(:layout_focus_label)
+elsif template_card.fetch(:sidebar_section_labels).any?
+  "Sidebar: #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+else
+  "Balanced single-column flow"
+end %>
+<% html_options = if card_state.present?
+  {
+    data: {
+      template_gallery_target: "card",
+      template_id: template.id,
+      family: card_state.fetch(:filter_family),
+      density: card_state.fetch(:filter_density),
+      column_count: card_state.fetch(:filter_column_count),
+      theme_tone: card_state.fetch(:filter_theme_tone),
+      shell_style: card_state.fetch(:filter_shell_style),
+      search_text: card_state.fetch(:search_text),
+      sort_name: card_state.fetch(:sort_name),
+      sort_family: card_state.fetch(:sort_family),
+      sort_density_rank: card_state.fetch(:sort_density_rank),
+      sort_recommendation_rank: card_state.fetch(:sort_recommendation_rank)
+    }
+  }
+else
+  {}
+end %>
+<%= render Ui::SurfaceCardComponent.new(padding: :lg, extra_classes: "relative h-full overflow-hidden", html_options: html_options) do %>
+  <div class="absolute -right-10 top-6 h-24 w-24 rounded-full atelier-glow opacity-40"></div>
+  <div class="absolute inset-x-6 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+  <div class="relative">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: layout_icon_name, size: :xs, tone: :minimal) %>
+            <%= template_card.fetch(:family_label) %>
+          </span>
+
+          <% if recommendation_badge_label.present? %>
+            <span class="<%= ui_badge_classes(:info) %>"><%= recommendation_badge_label %></span>
+          <% end %>
+        </div>
+
+        <h2 class="mt-4 text-xl font-semibold tracking-tight text-ink-950"><%= template.name %></h2>
+        <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= description_text %></p>
+      </div>
+
+      <div class="rounded-[1.2rem] border border-canvas-200/80 bg-canvas-100/88 px-3 py-3 text-right shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-end gap-2">
+          <span class="h-3.5 w-3.5 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
+          <span class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Accent</span>
+        </div>
+        <p class="mt-2 text-sm font-semibold text-ink-950"><%= template_card.fetch(:accent_color) %></p>
+      </div>
+    </div>
+
+    <div class="mt-5 rounded-[1.75rem] border border-mist-200/80 bg-canvas-100/84 p-3 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+      <div class="mb-3 flex items-center justify-between gap-3 px-1">
+        <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70">Live sample</p>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= template_card.fetch(:short_label) %></span>
+      </div>
+
+      <div class="<%= [ui_inset_panel_classes(tone: :default), 'overflow-hidden'].join(' ') %>">
+        <%= render "resumes/template_picker_preview", template_card: template_card %>
+      </div>
+    </div>
+
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+        <div class="flex items-start gap-3">
+          <%= render Ui::GlyphComponent.new(name: layout_icon_name, size: :sm, tone: :soft) %>
+          <div>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Layout focus</p>
+            <p class="mt-2 text-sm font-semibold text-ink-950"><%= layout_focus_label %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+        <div class="flex items-start gap-3">
+          <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
+          <div>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Shell style</p>
+            <p class="mt-2 text-sm font-semibold text-ink-950"><%= template_card.fetch(:shell_style_label) %> shell</p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80">Keep the same resume content reusable if you switch layouts later.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-2">
+      <% badge_labels.each do |badge_label| %>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= badge_label %></span>
+      <% end %>
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      <%= link_to "Preview template", preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
+      <%= link_to "Use template", use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center" %>
+    </div>
+  </div>
+<% end %>

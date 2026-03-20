@@ -1,19 +1,36 @@
-<section class="space-y-6">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Resume builder</p>
-      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900"><%= @resume.title %></h1>
-      <p class="mt-2 text-sm text-slate-600">Edit details, sections, and entries on the left. The right panel stays in sync through Turbo updates.</p>
-    </div>
+ <%= turbo_stream_from [@resume, :export] %>
 
-    <div class="flex flex-wrap gap-2">
-      <%= link_to "Back to resumes", resumes_path, class: "rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
-      <%= link_to "Preview page", resume_path(@resume), class: "rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
-    </div>
+<% workspace_state = resume_builder_workspace_state(@resume) %>
+<% preview_state = resume_builder_preview_state(@resume) %>
+<% preview_page_action = preview_state.preview_page_action %>
+
+<section class="space-y-6">
+  <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
+
+  <div class="xl:hidden">
+    <%= render Ui::DashboardPanelComponent.new(
+      eyebrow: "Preview page",
+      title: "Open the full preview when you need more space",
+      description: "On smaller screens the live preview rail moves below the editor. Use the preview page when you want export actions and the rendered page together.",
+      padding: :sm,
+      density: :compact
+    ) do %>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-wrap gap-2">
+          <% preview_state.badges.each do |badge| %>
+            <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+          <% end %>
+        </div>
+
+        <div>
+          <%= link_to preview_page_action.fetch(:label), preview_page_action.fetch(:path), **preview_page_action.fetch(:options, {}).merge(class: ui_button_classes(:secondary, size: :sm)) %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
-  <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr] xl:items-start">
+  <div class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_24rem] xl:items-start">
     <%= render "editor", resume: @resume %>
-    <%= render "preview", resume: @resume %>
+    <%= render "preview", resume: @resume, preview_state: preview_state %>
   </div>
 </section>

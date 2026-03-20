@@ -34,5 +34,19 @@ RSpec.describe 'Sections', type: :request do
       expect(second_section.reload.position).to eq(0)
       expect(first_section.reload.position).to eq(1)
     end
+
+    it 'returns targeted Turbo Stream updates for drag-and-drop reordering' do
+      first_section = create(:section, resume:, position: 0)
+      second_section = create(:section, resume:, position: 1, title: 'Projects', section_type: 'projects')
+
+      patch move_resume_section_path(resume, second_section), params: { position: 0, step: 'finalize' }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(second_section.reload.position).to eq(0)
+      expect(first_section.reload.position).to eq(1)
+      expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
+      expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
+    end
   end
 end

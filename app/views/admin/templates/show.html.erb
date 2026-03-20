@@ -1,47 +1,300 @@
+<% layout_metadata = template_layout_metadata(@template) %>
+<% preview_resume = template_preview_resume(@template) %>
+<% section_links = [
+     { id: "layout-profile", label: "Layout profile", caption: "Family, density, shell, and structure" },
+     { id: "shared-preview", label: "Shared preview", caption: "Live sample from the shared renderer" },
+     { id: "configuration", label: "Configuration", caption: "Visibility and raw layout config" }
+   ] %>
+
 <section class="space-y-6">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Template</p>
-      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900"><%= @template.name %></h1>
-      <p class="mt-2 text-sm text-slate-600"><%= @template.description.presence || "No description provided." %></p>
-    </div>
+  <%= render Ui::HeroHeaderComponent.new(
+    eyebrow: "Template",
+    title: @template.name,
+    description: @template.description.presence || layout_metadata.fetch(:summary),
+    avatar_text: layout_metadata.fetch(:short_label),
+    badges: [
+      { label: layout_metadata.fetch(:family_label), tone: :hero },
+      { label: template_status_label(@template), tone: @template.active? ? :hero_success : :hero },
+      { label: "Density: #{layout_metadata.fetch(:density_label)}", tone: :hero },
+      { label: "Columns: #{layout_metadata.fetch(:column_count_label)}", tone: :hero }
+    ],
+    actions: [
+      { label: "Back to templates", path: admin_templates_path, style: :hero_secondary },
+      { label: "Template gallery", path: templates_path, style: :hero_secondary },
+      (@template.active? ? { label: "Use in new resume", path: new_resume_path(template_id: @template.id), style: :hero_secondary } : nil),
+      { label: "Edit", path: edit_admin_template_path(@template), style: :hero_primary },
+      { label: "Delete", path: admin_template_path(@template), style: :danger, method: :delete }
+    ].compact,
+    metrics: [
+      {
+        label: "Layout focus",
+        value: template_layout_focus_summary(@template),
+        description: layout_metadata.fetch(:summary)
+      },
+      {
+        label: "Shell",
+        value: layout_metadata.fetch(:shell_style_label),
+        description: "Header #{layout_metadata.fetch(:header_style_label)} · Entries #{layout_metadata.fetch(:entry_style_label)}"
+      },
+      {
+        label: "Theme",
+        value: layout_metadata.fetch(:theme_tone_label),
+        description: "Shared color tone used across the gallery, preview, and export renderer."
+      },
+      {
+        label: "Accent",
+        value: layout_metadata.fetch(:accent_color),
+        description: "Applied to the shared preview and export renderer."
+      },
+      {
+        label: "Availability",
+        value: template_visibility_label(@template),
+        description: template_visibility_description(@template)
+      }
+    ]
+  ) %>
 
-    <div class="flex flex-wrap gap-2">
-      <%= link_to "Edit", edit_admin_template_path(@template), class: "rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700" %>
-      <%= button_to "Delete", admin_template_path(@template), method: :delete, class: "rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50" %>
-    </div>
-  </div>
-
-  <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-    <div class="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <div>
-        <p class="text-sm font-medium text-slate-500">Slug</p>
-        <p class="mt-2 text-base font-medium text-slate-900"><%= @template.slug %></p>
-      </div>
-      <div>
-        <p class="text-sm font-medium text-slate-500">Status</p>
-        <span class="mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium <%= template_badge_classes(@template) %>"><%= @template.active? ? "Active" : "Inactive" %></span>
-      </div>
-      <div>
-        <p class="text-sm font-medium text-slate-500">Variant</p>
-        <p class="mt-2 text-base font-medium text-slate-900"><%= @template.layout_config.fetch("variant", "modern") %></p>
-      </div>
-      <div>
-        <p class="text-sm font-medium text-slate-500">Accent color</p>
-        <div class="mt-2 flex items-center gap-3">
-          <span class="h-8 w-8 rounded-full border border-slate-200" style="background-color: <%= @template.layout_config.fetch("accent_color", "#0F172A") %>;"></span>
-          <span class="text-base font-medium text-slate-900"><%= @template.layout_config.fetch("accent_color", "#0F172A") %></span>
+  <div class="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Template hub",
+        title: "Review this template",
+        description: "Move between layout profile, shared preview, and configuration guidance.",
+        action_label: "Template gallery",
+        action_path: templates_path,
+        action_style: :secondary
+      ) do %>
+        <div class="space-y-3">
+          <% section_links.each do |section| %>
+            <%= render Ui::SectionLinkCardComponent.new(
+              label: section.fetch(:label),
+              caption: section.fetch(:caption),
+              path: "##{section.fetch(:id)}"
+            ) %>
+          <% end %>
         </div>
-      </div>
-      <div>
-        <p class="text-sm font-medium text-slate-500">Font scale</p>
-        <p class="mt-2 text-base font-medium text-slate-900"><%= @template.layout_config.fetch("font_scale", "base") %></p>
-      </div>
-    </div>
+      <% end %>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 class="text-xl font-semibold tracking-tight text-slate-900">Raw layout config</h2>
-      <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-sm text-slate-100"><%= JSON.pretty_generate(@template.layout_config) %></pre>
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Visibility",
+        title: template_visibility_label(@template),
+        description: template_visibility_description(@template),
+        badge: template_status_label(@template),
+        badge_classes: ui_badge_classes(template_status_badge_tone(@template)),
+        title_size: :base
+      ) %>
+
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Layout profile",
+        title: layout_metadata.fetch(:family_label),
+        description: layout_metadata.fetch(:summary),
+        badge: layout_metadata.fetch(:shell_style_label),
+        badge_classes: ui_badge_classes(:neutral),
+        title_size: :base
+      ) do %>
+        <div class="flex flex-wrap gap-2">
+          <span class="<%= ui_badge_classes(:neutral) %>">Density: <%= layout_metadata.fetch(:density_label) %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>">Columns: <%= layout_metadata.fetch(:column_count_label) %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>">Theme: <%= layout_metadata.fetch(:theme_tone_label) %></span>
+          <span class="<%= ui_badge_classes(template_headshot_metadata_tone(@template)) %>">Headshot metadata: <%= template_headshot_metadata_label(@template) %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>">Section headings: <%= layout_metadata.fetch(:section_heading_style_label) %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>">Skills: <%= layout_metadata.fetch(:skill_style_label) %></span>
+        </div>
+      <% end %>
+
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Accent system",
+        title: layout_metadata.fetch(:accent_color),
+        description: "The accent color is seeded into both the shared preview renderer and export output.",
+        badge: layout_metadata.fetch(:density_label),
+        badge_classes: ui_badge_classes(:neutral),
+        title_size: :base
+      ) do %>
+        <div class="<%= ui_inset_panel_classes %>">
+          <div class="flex items-start gap-3">
+            <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
+            <div>
+              <div class="flex items-center gap-3">
+                <span class="h-4 w-4 rounded-full border border-black/10" style="background-color: <%= layout_metadata.fetch(:accent_color) %>;"></span>
+                <p class="text-sm font-medium text-ink-950">Preview accent</p>
+              </div>
+              <p class="mt-2 text-sm leading-6 text-ink-700/80">Use this as the shared renderer starting point before checking the live preview and export output.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </aside>
+
+    <div class="space-y-6">
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Layout profile",
+        anchor: "layout-profile",
+        eyebrow: "Template metadata",
+        description: "Inspect the normalized layout values that shape the shared preview and export presentation for this template.",
+        badges: [
+          { label: layout_metadata.fetch(:family_label), tone: :neutral },
+          { label: template_status_label(@template), tone: template_status_badge_tone(@template) }
+        ]
+      ) do %>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Slug</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= @template.slug %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Family</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:family_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Density</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:density_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Font scale</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:font_scale_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Columns</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:column_count_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Theme tone</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:theme_tone_label) %></p>
+          </div>
+
+          <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'sm:col-span-2'].join(' ') %>">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-medium text-ink-700/70">Headshot metadata</p>
+                <p class="mt-2 text-base font-medium text-ink-950"><%= template_headshot_metadata_label(@template) %></p>
+              </div>
+
+              <span class="<%= ui_badge_classes(template_headshot_metadata_tone(@template)) %>"><%= template_headshot_metadata_label(@template) %></span>
+            </div>
+
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= template_headshot_metadata_description(@template) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Shell style</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:shell_style_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Header style</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:header_style_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Section heading style</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:section_heading_style_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Entry style</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:entry_style_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Skill style</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= layout_metadata.fetch(:skill_style_label) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/70">Accent color</p>
+            <div class="mt-2 flex items-center gap-3">
+              <span class="h-8 w-8 rounded-full border border-canvas-200/80" style="background-color: <%= layout_metadata.fetch(:accent_color) %>;"></span>
+              <span class="text-base font-medium text-ink-950"><%= layout_metadata.fetch(:accent_color) %></span>
+            </div>
+          </div>
+
+          <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'sm:col-span-2'].join(' ') %>">
+            <p class="text-sm font-medium text-ink-700/70">Layout focus</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= template_layout_focus_summary(@template) %></p>
+            <p class="mt-2 text-sm text-ink-700/80"><%= layout_metadata.fetch(:summary) %></p>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Shared preview",
+        anchor: "shared-preview",
+        eyebrow: "Live sample",
+        description: "This sample uses the same server-rendered template component path as the editor preview and PDF export pipeline.",
+        badges: [
+          { label: layout_metadata.fetch(:family_label), tone: :neutral },
+          { label: layout_metadata.fetch(:shell_style_label), tone: :neutral }
+        ]
+      ) do %>
+        <div class="flex items-center justify-between gap-3 border-b border-canvas-200/80 pb-4">
+          <div>
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+              Live sample
+            </span>
+            <p class="mt-3 text-sm leading-6 text-ink-700/80">Preview the actual renderer output before making configuration changes.</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <% if @template.active? %>
+              <%= link_to "Use in new resume", new_resume_path(template_id: @template.id), class: ui_button_classes(:primary, size: :sm) %>
+            <% end %>
+            <%= link_to "Template gallery", templates_path, class: ui_button_classes(:secondary, size: :sm) %>
+          </div>
+        </div>
+
+        <div class="relative mt-4 overflow-hidden rounded-[1.75rem] border border-canvas-200/80 bg-canvas-50/92 p-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)] sm:p-6">
+          <div class="absolute -right-12 top-6 h-24 w-24 rounded-full atelier-glow opacity-35"></div>
+          <div class="absolute inset-x-6 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+          <div class="relative">
+            <%= render ResumeTemplates::ComponentResolver.component_for(preview_resume) %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Configuration",
+        anchor: "configuration",
+        eyebrow: "Activation & config",
+        description: "Review who can see this template and inspect the raw stored layout config used to derive normalized rendering values.",
+        badges: [
+          { label: template_visibility_label(@template), tone: template_visibility_tone(@template) },
+          { label: template_status_label(@template), tone: template_status_badge_tone(@template) }
+        ]
+      ) do %>
+        <div class="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+          <div class="space-y-4">
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-sm font-medium text-ink-700/70">Template visibility</p>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <span class="<%= ui_badge_classes(template_visibility_tone(@template)) %>"><%= template_visibility_label(@template) %></span>
+                <span class="text-sm text-ink-700/80"><%= template_visibility_description(@template) %></span>
+              </div>
+            </div>
+
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <div class="flex items-start gap-3">
+                <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
+                <div>
+                  <p class="text-sm font-medium text-ink-950">Next step</p>
+                  <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the edit flow to adjust the family, typography, density, and accent settings, then confirm the shared preview still matches the intended layout direction.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <%= render Ui::CodeBlockComponent.new(
+            title: "Raw layout config",
+            description: "Stored values are normalized through the template catalog when the record is saved.",
+            body: JSON.pretty_generate(@template.layout_config)
+          ) %>
+        </div>
+      <% end %>
     </div>
   </div>
 </section>

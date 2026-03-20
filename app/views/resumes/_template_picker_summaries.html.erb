@@ -1,0 +1,49 @@
+<% preview_size = local_assigns.fetch(:preview_size, :compact) %>
+<% wrapper_classes = local_assigns.fetch(:wrapper_classes, "space-y-4") %>
+
+<div class="<%= wrapper_classes %>">
+  <% template_picker_state.card_states.each do |card_state| %>
+    <% template = card_state.fetch(:template) %>
+    <% template_card = card_state.fetch(:template_card) %>
+
+    <div class="<%= "hidden" if card_state.fetch(:summary_hidden) %>" data-template-picker-target="summary" data-template-id="<%= template.id %>" aria-hidden="<%= card_state.fetch(:summary_aria_hidden) %>">
+      <%= render Ui::WidgetCardComponent.new(**card_state.fetch(:summary_card_attributes)) do %>
+        <div class="space-y-3">
+          <%= render "resumes/template_picker_preview", template_card: template_card, size: preview_size %>
+
+          <div class="flex flex-wrap gap-2">
+            <% card_state.fetch(:summary_badges).each do |badge_label| %>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= badge_label %></span>
+            <% end %>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <div class="flex items-start gap-3">
+              <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
+              <div>
+                <div class="flex items-center gap-3">
+                  <span class="h-3 w-3 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
+                  <p class="text-sm font-semibold text-ink-950"><%= template_card.fetch(:family_label) %></p>
+                </div>
+                <p class="text-xs text-ink-700/70"><%= card_state.fetch(:summary_detail_text) %></p>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-sm leading-6 text-ink-700/80"><%= card_state.fetch(:summary_note) %></p>
+
+          <% if card_state.fetch(:recommended) %>
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= card_state.fetch(:recommendation_badge_label) %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= card_state.fetch(:recommendation_reason) %></p>
+            </div>
+          <% end %>
+
+          <div>
+            <%= link_to "Open full preview", template_path(template), class: ui_button_classes(:secondary, size: :sm) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

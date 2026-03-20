@@ -1,0 +1,109 @@
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-canvas-200/80">
+    <thead class="bg-canvas-50/72 text-left text-sm font-medium text-ink-700/70">
+      <tr>
+        <th class="px-6 py-4">
+          <%= link_to admin_llm_providers_path(table_sort_params(column: "name", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Provider</span>
+            <%= table_sort_indicator("name", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">Endpoint &amp; runtime</th>
+        <th class="px-6 py-4">
+          <%= link_to admin_llm_providers_path(table_sort_params(column: "adapter", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Adapter</span>
+            <%= table_sort_indicator("adapter", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">
+          <%= link_to admin_llm_providers_path(table_sort_params(column: "active", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Request readiness</span>
+            <%= table_sort_indicator("active", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4">Catalog sync</th>
+        <th class="px-6 py-4">
+          <%= link_to admin_llm_providers_path(table_sort_params(column: "updated_at", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Updated</span>
+            <%= table_sort_indicator("updated_at", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-6 py-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-canvas-200/80 text-sm text-ink-700/80">
+      <% if llm_providers.any? %>
+        <% llm_providers.each do |llm_provider| %>
+          <tr class="align-top transition hover:bg-canvas-100/70">
+            <td class="px-6 py-4">
+              <div class="flex items-start gap-3">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-canvas-100 text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/80">
+                  <%= llm_provider.name.to_s.first(2) %>
+                </div>
+
+                <div class="min-w-0">
+                  <p class="font-medium text-ink-950"><%= llm_provider.name %></p>
+                  <p class="mt-1 text-ink-700/70"><%= llm_provider.slug %></p>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <span class="<%= ui_badge_classes(:neutral) %>"><%= llm_provider_adapter_label(llm_provider) %></span>
+                    <span class="<%= ui_badge_classes(llm_provider_badge_tone(llm_provider)) %>"><%= llm_provider.active? ? "Active" : "Inactive" %></span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <p class="break-all font-medium text-ink-950"><%= llm_provider.base_url %></p>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <span class="<%= ui_badge_classes(llm_provider_credential_status_tone(llm_provider)) %>"><%= llm_provider_credential_status_label(llm_provider) %></span>
+                <span class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/55"><%= llm_provider.request_timeout_seconds %>s timeout</span>
+              </div>
+              <p class="mt-2 text-sm text-ink-700/80"><%= llm_provider_credential_summary(llm_provider) %></p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= llm_provider_adapter_label(llm_provider) %></span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(llm_provider_request_status_tone(llm_provider)) %>"><%= llm_provider_request_badge_label(llm_provider) %></span>
+                <span class="<%= ui_badge_classes(llm_provider_credential_status_tone(llm_provider)) %>"><%= llm_provider_credential_status_label(llm_provider) %></span>
+              </div>
+              <p class="mt-2 text-ink-700/80"><%= llm_provider_request_status_label(llm_provider) %></p>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(llm_provider_sync_badge_tone(llm_provider)) %>"><%= llm_provider_sync_label(llm_provider) %></span>
+              </div>
+              <p class="mt-2 text-ink-700/80"><%= llm_provider_sync_summary(llm_provider) %></p>
+              <p class="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/55"><%= llm_provider.last_synced_model_count.present? ? pluralize(llm_provider.last_synced_model_count, "model") : "Catalog pending" %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-medium text-ink-950"><%= l(llm_provider.updated_at, format: :short) %></p>
+              <p class="mt-1 text-ink-700/70"><%= time_ago_in_words(llm_provider.updated_at) %> ago</p>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="inline-flex flex-wrap justify-end gap-2">
+                <%= button_to "Sync", sync_models_admin_llm_provider_path(llm_provider), method: :post, form_class: "inline-flex", class: ui_button_classes(llm_provider.configured_for_requests? ? :secondary : :warning, size: :sm), data: { turbo_frame: "_top" } %>
+                <%= link_to "View", admin_llm_provider_path(llm_provider), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %>
+                <%= link_to "Edit", edit_admin_llm_provider_path(llm_provider), class: ui_button_classes(:primary, size: :sm), data: { turbo_frame: "_top" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="7" class="px-6 py-6">
+            <%= render Ui::EmptyStateComponent.new(
+              title: "No providers match the current filters.",
+              description: "Try clearing the current filters or register a new provider.",
+              action_label: "Clear filters",
+              action_path: admin_llm_providers_path,
+              action_style: :secondary,
+              padding: :sm,
+              tone: :subtle
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -4,7 +4,7 @@ FactoryBot.define do
     job_type { "ResumeExportJob" }
     queue_name { "default" }
     status { "queued" }
-    input { { "resume_id" => 1 } }
+    input { { "arguments" => [1, 1] } }
     output { {} }
     error_details { {} }
     duration_ms { nil }

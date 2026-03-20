@@ -1,0 +1,16 @@
+<section class="<%= wrapper_classes %>">
+  <div class="<%= layout_classes %>">
+    <div>
+      <p class="<%= title_classes %>"><%= title %></p>
+      <% if description.present? %>
+        <p class="<%= description_classes %>"><%= description %></p>
+      <% end %>
+    </div>
+
+    <% if content? %>
+      <div class="<%= content_classes %>">
+        <%= content %>
+      </div>
+    <% end %>
+  </div>
+</section>

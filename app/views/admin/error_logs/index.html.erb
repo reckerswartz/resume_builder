@@ -1,0 +1,39 @@
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "Error logs",
+    description: "Review captured application errors, reference IDs, and linked request or job context.",
+    density: :compact,
+    badges: [
+      { label: pluralize(@total_count, "error log"), tone: :neutral }
+    ]
+  ) %>
+
+  <%= render partial: "shared/admin_async_table", locals: {
+    frame_id: "admin_error_logs_table",
+    filter_keys: %i[query source],
+    before_table_partial: "admin/error_logs/frame_panels",
+    before_table_locals: {
+      error_log_stats: @error_log_stats,
+      query: @query,
+      source_filter: @source_filter
+    },
+    filter_partial: "admin/error_logs/filters",
+    filter_locals: {
+      query: @query,
+      source_filter: @source_filter,
+      sort: @sort,
+      direction: @direction,
+      total_count: @total_count
+    },
+    table_partial: "admin/error_logs/table",
+    table_locals: {
+      error_logs: @error_logs,
+      sort: @sort,
+      direction: @direction
+    },
+    current_page: @current_page,
+    total_pages: @total_pages,
+    pagination_base_path: admin_error_logs_path
+  } %>
+</section>

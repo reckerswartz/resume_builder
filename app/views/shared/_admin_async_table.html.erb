@@ -1,0 +1,44 @@
+<% filter_keys = Array(filter_keys) %>
+<% page_keys = Array(local_assigns.fetch(:page_keys, filter_keys + %i[sort direction])) %>
+<% before_table_partial = local_assigns[:before_table_partial] %>
+<% before_table_locals = local_assigns.fetch(:before_table_locals, {}) %>
+
+<%= turbo_frame_tag frame_id, data: { turbo_action: "advance" } do %>
+  <% sort_params = current_table_params(*filter_keys) %>
+  <% page_params = current_table_params(*page_keys) %>
+
+  <% if before_table_partial.present? %>
+    <%= render partial: before_table_partial, locals: before_table_locals %>
+  <% end %>
+
+  <div class="min-w-0 overflow-hidden rounded-[2rem] border border-canvas-200/80 bg-canvas-50/92 shadow-sm">
+    <%= render partial: filter_partial, locals: filter_locals %>
+    <%= render partial: table_partial, locals: table_locals.merge(sort_params: sort_params) %>
+
+    <div class="flex flex-col gap-3 border-t border-canvas-200/80 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-ink-700/70">Page <%= current_page %> of <%= total_pages %></p>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <% if current_page > 1 %>
+          <%= link_to "Previous", table_query_path(pagination_base_path, page_params.merge("page" => current_page - 1)), class: ui_button_classes(:secondary, size: :sm) %>
+        <% else %>
+          <span class="rounded-full border border-canvas-200/80 px-4 py-2 text-sm font-medium text-ink-700/35">Previous</span>
+        <% end %>
+
+        <% table_page_window(current_page: current_page, total_pages: total_pages).each do |page| %>
+          <% if page == current_page %>
+            <span class="rounded-full bg-ink-950 px-4 py-2 text-sm font-medium text-white"><%= page %></span>
+          <% else %>
+            <%= link_to page, table_query_path(pagination_base_path, page_params.merge("page" => page)), class: ui_button_classes(:secondary, size: :sm) %>
+          <% end %>
+        <% end %>
+
+        <% if current_page < total_pages %>
+          <%= link_to "Next", table_query_path(pagination_base_path, page_params.merge("page" => current_page + 1)), class: ui_button_classes(:secondary, size: :sm) %>
+        <% else %>
+          <span class="rounded-full border border-canvas-200/80 px-4 py-2 text-sm font-medium text-ink-700/35">Next</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

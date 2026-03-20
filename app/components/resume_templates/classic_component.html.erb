@@ -1,58 +1,108 @@
-<div class="mx-auto w-full max-w-3xl bg-white p-8 text-slate-900 sm:p-10">
-  <header class="border-b-2 pb-5" style="border-color: <%= accent_color %>;">
-    <h1 class="text-3xl font-bold tracking-tight text-slate-900"><%= full_name %></h1>
-    <% if resume.headline.present? %>
-      <p class="mt-2 text-base uppercase tracking-[0.18em] text-slate-500"><%= resume.headline %></p>
-    <% end %>
+<div class="<%= shell_classes %>">
+  <header class="border-b-2 <%= header_padding_class %>" style="border-color: <%= accent_color %>;">
+    <% if split_header? %>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 class="<%= [name_text_class, "font-bold tracking-tight text-slate-900"].join(" ") %>"><%= full_name %></h1>
+          <% if resume.headline.present? %>
+            <p class="<%= ["mt-2", headline_text_class, "uppercase tracking-[0.18em] text-slate-500"].join(" ") %>"><%= resume.headline %></p>
+          <% end %>
+        </div>
 
-    <% if contact_items.any? %>
-      <p class="mt-4 text-sm leading-6 text-slate-600"><%= contact_items.map { |_label, value| value }.join(" · ") %></p>
+        <% if contact_items.any? %>
+          <div class="<%= [meta_text_class, "flex flex-wrap gap-x-4 gap-y-2 text-slate-600 sm:max-w-xs sm:justify-end"].join(" ") %>">
+            <% contact_items.each do |_label, value| %>
+              <span><%= value %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <h1 class="<%= [name_text_class, "font-bold tracking-tight text-slate-900"].join(" ") %>"><%= full_name %></h1>
+      <% if resume.headline.present? %>
+        <p class="<%= ["mt-2", headline_text_class, "uppercase tracking-[0.18em] text-slate-500"].join(" ") %>"><%= resume.headline %></p>
+      <% end %>
+
+      <% if contact_items.any? %>
+        <p class="<%= ["mt-4", meta_text_class, "leading-6 text-slate-600"].join(" ") %>"><%= contact_items.map { |_label, value| value }.join(" · ") %></p>
+      <% end %>
     <% end %>
 
     <% if resume.summary.present? %>
-      <p class="mt-4 text-sm leading-7 text-slate-700"><%= resume.summary %></p>
+      <p class="<%= [summary_margin_top_class, body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
     <% end %>
   </header>
 
-  <div class="mt-8 space-y-7">
+  <div class="<%= section_stack_classes %>">
     <% resume.ordered_sections.each do |section| %>
       <section>
-        <h2 class="border-b pb-2 text-lg font-semibold uppercase tracking-[0.18em]" style="border-color: <%= accent_color %>44; color: <%= accent_color %>;"><%= section.title %></h2>
+        <% if marker_section_heading? %>
+          <div class="<%= [section_heading_spacing_class, "flex items-center gap-3"].join(" ") %>">
+            <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= accent_color %>;"></span>
+            <h2 class="<%= [section_title_text_class, "font-semibold uppercase tracking-[0.18em] text-slate-900"].join(" ") %>"><%= section.title %></h2>
+          </div>
+        <% else %>
+          <h2 class="<%= [section_heading_spacing_class, section_title_text_class, "border-b pb-2 font-semibold uppercase tracking-[0.18em]"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("44") %>; color: <%= accent_color %>;"><%= section.title %></h2>
+        <% end %>
 
         <% if section.section_type == "skills" %>
-          <p class="mt-3 text-sm leading-7 text-slate-700"><%= section_entries(section).map { |entry| [value_for(entry, "name"), value_for(entry, "level")].reject(&:blank?).join(" (")&.sub(/\z/, value_for(entry, "level").present? ? ")" : "") }.join(" • ") %></p>
+          <% if chip_skill_style? %>
+            <div class="flex flex-wrap gap-2">
+              <% section_entries(section).each do |entry| %>
+                <span class="<%= [chip_text_class, "rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-slate-700"].join(" ") %>">
+                  <span class="font-medium text-slate-900"><%= value_for(entry, "name") %></span>
+                  <% if value_for(entry, "level").present? %>
+                    <span class="text-slate-500">· <%= value_for(entry, "level") %></span>
+                  <% end %>
+                </span>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="<%= [body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= inline_skill_summary(section) %></p>
+          <% end %>
         <% else %>
-          <div class="mt-4 space-y-4">
+          <div class="<%= entry_stack_classes %>">
             <% section_entries(section).each do |entry| %>
-              <article>
+              <% article_classes = [("rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4" if card_entry_style?)].compact.join(" ") %>
+              <% subtitle = entry_subtitle(entry) %>
+              <% date_range = date_range_for(entry) %>
+              <% location = entry_location(entry) %>
+              <% highlights = entry_highlights(entry) %>
+              <% url = entry_url(entry) %>
+              <article class="<%= article_classes %>">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 class="text-base font-semibold text-slate-900"><%= value_for(entry, "title").presence || value_for(entry, "degree").presence || value_for(entry, "name") %></h3>
-                    <p class="mt-1 text-sm text-slate-600"><%= [value_for(entry, "organization"), value_for(entry, "institution"), value_for(entry, "role")].reject(&:blank?).join(" · ") %></p>
-                  </div>
-                  <div class="text-sm text-slate-500 sm:text-right">
-                    <div><%= date_range_for(entry) %></div>
-                    <% if value_for(entry, "location").present? %>
-                      <div class="mt-1"><%= value_for(entry, "location") %></div>
+                    <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
+                    <% if subtitle.present? %>
+                      <p class="<%= ["mt-1", meta_text_class, "text-slate-600"].join(" ") %>"><%= subtitle %></p>
                     <% end %>
                   </div>
+                  <% if date_range.present? || location.present? %>
+                    <div class="<%= [meta_text_class, "text-slate-500 sm:text-right"].join(" ") %>">
+                      <% if date_range.present? %>
+                        <div><%= date_range %></div>
+                      <% end %>
+                      <% if location.present? %>
+                        <div class="mt-1"><%= location %></div>
+                      <% end %>
+                    </div>
+                  <% end %>
                 </div>
 
-                <% [value_for(entry, "summary"), value_for(entry, "details")].reject(&:blank?).each do |paragraph| %>
-                  <p class="mt-2 text-sm leading-6 text-slate-700"><%= paragraph %></p>
+                <% entry_body_paragraphs(entry).each do |paragraph| %>
+                  <p class="<%= [entry_body_spacing_class, body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= paragraph %></p>
                 <% end %>
 
-                <% highlights = list_values_for(entry, "highlights") %>
                 <% if highlights.any? %>
-                  <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-700">
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, "list-disc space-y-1 pl-5 leading-6 text-slate-700"].join(" ") %>">
                     <% highlights.each do |highlight| %>
                       <li><%= highlight %></li>
                     <% end %>
                   </ul>
                 <% end %>
 
-                <% if value_for(entry, "url").present? %>
-                  <p class="mt-2 text-sm text-slate-600"><%= value_for(entry, "url") %></p>
+                <% if url.present? %>
+                  <p class="<%= [entry_body_spacing_class, meta_text_class, "text-slate-600"].join(" ") %>"><%= url %></p>
                 <% end %>
               </article>
             <% end %>

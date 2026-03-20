@@ -1,0 +1,29 @@
+<section class="<%= wrapper_classes %>">
+  <% if header? %>
+    <div class="<%= header_classes %>">
+      <div class="min-w-0 flex-1">
+        <% if eyebrow.present? %>
+          <p class="<%= eyebrow_classes %>"><%= eyebrow %></p>
+        <% end %>
+
+        <% if title.present? %>
+          <h2 class="mt-2 <%= title_classes %>"><%= title %></h2>
+        <% end %>
+
+        <% if description.present? %>
+          <p class="<%= description_classes %>"><%= description %></p>
+        <% end %>
+      </div>
+
+      <% if action? %>
+        <%= link_to action_label, action_path, class: action_classes %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if content? %>
+    <div class="<%= content_classes %>">
+      <%= content %>
+    </div>
+  <% end %>
+</section>

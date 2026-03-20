@@ -3,7 +3,20 @@ Rails.application.routes.draw do
     root "dashboard#show"
 
     resource :dashboard, only: :show
-    resources :job_logs, only: %i[ index show ]
+    resources :job_logs, only: %i[ index show ] do
+      member do
+        post :retry
+        post :discard
+        post :requeue
+      end
+    end
+    resources :error_logs, only: %i[ index show ]
+    resources :llm_models, only: %i[ index show new create edit update destroy ]
+    resources :llm_providers, only: %i[ index show new create edit update destroy ] do
+      member do
+        post :sync_models
+      end
+    end
     resource :settings, only: %i[ show update ]
     resources :templates
   end
@@ -11,10 +24,13 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   resource :session, only: %i[ new create destroy ]
   resources :passwords, only: %i[ new create edit update ], param: :token
+  resources :templates, only: %i[ index show ]
+  get "resume_source_imports/:provider", to: "resume_source_imports#show", as: :resume_source_import
 
   resources :resumes do
     member do
       get :download
+      get :download_text
       post :export
     end
 

@@ -1,0 +1,58 @@
+<%= render Ui::SurfaceCardComponent.new(
+  padding: :none,
+  extra_classes: "overflow-hidden",
+  html_options: { id: dom_id(resume, :editor_chrome) }
+) do %>
+  <div class="relative overflow-hidden bg-ink-950 px-6 py-6 text-white">
+    <div class="absolute -right-10 top-6 h-24 w-24 rounded-full atelier-glow opacity-40"></div>
+    <div class="absolute inset-x-6 top-0 h-px bg-white/10"></div>
+
+    <div class="relative flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+      <div class="space-y-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">Guided builder</p>
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div class="flex h-14 w-14 items-center justify-center rounded-[1.5rem] bg-white/10 text-base font-semibold tracking-[0.18em] text-white shadow-inner shadow-white/10">
+            <%= builder_state.current_step_avatar_text %>
+          </div>
+
+          <div>
+            <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl"><%= builder_state.current_step_title %></h2>
+            <p class="mt-2 max-w-3xl text-sm text-white/70"><%= builder_state.current_step_description %></p>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <% builder_state.hero_badges.each do |badge| %>
+                <span class="<%= ui_badge_classes(badge.fetch(:tone, :hero)) %>"><%= badge.fetch(:label) %></span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2 xl:min-w-[22rem]">
+        <%= render Ui::WidgetCardComponent.new(**builder_state.progress_card_attributes) do %>
+          <div class="flex items-center gap-3">
+            <div class="h-2 flex-1 overflow-hidden rounded-full bg-canvas-200/80">
+              <div class="h-full rounded-full bg-aqua-300 transition-all" style="<%= builder_state.progress_meter_style %>"></div>
+            </div>
+            <span class="text-sm font-semibold text-ink-950"><%= builder_state.progress_meter_label %></span>
+          </div>
+        <% end %>
+
+        <%= render Ui::WidgetCardComponent.new(**builder_state.next_step_card_attributes) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-canvas-200/80 bg-canvas-50/92 px-4 py-4 sm:px-6">
+    <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+      <%= render Ui::SectionTabsComponent.new(items: builder_state.builder_tab_items, label: "Builder steps") %>
+
+      <div class="flex flex-wrap gap-2 xl:justify-end">
+        <% builder_state.navigation_actions.each do |action| %>
+          <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), **action.fetch(:options, {}) %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

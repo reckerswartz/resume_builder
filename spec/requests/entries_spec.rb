@@ -4,10 +4,25 @@ RSpec.describe 'Entries', type: :request do
   let(:user) { create(:user) }
   let(:resume) { create(:resume, user:) }
   let(:section) { create(:section, resume:, section_type: 'experience', position: 0) }
-
+  let(:llm_provider) { create(:llm_provider) }
+  let(:llm_model) { create(:llm_model, llm_provider:, identifier: 'request-model') }
+  let!(:llm_model_assignment) { create(:llm_model_assignment, llm_model:, role: 'text_generation') }
+  let(:provider_client_class) do
+    Class.new do
+      def generate_text(model:, prompt:)
+        {
+          content: '{"highlights":["Delivered improved search quality"]}',
+          token_usage: { 'input_tokens' => 8, 'output_tokens' => 5 },
+          metadata: { 'source' => 'request-spec' }
+        }
+      end
+    end
+  end
+ 
   before do
     PlatformSetting.current.update!(feature_flags: { 'llm_access' => true, 'resume_suggestions' => true, 'autofill_content' => false }, preferences: PlatformSetting.current.preferences)
     sign_in_as(user)
+    allow(Llm::ClientFactory).to receive(:build).and_return(provider_client_class.new)
   end
 
   describe 'POST /resumes/:resume_id/sections/:section_id/entries' do
@@ -27,6 +42,30 @@ RSpec.describe 'Entries', type: :request do
       expect(response).to redirect_to(edit_resume_path(resume))
       expect(section.entries.last.highlights).to eq(['improved search quality', 'scaled internal tooling'])
     end
+
+    it 'normalizes guided experience fields into the preview-friendly JSON shape' do
+      post resume_section_entries_path(resume, section), params: {
+        entry: {
+          content: {
+            title: 'Senior Engineer',
+            organization: 'Acme',
+            remote: 'true',
+            start_month: 'May',
+            start_year: '2022',
+            end_month: 'June',
+            end_year: '2024',
+            current_role: 'false'
+          }
+        }
+      }
+
+      expect(section.entries.last.content).to include(
+        'remote' => true,
+        'current_role' => false,
+        'start_date' => 'May 2022',
+        'end_date' => 'June 2024'
+      )
+    end
   end
 
   describe 'POST /resumes/:resume_id/sections/:section_id/entries/:id/improve' do
@@ -36,8 +75,31 @@ RSpec.describe 'Entries', type: :request do
       post improve_resume_section_entry_path(resume, section, entry)
 
       expect(response).to redirect_to(edit_resume_path(resume))
+      expect(entry.reload.highlights).to eq(['Delivered improved search quality'])
+
+      interaction = resume.reload.llm_interactions.last
+      expect(interaction).to be_succeeded
+      expect(interaction.llm_model).to eq(llm_model)
+      expect(interaction.llm_provider).to eq(llm_provider)
+      expect(interaction.role).to eq('text_generation')
       expect(entry.reload.highlights.first).to start_with('Delivered')
       expect(resume.llm_interactions.last).to be_succeeded
+    end
+  end
+
+  describe 'PATCH /resumes/:resume_id/sections/:section_id/entries/:id/move' do
+    it 'returns targeted Turbo Stream updates for drag-and-drop reordering' do
+      first_entry = create(:entry, section:, position: 0, content: { 'title' => 'First', 'organization' => 'Acme' })
+      second_entry = create(:entry, section:, position: 1, content: { 'title' => 'Second', 'organization' => 'Acme' })
+
+      patch move_resume_section_entry_path(resume, section, second_entry), params: { position: 0, step: 'experience' }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(second_entry.reload.position).to eq(0)
+      expect(first_entry.reload.position).to eq(1)
+      expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
+      expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :preview)}"))
     end
   end
 end

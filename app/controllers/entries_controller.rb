@@ -37,7 +37,7 @@ class EntriesController < ApplicationController
   def move
     authorize @resume, :update?
 
-    Resumes::PositionMover.new(record: @entry, direction: params[:direction]).call
+    Resumes::PositionMover.new(record: @entry, direction: params[:direction], position: params[:position]).call
     respond_to_success("Entry order updated.")
   end
 
@@ -50,8 +50,8 @@ class EntriesController < ApplicationController
       respond_to_success("Entry suggestions applied.")
     else
       respond_to do |format|
-        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: result.interaction.error_message || "Resume suggestions are unavailable right now.") }
-        format.html { redirect_to edit_resume_path(@resume), alert: result.interaction.error_message || "Resume suggestions are unavailable right now." }
+        format.turbo_stream { render_builder_update(@resume, status: :unprocessable_entity, alert: result.error_message || "Resume suggestions are unavailable right now.") }
+        format.html { redirect_to edit_resume_path(@resume), alert: result.error_message || "Resume suggestions are unavailable right now." }
       end
     end
   end

@@ -1,0 +1,62 @@
+<%= form_with url: templates_path, method: :get, class: "space-y-4", local: true do |form| %>
+  <%= form.hidden_field :family, value: family_filter %>
+  <%= form.hidden_field :density, value: density_filter %>
+  <%= form.hidden_field :shell_style, value: shell_style_filter %>
+
+  <div class="<%= ui_inset_panel_classes(tone: :subtle, padding: :lg) %>">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Filter templates</p>
+          <p class="mt-1 text-sm text-slate-600">Search by template name or description, then narrow the gallery by family, density, or layout shell.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <% if filters_active %>
+            <%= link_to "Clear filters", templates_path, class: ui_button_classes(:secondary, size: :sm) %>
+          <% end %>
+          <%= form.submit "Apply", class: ui_button_classes(:primary, size: :sm) %>
+        </div>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-end">
+        <div>
+          <%= form.label :query, "Search templates", class: ui_label_classes %>
+          <%= form.search_field :query, value: query, placeholder: "Search by name or description", class: ui_input_classes %>
+        </div>
+
+        <div class="pb-1 lg:text-right">
+          <p class="text-sm text-slate-500"><%= results_label %></p>
+        </div>
+      </div>
+
+      <% if active_filter_badges.any? %>
+        <div class="flex flex-wrap gap-2">
+          <% active_filter_badges.each do |badge| %>
+            <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="grid gap-4 lg:grid-cols-3">
+        <% filter_groups.each do |filter_group| %>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500"><%= filter_group.fetch(:label) %></p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <% filter_group.fetch(:options).each do |option| %>
+                <%= link_to template_marketplace_filter_path(
+                  current_params: current_table_params(:query, :family, :density, :shell_style),
+                  key: filter_group.fetch(:key),
+                  value: option.fetch(:value)
+                ), class: ui_filter_chip_classes(active: option.fetch(:active)) do %>
+                  <span><%= option.fetch(:label) %></span>
+                  <span class="ml-1 opacity-70"><%= option.fetch(:count) %></span>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -4,6 +4,6 @@ FactoryBot.define do
     sequence(:slug) { |n| "template-#{n}" }
     description { "Clean professional resume layout" }
     active { true }
-    layout_config { { "variant" => "modern", "accent_color" => "#0F172A", "font_scale" => "base" } }
+    layout_config { ResumeTemplates::Catalog.default_layout_config }
   end
 end

@@ -1,0 +1,43 @@
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "LLM providers",
+    description: "Review provider endpoints, credential references, and sync readiness.",
+    density: :compact,
+    actions: [
+      { label: "Platform settings", path: admin_settings_path, style: :secondary },
+      { label: "New provider", path: new_admin_llm_provider_path, style: :primary }
+    ]
+  ) %>
+
+  <%= render partial: "shared/admin_async_table", locals: {
+    frame_id: "admin_llm_providers_table",
+    filter_keys: %i[query status adapter],
+    filter_partial: "admin/llm_providers/filters",
+    filter_locals: {
+      query: @query,
+      status_filter: @status_filter,
+      adapter_filter: @adapter_filter,
+      sort: @sort,
+      direction: @direction,
+      total_count: @total_count
+    },
+    before_table_partial: "admin/llm_providers/summary",
+    before_table_locals: {
+      llm_providers: @llm_providers,
+      total_count: @total_count,
+      query: @query,
+      status_filter: @status_filter,
+      adapter_filter: @adapter_filter
+    },
+    table_partial: "admin/llm_providers/table",
+    table_locals: {
+      llm_providers: @llm_providers,
+      sort: @sort,
+      direction: @direction
+    },
+    current_page: @current_page,
+    total_pages: @total_pages,
+    pagination_base_path: admin_llm_providers_path
+  } %>
+</section>

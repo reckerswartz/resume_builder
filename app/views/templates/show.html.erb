@@ -1,0 +1,157 @@
+<% template_card = marketplace_template_card(@template) %>
+<% resume_intake_params = @recommendation_resume&.intake_details&.slice("experience_level", "student_status") || {} %>
+<% use_template_path = if resume_intake_params.present?
+  new_resume_path(template_id: @template.id, resume: { intake_details: resume_intake_params })
+else
+  new_resume_path(template_id: @template.id)
+end %>
+<% templates_path_with_context = if resume_intake_params.present?
+  templates_path(resume: { intake_details: resume_intake_params })
+else
+  templates_path
+end %>
+<% sidebar_summary = if template_card.fetch(:sidebar_section_labels).any?
+  "#{template_card.fetch(:sidebar_position).to_s.titleize} sidebar for #{template_card.fetch(:sidebar_section_labels).to_sentence}"
+else
+  "Balanced single-column section flow"
+end %>
+
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Template detail",
+    title: @template.name,
+    description: @template.description.presence || template_card.fetch(:summary),
+    badges: [
+      { label: template_card.fetch(:family_label), tone: :neutral },
+      { label: "Columns: #{template_card.fetch(:column_count_label)}", tone: :neutral },
+      { label: "Theme: #{template_card.fetch(:theme_tone_label)}", tone: :neutral }
+    ],
+    actions: [
+      { label: "Use this template", path: use_template_path, style: :primary },
+      { label: "Back to templates", path: templates_path_with_context, style: :secondary }
+    ],
+    density: :compact
+  ) %>
+
+  <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <div class="space-y-4">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Live sample",
+        title: "Preview the full layout",
+        description: "Open the live sample and decide whether this page balance fits your story.",
+        padding: :md,
+        density: :compact
+      ) do %>
+        <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm, extra_classes: "relative overflow-hidden") do %>
+          <div class="absolute -right-12 top-6 h-24 w-24 rounded-full atelier-glow opacity-35"></div>
+          <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+          <div class="relative">
+            <div class="flex flex-wrap items-start justify-between gap-3 px-1">
+              <div>
+                <span class="atelier-pill">
+                  <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+                  Live sample
+                </span>
+                <p class="mt-3 text-sm leading-6 text-ink-700/80">Use the preview to decide whether this layout deserves a closer look in the builder.</p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= template_card.fetch(:family_label) %></span>
+                <span class="<%= ui_badge_classes(:neutral) %>">Columns: <%= template_card.fetch(:column_count_label) %></span>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-[1.75rem] border border-canvas-200/80 bg-canvas-50/92 p-3 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+              <%= render ResumeTemplates::ComponentResolver.component_for(@preview_resume) %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Quick take",
+        title: "Use this layout if the page balance feels right",
+        description: "Start with this look now or keep browsing. You can still switch layouts later without rebuilding the draft.",
+        tone: :brand,
+        padding: :sm,
+        density: :compact
+      ) do %>
+        <div class="space-y-3">
+          <div class="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
+            <div class="flex items-start gap-3">
+              <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :hero) %>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Layout profile</p>
+                <p class="mt-2 text-sm font-semibold tracking-tight text-white"><%= template_card.fetch(:family_label) %></p>
+                <p class="mt-1 text-sm leading-6 text-white/72"><%= template_card.fetch(:summary) %></p>
+              </div>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="<%= ui_badge_classes(:hero) %>">Columns: <%= template_card.fetch(:column_count_label) %></span>
+              <span class="<%= ui_badge_classes(:hero) %>">Theme: <%= template_card.fetch(:theme_tone_label) %></span>
+              <span class="<%= ui_badge_classes(:hero) %>">Density: <%= template_card.fetch(:density_label) %></span>
+            </div>
+          </div>
+
+          <div class="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
+            <div class="flex items-start gap-3">
+              <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :hero) %>
+              <div>
+                <p class="text-sm font-semibold text-white">Try it in the builder</p>
+                <p class="mt-1 text-sm leading-6 text-white/72">Use this layout now, then keep refining copy, sections, and accent decisions inside the live editor.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2 text-sm">
+            <%= link_to "Use this template", use_template_path, class: "#{ui_button_classes(:hero_primary)} w-full justify-center" %>
+            <%= link_to "Browse all templates", templates_path_with_context, class: "#{ui_button_classes(:hero_secondary)} w-full justify-center" %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Accent color",
+        title: "Starting swatch",
+        description: "This starting accent is applied here and can still be adjusted later from finalize.",
+        tone: :subtle,
+        padding: :sm
+      ) do %>
+        <div class="<%= ui_inset_panel_classes %>">
+          <div class="flex items-start gap-3">
+            <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
+            <div>
+              <div class="flex items-center gap-3">
+                <span class="h-4 w-4 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
+                <p class="text-sm font-medium text-ink-950">Preview accent</p>
+              </div>
+              <p class="mt-2 text-sm leading-6 text-ink-700/80">Treat this as the starting visual cue for the builder, not a locked brand decision.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Layout focus",
+        title: sidebar_summary,
+        description: "Use this summary to decide whether the page balance matches the story you want the resume to tell.",
+        tone: :default,
+        padding: :sm
+      ) do %>
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <div class="flex items-start gap-3">
+            <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
+            <div>
+              <p class="text-sm font-semibold text-ink-950">Use this when the page rhythm matches your story</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">Balanced layouts suit broad experience storytelling, while sidebar-heavy layouts keep secondary sections grouped and quieter.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </aside>
+  </div>
+</section>

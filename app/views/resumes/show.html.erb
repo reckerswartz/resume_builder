@@ -1,22 +1,78 @@
+<%= turbo_stream_from [@resume, :export] %>
+
+<% show_state = resume_show_state(@resume) %>
+
 <section class="space-y-6">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Preview</p>
-      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900"><%= @resume.title %></h1>
-      <p class="mt-2 text-sm text-slate-600">Shared rendering used for both on-screen preview and PDF export.</p>
-    </div>
+  <%= render Ui::PageHeaderComponent.new(**show_state.page_header_attributes) %>
 
-    <div class="flex flex-wrap gap-2">
-      <%= link_to "Edit resume", edit_resume_path(@resume), class: "rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700" %>
-      <% if @resume.pdf_export.attached? %>
-        <%= link_to "Download PDF", download_resume_path(@resume), class: "rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
-      <% else %>
-        <%= button_to "Export PDF", export_resume_path(@resume), method: :post, class: "rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900" %>
+  <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
+    <%= render Ui::SurfaceCardComponent.new(**show_state.preview_surface_attributes) do %>
+      <div class="absolute -right-12 top-6 h-24 w-24 rounded-full atelier-glow opacity-35"></div>
+      <div class="absolute inset-x-6 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+      <div class="relative space-y-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+              Live preview
+            </span>
+            <h2 class="mt-4 text-xl font-semibold tracking-tight text-ink-950">Review before you export</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80">Check the latest layout, confirm the details you care about, and then download or keep editing.</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <% show_state.artifact_badges.each do |badge| %>
+              <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="xl:hidden">
+          <%= render Ui::DashboardPanelComponent.new(
+            eyebrow: "Quick actions",
+            title: "Export or keep editing",
+            description: "Use these actions before you scroll through the preview on smaller screens.",
+            padding: :sm,
+            density: :compact
+          ) do %>
+            <div class="space-y-4">
+              <%= render "export_actions", resume: @resume, context: :show_mobile, export_actions_state: show_state.export_actions_state %>
+              <%= render "export_status_panel", resume: @resume, context: :show_mobile, export_status_state: show_state.export_status_state %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="relative overflow-hidden rounded-[1.75rem] border border-canvas-200/80 bg-canvas-50/92 p-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)] sm:p-6">
+          <div class="absolute -right-12 top-6 h-24 w-24 rounded-full atelier-glow opacity-30"></div>
+          <div class="absolute inset-x-6 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+          <div class="relative">
+            <%= render ResumeTemplates::ComponentResolver.component_for(@resume) %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <aside class="hidden space-y-4 xl:sticky xl:top-6 xl:block">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Preview actions",
+        title: "Download or go back to editing",
+        description: "Keep the current preview in view while you export, download, or return to the editor.",
+        padding: :sm,
+        density: :compact
+      ) do %>
+        <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
+          <div class="space-y-2">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">What this shows</p>
+            <p class="text-sm leading-6 text-ink-700/80">Use this preview to make sure the layout, content, and export status look right before you download the file.</p>
+          </div>
+
+          <%= render "export_actions", resume: @resume, context: :show, export_actions_state: show_state.export_actions_state %>
+        </div>
       <% end %>
-    </div>
-  </div>
 
-  <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-    <%= render ResumeTemplates::ComponentResolver.component_for(@resume) %>
+      <%= render "export_status_panel", resume: @resume, context: :show, export_status_state: show_state.export_status_state %>
+    </aside>
   </div>
 </section>

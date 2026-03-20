@@ -1,0 +1,139 @@
+<%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
+  <%= render Ui::StepHeaderComponent.new(
+    title: "Finalize and export",
+    description: "Choose the final layout, review export actions, and manage any extra sections that sit outside the core guided flow.",
+    aside_classes: "flex flex-wrap gap-2"
+  ) do %>
+    <%= link_to "Preview", resume_path(resume, **resume_builder_step_params("finalize")), data: { turbo_frame: "_top" }, class: ui_button_classes(:secondary, size: :sm) %>
+    <%= render "resumes/export_actions", resume: resume, context: :finalize, export_actions_state: resume_export_actions_state(resume, context: :finalize) %>
+  <% end %>
+
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
+    <% if resume.errors.any? %>
+      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
+        <%= resume.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+            Preview actions
+          </span>
+          <h4 class="mt-4 text-sm font-semibold text-ink-950">Keep the last decisions lightweight</h4>
+        </div>
+
+        <span class="<%= ui_badge_classes(:neutral) %>">Export stays ready</span>
+      </div>
+
+      <p class="text-sm leading-6 text-ink-700/80">Choose a template first, then open extra output settings only if you need them. Export and download actions stay close while you make the last adjustments.</p>
+    </div>
+
+    <div class="space-y-5">
+      <div>
+        <%= render "resumes/template_picker",
+          form: form,
+          resume: resume,
+          template_picker_state: resume_template_picker_state(
+            resume: resume,
+            form_object_name: form.object_name,
+            field_label: "Template",
+            description: "Switch the look without changing the saved resume content. Active templates stay available here, and a legacy template remains selectable if this resume already uses it."
+          ) %>
+      </div>
+
+      <details
+        class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)]"
+        data-controller="disclosure"
+        data-disclosure-storage-key-value="resume-finalize-output-settings"
+        data-action="toggle->disclosure#remember">
+        <summary class="cursor-pointer list-none">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70">Output settings</p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80">Open link, page-size, color, and contact-display controls only when you need them.</p>
+            </div>
+            <span class="<%= ui_badge_classes(:neutral) %>">Optional</span>
+          </div>
+        </summary>
+
+        <div class="mt-4 grid gap-5 sm:grid-cols-2">
+          <div>
+            <%= form.label :slug, "Resume link", class: ui_label_classes %>
+            <%= form.text_field :slug, class: ui_input_classes %>
+          </div>
+
+          <div>
+            <%= label_tag "resume_settings_page_size", "Page size", class: ui_label_classes %>
+            <%= select_tag "resume[settings][page_size]", options_for_select([["A4", "A4"], ["Letter", "Letter"]], resume.settings.fetch("page_size", "A4")), class: ui_input_classes %>
+          </div>
+
+          <div>
+            <%= label_tag "resume_settings_accent_color", "Accent color", class: ui_label_classes %>
+            <%= color_field_tag "resume[settings][accent_color]", resume.settings.fetch("accent_color", "#0F172A"), class: "#{ui_input_classes} h-12 px-2 py-2" %>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <%= hidden_field_tag "resume[settings][show_contact_icons]", false %>
+            <label class="flex items-center justify-between gap-4">
+              <span>
+                <span class="block <%= ui_label_classes %>">Show contact icons</span>
+                <span class="mt-1 block text-sm text-ink-700/80">Keep contact info compact in the preview and exported PDF.</span>
+              </span>
+              <%= check_box_tag "resume[settings][show_contact_icons]", true, resume.settings.fetch("show_contact_icons", true), class: ui_checkbox_classes %>
+            </label>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-ink-700/70">Changes save in place here, so you can export from the builder once the shared preview looks right.</p>
+      <%= form.submit "Save finalize settings", class: ui_button_classes(:primary) %>
+    </div>
+  <% end %>
+<% end %>
+
+<section id="<%= dom_id(resume, :step_sections) %>" class="space-y-4">
+  <%= render Ui::SurfaceCardComponent.new(padding: :sm, extra_classes: "overflow-hidden") do %>
+    <div class="relative">
+      <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+      <div class="relative space-y-3">
+        <span class="atelier-pill">
+          <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+          Additional sections
+        </span>
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h3 class="text-xl font-semibold tracking-tight text-ink-950">Additional sections</h3>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80">Projects and custom sections remain available here while the main builder flow stays focused on heading, experience, education, skills, and summary.</p>
+          </div>
+
+          <span class="<%= ui_badge_classes(:neutral) %>">White-canvas editor</span>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if step_sections.any? %>
+    <div class="space-y-4" data-controller="sortable">
+      <% step_sections.each do |section| %>
+        <div id="<%= dom_id(section, :sortable_item) %>" data-action="dragstart->sortable#dragstart dragover->sortable#dragover drop->sortable#drop dragend->sortable#dragend" data-sortable-target="item" data-sortable-move-url="<%= move_resume_section_path(resume, section, **resume_builder_step_params) %>" draggable="true">
+          <%= render "resumes/section_editor", resume: resume, section: section, allowed_section_types: add_section_types %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render Ui::EmptyStateComponent.new(
+      title: "No additional sections yet",
+      description: "Add projects or other custom sections here once the core guided steps feel complete."
+    ) %>
+  <% end %>
+
+  <% if add_section_types.any? %>
+    <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types %>
+  <% end %>
+</section>

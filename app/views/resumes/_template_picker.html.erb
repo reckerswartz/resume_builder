@@ -1,0 +1,22 @@
+<% field_label = local_assigns.fetch(:field_label, "Template") %>
+<% picker_description = local_assigns.fetch(:description, "Choose a layout for the live preview and exported PDF. You can switch templates later without losing the current resume content.") %>
+<% template_picker_state = local_assigns.fetch(:template_picker_state) do
+     resume_template_picker_state(
+       resume: resume,
+       form_object_name: form.object_name,
+       field_label: field_label,
+       description: picker_description
+     )
+   end %>
+<% compact_picker = template_picker_state.compact? %>
+
+<div class="<%= ["space-y-4", ("template-picker-compact" if compact_picker)].compact.join(" ") %>" data-controller="template-picker">
+  <div>
+    <%= form.label :template_id, template_picker_state.field_label, class: ui_label_classes %>
+    <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_picker_state.description %></p>
+  </div>
+
+  <%= render compact_picker ? "resumes/template_picker_compact" : "resumes/template_picker_default",
+    template_picker_state: template_picker_state,
+    form: form %>
+</div>

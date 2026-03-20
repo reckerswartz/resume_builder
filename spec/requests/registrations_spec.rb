@@ -10,6 +10,10 @@ RSpec.describe 'Registrations', type: :request do
       get new_registration_path
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Workspace setup')
+      expect(response.body).to include('Start with a draft you can shape right away.')
+      expect(response.body).to include('Starter draft included')
+      expect(response.body).to include('atelier-pill')
     end
   end
 

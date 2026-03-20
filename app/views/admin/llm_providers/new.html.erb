@@ -1,0 +1,12 @@
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin",
+    title: "New LLM provider",
+    description: "Register a provider endpoint and request settings for sync and live requests.",
+    actions: [
+      { label: "Back to providers", path: admin_llm_providers_path, style: :secondary }
+    ]
+  ) %>
+
+  <%= render "form", llm_provider: @llm_provider %>
+</section>

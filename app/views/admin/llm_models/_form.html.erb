@@ -1,0 +1,216 @@
+<% model_sections = [
+     { id: "model-identity", label: "Model identity", caption: "Provider, name, and identifier" },
+     { id: "runtime-defaults", label: "Runtime defaults", caption: "Capabilities, temperature, and token limits" },
+     { id: "activation-orchestration", label: "Activation & orchestration", caption: "Readiness and role-assignment follow-up" }
+   ] %>
+<% save_message = llm_model.persisted? ? "Saving changes keeps the model registry aligned so assignments from the settings hub can use the updated runtime profile." : "Creating the model registers it for future assignment from the settings hub once provider readiness is complete." %>
+<% provider_guidance = if llm_model.llm_provider.present?
+     llm_model_provider_status_description(llm_model)
+   else
+     "Choose a provider first so runtime defaults and orchestration readiness stay anchored to a live endpoint."
+   end %>
+
+<%= form_with model: [:admin, llm_model], class: "grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]" do |form| %>
+  <% if llm_model.errors.any? %>
+    <div class="xl:col-span-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      <%= llm_model.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+    <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+      <div class="space-y-4">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
+            Model setup
+          </span>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= llm_model.persisted? ? "Update model readiness" : "Register a model" %></h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80">Work through identity, runtime defaults, and activation before saving this model.</p>
+        </div>
+
+        <div class="space-y-3">
+          <% model_sections.each do |section| %>
+            <%= render Ui::SectionLinkCardComponent.new(
+              label: section.fetch(:label),
+              caption: section.fetch(:caption),
+              path: "##{section.fetch(:id)}"
+            ) %>
+          <% end %>
+        </div>
+
+        <div class="<%= ui_inset_panel_classes(tone: llm_model_provider_status_tone(llm_model) == :success ? :success : :default) %>">
+          <p class="text-sm font-medium text-ink-950">Provider readiness</p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= provider_guidance %></p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="<%= ui_badge_classes(llm_model_provider_status_tone(llm_model)) %>"><%= llm_model_provider_status_label(llm_model) %></span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= llm_model.llm_provider&.name || "Provider needed" %></span>
+          </div>
+        </div>
+
+        <div class="<%= ui_inset_panel_classes(tone: llm_model.llm_model_assignments.any? ? :success : :subtle) %>">
+          <p class="text-sm font-medium text-ink-950">Assignment coverage</p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= llm_model.persisted? ? "#{llm_model_assignment_summary(llm_model)}. Adjust role coverage from Platform settings after save." : "Assign roles from Platform settings after the model is saved." %></p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="<%= ui_badge_classes(llm_model_assignment_tone(llm_model)) %>"><%= llm_model_assignment_badge_label(llm_model) %></span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= pluralize(llm_model.llm_model_assignments.size, "role") %></span>
+          </div>
+        </div>
+
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <p class="text-sm font-medium text-ink-950">Save behavior</p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= save_message %></p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <% if llm_model.persisted? %>
+            <%= link_to "View model", admin_llm_model_path(llm_model), class: ui_button_classes(:secondary, size: :sm) %>
+          <% else %>
+            <%= link_to "Back to models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </aside>
+
+  <div class="space-y-6">
+    <%= render Ui::SettingsSectionComponent.new(
+      title: "Model identity",
+      anchor: "model-identity",
+      eyebrow: "Core details",
+      description: "Register the provider, model name, and identifier used across orchestration and provider catalog sync.",
+      badges: [
+        { label: llm_model.persisted? ? "Saved record" : "New record", tone: llm_model.persisted? ? :success : :neutral },
+        { label: llm_model_provider_status_label(llm_model), tone: llm_model_provider_status_tone(llm_model) }
+      ]
+    ) do %>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= form.label :llm_provider_id, "Provider", class: ui_label_classes %>
+          <%= form.collection_select :llm_provider_id, llm_providers, :id, :name, { prompt: "Select a provider" }, class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= form.label :name, class: ui_label_classes %>
+          <%= form.text_field :name, class: ui_input_classes %>
+        </div>
+
+        <div class="sm:col-span-2">
+          <%= form.label :identifier, class: ui_label_classes %>
+          <%= form.text_field :identifier, class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the provider catalog identifier when possible so sync and manual edits stay aligned.</p>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::SettingsSectionComponent.new(
+      title: "Runtime defaults",
+      anchor: "runtime-defaults",
+      eyebrow: "Capabilities & limits",
+      description: "Define the capabilities and runtime defaults that guide how the orchestration layer uses this model.",
+      badges: [
+        { label: llm_model_catalog_label(llm_model), tone: llm_model.provider_synced? ? :success : :neutral },
+        { label: llm_model_capability_summary(llm_model), tone: :neutral }
+      ]
+    ) do %>
+      <div class="space-y-4">
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <%= label_tag "llm_model_temperature", "Temperature", class: ui_label_classes %>
+            <%= number_field_tag "llm_model[temperature]", llm_model.temperature, step: 0.1, min: 0, max: 2, class: ui_input_classes %>
+          </div>
+
+          <div>
+            <%= label_tag "llm_model_max_output_tokens", "Max output tokens", class: ui_label_classes %>
+            <%= number_field_tag "llm_model[max_output_tokens]", llm_model.max_output_tokens, step: 1, min: 1, class: ui_input_classes %>
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <label class="flex items-start justify-between gap-4">
+              <span>
+                <span class="block text-sm font-medium text-ink-950">Supports text analysis</span>
+                <span class="mt-1 block text-sm leading-6 text-ink-700/80">Use this model for text generation or verification tasks.</span>
+              </span>
+              <%= form.check_box :supports_text, class: ui_checkbox_classes %>
+            </label>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <label class="flex items-start justify-between gap-4">
+              <span>
+                <span class="block text-sm font-medium text-ink-950">Supports vision analysis</span>
+                <span class="mt-1 block text-sm leading-6 text-ink-700/80">Use this model for image or multimodal verification flows.</span>
+              </span>
+              <%= form.check_box :supports_vision, class: ui_checkbox_classes %>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="<%= ui_inset_panel_classes(tone: (llm_model.supports_text? || llm_model.supports_vision?) ? :subtle : :default) %>">
+            <p class="text-sm font-medium text-ink-700/80">Capability summary</p>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= llm_model_capability_summary(llm_model) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Current runtime defaults</p>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= llm_model_runtime_summary(llm_model) %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::SettingsSectionComponent.new(
+      title: "Activation & orchestration",
+      anchor: "activation-orchestration",
+      eyebrow: "Live workflow eligibility",
+      description: "Control whether this model can participate in ready-model selection and review what still needs follow-up before assignment-driven workflows use it.",
+      badges: [
+        { label: llm_model.active? ? "Active" : "Inactive", tone: llm_model.active? ? :success : :neutral },
+        { label: llm_model_assignment_badge_label(llm_model), tone: llm_model_assignment_tone(llm_model) }
+      ]
+    ) do %>
+      <div class="space-y-4">
+        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+          <label class="flex items-start justify-between gap-4">
+            <span>
+              <span class="block text-sm font-medium text-ink-950">Active model</span>
+              <span class="mt-1 block text-sm leading-6 text-ink-700/80">Inactive models stay in the catalog but are ignored by the orchestration layer.</span>
+            </span>
+            <%= form.check_box :active, class: ui_checkbox_classes %>
+          </label>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="<%= ui_inset_panel_classes(tone: llm_model_provider_status_tone(llm_model) == :success ? :success : :default) %>">
+            <p class="text-sm font-medium text-ink-700/80">Provider readiness</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(llm_model_provider_status_tone(llm_model)) %>"><%= llm_model_provider_status_label(llm_model) %></span>
+              <span class="text-sm leading-6 text-ink-700/80"><%= provider_guidance %></span>
+            </div>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: llm_model.llm_model_assignments.any? ? :success : :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Assignment follow-up</p>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= llm_model.persisted? ? "Use Platform settings to adjust #{llm_model_assignment_summary(llm_model).downcase}." : "Assignments become available after the model is saved." %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::StickyActionBarComponent.new(
+      title: llm_model.persisted? ? "Save model" : "Create model",
+      description: save_message,
+      density: :compact
+    ) do %>
+      <% if llm_model.persisted? %>
+        <%= link_to "View model", admin_llm_model_path(llm_model), class: ui_button_classes(:secondary, size: :sm) %>
+      <% else %>
+        <%= link_to "Back to models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+      <% end %>
+      <%= form.submit(llm_model.persisted? ? "Save model" : "Create model", class: ui_button_classes(:primary)) %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,9 +1,21 @@
-<section class="space-y-6">
-  <div>
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">New resume</p>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Start a resume</h1>
-    <p class="mt-2 max-w-2xl text-sm text-slate-600">Choose a name and template. The builder will create starter sections for experience, education, skills, and projects.</p>
-  </div>
+<% start_flow_state = Resumes::StartFlowState.new(resume: @resume, step: params[:step]) %>
 
-  <%= render "form", resume: @resume %>
+<section class="space-y-5">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "New resume",
+    title: "Start a resume",
+    description: "Name the draft, keep the selected template, and jump straight into editing. You can browse more looks only when you need them.",
+    actions: [
+      { label: "Back to workspace", path: resumes_path, style: :secondary }
+    ],
+    density: :compact
+  ) %>
+
+  <% if start_flow_state.experience_step? %>
+    <%= render "start_flow_experience_step", resume: @resume, start_flow_state: start_flow_state %>
+  <% elsif start_flow_state.student_step? %>
+    <%= render "start_flow_student_step", resume: @resume, start_flow_state: start_flow_state %>
+  <% else %>
+    <%= render "form", resume: @resume, start_flow_state: start_flow_state %>
+  <% end %>
 </section>

@@ -1,0 +1,41 @@
+<%= form_with url: admin_llm_models_path, method: :get, class: "border-b border-canvas-200/80 bg-canvas-100/84 px-6 py-5", data: { controller: "autosave" } do |form| %>
+  <%= form.hidden_field :sort, value: sort %>
+  <%= form.hidden_field :direction, value: direction %>
+
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70">Filter models</p>
+        <p class="mt-1 text-sm leading-6 text-ink-700/80">Search by model name, identifier, or provider, then narrow the list by activation state or capability before adjusting workflow coverage.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <% if query.present? || status_filter.present? || capability_filter.present? %>
+          <%= link_to "Clear filters", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <% end %>
+        <%= form.submit "Apply", class: ui_button_classes(:primary, size: :sm) %>
+      </div>
+    </div>
+
+    <div class="grid flex-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_14rem_14rem_auto] xl:items-end">
+      <div class="space-y-2">
+        <%= form.label :query, "Search models", class: ui_label_classes %>
+        <%= form.search_field :query, value: query, placeholder: "Search by model, identifier, or provider", class: ui_input_classes, data: { action: "input->autosave#queue search->autosave#queue" } %>
+      </div>
+
+      <div class="space-y-2">
+        <%= form.label :status, "Status", class: ui_label_classes %>
+        <%= form.select :status, options_for_select([["All statuses", ""], ["Active", "active"], ["Inactive", "inactive"]], status_filter), {}, class: ui_input_classes, data: { action: "change->autosave#queue" } %>
+      </div>
+
+      <div class="space-y-2">
+        <%= form.label :capability, "Capability", class: ui_label_classes %>
+        <%= form.select :capability, options_for_select([["All capabilities", ""], ["Text", "text"], ["Vision", "vision"]], capability_filter), {}, class: ui_input_classes, data: { action: "change->autosave#queue" } %>
+      </div>
+
+      <div class="pb-1 md:col-span-2 xl:col-span-1 xl:text-right">
+        <p class="text-sm text-ink-700/70"><%= pluralize(total_count, "model") %></p>
+      </div>
+    </div>
+  </div>
+<% end %>

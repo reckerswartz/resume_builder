@@ -36,7 +36,7 @@ class SectionsController < ApplicationController
   def move
     authorize @resume, :update?
 
-    Resumes::PositionMover.new(record: @section, direction: params[:direction]).call
+    Resumes::PositionMover.new(record: @section, direction: params[:direction], position: params[:position]).call
     respond_to_success("Section order updated.")
   end
 

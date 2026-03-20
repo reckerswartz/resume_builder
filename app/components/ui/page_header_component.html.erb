@@ -1,0 +1,35 @@
+<section class="<%= wrapper_classes %>">
+  <div class="<%= divider_classes %>"></div>
+
+  <div class="<%= layout_classes %>">
+    <div>
+      <% if eyebrow.present? %>
+        <p class="<%= eyebrow_classes %>"><%= eyebrow %></p>
+      <% end %>
+      <h1 class="<%= title_classes %>"><%= title %></h1>
+      <% if description.present? %>
+        <p class="<%= description_classes %>"><%= description %></p>
+      <% end %>
+
+      <% if badges.any? %>
+        <div class="<%= badges_classes %>">
+          <% badges.each do |badge| %>
+            <span class="<%= helpers.ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if actions.any? %>
+      <div class="<%= actions_classes %>">
+        <% actions.each do |action| %>
+          <% if action[:method].present? && action[:method].to_sym != :get %>
+            <%= button_to action.fetch(:label), action.fetch(:path), method: action.fetch(:method), form_class: "inline-flex", class: helpers.ui_button_classes(action.fetch(:style, :secondary), size: action.fetch(:size, default_action_size)) %>
+          <% else %>
+            <%= link_to action.fetch(:label), action.fetch(:path), class: helpers.ui_button_classes(action.fetch(:style, :secondary), size: action.fetch(:size, default_action_size)) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>

@@ -1,0 +1,118 @@
+<% summary_step_state = resume_summary_step_state(resume) %>
+
+<%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
+  <%= render Ui::StepHeaderComponent.new(
+    title: "Professional summary",
+    description: "Use this step to shape the short narrative that appears near the top of the preview and exported PDF."
+  ) do %>
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Guided summary step",
+      title: "Keep the pitch focused",
+      description: "Search a nearby role, review a curated draft, and insert a plain-text summary without losing autosave or preview updates.",
+      padding: :sm
+    ) %>
+  <% end %>
+
+  <div class="space-y-6 px-6 py-6" data-controller="summary-suggestions">
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-4' ].join(' ') %>">
+      <div class="space-y-1">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Curated summary library</p>
+        <h3 class="text-base font-semibold text-ink-950">Search by job title</h3>
+        <p class="text-sm text-slate-500">Start from a curated summary, then refine it in your own voice before moving on.</p>
+      </div>
+
+      <%= form_with url: edit_resume_path(resume), method: :get, class: "space-y-4" do %>
+        <%= hidden_field_tag :step, current_step.fetch(:key) %>
+
+        <div>
+          <%= label_tag :summary_query, "Search by job title", class: ui_label_classes %>
+          <%= text_field_tag :summary_query, summary_step_state.query, placeholder: summary_step_state.search_placeholder, class: ui_input_classes %>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <%= submit_tag "Search summaries", class: ui_button_classes(:secondary), name: nil %>
+          <%= link_to "Clear search", edit_resume_path(resume, step: current_step.fetch(:key)), class: ui_button_classes(:ghost, size: :sm) %>
+        </div>
+      <% end %>
+
+      <% if summary_step_state.related_roles.any? %>
+        <div class="space-y-3">
+          <p class="text-sm font-medium text-ink-900">Related roles</p>
+
+          <div class="flex flex-wrap gap-2">
+            <% summary_step_state.related_roles.each do |role| %>
+              <%= link_to role.fetch(:title), edit_resume_path(resume, step: current_step.fetch(:key), summary_query: role.fetch(:query)), class: ui_filter_chip_classes(active: false) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 class="text-base font-semibold text-ink-950">Curated suggestions</h3>
+          <p class="text-sm text-slate-500"><%= summary_step_state.guidance_message %></p>
+        </div>
+
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= summary_step_state.results_label %></span>
+      </div>
+
+      <% if summary_step_state.results.any? %>
+        <div class="grid gap-4 xl:grid-cols-2">
+          <% summary_step_state.results.each do |suggestion| %>
+            <div class="<%= [ ui_inset_panel_classes(tone: :default, padding: :lg), 'space-y-4' ].join(' ') %>" data-summary-suggestions-card>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div class="space-y-2">
+                  <p class="text-sm font-semibold text-ink-950"><%= suggestion.fetch(:role_title) %></p>
+                  <div class="flex flex-wrap gap-2">
+                    <% if suggestion.fetch(:expert_recommended) %>
+                      <span class="<%= ui_badge_classes(:success) %>"><%= suggestion.fetch(:expert_badge_label) %></span>
+                    <% end %>
+                    <span class="<%= ui_badge_classes(:info) %>"><%= suggestion.fetch(:experience_badge_label) %></span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="<%= ui_button_classes(:secondary, size: :sm) %>"
+                  data-action="summary-suggestions#insert">
+                  Insert this summary
+                </button>
+              </div>
+
+              <p class="text-xs font-medium uppercase tracking-[0.18em] text-ink-700/70">Related roles: <span class="normal-case tracking-normal text-slate-500"><%= suggestion.fetch(:related_roles_text) %></span></p>
+              <p class="whitespace-pre-line text-sm leading-7 text-slate-600" data-summary-suggestions-text><%= suggestion.fetch(:summary) %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <%= render Ui::EmptyStateComponent.new(
+          title: summary_step_state.empty_state_title,
+          description: summary_step_state.empty_state_description,
+          padding: :sm,
+          tone: :subtle,
+          align: :left
+        ) %>
+      <% end %>
+    </div>
+
+    <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6" do |form| %>
+      <% if resume.errors.any? %>
+        <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
+          <%= resume.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :summary, "Professional summary", class: ui_label_classes %>
+        <%= form.text_area :summary, rows: 8, class: ui_input_classes, data: { summary_suggestions_target: 'input' } %>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-slate-500">Aim for three or four lines that help the preview feel complete before you move into the final review step.</p>
+        <%= form.submit "Save summary", class: ui_button_classes(:primary) %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

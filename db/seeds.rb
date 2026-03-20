@@ -15,9 +15,14 @@ seed_templates = [
     description: "Bold headings with balanced spacing for product and tech resumes.",
     active: true,
     layout_config: {
+      "family" => "modern",
       "variant" => "modern",
       "accent_color" => "#0F172A",
-      "font_scale" => "base"
+      "font_scale" => "base",
+      "density" => "comfortable",
+      "column_count" => "single_column",
+      "theme_tone" => "slate",
+      "supports_headshot" => false
     }
   },
   {
@@ -26,9 +31,80 @@ seed_templates = [
     description: "A compact, traditional layout tuned for ATS-friendly exports.",
     active: true,
     layout_config: {
+      "family" => "classic",
       "variant" => "classic",
       "accent_color" => "#1D4ED8",
-      "font_scale" => "sm"
+      "font_scale" => "sm",
+      "density" => "compact",
+      "column_count" => "single_column",
+      "theme_tone" => "blue",
+      "supports_headshot" => false
+    }
+  },
+  {
+    name: "ATS Minimal",
+    slug: "ats-minimal",
+    description: "A stripped-down layout tuned for ATS-friendly screening and dense professional histories.",
+    active: true,
+    layout_config: {
+      "family" => "ats-minimal",
+      "variant" => "ats-minimal",
+      "accent_color" => "#334155",
+      "font_scale" => "sm",
+      "density" => "compact",
+      "column_count" => "single_column",
+      "theme_tone" => "slate",
+      "supports_headshot" => false
+    }
+  },
+  {
+    name: "Professional",
+    slug: "professional",
+    description: "Balanced structure with conservative hierarchy for operations, management, and consulting resumes.",
+    active: true,
+    layout_config: {
+      "family" => "professional",
+      "variant" => "professional",
+      "accent_color" => "#0F4C81",
+      "font_scale" => "base",
+      "density" => "comfortable",
+      "column_count" => "single_column",
+      "theme_tone" => "blue",
+      "supports_headshot" => false
+    }
+  },
+  {
+    name: "Modern Clean",
+    slug: "modern-clean",
+    description: "Spacious contemporary cards with lighter chrome for product, design, and tech profiles.",
+    active: true,
+    layout_config: {
+      "family" => "modern-clean",
+      "variant" => "modern-clean",
+      "accent_color" => "#0F766E",
+      "font_scale" => "base",
+      "density" => "relaxed",
+      "column_count" => "single_column",
+      "theme_tone" => "teal",
+      "supports_headshot" => false
+    }
+  },
+  {
+    name: "Sidebar Accent",
+    slug: "sidebar-accent",
+    description: "A two-column layout that tucks supporting details into a tinted sidebar without duplicating content.",
+    active: true,
+    layout_config: {
+      "family" => "sidebar-accent",
+      "variant" => "sidebar-accent",
+      "accent_color" => "#4338CA",
+      "font_scale" => "base",
+      "density" => "comfortable",
+      "column_count" => "two_column",
+      "theme_tone" => "indigo",
+      "supports_headshot" => false,
+      "sidebar_position" => "left",
+      "sidebar_section_types" => %w[skills education]
     }
   }
 ]
@@ -44,6 +120,94 @@ seed_platform_setting = {
     "support_email" => "support@example.com"
   }
 }
+
+seed_llm_providers = [
+  {
+    name: "Ollama Local",
+    slug: "ollama-local",
+    adapter: "ollama",
+    base_url: "http://127.0.0.1:11434",
+    api_key_env_var: nil,
+    active: true,
+    settings: {
+      "request_timeout_seconds" => 30
+    }
+  },
+  {
+    name: "NVIDIA Build",
+    slug: "nvidia-build",
+    adapter: "nvidia_build",
+    base_url: "https://integrate.api.nvidia.com",
+    api_key_env_var: "NVIDIA_API_KEY",
+    active: true,
+    settings: {
+      "request_timeout_seconds" => 45
+    }
+  }
+].freeze
+
+seed_llm_models = [
+  {
+    provider_slug: "ollama-local",
+    name: "Llama 3.2",
+    identifier: "llama3.2:latest",
+    active: true,
+    supports_text: true,
+    supports_vision: false,
+    settings: {
+      "temperature" => 0.2,
+      "max_output_tokens" => 300
+    },
+    metadata: {
+      "seeded" => true
+    }
+  },
+  {
+    provider_slug: "ollama-local",
+    name: "Llava",
+    identifier: "llava:latest",
+    active: true,
+    supports_text: true,
+    supports_vision: true,
+    settings: {
+      "temperature" => 0.2,
+      "max_output_tokens" => 300
+    },
+    metadata: {
+      "seeded" => true
+    }
+  },
+  {
+    provider_slug: "nvidia-build",
+    name: "Gemma 2 9B IT",
+    identifier: "google/gemma-2-9b-it",
+    active: true,
+    supports_text: true,
+    supports_vision: false,
+    settings: {
+      "temperature" => 0.2,
+      "max_output_tokens" => 300
+    },
+    metadata: {
+      "seeded" => true
+    }
+  },
+  {
+    provider_slug: "nvidia-build",
+    name: "Phi-4 Multimodal Instruct",
+    identifier: "microsoft/phi-4-multimodal-instruct",
+    active: true,
+    supports_text: true,
+    supports_vision: true,
+    settings: {
+      "temperature" => 0.2,
+      "max_output_tokens" => 300
+    },
+    metadata: {
+      "seeded" => true
+    }
+  }
+].freeze
 
 seed_users = if Rails.env.development? || Rails.env.test?
   seed_random = Random.new(ENV.fetch("SEED_RANDOM", Rails.env.test? ? "20260319" : "20260320").to_i)
@@ -65,7 +229,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
 
   build_seed_resume = lambda do |
     email_address:, template_slug:, accent_color:, primary_title:, secondary_title:, focus:, project_name:,
-    project_role:, skills:|
+    project_role:, skills:, driving_licence:, personal_details:|
     full_name = Faker::Name.name
     current_company = Faker::Company.name
     previous_company = Faker::Company.name
@@ -92,8 +256,10 @@ seed_users = if Rails.env.development? || Rails.env.test?
         "phone" => Faker::PhoneNumber.phone_number,
         "location" => hometown,
         "website" => website,
-        "linkedin" => "linkedin.com/in/#{full_name_slug.delete("-")}"
+        "linkedin" => "linkedin.com/in/#{full_name_slug.delete("-")}",
+        "driving_licence" => driving_licence
       },
+      personal_details: personal_details,
       settings: {
         "accent_color" => accent_color,
         "show_contact_icons" => true,
@@ -173,7 +339,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
 
   build_seed_user = lambda do |
     label:, role:, email_address:, password:, template_slug:, accent_color:, primary_title:,
-    secondary_title:, focus:, project_name:, project_role:, skills:|
+    secondary_title:, focus:, project_name:, project_role:, skills:, driving_licence:, personal_details:|
     {
       label:,
       role:,
@@ -189,7 +355,9 @@ seed_users = if Rails.env.development? || Rails.env.test?
           focus:,
           project_name:,
           project_role:,
-          skills:
+          skills:,
+          driving_licence:,
+          personal_details:
         )
       ]
     }
@@ -208,7 +376,14 @@ seed_users = if Rails.env.development? || Rails.env.test?
       focus: "Rails Delivery",
       project_name: "Resume Builder",
       project_role: "Product Lead",
-      skills: ["Ruby on Rails", "Hotwire", "Product Leadership"]
+      skills: ["Ruby on Rails", "Hotwire", "Product Leadership"],
+      driving_licence: "Class B",
+      personal_details: {
+        "date_of_birth" => "",
+        "nationality" => "Indian",
+        "marital_status" => "",
+        "visa_status" => "Authorized to work in India"
+      }
     ),
     build_seed_user.call(
       label: "Demo User",
@@ -222,7 +397,14 @@ seed_users = if Rails.env.development? || Rails.env.test?
       focus: "UX Systems",
       project_name: "Portfolio Refresh",
       project_role: "Designer",
-      skills: ["Product Design", "Design Systems", "User Research"]
+      skills: ["Product Design", "Design Systems", "User Research"],
+      driving_licence: "Class C",
+      personal_details: {
+        "date_of_birth" => "",
+        "nationality" => "United States",
+        "marital_status" => "",
+        "visa_status" => "U.S. citizen"
+      }
     )
   ]
 else
@@ -237,6 +419,22 @@ ApplicationRecord.transaction do
 
   platform_setting = PlatformSetting.find_or_initialize_by(name: "global")
   platform_setting.update!(seed_platform_setting)
+
+  llm_providers_by_slug = seed_llm_providers.each_with_object({}) do |attributes, registry|
+    llm_provider = LlmProvider.find_or_initialize_by(slug: attributes.fetch(:slug))
+    llm_provider.update!(attributes)
+    registry[attributes.fetch(:slug)] = llm_provider
+  end
+
+  seed_llm_models.each do |attributes|
+    llm_provider = llm_providers_by_slug.fetch(attributes.fetch(:provider_slug))
+    llm_model = LlmModel.find_or_initialize_by(
+      llm_provider: llm_provider,
+      identifier: attributes.fetch(:identifier)
+    )
+
+    llm_model.update!(attributes.except(:provider_slug, :identifier).merge(identifier: attributes.fetch(:identifier)))
+  end
 
   unless Rails.env.production?
     seed_users.each do |user_definition|
@@ -259,6 +457,7 @@ ApplicationRecord.transaction do
           headline: resume_definition.fetch(:headline),
           summary: resume_definition.fetch(:summary),
           contact_details: resume_definition.fetch(:contact_details),
+          personal_details: resume_definition.fetch(:personal_details, {}),
           settings: resume_definition.fetch(:settings),
           template: template
         )
@@ -280,6 +479,28 @@ ApplicationRecord.transaction do
         end
       end
     end
+
+    demo_admin = User.find_by(email_address: "admin@resume-builder.local")
+    sample_error_log = ErrorLog.find_or_initialize_by(reference_id: "ERR-SEED-0001")
+    sample_error_log.assign_attributes(
+      source: :request,
+      error_class: "StandardError",
+      message: "Sample tracked error for the admin dashboard.",
+      context: {
+        request_id: "seed-request-0001",
+        path: "/resumes",
+        method: "GET",
+        user_id: demo_admin&.id,
+        note: "Generated from db/seeds.rb for admin monitoring previews."
+      },
+      backtrace_lines: [
+        "app/controllers/resumes_controller.rb:12:in `index'",
+        "app/services/errors/tracker.rb:15:in `capture'"
+      ],
+      duration_ms: 184,
+      occurred_at: Time.current - 2.hours
+    )
+    sample_error_log.save!
   end
 end
 

@@ -12,7 +12,7 @@ VCR.configure do |config|
     match_requests_on: %i[method uri body]
   }
 
-  %w[OPENAI_API_KEY ANTHROPIC_API_KEY].each do |key|
+  %w[OPENAI_API_KEY ANTHROPIC_API_KEY NVIDIA_API_KEY].each do |key|
     value = ENV[key]
     config.filter_sensitive_data("<#{key}>") { value } if value.present?
   end

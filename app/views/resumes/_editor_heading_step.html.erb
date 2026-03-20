@@ -1,0 +1,82 @@
+<%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
+  <%= render Ui::StepHeaderComponent.new(
+    title: "Heading details",
+    description: "Keep this step focused on the name, headline, and contact details employers actually need first."
+  ) do %>
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Optional next step",
+      title: "Move extras out of the way",
+      description: "Website, LinkedIn, driving licence, and other optional personal details live in the next step when they matter for the role or locale.",
+      padding: :sm
+    ) do %>
+      <div class="flex flex-wrap gap-2">
+        <%= link_to "Open personal details", edit_resume_path(resume, step: "personal_details"), class: ui_button_classes(:secondary, size: :sm) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
+    <% if resume.errors.any? %>
+      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
+        <%= resume.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <%= form.label :title, class: ui_label_classes %>
+        <%= form.text_field :title, class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= form.label :headline, class: ui_label_classes %>
+        <%= form.text_field :headline, class: ui_input_classes %>
+      </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div>
+        <%= label_tag "resume_contact_details_first_name", "First name", class: ui_label_classes %>
+        <%= text_field_tag "resume[contact_details][first_name]", resume.contact_field("first_name"), class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= label_tag "resume_contact_details_surname", "Surname", class: ui_label_classes %>
+        <%= text_field_tag "resume[contact_details][surname]", resume.contact_field("surname"), class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= label_tag "resume_contact_details_email", "Email *", class: ui_label_classes %>
+        <%= email_field_tag "resume[contact_details][email]", resume.contact_field("email"), required: true, class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= label_tag "resume_contact_details_phone", "Phone", class: ui_label_classes %>
+        <%= telephone_field_tag "resume[contact_details][phone]", resume.contact_field("phone"), class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= label_tag "resume_contact_details_city", "City", class: ui_label_classes %>
+        <%= text_field_tag "resume[contact_details][city]", resume.contact_field("city"), class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= label_tag "resume_contact_details_country", "Country", class: ui_label_classes %>
+        <%= text_field_tag "resume[contact_details][country]", resume.contact_field("country"), class: ui_input_classes %>
+      </div>
+
+      <div>
+        <%= label_tag "resume_contact_details_pin_code", "Pin code", class: ui_label_classes %>
+        <%= text_field_tag "resume[contact_details][pin_code]", resume.contact_field("pin_code"), class: ui_input_classes %>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-slate-500">Changes save in place and keep the preview in sync while you move between guided steps.</p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <%= link_to "Open personal details", edit_resume_path(resume, step: "personal_details"), class: ui_button_classes(:secondary) %>
+        <%= form.submit "Save heading", class: ui_button_classes(:primary) %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,93 @@
+<%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
+  <%= render Ui::StepHeaderComponent.new(
+    title: "Personal details",
+    description: "Add profile links, credentials, and optional personal information only when it is relevant for the role or application."
+  ) do %>
+    <%= render Ui::WidgetCardComponent.new(
+      eyebrow: "Optional step",
+      title: "Skip anything that does not belong on this resume",
+      description: "Most resumes can leave many of these fields blank. Add them only when a role, country, or application asks for them.",
+      padding: :sm
+    ) do %>
+      <div class="flex flex-wrap gap-2">
+        <% if next_step_path.present? %>
+          <%= link_to "Skip for now", next_step_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <% end %>
+        <%= link_to "Back to heading", edit_resume_path(resume, step: "heading"), class: ui_button_classes(:secondary, size: :sm) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
+    <% if resume.errors.any? %>
+      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
+        <%= resume.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
+      <div class="space-y-1">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Profile links and credentials</p>
+        <h3 class="text-base font-semibold text-ink-950">Contact details that may still belong near the top of the resume</h3>
+        <p class="text-sm text-slate-500">Use this area for links and credentials that genuinely help a reviewer contact you or verify your background.</p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div>
+          <%= label_tag "resume_contact_details_website", "Website", class: ui_label_classes %>
+          <%= url_field_tag "resume[contact_details][website]", resume.contact_field("website"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_contact_details_linkedin", "LinkedIn", class: ui_label_classes %>
+          <%= url_field_tag "resume[contact_details][linkedin]", resume.contact_field("linkedin"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_contact_details_driving_licence", "Driving licence", class: ui_label_classes %>
+          <%= text_field_tag "resume[contact_details][driving_licence]", resume.contact_field("driving_licence"), class: ui_input_classes %>
+        </div>
+      </div>
+    </div>
+
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
+      <div class="space-y-1">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70">Optional personal information</p>
+        <h3 class="text-base font-semibold text-ink-950">Only add fields you are comfortable sharing</h3>
+        <p class="text-sm text-slate-500">Most resumes do not need these details. Add them only when they are expected for the role or application process.</p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div>
+          <%= label_tag "resume_personal_details_date_of_birth", "Date of Birth", class: ui_label_classes %>
+          <%= date_field_tag "resume[personal_details][date_of_birth]", resume.personal_detail_field("date_of_birth"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_personal_details_nationality", "Nationality", class: ui_label_classes %>
+          <%= text_field_tag "resume[personal_details][nationality]", resume.personal_detail_field("nationality"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_personal_details_marital_status", "Marital Status", class: ui_label_classes %>
+          <%= text_field_tag "resume[personal_details][marital_status]", resume.personal_detail_field("marital_status"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_personal_details_visa_status", "Visa Status", class: ui_label_classes %>
+          <%= text_field_tag "resume[personal_details][visa_status]", resume.personal_detail_field("visa_status"), class: ui_input_classes %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-slate-500">Only keep fields that clearly help this application.</p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <% if next_step_path.present? %>
+          <%= link_to "Skip for now", next_step_path, class: ui_button_classes(:secondary) %>
+        <% end %>
+        <%= form.submit "Save personal details", class: ui_button_classes(:primary) %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

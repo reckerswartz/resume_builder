@@ -1,58 +1,202 @@
-<section class="space-y-8">
-  <div>
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Admin</p>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
-    <p class="mt-2 text-sm text-slate-600">Monitor template availability, feature flags, and background job activity.</p>
-  </div>
+<% quick_links = [
+     [ "Manage templates", admin_templates_path ],
+     [ "Manage LLM providers", admin_llm_providers_path ],
+     [ "Manage LLM models", admin_llm_models_path ],
+     [ "Feature settings", admin_settings_path ],
+     [ "Job logs", admin_job_logs_path ],
+     [ "Error logs", admin_error_logs_path ],
+     [ "Back to resumes", resumes_path ]
+   ] %>
+<% healthy_processes = [ @queue_overview.processes - @queue_overview.stale_processes, 0 ].max %>
+<% operational_metrics = [
+     {
+       label: "Queue backlog",
+       value: @queue_overview.unavailable? ? "N/A" : @queue_overview.backlog,
+       description: @queue_overview.unavailable? ? @queue_overview.error_message : "#{@queue_overview.queued} ready, #{@queue_overview.scheduled} scheduled, #{@queue_overview.blocked} blocked."
+     },
+     {
+       label: "Running now",
+       value: @job_log_stats.running,
+       description: "#{pluralize(@job_log_stats.queued, "queued job")} and #{throughput_label(@job_log_stats.completed_last_hour)} across recent activity."
+     },
+     {
+       label: "Failure rate",
+       value: number_to_percentage(@job_log_stats.failure_rate, precision: 1),
+       description: "#{pluralize(@job_log_stats.failed, "failure")} across #{pluralize(@job_log_stats.completed, "completed job")}."
+     },
+     {
+       label: "Average runtime",
+       value: job_duration_label(@job_log_stats.average_duration_seconds),
+       description: "#{pluralize(@job_log_stats.stale_running, "stale running job")} currently flagged for follow-up."
+     }
+   ] %>
+<% attention_required = @queue_overview.unavailable? || @queue_overview.stale_processes.positive? || @job_log_stats.failed.positive? %>
 
-  <div class="grid gap-5 md:grid-cols-3">
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <p class="text-sm font-medium text-slate-500">Resumes</p>
-      <p class="mt-3 text-3xl font-semibold tracking-tight text-slate-900"><%= @resumes_count %></p>
-    </div>
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <p class="text-sm font-medium text-slate-500">Templates</p>
-      <p class="mt-3 text-3xl font-semibold tracking-tight text-slate-900"><%= @templates_count %></p>
-      <p class="mt-2 text-sm text-slate-500"><%= @active_templates_count %> active</p>
-    </div>
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <p class="text-sm font-medium text-slate-500">LLM access</p>
-      <p class="mt-3 text-3xl font-semibold tracking-tight text-slate-900"><%= @platform_setting.feature_enabled?("llm_access") ? "On" : "Off" %></p>
-      <p class="mt-2 text-sm text-slate-500">Resume suggestions: <%= @platform_setting.feature_enabled?("resume_suggestions") ? "enabled" : "disabled" %></p>
-    </div>
-  </div>
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin hub",
+    title: "Dashboard",
+    description: "Review queue health, recent background work, and captured application errors from one place.",
+    badges: [
+      { label: "#{@active_templates_count} active template#{"s" unless @active_templates_count == 1}", tone: :neutral },
+      { label: "Logged errors: #{@error_logs_count}", tone: :neutral }
+    ],
+    actions: [
+      { label: "Manage templates", path: admin_templates_path, style: :primary },
+      { label: "Manage models", path: admin_llm_models_path, style: :secondary },
+      { label: "Feature settings", path: admin_settings_path, style: :secondary }
+    ],
+    density: :compact
+  ) %>
 
-  <div class="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-    <div class="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 class="text-xl font-semibold tracking-tight text-slate-900">Quick links</h2>
-      <div class="flex flex-col gap-3">
-        <%= link_to "Manage templates", admin_templates_path, class: "rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" %>
-        <%= link_to "Feature settings", admin_settings_path, class: "rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" %>
-        <%= link_to "Job logs", admin_job_logs_path, class: "rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" %>
-        <%= link_to "Back to resumes", resumes_path, class: "rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" %>
-      </div>
-    </div>
+  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg, extra_classes: "relative overflow-hidden") do %>
+    <div class="absolute -right-10 top-4 h-20 w-20 rounded-full atelier-glow opacity-25"></div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <div class="flex items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <h2 class="text-xl font-semibold tracking-tight text-slate-900">Recent job activity</h2>
-        <%= link_to "View all", admin_job_logs_path, class: "text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4" %>
-      </div>
-
-      <% if @recent_job_logs.any? %>
-        <div class="mt-4 space-y-3">
-          <% @recent_job_logs.each do |job_log| %>
-            <%= link_to admin_job_log_path(job_log), class: "flex items-center justify-between gap-4 rounded-2xl border border-slate-200 px-4 py-3 transition hover:border-slate-300 hover:bg-slate-50" do %>
-              <div>
-                <p class="text-sm font-medium text-slate-900"><%= job_log.job_type %></p>
-                <p class="mt-1 text-sm text-slate-500"><%= l(job_log.created_at, format: :short) %></p>
-              </div>
-              <span class="rounded-full px-3 py-1 text-xs font-medium <%= job_log_status_classes(job_log) %>"><%= job_log.status.humanize %></span>
-            <% end %>
-          <% end %>
+    <div class="relative space-y-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+            Quick links
+          </span>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump straight to the area that needs attention</h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the dashboard for signals first, then open the detail pages only when a setting, queue, or incident needs a closer look.</p>
         </div>
+
+        <span class="<%= ui_badge_classes(attention_required ? :warning : :success) %>"><%= attention_required ? "Needs follow-up" : "Stable now" %></span>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <% quick_links.each_with_index do |(label, path), index| %>
+          <%= link_to label, path, class: ui_button_classes(index.zero? ? :primary : :secondary, size: :sm) %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= render Ui::DashboardPanelComponent.new(
+    eyebrow: "Platform snapshot",
+    title: "Runtime and queue health",
+    description: "Check backlog, running jobs, failures, and worker health before opening the detailed logs.",
+    padding: :sm,
+    tone: :subtle,
+    density: :compact
+  ) do %>
+    <div class="grid gap-3 lg:grid-cols-3">
+      <%= render Ui::WidgetCardComponent.new(
+        eyebrow: "Job throughput",
+        title: throughput_label(@job_log_stats.completed_last_hour),
+        description: "#{pluralize(@job_log_stats.stale_running, "stale running job")} and #{pluralize(@job_log_stats.failed, "failed job")} currently tracked.",
+        badge: number_to_percentage(@job_log_stats.failure_rate, precision: 0),
+        badge_classes: ui_badge_classes(@job_log_stats.failed.positive? ? :warning : :success),
+        padding: :sm,
+        title_size: :base
+      ) %>
+
+      <% if @queue_overview.unavailable? %>
+        <%= render Ui::WidgetCardComponent.new(
+          eyebrow: "Queue runtime",
+          title: "Unavailable",
+          description: @queue_overview.error_message,
+          badge: "Queue",
+          badge_classes: ui_badge_classes(:warning),
+          padding: :sm,
+          title_size: :base
+        ) %>
       <% else %>
-        <p class="mt-4 text-sm text-slate-500">No background jobs have been tracked yet.</p>
+        <%= render Ui::WidgetCardComponent.new(
+          eyebrow: "Queue backlog",
+          title: @queue_overview.backlog,
+          description: "#{@queue_overview.queued} ready, #{@queue_overview.scheduled} scheduled, #{@queue_overview.blocked} blocked.",
+          badge: "#{@queue_overview.running} running",
+          badge_classes: ui_badge_classes(:neutral),
+          padding: :sm,
+          title_size: :xl
+        ) %>
+
+        <%= render Ui::WidgetCardComponent.new(
+          eyebrow: "Worker health",
+          title: "#{healthy_processes}/#{@queue_overview.processes}",
+          description: "#{pluralize(@queue_overview.failed, "queue failure")} and #{pluralize(@queue_overview.stale_processes, "stale worker")} currently visible.",
+          badge: @queue_overview.stale_processes.zero? ? "Healthy" : "#{pluralize(@queue_overview.stale_processes, "stale")}",
+          badge_classes: ui_badge_classes(@queue_overview.stale_processes.zero? ? :success : :warning),
+          padding: :sm,
+          title_size: :xl
+        ) %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="space-y-6">
+    <div class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+      <% operational_metrics.each do |metric| %>
+        <%= render Ui::MetricCardComponent.new(
+          label: metric.fetch(:label),
+          value: metric.fetch(:value),
+          description: metric.fetch(:description)
+        ) %>
+      <% end %>
+    </div>
+
+    <div class="grid gap-6 2xl:grid-cols-2">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Background jobs",
+        title: "Recent job activity",
+        description: "Latest tracked background work across exports and other async workflows.",
+        action_label: "View all",
+        action_path: admin_job_logs_path,
+        density: :compact
+      ) do %>
+          <% if @recent_job_logs.any? %>
+            <div class="space-y-3">
+              <% @recent_job_logs.each do |job_log| %>
+                <%= render Ui::ReportRowComponent.new(
+                  title: job_log.job_type,
+                  subtitle: l(job_log.created_at, format: :short),
+                  badge: job_log.status.humanize,
+                  badge_classes: job_log_status_classes(job_log),
+                  path: admin_job_log_path(job_log)
+                ) %>
+              <% end %>
+            </div>
+          <% else %>
+            <%= render Ui::EmptyStateComponent.new(
+              description: "No background jobs have been tracked yet.",
+              padding: :sm,
+              tone: :subtle,
+              align: :left
+            ) %>
+          <% end %>
+      <% end %>
+
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Error tracking",
+        title: "Recent error activity",
+        description: "Unhandled request and job failures captured with reference IDs for debugging.",
+        action_label: "View all",
+        action_path: admin_error_logs_path,
+        density: :compact
+      ) do %>
+          <% if @recent_error_logs.any? %>
+            <div class="space-y-3">
+              <% @recent_error_logs.each do |error_log| %>
+                <%= render Ui::ReportRowComponent.new(
+                  title: error_log.reference_id,
+                  subtitle: "#{error_log.error_class} · #{l(error_log.occurred_at, format: :short)}",
+                  badge: error_log.source.humanize,
+                  badge_classes: error_log_source_classes(error_log),
+                  path: admin_error_log_path(error_log)
+                ) %>
+              <% end %>
+            </div>
+          <% else %>
+            <%= render Ui::EmptyStateComponent.new(
+              description: "No application errors have been recorded yet.",
+              padding: :sm,
+              tone: :subtle,
+              align: :left
+            ) %>
+          <% end %>
       <% end %>
     </div>
   </div>

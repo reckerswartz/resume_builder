@@ -1,0 +1,114 @@
+<div class="min-w-0 overflow-x-auto">
+  <table class="min-w-full table-fixed divide-y divide-canvas-200/80 xl:table-auto">
+    <thead class="bg-canvas-50/72 text-left text-sm font-medium text-ink-700/70">
+      <tr>
+        <th class="px-4 py-4 xl:px-6">
+          <%= link_to admin_llm_models_path(table_sort_params(column: "name", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Model</span>
+            <%= table_sort_indicator("name", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-4 py-4 xl:px-6">
+          <%= link_to admin_llm_models_path(table_sort_params(column: "provider", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Provider</span>
+            <%= table_sort_indicator("provider", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-4 py-4 xl:px-6">Capabilities</th>
+        <th class="px-4 py-4 xl:px-6">Orchestration</th>
+        <th class="px-4 py-4 xl:px-6">
+          <%= link_to admin_llm_models_path(table_sort_params(column: "active", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Status</span>
+            <%= table_sort_indicator("active", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-4 py-4 xl:px-6">
+          <%= link_to admin_llm_models_path(table_sort_params(column: "updated_at", current_sort: sort, current_direction: direction, params: sort_params)), class: "inline-flex items-center gap-2 transition hover:text-ink-950" do %>
+            <span>Updated</span>
+            <%= table_sort_indicator("updated_at", current_sort: sort, current_direction: direction) %>
+          <% end %>
+        </th>
+        <th class="px-4 py-4 text-left xl:px-6 xl:text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-canvas-200/80 text-sm text-ink-700/80">
+      <% if llm_models.any? %>
+        <% llm_models.each do |llm_model| %>
+          <tr class="align-top transition hover:bg-canvas-100/70">
+            <td class="px-4 py-4 xl:px-6">
+              <div class="flex items-start gap-3">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-canvas-100 text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/80">
+                  <%= llm_model.name.to_s.first(2) %>
+                </div>
+
+                <div class="min-w-0">
+                  <p class="font-medium text-ink-950"><%= llm_model.name %></p>
+                  <p class="mt-1 break-all text-ink-700/80"><%= llm_model_metadata_summary(llm_model) %></p>
+                  <% if llm_model.family.present? || llm_model.parameter_size.present? %>
+                    <p class="mt-2 break-words text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/55"><%= [ llm_model.family, llm_model.parameter_size ].compact_blank.join(" · ") %></p>
+                  <% end %>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4 xl:px-6">
+              <p class="font-medium text-ink-950"><%= llm_model.llm_provider.name %></p>
+              <p class="mt-1 break-words text-ink-700/80"><%= llm_model_runtime_summary(llm_model) %></p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(llm_model.llm_provider.configured_for_requests? ? :success : :warning) %>"><%= llm_model.llm_provider.configured_for_requests? ? "Provider ready" : "Provider setup" %></span>
+              </div>
+            </td>
+            <td class="px-4 py-4 xl:px-6">
+              <div class="flex flex-wrap gap-2">
+                <% llm_model_capability_labels(llm_model).each do |label| %>
+                  <span class="<%= ui_badge_classes(:neutral) %>"><%= label %></span>
+                <% end %>
+              </div>
+              <% if llm_model.modality_summary.present? %>
+                <p class="mt-2 break-words text-ink-700/80"><%= llm_model.modality_summary %></p>
+              <% end %>
+            </td>
+            <td class="px-4 py-4 xl:px-6">
+              <div class="flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(llm_model_orchestration_status_tone(llm_model)) %>"><%= llm_model_orchestration_status_badge_label(llm_model) %></span>
+                <span class="<%= ui_badge_classes(llm_model.llm_model_assignments.any? ? :success : :neutral) %>"><%= pluralize(llm_model.llm_model_assignments.size, "role") %></span>
+              </div>
+              <p class="mt-2 break-words text-ink-700/80"><%= llm_model_assignment_summary(llm_model) %></p>
+              <p class="mt-2 hidden break-words text-xs leading-6 text-ink-700/65 xl:block"><%= llm_model_orchestration_status_label(llm_model) %></p>
+            </td>
+            <td class="px-4 py-4 xl:px-6">
+              <div class="flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(llm_model_source_badge_tone(llm_model)) %>"><%= llm_model_catalog_label(llm_model) %></span>
+                <span class="<%= ui_badge_classes(llm_model_badge_tone(llm_model)) %>"><%= llm_model.active? ? "Active" : "Inactive" %></span>
+              </div>
+              <p class="mt-2 hidden break-words text-ink-700/80 xl:block"><%= llm_model.provider_synced? ? "Managed by provider sync." : "Maintained manually in the registry." %></p>
+            </td>
+            <td class="px-4 py-4 xl:px-6">
+              <p class="font-medium text-ink-950"><%= l(llm_model.updated_at, format: :short) %></p>
+              <p class="mt-1 hidden text-ink-700/70 xl:block"><%= time_ago_in_words(llm_model.updated_at) %> ago</p>
+            </td>
+            <td class="px-4 py-4 text-left xl:px-6 xl:text-right">
+              <div class="flex flex-col gap-2 xl:inline-flex xl:flex-row xl:justify-end">
+                <%= link_to "View", admin_llm_model_path(llm_model), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %>
+                <%= link_to "Edit", edit_admin_llm_model_path(llm_model), class: ui_button_classes(:primary, size: :sm), data: { turbo_frame: "_top" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="7" class="px-6 py-6">
+            <%= render Ui::EmptyStateComponent.new(
+              title: "No models match the current filters.",
+              description: "Try clearing the current filters or register a new model.",
+              action_label: "Clear filters",
+              action_path: admin_llm_models_path,
+              action_style: :secondary,
+              padding: :sm,
+              tone: :subtle
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

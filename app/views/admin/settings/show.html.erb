@@ -1,42 +1,360 @@
-<section class="space-y-6">
-  <div>
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Admin</p>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Platform settings</h1>
-    <p class="mt-2 text-sm text-slate-600">Control feature availability and shared platform preferences.</p>
-  </div>
+<% feature_flags = feature_flags_for_settings(@platform_setting) %>
+<% enabled_feature_count = feature_flags.count { |flag| flag[:enabled] } %>
+<% default_template_slug = @platform_setting.preferences.fetch("default_template_slug", "modern") %>
+<% support_email = @platform_setting.preferences.fetch("support_email", "support@example.com") %>
+<% text_primary_model = settings_primary_llm_model(@llm_assignment_model_ids, :text_generation, @text_llm_models) %>
+<% text_verification_models = settings_selected_llm_models(@llm_assignment_model_ids, :text_verification, @text_llm_models) %>
+<% text_verification_model_ids = selected_llm_model_ids(@llm_assignment_model_ids, :text_verification) %>
+<% vision_primary_model = settings_primary_llm_model(@llm_assignment_model_ids, :vision_generation, @vision_llm_models) %>
+<% vision_verification_models = settings_selected_llm_models(@llm_assignment_model_ids, :vision_verification, @vision_llm_models) %>
+<% vision_verification_model_ids = selected_llm_model_ids(@llm_assignment_model_ids, :vision_verification) %>
+<% cloud_import_provider_states = cloud_import_provider_states_for_settings %>
+<% configured_cloud_import_provider_count = cloud_import_provider_states.count { |provider| provider.fetch(:configured) } %>
+<% hub_sections = [
+     { id: "feature-access", label: "Feature access", caption: "Rollout and feature gating" },
+     { id: "platform-defaults", label: "Platform defaults", caption: "Default template and support contact" },
+     { id: "cloud-import-connectors", label: "Cloud import connectors", caption: "Provider readiness and environment checks" },
+     { id: "llm-orchestration", label: "LLM orchestration", caption: "Generation and verification workflows" }
+   ] %>
+<% workflow_ready_count = [text_primary_model.present?, vision_primary_model.present?].count(true) %>
 
-  <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-    <%= form_with model: @platform_setting, url: admin_settings_path, method: :patch, class: "space-y-8" do |form| %>
-      <div>
-        <h2 class="text-xl font-semibold tracking-tight text-slate-900">Feature flags</h2>
-        <div class="mt-4 space-y-4">
-          <% [["llm_access", "Enable LLM access"], ["resume_suggestions", "Enable resume suggestions"], ["autofill_content", "Enable autofill content"]].each do |key, label| %>
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-              <%= hidden_field_tag "platform_setting[feature_flags][#{key}]", false %>
-              <label class="flex items-center justify-between gap-4">
-                <span class="text-sm font-medium text-slate-700"><%= label %></span>
-                <%= check_box_tag "platform_setting[feature_flags][#{key}]", true, @platform_setting.feature_flags.fetch(key, false), class: "h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-400" %>
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "Admin settings",
+    title: "Platform settings",
+    description: "Control feature access, platform defaults, cloud-import readiness, and model assignments from one shared admin surface.",
+    badges: [
+      { label: "#{enabled_feature_count}/#{feature_flags.size} enabled", tone: :neutral },
+      { label: "#{@llm_providers_count} providers", tone: :neutral },
+      { label: "#{@llm_models.count} models", tone: :neutral }
+    ],
+    actions: [
+      { label: "Manage templates", path: admin_templates_path, style: :secondary },
+      { label: "Manage providers", path: admin_llm_providers_path, style: :secondary },
+      { label: "Manage models", path: admin_llm_models_path, style: :primary }
+    ],
+    density: :compact
+  ) %>
+
+  <%= form_with model: @platform_setting, url: admin_settings_path, method: :patch, class: "grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]" do |form| %>
+    <% if @platform_setting.errors.any? %>
+      <div class="xl:col-span-2 <%= ui_inset_panel_classes(tone: :danger) %>">
+        <%= @platform_setting.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+        <div class="space-y-4">
+          <div>
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
+              Settings sections
+            </span>
+            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to the grouped controls</h2>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the list for orientation, then keep edits focused in the main settings sections.</p>
+          </div>
+
+          <div class="space-y-3">
+            <% hub_sections.each do |section| %>
+              <%= render Ui::SectionLinkCardComponent.new(
+                label: section.fetch(:label),
+                caption: section.fetch(:caption),
+                path: "##{section.fetch(:id)}"
+              ) %>
+            <% end %>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= enabled_feature_count %>/<%= feature_flags.size %> enabled</span>
+            <span class="<%= ui_badge_classes(workflow_ready_count == 2 ? :success : :warning) %>"><%= workflow_ready_count %>/2 workflows assigned</span>
+            <span class="<%= ui_badge_classes(configured_cloud_import_provider_count == cloud_import_provider_states.size ? :success : :warning) %>"><%= configured_cloud_import_provider_count %>/<%= cloud_import_provider_states.size %> connectors configured</span>
+          </div>
+        </div>
+      <% end %>
+    </aside>
+
+    <div class="space-y-6">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: "Settings summary",
+        title: "One save surface for grouped controls",
+        description: "Edit rollout flags, defaults, connector readiness, and workflow assignments below, then save once from the action bar.",
+        padding: :sm,
+        density: :compact
+      ) do %>
+        <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-3' ].join(' ') %>">
+          <div class="flex flex-wrap gap-2">
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+              Workflow readiness
+            </span>
+            <span class="<%= ui_badge_classes(workflow_ready_count == 2 ? :success : :warning) %>"><%= workflow_ready_count %>/2 workflows assigned</span>
+            <span class="<%= ui_badge_classes(configured_cloud_import_provider_count == cloud_import_provider_states.size ? :success : :warning) %>"><%= configured_cloud_import_provider_count %>/<%= cloud_import_provider_states.size %> connectors configured</span>
+          </div>
+
+          <p class="text-sm leading-6 text-ink-700/80">Use provider and model management pages for registry changes, then return here to wire the active platform workflows and rollout defaults.</p>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Feature access",
+        anchor: "feature-access",
+        eyebrow: "Platform controls",
+        description: "Enable or disable major product capabilities from one shared admin surface.",
+        badges: [
+          { label: "#{enabled_feature_count}/#{feature_flags.size} enabled", tone: enabled_feature_count.positive? ? :success : :neutral }
+        ]
+      ) do %>
+        <div class="space-y-4">
+          <% feature_flags.each do |flag| %>
+            <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+              <%= hidden_field_tag "platform_setting[feature_flags][#{flag.fetch(:key)}]", false %>
+              <label class="flex items-start justify-between gap-4">
+                <span>
+                  <span class="block text-sm font-medium text-ink-950"><%= flag.fetch(:label) %></span>
+                  <span class="mt-1 block text-sm text-ink-700/80"><%= flag.fetch(:description) %></span>
+                </span>
+
+                <span class="flex items-center gap-3">
+                  <span class="<%= ui_badge_classes(flag.fetch(:enabled) ? :success : :neutral) %>"><%= flag.fetch(:enabled) ? "On" : "Off" %></span>
+                  <%= check_box_tag "platform_setting[feature_flags][#{flag.fetch(:key)}]", true, flag.fetch(:enabled), class: ui_checkbox_classes %>
+                </span>
               </label>
             </div>
           <% end %>
         </div>
-      </div>
+      <% end %>
 
-      <div class="grid gap-5 sm:grid-cols-2">
-        <div>
-          <%= label_tag "platform_setting_preferences_default_template_slug", "Default template slug", class: "text-sm font-medium text-slate-700" %>
-          <%= text_field_tag "platform_setting[preferences][default_template_slug]", @platform_setting.preferences.fetch("default_template_slug", "modern"), class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Platform defaults",
+        anchor: "platform-defaults",
+        eyebrow: "Shared preferences",
+        description: "Fallback values used throughout the application for newly created resumes and support touchpoints.",
+        badges: [
+          { label: default_template_slug, tone: :neutral },
+          { label: support_email.present? ? "Support email set" : "Support email needed", tone: support_email.present? ? :success : :warning }
+        ]
+      ) do %>
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <%= label_tag "platform_setting_preferences_default_template_slug", "Default template slug", class: ui_label_classes %>
+            <%= text_field_tag "platform_setting[preferences][default_template_slug]", default_template_slug, class: ui_input_classes %>
+          </div>
+
+          <div>
+            <%= label_tag "platform_setting_preferences_support_email", "Support email", class: ui_label_classes %>
+            <%= email_field_tag "platform_setting[preferences][support_email]", support_email, class: ui_input_classes %>
+          </div>
         </div>
+      <% end %>
 
-        <div>
-          <%= label_tag "platform_setting_preferences_support_email", "Support email", class: "text-sm font-medium text-slate-700" %>
-          <%= email_field_tag "platform_setting[preferences][support_email]", @platform_setting.preferences.fetch("support_email", "support@example.com"), class: "mt-2 block w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" %>
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Cloud import connectors",
+        anchor: "cloud-import-connectors",
+        eyebrow: "Provider readiness",
+        description: "Review provider environment setup before any OAuth handoff or remote file import work begins.",
+        badges: [
+          { label: "#{configured_cloud_import_provider_count}/#{cloud_import_provider_states.size} configured", tone: configured_cloud_import_provider_count == cloud_import_provider_states.size ? :success : :warning },
+          { label: "Safe scaffold", tone: :neutral }
+        ]
+      ) do %>
+        <div class="grid gap-4 xl:grid-cols-2">
+          <% cloud_import_provider_states.each do |provider| %>
+            <div class="<%= [ ui_inset_panel_classes(tone: :default), 'space-y-4' ].join(' ') %>">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="text-sm font-medium text-ink-950"><%= provider.fetch(:label) %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= provider.fetch(:description) %></p>
+                </div>
+
+                <span class="<%= ui_badge_classes(provider.fetch(:status_tone)) %>"><%= provider.fetch(:status_label) %></span>
+              </div>
+
+              <p class="text-sm leading-6 text-ink-700/80"><%= provider.fetch(:message) %></p>
+
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">Required environment variables</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <% provider.fetch(:required_env_vars).each do |env_var| %>
+                    <span class="<%= ui_badge_classes(:neutral) %>"><%= env_var %></span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
         </div>
-      </div>
+      <% end %>
 
-      <div class="flex justify-end">
-        <%= form.submit "Save settings", class: "inline-flex justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700" %>
-      </div>
-    <% end %>
-  </div>
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "LLM orchestration",
+        anchor: "llm-orchestration",
+        eyebrow: "Model roles",
+        description: "Choose the primary generation models and the verification models that run in parallel for text and vision workflows.",
+        badges: [
+          { label: "#{@llm_providers_count} providers", tone: :neutral },
+          { label: "#{@llm_models.count} models", tone: :neutral }
+        ]
+      ) do %>
+        <% if @llm_models.any? %>
+          <div class="grid gap-4 lg:grid-cols-2">
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Text registry",
+              title: text_primary_model&.name || "Primary text model needed",
+              description: "#{@text_llm_models.count} text-capable models are available for suggestion and autofill workflows.",
+              badge: "#{selected_llm_model_ids(@llm_assignment_model_ids, :text_verification).size} verifiers",
+              badge_classes: ui_badge_classes(selected_llm_model_ids(@llm_assignment_model_ids, :text_verification).any? ? :success : :neutral),
+              title_size: :base
+            ) %>
+
+            <%= render Ui::WidgetCardComponent.new(
+              eyebrow: "Vision registry",
+              title: vision_primary_model&.name || "Primary vision model needed",
+              description: "#{@vision_llm_models.count} vision-capable models are available for future multimodal review flows.",
+              badge: "#{selected_llm_model_ids(@llm_assignment_model_ids, :vision_verification).size} verifiers",
+              badge_classes: ui_badge_classes(selected_llm_model_ids(@llm_assignment_model_ids, :vision_verification).any? ? :success : :neutral),
+              title_size: :base
+            ) %>
+          </div>
+
+          <div class="mt-5 grid gap-5 xl:grid-cols-2">
+            <%= render Ui::DashboardPanelComponent.new(
+              eyebrow: "Text workflow",
+              title: text_primary_model&.name || "Choose a primary text model",
+              description: "Use one primary text model for generation and optional verification models to support suggestion and autofill workflows.",
+              action_label: "Manage models",
+              action_path: admin_llm_models_path,
+              action_style: :secondary,
+              padding: :sm,
+              density: :compact
+            ) do %>
+              <div class="space-y-4">
+                <%= render Ui::ReportRowComponent.new(
+                  title: "Current primary model",
+                  subtitle: text_primary_model.present? ? settings_llm_model_option_summary(text_primary_model) : "No primary text model selected yet.",
+                  badge: text_primary_model.present? ? text_primary_model.name : "Unassigned",
+                  badge_classes: ui_badge_classes(text_primary_model.present? ? :success : :neutral)
+                ) %>
+
+                <%= render Ui::ReportRowComponent.new(
+                  title: "Verification coverage",
+                  subtitle: text_verification_models.any? ? "#{pluralize(text_verification_models.size, "model")} selected for text verification." : "No verification models selected yet.",
+                  badges: text_verification_models.any? ? text_verification_models.first(3).map { |llm_model| { label: llm_model.name, classes: ui_badge_classes(:neutral) } } + (text_verification_models.size > 3 ? [ { label: "+#{text_verification_models.size - 3} more", classes: ui_badge_classes(:neutral) } ] : []) : [ { label: "No verifiers", classes: ui_badge_classes(:neutral) } ]
+                ) %>
+
+                <div>
+                  <%= label_tag "llm_role_assignments_text_generation", "Primary text model", class: ui_label_classes %>
+                  <%= select_tag "llm_role_assignments[text_generation][]", options_for_select([["No model selected", ""]] + llm_model_options_for_select(@text_llm_models), selected_llm_model_id(@llm_assignment_model_ids, :text_generation)), class: ui_input_classes %>
+                </div>
+
+                <div>
+                  <%= hidden_field_tag "llm_role_assignments[text_verification][]", "" %>
+                  <p class="text-sm font-medium text-ink-700/80">Verification models</p>
+                  <div class="mt-3 space-y-3">
+                    <% @text_llm_models.each do |llm_model| %>
+                      <% selected = text_verification_model_ids.include?(llm_model.id) %>
+                      <div class="<%= ui_inset_panel_classes(tone: selected ? :success : :subtle) %>">
+                        <label class="flex items-start justify-between gap-4">
+                          <span>
+                            <span class="block text-sm font-medium text-ink-950"><%= llm_model.name %></span>
+                            <span class="mt-1 block text-sm text-ink-700/80"><%= settings_llm_model_option_summary(llm_model) %></span>
+                            <% if settings_llm_model_option_meta(llm_model).present? %>
+                              <span class="mt-1 block text-xs text-ink-700/60"><%= settings_llm_model_option_meta(llm_model) %></span>
+                            <% end %>
+                          </span>
+                          <span class="flex items-center gap-3">
+                            <span class="<%= ui_badge_classes(selected ? :success : :neutral) %>"><%= selected ? "Selected" : "Optional" %></span>
+                            <%= check_box_tag "llm_role_assignments[text_verification][]", llm_model.id, selected, class: "mt-1 #{ui_checkbox_classes}" %>
+                          </span>
+                        </label>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <%= render Ui::DashboardPanelComponent.new(
+              eyebrow: "Vision workflow",
+              title: vision_primary_model&.name || "Choose a primary vision model",
+              description: "Prepare one primary vision model and optional verification models for future visual or multimodal review flows.",
+              action_label: "Manage models",
+              action_path: admin_llm_models_path,
+              action_style: :secondary,
+              padding: :sm,
+              density: :compact
+            ) do %>
+              <div class="space-y-4">
+                <%= render Ui::ReportRowComponent.new(
+                  title: "Current primary model",
+                  subtitle: vision_primary_model.present? ? settings_llm_model_option_summary(vision_primary_model) : "No primary vision model selected yet.",
+                  badge: vision_primary_model.present? ? vision_primary_model.name : "Unassigned",
+                  badge_classes: ui_badge_classes(vision_primary_model.present? ? :success : :neutral)
+                ) %>
+
+                <%= render Ui::ReportRowComponent.new(
+                  title: "Verification coverage",
+                  subtitle: vision_verification_models.any? ? "#{pluralize(vision_verification_models.size, "model")} selected for vision verification." : "No verification models selected yet.",
+                  badges: vision_verification_models.any? ? vision_verification_models.first(3).map { |llm_model| { label: llm_model.name, classes: ui_badge_classes(:neutral) } } + (vision_verification_models.size > 3 ? [ { label: "+#{vision_verification_models.size - 3} more", classes: ui_badge_classes(:neutral) } ] : []) : [ { label: "No verifiers", classes: ui_badge_classes(:neutral) } ]
+                ) %>
+
+                <div>
+                  <%= label_tag "llm_role_assignments_vision_generation", "Primary vision model", class: ui_label_classes %>
+                  <%= select_tag "llm_role_assignments[vision_generation][]", options_for_select([["No model selected", ""]] + llm_model_options_for_select(@vision_llm_models), selected_llm_model_id(@llm_assignment_model_ids, :vision_generation)), class: ui_input_classes %>
+                </div>
+
+                <div>
+                  <%= hidden_field_tag "llm_role_assignments[vision_verification][]", "" %>
+                  <p class="text-sm font-medium text-ink-700/80">Verification models</p>
+                  <div class="mt-3 space-y-3">
+                    <% @vision_llm_models.each do |llm_model| %>
+                      <% selected = vision_verification_model_ids.include?(llm_model.id) %>
+                      <div class="<%= ui_inset_panel_classes(tone: selected ? :success : :subtle) %>">
+                        <label class="flex items-start justify-between gap-4">
+                          <span>
+                            <span class="block text-sm font-medium text-ink-950"><%= llm_model.name %></span>
+                            <span class="mt-1 block text-sm text-ink-700/80"><%= settings_llm_model_option_summary(llm_model) %></span>
+                            <% if settings_llm_model_option_meta(llm_model).present? %>
+                              <span class="mt-1 block text-xs text-ink-700/60"><%= settings_llm_model_option_meta(llm_model) %></span>
+                            <% end %>
+                          </span>
+                          <span class="flex items-center gap-3">
+                            <span class="<%= ui_badge_classes(selected ? :success : :neutral) %>"><%= selected ? "Selected" : "Optional" %></span>
+                            <%= check_box_tag "llm_role_assignments[vision_verification][]", llm_model.id, selected, class: "mt-1 #{ui_checkbox_classes}" %>
+                          </span>
+                        </label>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <%= render Ui::WidgetCardComponent.new(
+            eyebrow: "Registry needed",
+            title: "Add providers and models first",
+            description: "Register at least one provider and one model before assigning text or vision workflows.",
+            badge: "Setup needed",
+            badge_classes: ui_badge_classes(:warning),
+            title_size: :base
+          ) do %>
+            <div class="flex flex-wrap gap-2">
+              <%= link_to "Manage providers", admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
+              <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:primary, size: :sm) %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= render Ui::StickyActionBarComponent.new(
+        title: "Platform settings",
+        description: "Save changes when you are ready. Feature flags and role assignments update immediately for admin-controlled workflows.",
+        density: :compact
+      ) do %>
+        <%= link_to "Manage providers", admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= form.submit "Save settings", class: ui_button_classes(:primary) %>
+      <% end %>
+    </div>
+  <% end %>
 </section>

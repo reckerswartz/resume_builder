@@ -2,7 +2,10 @@ FactoryBot.define do
   factory :llm_interaction do
     association :user
     association :resume, user: user
+    llm_model { nil }
+    llm_provider { llm_model&.llm_provider }
     feature_name { "resume_suggestions" }
+    role { nil }
     status { "queued" }
     prompt { "Improve these bullets" }
     response { "Delivered measurable improvements" }

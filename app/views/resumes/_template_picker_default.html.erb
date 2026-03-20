@@ -1,0 +1,12 @@
+<div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+  <%= render "resumes/template_picker_browser",
+    template_picker_state: template_picker_state,
+    form: form,
+    wrapper_classes: [ui_inset_panel_classes(tone: :subtle), "space-y-4"].join(" "),
+    show_results_label: true %>
+
+  <%= render "resumes/template_picker_summaries",
+    template_picker_state: template_picker_state,
+    preview_size: :compact,
+    wrapper_classes: "space-y-4" %>
+</div>

@@ -1,0 +1,342 @@
+<% section_links = [
+     { id: "catalog-runtime", label: "Catalog & runtime", caption: "Provider, identifier, capabilities, and defaults" },
+     { id: "orchestration-readiness", label: "Orchestration readiness", caption: "Provider setup and role assignment follow-up" },
+     { id: "assigned-roles", label: "Assigned roles", caption: "Current workflow coverage from the settings hub" }
+   ] %>
+<% readiness_items = [] %>
+<% unless @llm_model.active? %>
+  <% readiness_items << {
+       label: "Activate this model",
+       detail: "Inactive models remain in the registry, but ready-model selection ignores them until they are activated again.",
+       tone: :neutral
+     } %>
+<% end %>
+<% unless @llm_model.supports_text? || @llm_model.supports_vision? %>
+  <% readiness_items << {
+       label: "Choose at least one capability",
+       detail: "Select text, vision, or both so this model can participate in orchestration roles from the settings hub.",
+       tone: :warning
+     } %>
+<% end %>
+<% unless @llm_model.llm_provider.configured_for_requests? %>
+  <% readiness_items << {
+       label: "Finish provider setup",
+       detail: llm_model_provider_status_description(@llm_model),
+       tone: :warning
+     } %>
+<% end %>
+<% if @llm_model.llm_model_assignments.blank? %>
+  <% readiness_items << {
+       label: "Assign this model to a workflow",
+       detail: "Use Platform settings to connect this model to text generation, verification, or future vision flows.",
+       tone: :neutral
+     } %>
+<% end %>
+<% if readiness_items.empty? %>
+  <% readiness_items << {
+       label: "Ready for orchestration",
+       detail: "This model is active, its provider is request-ready, and it has the coverage needed for assignment-driven workflows.",
+       tone: :success
+     } %>
+<% end %>
+<% blocking_items = readiness_items.reject { |item| item.fetch(:tone, :neutral) == :success } %>
+<% triage_tone = if blocking_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
+     :warning
+   elsif blocking_items.any?
+     :neutral
+   else
+     :success
+   end %>
+<% triage_title = case triage_tone
+   when :warning
+     "Blocked for assignment"
+   when :neutral
+     "Usable with follow-up"
+   else
+     "Good to assign"
+   end %>
+<% technical_metadata_present = [ @llm_model.family, @llm_model.parameter_size, @llm_model.owned_by, @llm_model.quantization_level, @llm_model.modality_summary ].any?(&:present?) %>
+
+<section class="space-y-6">
+  <%= render Ui::PageHeaderComponent.new(
+    eyebrow: "LLM model",
+    title: @llm_model.name,
+    description: "Check provider state, assignment readiness, and runtime defaults for this model.",
+    badges: [
+      { label: @llm_model.llm_provider.name, tone: :neutral },
+      { label: @llm_model.model_type_label, tone: :neutral },
+      { label: @llm_model.active? ? "Active" : "Inactive", tone: @llm_model.active? ? :success : :neutral },
+      { label: llm_model_catalog_label(@llm_model), tone: @llm_model.provider_synced? ? :success : :neutral }
+    ],
+    actions: [
+      { label: "Back to models", path: admin_llm_models_path, style: :secondary },
+      { label: "Feature settings", path: admin_settings_path, style: :secondary },
+      { label: "Edit model", path: edit_admin_llm_model_path(@llm_model), style: :primary }
+    ],
+    density: :compact
+  ) %>
+
+  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+    <div class="space-y-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
+            Assignment readiness
+          </span>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Review this model</h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80">Decide whether this model is good to assign now, usable with caution, or still blocked before you inspect deeper catalog metadata.</p>
+        </div>
+
+        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <span class="<%= ui_badge_classes(llm_model_provider_status_tone(@llm_model)) %>"><%= llm_model_provider_status_label(@llm_model) %></span>
+        <span class="<%= ui_badge_classes(@llm_model.active? ? :success : :neutral) %>"><%= @llm_model.active? ? "Active" : "Inactive" %></span>
+        <span class="<%= ui_badge_classes(llm_model_assignment_tone(@llm_model)) %>"><%= llm_model_assignment_badge_label(@llm_model) %></span>
+        <span class="<%= ui_badge_classes(@llm_model.provider_synced? ? :success : :neutral) %>"><%= llm_model_catalog_label(@llm_model) %></span>
+      </div>
+
+      <div class="space-y-3">
+        <% readiness_items.each do |item| %>
+          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
+              </div>
+
+              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
+                <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
+    <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
+        <div class="space-y-4">
+          <div>
+            <span class="atelier-pill">
+              <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+              Model sections
+            </span>
+            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to details</h2>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80">Move between catalog details, readiness follow-up, and assigned roles.</p>
+          </div>
+
+          <div class="space-y-3">
+            <% section_links.each do |section| %>
+              <%= render Ui::SectionLinkCardComponent.new(
+                label: section.fetch(:label),
+                caption: section.fetch(:caption),
+                path: "##{section.fetch(:id)}"
+              ) %>
+            <% end %>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <%= link_to "View provider", admin_llm_provider_path(@llm_model.llm_provider), class: ui_button_classes(:secondary, size: :sm) %>
+          </div>
+        </div>
+      <% end %>
+    </aside>
+
+    <div class="space-y-6">
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Catalog & runtime",
+        anchor: "catalog-runtime",
+        eyebrow: "Model profile",
+        description: "Review the provider, identifier, capabilities, and runtime defaults stored for this model.",
+        badges: [
+          { label: @llm_model.llm_provider.name, tone: :neutral },
+          { label: llm_model_catalog_label(@llm_model), tone: @llm_model.provider_synced? ? :success : :neutral }
+        ]
+      ) do %>
+        <div class="space-y-4">
+          <div class="grid gap-4 sm:grid-cols-2">
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Provider</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.llm_provider.name %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Identifier</p>
+            <p class="mt-2 break-all text-base font-medium text-ink-950"><%= @llm_model.identifier %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: llm_model_provider_status_tone(@llm_model) == :success ? :success : :default) %>">
+            <p class="text-sm font-medium text-ink-700/80">Provider readiness</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(llm_model_provider_status_tone(@llm_model)) %>"><%= llm_model_provider_status_label(@llm_model) %></span>
+              <span class="text-sm leading-6 text-ink-700/80"><%= llm_model_provider_status_description(@llm_model) %></span>
+            </div>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: @llm_model.provider_synced? ? :success : :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Catalog source</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(llm_model_source_badge_tone(@llm_model)) %>"><%= llm_model_catalog_label(@llm_model) %></span>
+              <span class="text-sm leading-6 text-ink-700/80"><%= @llm_model.provider_synced? ? "Managed by provider sync." : "Maintained manually in the registry." %></span>
+            </div>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %> sm:col-span-2">
+            <p class="text-sm font-medium text-ink-700/80">Capabilities</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <% llm_model_capability_labels(@llm_model).each do |label| %>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= label %></span>
+              <% end %>
+            </div>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= llm_model_capability_summary(@llm_model) %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Temperature</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.temperature || "Provider default" %></p>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+            <p class="text-sm font-medium text-ink-700/80">Max output tokens</p>
+            <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.max_output_tokens || "Provider default" %></p>
+          </div>
+          </div>
+
+          <% if technical_metadata_present %>
+            <details class="overflow-hidden rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92">
+              <summary class="cursor-pointer px-5 py-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-ink-950">Technical metadata</p>
+                    <p class="mt-1 text-sm leading-6 text-ink-700/80">Lower-priority catalog details such as family, parameter size, ownership, quantization, and modality metadata.</p>
+                  </div>
+
+                  <span class="<%= ui_badge_classes(:neutral) %>">Reference only</span>
+                </div>
+              </summary>
+
+              <div class="border-t border-canvas-200/80 px-5 py-5">
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <% if @llm_model.family.present? %>
+                    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+                      <p class="text-sm font-medium text-ink-700/80">Family</p>
+                      <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.family %></p>
+                    </div>
+                  <% end %>
+
+                  <% if @llm_model.parameter_size.present? %>
+                    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+                      <p class="text-sm font-medium text-ink-700/80">Parameter size</p>
+                      <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.parameter_size %></p>
+                    </div>
+                  <% end %>
+
+                  <% if @llm_model.owned_by.present? %>
+                    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+                      <p class="text-sm font-medium text-ink-700/80">Owned by</p>
+                      <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.owned_by %></p>
+                    </div>
+                  <% end %>
+
+                  <% if @llm_model.quantization_level.present? %>
+                    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+                      <p class="text-sm font-medium text-ink-700/80">Quantization</p>
+                      <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.quantization_level %></p>
+                    </div>
+                  <% end %>
+
+                  <% if @llm_model.modality_summary.present? %>
+                    <div class="<%= ui_inset_panel_classes(tone: :subtle) %> sm:col-span-2">
+                      <p class="text-sm font-medium text-ink-700/80">Modalities</p>
+                      <p class="mt-2 text-base font-medium text-ink-950"><%= @llm_model.modality_summary %></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </details>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Orchestration readiness",
+        anchor: "orchestration-readiness",
+        eyebrow: "Operational status",
+        description: "Surface the follow-ups required before this model can reliably participate in assignment-driven workflows.",
+        badges: [
+          { label: @llm_model.active? ? "Active" : "Inactive", tone: @llm_model.active? ? :success : :neutral },
+          { label: llm_model_assignment_badge_label(@llm_model), tone: llm_model_assignment_tone(@llm_model) }
+        ]
+      ) do %>
+        <div class="space-y-3">
+          <% readiness_items.each do |item| %>
+            <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
+                </div>
+
+                <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
+                  <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="flex flex-wrap gap-2 pt-2">
+            <%= link_to "Edit model", edit_admin_llm_model_path(@llm_model), class: ui_button_classes(:primary, size: :sm) %>
+            <%= link_to "Feature settings", admin_settings_path, class: ui_button_classes(:secondary, size: :sm) %>
+            <%= link_to "View provider", admin_llm_provider_path(@llm_model.llm_provider), class: ui_button_classes(:secondary, size: :sm) %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: "Assigned roles",
+        anchor: "assigned-roles",
+        eyebrow: "Workflow coverage",
+        description: "Inspect the orchestration roles currently using this model and jump to the settings hub when assignments need to change.",
+        badges: [
+          { label: pluralize(@llm_model.llm_model_assignments.size, "role"), tone: @llm_model.llm_model_assignments.any? ? :success : :neutral },
+          { label: llm_model_provider_status_label(@llm_model), tone: llm_model_provider_status_tone(@llm_model) }
+        ]
+      ) do %>
+        <div class="flex items-center justify-between gap-3 border-b border-canvas-200/80 pb-4">
+          <p class="text-sm leading-6 text-ink-700/80">Assignment order and workflow coverage for <%= @llm_model.name %>.</p>
+          <%= link_to "Feature settings", admin_settings_path, class: ui_button_classes(:ghost, size: :sm) %>
+        </div>
+
+        <% if @llm_model.llm_model_assignments.any? %>
+          <div class="mt-4 space-y-3">
+            <% llm_model_ordered_assignments(@llm_model).each do |assignment| %>
+              <%= render Ui::ReportRowComponent.new(
+                title: assignment.role.humanize,
+                subtitle: "Execution order #{assignment.position + 1} · #{llm_model_capability_summary(@llm_model)}",
+                badges: [
+                  { label: "Settings hub", classes: ui_badge_classes(:neutral) },
+                  { label: llm_model_provider_status_label(@llm_model), classes: ui_badge_classes(llm_model_provider_status_tone(@llm_model)) }
+                ],
+                path: admin_settings_path
+              ) %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="mt-4">
+            <%= render Ui::EmptyStateComponent.new(
+              description: "This model is not assigned to any orchestration role yet.",
+              padding: :sm,
+              tone: :subtle,
+              align: :left
+            ) %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</section>

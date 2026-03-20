@@ -16,6 +16,8 @@ gem "turbo-rails"
 gem "stimulus-rails"
 gem "pundit"
 gem "view_component"
+gem "pdf-reader"
+gem "rubyzip"
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
@@ -69,7 +71,6 @@ end
 
 group :test do
   gem "capybara"
-  gem "pdf-reader"
   gem "selenium-webdriver"
   gem "vcr"
   gem "webmock"

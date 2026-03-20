@@ -11,7 +11,7 @@ class PasswordsController < ApplicationController
       PasswordsMailer.reset(user).deliver_later
     end
 
-    redirect_to new_session_path, notice: "Password reset instructions sent (if user with that email address exists)."
+    redirect_to new_session_path, notice: "If that email is in the system, we sent a reset link."
   end
 
   def edit
@@ -20,9 +20,10 @@ class PasswordsController < ApplicationController
   def update
     if @user.update(params.permit(:password, :password_confirmation))
       @user.sessions.destroy_all
-      redirect_to new_session_path, notice: "Password has been reset."
+      redirect_to new_session_path, notice: "Your password has been updated. Sign in to continue."
     else
-      redirect_to edit_password_path(params[:token]), alert: "Passwords did not match."
+      @form_error = @user.errors.full_messages.to_sentence.presence || "Check the password fields and try again."
+      render :edit, status: :unprocessable_entity
     end
   end
 

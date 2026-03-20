@@ -1,0 +1,12 @@
+<% context = context.to_sym %>
+<% export_actions_state = local_assigns.fetch(:export_actions_state) { resume_export_actions_state(resume, context: context) } %>
+
+<div id="<%= dom_id(resume, "#{context}_export_actions") %>" class="flex flex-wrap gap-2">
+  <% export_actions_state.actions.each do |action| %>
+    <% if action[:method].present? && action[:method].to_sym != :get %>
+      <%= button_to action.fetch(:label), action.fetch(:path), method: action.fetch(:method), class: ui_button_classes(action.fetch(:style), size: :sm), **action.fetch(:options, {}) %>
+    <% else %>
+      <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), **action.fetch(:options, {}) %>
+    <% end %>
+  <% end %>
+</div>
