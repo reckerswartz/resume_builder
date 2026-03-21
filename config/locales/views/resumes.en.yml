@@ -274,6 +274,8 @@ en:
     template_picker_compact:
       fast_start_pill: "Fast start"
       fast_start_description: "Open the full browser only if you want to compare more options."
+      choose_later_note: "You can change the template and accent color anytime from the finalize step."
+      carried_accent_note: "Accent color carried from your template selection."
       open_marketplace: "Open marketplace"
       recommended_pill: "Recommended for this draft"
       recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
@@ -281,5 +283,6 @@ en:
       expand_preview_hint: "Preview"
       browse_all_templates: "Browse all templates"
       browse_all_templates_description: "Filter by family, density, columns, theme, or layout"
+      choose_later_badge: "Change anytime"
     template_picker_summaries:
       open_full_preview: "Open full preview"
