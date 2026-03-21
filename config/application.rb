@@ -32,6 +32,7 @@ module ResumeBuilder
     config.i18n.available_locales = %i[en]
     config.i18n.default_locale = :en
     config.i18n.fallbacks = true
+    config.active_storage.variant_processor = :vips
 
     # Configuration for the application, engines, and railties goes here.
     #

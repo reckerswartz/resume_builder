@@ -65,3 +65,46 @@ en:
           title: "Finalize and export"
           description: "Choose the final layout, review export actions, and manage any extra sections that sit outside the core guided flow."
 
+  resume_templates:
+    catalog:
+      labels:
+        family:
+          modern: "Modern"
+          classic: "Classic"
+          ats-minimal: "ATS Minimal"
+          professional: "Professional"
+          modern-clean: "Modern Clean"
+          sidebar-accent: "Sidebar Accent"
+          editorial-split: "Editorial Split"
+        density:
+          compact: "Compact"
+          comfortable: "Comfortable"
+          relaxed: "Relaxed"
+        column_count:
+          single_column: "1 column"
+          two_column: "2 columns"
+        theme_tone:
+          slate: "Slate"
+          blue: "Blue"
+          teal: "Teal"
+          indigo: "Indigo"
+          lime: "Lime"
+        shell_style:
+          flat: "Flat"
+          card: "Card"
+        header_style:
+          rule: "Rule"
+          split: "Split"
+        entry_style:
+          list: "List"
+          cards: "Cards"
+        skill_style:
+          inline: "Inline"
+          chips: "Chips"
+        section_heading_style:
+          rule: "Rule"
+          marker: "Marker"
+        sidebar_position:
+          left: "Left"
+          right: "Right"
+

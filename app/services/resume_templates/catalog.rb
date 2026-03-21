@@ -238,11 +238,14 @@ module ResumeTemplates
       end
 
       def family_label(family)
-        family_definition_for(family).fetch(:label)
+        family_key = family.to_s
+        default_label = FAMILY_DEFINITIONS[family_key]&.fetch(:label) || family_key.humanize
+
+        I18n.t("resume_templates.catalog.labels.family.#{family_key}", default: default_label)
       end
 
       def family_options
-        FAMILY_DEFINITIONS.map { |key, definition| [ definition.fetch(:label), key ] }
+        FAMILY_DEFINITIONS.keys.map { |key| [ family_label(key), key ] }
       end
 
       def font_scale_options
@@ -250,27 +253,59 @@ module ResumeTemplates
       end
 
       def density_options
-        [ [ "Compact", "compact" ], [ "Comfortable", "comfortable" ], [ "Relaxed", "relaxed" ] ]
+        DENSITY_SCALES.keys.map { |density| [ density_label(density), density ] }
+      end
+
+      def density_label(density)
+        option_label("density", density)
       end
 
       def column_count_options
-        COLUMN_COUNTS.map { |value, label| [ label, value ] }
+        COLUMN_COUNTS.keys.map { |value| [ column_count_label(value), value ] }
       end
 
       def column_count_label(column_count)
-        COLUMN_COUNTS.fetch(column_count.to_s, column_count.to_s.humanize)
+        column_count_key = column_count.to_s
+
+        I18n.t("resume_templates.catalog.labels.column_count.#{column_count_key}", default: COLUMN_COUNTS.fetch(column_count_key, column_count_key.humanize))
       end
 
       def theme_tone_options
-        THEME_TONES.map { |value, label| [ label, value ] }
+        THEME_TONES.keys.map { |value| [ theme_tone_label(value), value ] }
       end
 
       def theme_tone_label(theme_tone)
-        THEME_TONES.fetch(theme_tone.to_s, theme_tone.to_s.humanize)
+        theme_tone_key = theme_tone.to_s
+
+        I18n.t("resume_templates.catalog.labels.theme_tone.#{theme_tone_key}", default: THEME_TONES.fetch(theme_tone_key, theme_tone_key.humanize))
       end
 
       def shell_style_options
-        SHELL_STYLES.map { |shell_style| [ shell_style.titleize, shell_style ] }
+        SHELL_STYLES.map { |shell_style| [ shell_style_label(shell_style), shell_style ] }
+      end
+
+      def shell_style_label(shell_style)
+        option_label("shell_style", shell_style)
+      end
+
+      def header_style_label(header_style)
+        option_label("header_style", header_style)
+      end
+
+      def entry_style_label(entry_style)
+        option_label("entry_style", entry_style)
+      end
+
+      def skill_style_label(skill_style)
+        option_label("skill_style", skill_style)
+      end
+
+      def section_heading_style_label(section_heading_style)
+        option_label("section_heading_style", section_heading_style)
+      end
+
+      def sidebar_position_label(sidebar_position)
+        option_label("sidebar_position", sidebar_position)
       end
 
       def default_layout_config(family: default_family)
@@ -368,6 +403,13 @@ module ResumeTemplates
               "background_style" => slot_config["background_style"].presence || "studio_clean"
             }
           end
+        end
+
+        def option_label(group, value)
+          value_key = value.to_s
+          return value_key if value_key.blank?
+
+          I18n.t("resume_templates.catalog.labels.#{group}.#{value_key}", default: value_key.humanize)
         end
     end
   end

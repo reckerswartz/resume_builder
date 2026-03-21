@@ -17,7 +17,7 @@ module Photos
     end
 
     def call
-      return failure("Assign at least one vision generation model before requesting resume image generation.") if generation_models.blank?
+      return failure(I18n.t("resumes.photo_library.generation_orchestrator.no_models")) if generation_models.blank?
 
       executions = Llm::ParallelVisionRunner.new(
         user: user,
@@ -96,7 +96,7 @@ module Photos
       end
 
       def compiled_error_message(executions)
-        executions.filter_map(&:error_message).presence&.to_sentence || "No provider returned a reusable generated image."
+        executions.filter_map(&:error_message).presence&.to_sentence || I18n.t("resumes.photo_library.generation_orchestrator.no_generated_image")
       end
 
       def failure(message, executions: [], prompt_text: nil)

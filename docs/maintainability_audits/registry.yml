@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-20T23:30:00Z"
+updated_at: "2026-03-20T23:39:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-20-admin-settings-update-orchestration/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-20-admin-settings-page-state/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -63,7 +63,7 @@ areas:
     path: "app/controllers/admin/settings_controller.rb"
     category: "controller"
     priority: "high"
-    status: "improved"
+    status: "in_progress"
     reasons:
       - "The update action owns a cross-model transaction and workflow orchestration inline."
       - "Success and failure handling currently depend on mutable controller-local state and merged errors."
@@ -73,6 +73,6 @@ areas:
       - "extract-settings-page-state"
     closed_follow_up_keys:
       - "extract-settings-update-service"
-    last_reviewed_at: "2026-03-20T23:30:00Z"
-    last_changed_at: "2026-03-20T23:30:00Z"
-    next_step: "Reassess whether the heavy inline page-state setup in app/views/admin/settings/show.html.erb should move into a presenter/helper-backed object next."
+    last_reviewed_at: "2026-03-20T23:39:00Z"
+    last_changed_at: "2026-03-20T23:39:00Z"
+    next_step: "Extract the heavy inline page-state setup in app/views/admin/settings/show.html.erb into a presenter/helper-backed object and then reassess the remaining admin settings maintainability hotspot."

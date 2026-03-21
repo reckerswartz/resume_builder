@@ -47,4 +47,22 @@ RSpec.describe ResumeTemplates::Catalog do
       expect(described_class.component_class_for('editorial-split')).to eq(ResumeTemplates::EditorialSplitComponent)
     end
   end
+
+  describe 'shared metadata labels' do
+    it 'returns locale-backed labels for shared template metadata and readable fallbacks for unknown values' do
+      expect(described_class.family_label('sidebar-accent')).to eq('Sidebar Accent')
+      expect(described_class.family_label('legacy')).to eq('Legacy')
+      expect(described_class.density_label('comfortable')).to eq('Comfortable')
+      expect(described_class.column_count_label('two_column')).to eq('2 columns')
+      expect(described_class.theme_tone_label('lime')).to eq('Lime')
+      expect(described_class.shell_style_label('card')).to eq('Card')
+      expect(described_class.header_style_label('stacked')).to eq('Stacked')
+      expect(described_class.entry_style_label('timeline')).to eq('Timeline')
+      expect(described_class.skill_style_label('bars')).to eq('Bars')
+      expect(described_class.section_heading_style_label('marker')).to eq('Marker')
+      expect(described_class.sidebar_position_label('left')).to eq('Left')
+      expect(described_class.density_options).to include(['Compact', 'compact'], ['Comfortable', 'comfortable'], ['Relaxed', 'relaxed'])
+      expect(described_class.shell_style_options).to include(['Flat', 'flat'], ['Card', 'card'])
+    end
+  end
 end

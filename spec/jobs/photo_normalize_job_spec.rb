@@ -30,11 +30,12 @@ RSpec.describe PhotoNormalizeJob, type: :job do
 
       expect do
         described_class.perform_now(processing_run.id, source_asset.id)
-      end.to change(JobLog, :count).by(1).and change { photo_profile.photo_assets.where(asset_kind: :normalized).count }.by(1)
+      end.to change(JobLog, :count).by(2).and change { photo_profile.photo_assets.where(asset_kind: :normalized).count }.by(1)
 
       processing_run.reload
       normalized_asset = photo_profile.photo_assets.where(asset_kind: :normalized).order(:created_at).last
-      job_log = JobLog.order(:created_at).last
+      job_log = JobLog.where(job_type: 'PhotoNormalizeJob').order(:created_at).last
+      enhancement_run = photo_profile.photo_processing_runs.where(workflow_type: :enhance).order(:created_at).last
 
       expect(processing_run).to be_succeeded
       expect(processing_run.output_asset_ids).to eq([ normalized_asset.id ])
@@ -42,6 +43,7 @@ RSpec.describe PhotoNormalizeJob, type: :job do
       expect(normalized_asset.file).to be_attached
       expect(source_asset.reload).to be_ready
       expect(job_log).to be_succeeded
+      expect(enhancement_run).to be_queued
       expect(job_log.output).to include(
         'photo_processing_run_id' => processing_run.id,
         'source_asset_id' => source_asset.id,

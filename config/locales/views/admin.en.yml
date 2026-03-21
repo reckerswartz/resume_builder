@@ -1,0 +1,45 @@
+en:
+  admin:
+    settings_page_state:
+      page_header:
+        eyebrow: "Admin settings"
+        title: "Platform settings"
+        description: "Control feature access, platform defaults, cloud-import readiness, and model assignments from one shared admin surface."
+        badges:
+          enabled: "%{enabled}/%{total} enabled"
+          providers: "%{count} providers"
+          models: "%{count} models"
+        actions:
+          manage_templates: "Manage templates"
+          manage_providers: "Manage providers"
+          manage_models: "Manage models"
+      hub_sections:
+        feature_access:
+          label: "Feature access"
+          caption: "Rollout and feature gating"
+        platform_defaults:
+          label: "Platform defaults"
+          caption: "Default template and support contact"
+        cloud_import_connectors:
+          label: "Cloud import connectors"
+          caption: "Provider readiness and environment checks"
+        llm_orchestration:
+          label: "LLM orchestration"
+          caption: "Generation and verification workflows"
+    settings_helper:
+      feature_flags:
+        llm_access:
+          label: "LLM access"
+          description: "Allow provider-backed model orchestration for suggestion, autofill, and verification flows."
+        resume_suggestions:
+          label: "Resume suggestions"
+          description: "Enable text suggestion workflows that rely on configured text generation and verification models."
+        autofill_content:
+          label: "Autofill content"
+          description: "Allow structured autofill flows to use configured LLM roles when source content is available."
+        photo_processing:
+          label: "Photo library"
+          description: "Enable the shared photo library, reusable upload pipeline, and headshot selection flows in the resume builder."
+        resume_image_generation:
+          label: "Resume image generation"
+          description: "Allow background removal, template-specific portrait generation, and verification actions when compatible vision roles are assigned."

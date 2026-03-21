@@ -118,10 +118,10 @@ module Templates
       badges = []
       badges << { label: I18n.t("templates.marketplace_state.active_badges.query", query: query), tone: :neutral } if query.present?
       badges << { label: ResumeTemplates::Catalog.family_label(family_filter), tone: :neutral } if family_filter.present?
-      badges << { label: density_filter.to_s.titleize, tone: :neutral } if density_filter.present?
+      badges << { label: ResumeTemplates::Catalog.density_label(density_filter), tone: :neutral } if density_filter.present?
       badges << { label: ResumeTemplates::Catalog.column_count_label(column_count_filter), tone: :neutral } if column_count_filter.present?
       badges << { label: ResumeTemplates::Catalog.theme_tone_label(theme_tone_filter), tone: :neutral } if theme_tone_filter.present?
-      badges << { label: shell_style_filter.to_s.titleize, tone: :neutral } if shell_style_filter.present?
+      badges << { label: ResumeTemplates::Catalog.shell_style_label(shell_style_filter), tone: :neutral } if shell_style_filter.present?
       badges << { label: I18n.t("templates.marketplace_state.active_badges.sort", sort: selected_sort_label), tone: :neutral } if sort_active?
       badges
     end
@@ -133,12 +133,12 @@ module Templates
     def sort_options
       @sort_options ||= begin
         options = [
-          { value: "family_asc", label: I18n.t("templates.marketplace_state.sort_options.family_asc") },
-          { value: "name_asc", label: I18n.t("templates.marketplace_state.sort_options.name_asc") },
-          { value: "density_asc", label: I18n.t("templates.marketplace_state.sort_options.density_asc") }
+          { value: "family_asc", label: sort_option_label("family_asc") },
+          { value: "name_asc", label: sort_option_label("name_asc") },
+          { value: "density_asc", label: sort_option_label("density_asc") }
         ]
 
-        recommendation_sort_available? ? [ { value: "recommended_first", label: I18n.t("templates.marketplace_state.sort_options.recommended_first") }, *options ] : options
+        recommendation_sort_available? ? [ { value: "recommended_first", label: sort_option_label("recommended_first") }, *options ] : options
       end
     end
 
@@ -329,7 +329,7 @@ module Templates
       end
 
       def selected_sort_label
-        sort_options.find { |option| option.fetch(:value) == selected_sort_value }&.fetch(:label) || selected_sort_value.titleize
+        sort_option_label(selected_sort_value)
       end
 
       def badge_labels(template_card, recommendation_badge_label: nil)
@@ -383,7 +383,7 @@ module Templates
       end
 
       def sort_option_label(value)
-        sort_options.find { |option| option.fetch(:value) == value }&.fetch(:label) || value.to_s.titleize
+        I18n.t("templates.marketplace_state.sort_options.#{value}", default: value.to_s.humanize)
       end
 
       def selected_filter_chip_classes

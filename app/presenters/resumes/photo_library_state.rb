@@ -83,6 +83,16 @@ module Resumes
       I18n.t("resumes.editor_personal_details_step.photo_library.recent_runs.statuses.#{run.status}")
     end
 
+    def run_guidance_label(run)
+      return if run.error_summary.present?
+      return unless run.succeeded? || run.next_step_guidance.present?
+
+      I18n.t(
+        "resumes.editor_personal_details_step.photo_library.recent_runs.guidance.#{run.workflow_type}",
+        default: run.next_step_guidance.presence
+      )
+    end
+
     private
       attr_reader :resume, :view_context
 

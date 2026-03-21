@@ -119,6 +119,7 @@
             <% if photo_library_state.recent_runs.any? %>
               <div class="mt-3 space-y-3">
                 <% photo_library_state.recent_runs.each do |run| %>
+                  <% guidance_label = photo_library_state.run_guidance_label(run) %>
                   <div class="rounded-[1rem] border border-canvas-200/80 bg-canvas-50/70 px-3 py-3">
                     <div class="flex items-center justify-between gap-3">
                       <p class="text-sm font-medium text-ink-950"><%= photo_library_state.workflow_label(run) %></p>
@@ -126,8 +127,8 @@
                     </div>
                     <% if run.error_summary.present? %>
                       <p class="mt-2 text-sm leading-6 text-rose-700"><%= run.error_summary %></p>
-                    <% elsif run.next_step_guidance.present? %>
-                      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= run.next_step_guidance %></p>
+                    <% elsif guidance_label.present? %>
+                      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= guidance_label %></p>
                     <% end %>
                   </div>
                 <% end %>

@@ -101,6 +101,44 @@ en:
         preview: "Preview"
         go_back: "Go back"
         next: "Next: %{step}"
+    editor_personal_details_step:
+      optional_step:
+        eyebrow: "Optional step"
+        title: "Skip anything that does not belong on this resume"
+        description: "Most resumes can leave many of these fields blank. Add them only when a role, country, or application asks for them."
+        skip_for_now: "Skip for now"
+        back_to_heading: "Back to heading"
+      profile_links:
+        eyebrow: "Profile links and credentials"
+        title: "Contact details that may still belong near the top of the resume"
+        description: "Use this area for links and credentials that genuinely help a reviewer contact you or verify your background."
+      headshot:
+        eyebrow: "Headshot"
+        title: "Add a profile photo only when it strengthens the application"
+        description: "Templates with truthful headshot support can render this image in preview and PDF export. Other templates keep their non-photo fallback."
+        label: "Headshot"
+        upload_hint: "Upload a JPG, PNG, or WebP image under 3 MB. Saving a new image replaces the current one."
+        current_upload_title: "Current upload"
+        unknown_type: "Unknown type"
+        remove_hint: "Remove the photo at any time to return supported templates to their text-only identity block."
+        remove_action: "Remove photo"
+        template_badges:
+          active: "Active in this template"
+          fallback: "Fallback in this template"
+      personal_information:
+        eyebrow: "Optional personal information"
+        title: "Only add fields you are comfortable sharing"
+        description: "Most resumes do not need these details. Add them only when they are expected for the role or application process."
+      labels:
+        website: "Website"
+        linkedin: "LinkedIn"
+        driving_licence: "Driving licence"
+        date_of_birth: "Date of Birth"
+        nationality: "Nationality"
+        marital_status: "Marital Status"
+        visa_status: "Visa Status"
+      footer_note: "Only keep fields that clearly help this application."
+      save_personal_details: "Save personal details"
     preview_state:
       panel:
         eyebrow: "Live preview"
@@ -312,6 +350,12 @@ en:
             succeeded: "Succeeded"
             failed: "Failed"
             cancelled: "Cancelled"
+          guidance:
+            normalize: "Enhanced derivative queued automatically for selection-ready output."
+            background_remove: "Background-removed derivative is ready for review or selection."
+            enhance: "Enhanced derivative is ready for resume selection and template rendering."
+            generate_for_template: "Generated portrait candidates are ready for review and selection."
+            verify_candidate: "Review the verification feedback before selecting this candidate for a template slot."
         template_support:
           active: "This template can render a selected shared headshot in preview and PDF export."
           fallback: "This template keeps its non-photo fallback even if you store shared headshots for later use."

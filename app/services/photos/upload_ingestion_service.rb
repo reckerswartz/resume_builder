@@ -20,8 +20,8 @@ module Photos
 
     def call
       files = normalized_uploaded_files
-      return failure([ "Attach at least one photo to continue." ]) if files.blank?
-      return failure([ "Upload up to #{MAX_FILES_PER_REQUEST} photos at a time." ]) if files.size > MAX_FILES_PER_REQUEST
+      return failure([ I18n.t("resumes.photo_library.upload_ingestion_service.files_required") ]) if files.blank?
+      return failure([ I18n.t("resumes.photo_library.upload_ingestion_service.max_files", count: MAX_FILES_PER_REQUEST) ]) if files.size > MAX_FILES_PER_REQUEST
 
       created_assets = []
       duplicate_assets = []

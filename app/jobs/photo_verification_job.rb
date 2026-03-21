@@ -25,7 +25,7 @@ class PhotoVerificationJob < ApplicationJob
         "verification_feedback" => result.execution.response_text,
         "verification_metadata" => result.execution.metadata
       },
-      next_step_guidance: "Review the verification feedback before selecting this candidate for a template slot."
+      next_step_guidance: I18n.t("resumes.editor_personal_details_step.photo_library.recent_runs.guidance.verify_candidate")
     )
     track_output(
       photo_processing_run_id: photo_processing_run.id,

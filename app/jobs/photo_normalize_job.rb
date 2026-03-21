@@ -17,7 +17,7 @@ class PhotoNormalizeJob < ApplicationJob
     photo_processing_run.mark_succeeded!(
       output_asset_ids: [ result.asset.id ],
       response_payload: result.metadata,
-      next_step_guidance: "Enhanced derivative queued automatically for selection-ready output."
+      next_step_guidance: I18n.t("resumes.editor_personal_details_step.photo_library.recent_runs.guidance.normalize")
     )
     track_output(
       photo_processing_run_id: photo_processing_run.id,

@@ -16,7 +16,7 @@ module Photos
     end
 
     def call
-      return failure("Assign at least one vision verification model before requesting candidate review.") if verification_models.blank?
+      return failure(I18n.t("resumes.photo_library.verification_service.no_models")) if verification_models.blank?
 
       execution = Llm::ParallelVisionRunner.new(
         user: user,
@@ -33,7 +33,7 @@ module Photos
         }
       ).call.find(&:success?)
 
-      return failure("No provider returned verification feedback for this candidate.") if execution.blank?
+      return failure(I18n.t("resumes.photo_library.verification_service.no_feedback")) if execution.blank?
 
       Result.new(success: true, execution: execution, error_message: nil)
     end

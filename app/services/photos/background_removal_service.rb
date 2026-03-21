@@ -17,7 +17,7 @@ module Photos
     end
 
     def call
-      return failure("Assign at least one vision generation model before requesting background removal.") if generation_models.blank?
+      return failure(I18n.t("resumes.photo_library.background_removal_service.no_models")) if generation_models.blank?
 
       execution = Llm::ParallelVisionRunner.new(
         user: user,
@@ -34,11 +34,11 @@ module Photos
         }
       ).call.find(&:success?)
 
-      return failure("No provider returned a reusable background-removed image.") if execution.blank? || execution.images.blank?
+      return failure(I18n.t("resumes.photo_library.background_removal_service.no_reusable_image")) if execution.blank? || execution.images.blank?
 
       image_payload = execution.images.first
       image_data = image_payload["data"].presence || image_payload["base64"].presence
-      return failure("No provider returned image data for the background removal step.") if image_data.blank?
+      return failure(I18n.t("resumes.photo_library.background_removal_service.no_image_data")) if image_data.blank?
 
       asset = persist_asset(execution:, image_payload:, image_data:)
       Result.new(success: true, execution: execution, asset: asset, error_message: nil)

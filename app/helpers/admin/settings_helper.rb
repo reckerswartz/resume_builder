@@ -55,28 +55,25 @@ module Admin::SettingsHelper
     end
   end
 
+  def admin_settings_page_state(platform_setting:, llm_models:, text_llm_models:, vision_llm_models:, llm_assignment_model_ids:, llm_providers_count:)
+    @admin_settings_page_states ||= Hash.new { |hash, key| hash[key] = {} }
+    state_key = [ llm_models.map(&:id), text_llm_models.map(&:id), vision_llm_models.map(&:id), llm_assignment_model_ids, llm_providers_count ]
+
+    @admin_settings_page_states[platform_setting.object_id][state_key] ||= Admin::SettingsPageState.new(
+      platform_setting: platform_setting,
+      llm_models: llm_models,
+      text_llm_models: text_llm_models,
+      vision_llm_models: vision_llm_models,
+      llm_assignment_model_ids: llm_assignment_model_ids,
+      llm_providers_count: llm_providers_count,
+      view_context: self
+    )
+  end
+
   def llm_model_options_for_select(llm_models)
     llm_models.map do |llm_model|
       [ [ llm_model.name, settings_llm_model_option_summary(llm_model) ].compact.join(" · "), llm_model.id ]
     end
-  end
-
-  def selected_llm_model_id(assignments_by_role, role)
-    Array(assignments_by_role.fetch(role.to_s, [])).first
-  end
-
-  def selected_llm_model_ids(assignments_by_role, role)
-    Array(assignments_by_role.fetch(role.to_s, []))
-  end
-
-  def settings_primary_llm_model(assignments_by_role, role, llm_models)
-    selected_id = selected_llm_model_id(assignments_by_role, role)
-    llm_models.find { |llm_model| llm_model.id == selected_id }
-  end
-
-  def settings_selected_llm_models(assignments_by_role, role, llm_models)
-    selected_ids = selected_llm_model_ids(assignments_by_role, role)
-    llm_models.select { |llm_model| selected_ids.include?(llm_model.id) }
   end
 
   def settings_llm_model_option_summary(llm_model)

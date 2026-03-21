@@ -1,6 +1,6 @@
 # Admin settings update orchestration
 
-This file tracks the `Admin::SettingsController` maintainability hotspot around the settings update flow, especially the controller-owned transaction, role-assignment orchestration, and success/failure branching.
+This file tracks the `Admin::SettingsController` maintainability hotspot around the admin settings surface, especially the controller-owned update workflow and the heavy inline page-state setup that previously lived in the settings view.
 
 ## Status
 
@@ -9,43 +9,46 @@ This file tracks the `Admin::SettingsController` maintainability hotspot around 
 - Path: `app/controllers/admin/settings_controller.rb`
 - Category: `controller`
 - Priority: `high`
-- Status: `improved`
+- Status: `closed`
 - Recommended refactor shape: `extract_service`
-- Last reviewed: `2026-03-20T23:30:00Z`
-- Last changed: `2026-03-20T23:30:00Z`
+- Last reviewed: `2026-03-20T23:55:00Z`
+- Last changed: `2026-03-20T23:55:00Z`
 
 ## Hotspot summary
 
 - Primary problem:
-  - `Admin::SettingsController#update` currently owns transaction control, cross-model workflow orchestration, error aggregation, and response branching inline.
+  - The admin settings surface previously mixed controller-owned update workflow orchestration with heavy inline page-state assembly, which made behavior harder to change safely.
 - Signals:
-  - The controller coordinates both `PlatformSetting` persistence and `Llm::RoleAssignmentUpdater` assignment syncing in one action.
-  - Success state is tracked through a mutable local flag rather than a dedicated workflow result.
+  - `Admin::SettingsController#update` coordinated both `PlatformSetting` persistence and `Llm::RoleAssignmentUpdater` assignment syncing inline.
+  - `app/views/admin/settings/show.html.erb` previously assembled feature-flag, connector-readiness, and LLM-assignment state inline before rendering the admin sections.
 - Risks:
-  - Future admin settings changes can make the controller harder to extend safely because the update action mixes HTTP concerns with workflow behavior.
-  - Failure handling can drift because validation errors from multiple layers are merged inside the controller.
+  - Future admin settings changes could sprawl across the controller, helper, and view if workflow orchestration and presentation-state responsibilities stayed mixed together.
+  - Readiness badges, default-preference summaries, and LLM selection state could drift if the same calculations remained embedded directly in the template.
 
 ## Current boundary notes
 
 - Current owners:
   - `Admin::SettingsController#update`
+  - `app/views/admin/settings/show.html.erb`
+  - `Admin::SettingsHelper`
   - `Llm::RoleAssignmentUpdater`
   - `PlatformSetting`
 - Desired boundary direction:
-  - Keep the controller on authorization, params, and response selection while moving the multi-step update workflow into a focused admin service.
+  - Keep the controller on authorization, params, and response selection while moving the multi-step update workflow into a focused admin service and view-state assembly into a helper-backed presenter/state object.
 - Constraints:
   - Behavior must stay unchanged for feature flag updates, preference updates, role assignment syncing, and validation error rendering on the settings page.
 
 ## Current slice
 
-- Slice goal: `Extract the settings update transaction and error-merging workflow into a focused admin service without changing the admin settings behavior.`
+- Slice goal: `Extract the heavy inline page-state setup from app/views/admin/settings/show.html.erb into a helper-backed presenter/state object without changing the rendered admin settings surface.`
 - Expected files to change:
-  - `app/controllers/admin/settings_controller.rb`
-  - `app/services/admin/settings_update_service.rb`
+  - `app/views/admin/settings/show.html.erb`
+  - `app/helpers/admin/settings_helper.rb`
+  - `app/presenters/admin/settings_page_state.rb`
   - `spec/requests/admin/settings_spec.rb`
-  - `spec/services/admin/settings_update_service_spec.rb`
+  - `spec/presenters/admin/settings_page_state_spec.rb`
 - Behavior guardrails:
-  - Keep `PATCH /admin/settings` behavior unchanged for both successful updates and validation/assignment failures.
+  - Keep the rendered `GET /admin/settings` admin shell unchanged while moving top-of-template state assembly out of the view.
 
 ## Completed
 
@@ -55,27 +58,32 @@ This file tracks the `Admin::SettingsController` maintainability hotspot around 
 - Updated `Admin::SettingsController#update` to delegate the workflow and stay focused on authorization, params, and response selection.
 - Added focused service coverage for successful settings updates and invalid role-assignment rollback behavior.
 - Added focused request coverage for the invalid role-assignment failure path on `PATCH /admin/settings`.
+- Extracted the heavy inline admin settings view-state setup into `Admin::SettingsPageState` and wired it through `Admin::SettingsHelper`.
+- Updated `app/views/admin/settings/show.html.erb` to consume the presenter-backed page state instead of assembling workflow, connector, and LLM state inline.
+- Added focused presenter coverage for `Admin::SettingsPageState` and re-verified the admin settings request surface after the view cleanup.
 
 ## Pending
 
-- Reassess whether the heavy inline state assembly at the top of `app/views/admin/settings/show.html.erb` should move into a presenter/helper-backed page-state object.
+- No remaining follow-up keys for this tracked admin settings hotspot.
+- Next likely hotspot: review `Admin::LlmProvidersController#create/update` for provider persistence plus post-save model-sync orchestration and controller-owned sync message composition.
 
 ## Open follow-up keys
 
-- `extract-settings-page-state`
+- none
 
 ## Closed follow-up keys
 
 - `extract-settings-update-service`
+- `extract-settings-page-state`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/services/admin/settings_update_service_spec.rb spec/requests/admin/settings_spec.rb`
+  - `bundle exec rspec spec/presenters/admin/settings_page_state_spec.rb spec/requests/admin/settings_spec.rb`
 - Lint or syntax:
-  - `ruby -c app/controllers/admin/settings_controller.rb`
-  - `ruby -c app/services/admin/settings_update_service.rb`
+  - `ruby -c app/presenters/admin/settings_page_state.rb`
+  - `ruby -c app/helpers/admin/settings_helper.rb`
+  - `ruby -c spec/presenters/admin/settings_page_state_spec.rb`
   - `ruby -c spec/requests/admin/settings_spec.rb`
-  - `ruby -c spec/services/admin/settings_update_service_spec.rb`
 - Notes:
-  - The focused admin settings/service verification passed with 5 examples and 0 failures.
+  - The focused presenter/request verification passed with 7 examples and 0 failures.

@@ -31,7 +31,7 @@ class ResumeTemplateImageGenerationJob < ApplicationJob
         "prompt_text" => result.prompt_text,
         "generated_asset_ids" => result.assets.map(&:id)
       },
-      next_step_guidance: "Generated portrait candidates are ready for review and selection."
+      next_step_guidance: I18n.t("resumes.editor_personal_details_step.photo_library.recent_runs.guidance.generate_for_template")
     )
     track_output(
       photo_processing_run_id: photo_processing_run.id,

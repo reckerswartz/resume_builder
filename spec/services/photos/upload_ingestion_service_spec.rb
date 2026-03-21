@@ -23,6 +23,31 @@ RSpec.describe Photos::UploadIngestionService, type: :service do
   end
 
   describe '#call' do
+    it 'returns the localized required-files error when no uploads are provided' do
+      result = described_class.new(user: user, photo_profile: photo_profile, uploaded_files: []).call
+
+      expect(result).not_to be_success
+      expect(result.created_assets).to be_empty
+      expect(result.duplicate_assets).to be_empty
+      expect(result.errors).to eq([ I18n.t('resumes.photo_library.upload_ingestion_service.files_required') ])
+      expect(result.error_message).to eq(I18n.t('resumes.photo_library.upload_ingestion_service.files_required'))
+    end
+
+    it 'returns the localized max-files error when the request exceeds the upload limit' do
+      uploaded_files = Array.new(described_class::MAX_FILES_PER_REQUEST + 1) do
+        instance_double(Rack::Test::UploadedFile, blank?: false)
+      end
+
+      result = described_class.new(user: user, photo_profile: photo_profile, uploaded_files: uploaded_files).call
+
+      expect(result).not_to be_success
+      expect(result.created_assets).to be_empty
+      expect(result.duplicate_assets).to be_empty
+      expect(result.errors).to eq([
+        I18n.t('resumes.photo_library.upload_ingestion_service.max_files', count: described_class::MAX_FILES_PER_REQUEST)
+      ])
+    end
+
     it 'creates a source asset and queues a normalization run' do
       result = nil
 

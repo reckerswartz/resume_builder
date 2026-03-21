@@ -32,7 +32,7 @@ module TemplatesHelper
 
     [
       build_template_marketplace_filter_group(
-        label: "Family",
+        label: I18n.t("templates.marketplace_state.filter_groups.family"),
         key: "family",
         selected_value: family_filter,
         options: template_cards.group_by { |template_card| template_card.fetch(:family) }.map do |value, cards|
@@ -40,7 +40,7 @@ module TemplatesHelper
         end.sort_by { |option| option.fetch(:label) }
       ),
       build_template_marketplace_filter_group(
-        label: "Density",
+        label: I18n.t("templates.marketplace_state.filter_groups.density"),
         key: "density",
         selected_value: density_filter,
         options: ResumeTemplates::Catalog.density_options.filter_map do |label, value|
@@ -51,7 +51,7 @@ module TemplatesHelper
         end
       ),
       build_template_marketplace_filter_group(
-        label: "Columns",
+        label: I18n.t("templates.marketplace_state.filter_groups.columns"),
         key: "column_count",
         selected_value: column_count_filter,
         options: ResumeTemplates::Catalog.column_count_options.filter_map do |label, value|
@@ -62,7 +62,7 @@ module TemplatesHelper
         end
       ),
       build_template_marketplace_filter_group(
-        label: "Theme",
+        label: I18n.t("templates.marketplace_state.filter_groups.theme"),
         key: "theme_tone",
         selected_value: theme_tone_filter,
         options: ResumeTemplates::Catalog.theme_tone_options.filter_map do |label, value|
@@ -73,7 +73,7 @@ module TemplatesHelper
         end
       ),
       build_template_marketplace_filter_group(
-        label: "Layout",
+        label: I18n.t("templates.marketplace_state.filter_groups.layout"),
         key: "shell_style",
         selected_value: shell_style_filter,
         options: ResumeTemplates::Catalog.shell_style_options.filter_map do |label, value|
@@ -92,15 +92,15 @@ module TemplatesHelper
 
   def template_marketplace_active_badges(query:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:, sort: nil, default_sort_value: nil, sort_options: [])
     badges = []
-    badges << { label: %(Query: "#{query}"), tone: :neutral } if query.present?
+    badges << { label: I18n.t("templates.marketplace_state.active_badges.query", query: query), tone: :neutral } if query.present?
     badges << { label: ResumeTemplates::Catalog.family_label(family_filter), tone: :neutral } if family_filter.present?
-    badges << { label: density_filter.to_s.titleize, tone: :neutral } if density_filter.present?
+    badges << { label: ResumeTemplates::Catalog.density_label(density_filter), tone: :neutral } if density_filter.present?
     badges << { label: ResumeTemplates::Catalog.column_count_label(column_count_filter), tone: :neutral } if column_count_filter.present?
     badges << { label: ResumeTemplates::Catalog.theme_tone_label(theme_tone_filter), tone: :neutral } if theme_tone_filter.present?
-    badges << { label: shell_style_filter.to_s.titleize, tone: :neutral } if shell_style_filter.present?
+    badges << { label: ResumeTemplates::Catalog.shell_style_label(shell_style_filter), tone: :neutral } if shell_style_filter.present?
     if sort.present? && sort != default_sort_value
-      sort_label = sort_options.find { |option| option.fetch(:value) == sort }&.fetch(:label) || sort.to_s.titleize
-      badges << { label: "Sort: #{sort_label}", tone: :neutral }
+      sort_label = sort_options.find { |option| option.fetch(:value) == sort }&.fetch(:label) || I18n.t("templates.marketplace_state.sort_options.#{sort}", default: sort.to_s.humanize)
+      badges << { label: I18n.t("templates.marketplace_state.active_badges.sort", sort: sort_label), tone: :neutral }
     end
     badges
   end
@@ -117,7 +117,7 @@ module TemplatesHelper
         label: label,
         key: key,
         options: [
-          { value: "all", label: "All", count: options.sum { |option| option.fetch(:count) }, active: selected_value.blank? },
+          { value: "all", label: I18n.t("templates.marketplace_state.filter_groups.all"), count: options.sum { |option| option.fetch(:count) }, active: selected_value.blank? },
           *options.map { |option| option.merge(active: selected_value == option.fetch(:value)) }
         ]
       }

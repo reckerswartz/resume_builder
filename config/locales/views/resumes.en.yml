@@ -32,8 +32,35 @@ en:
         generation_unavailable: "Resume image generation is unavailable right now."
         verification_unavailable: "Photo verification is unavailable right now."
         resume_required: "Open this action from a specific resume to continue."
+      upload_ingestion_service:
+        files_required: "Attach at least one photo to continue."
+        max_files:
+          one: "Upload up to %{count} photo at a time."
+          other: "Upload up to %{count} photos at a time."
+      background_removal_service:
+        no_models: "Assign at least one vision generation model before requesting background removal."
+        no_reusable_image: "No provider returned a reusable background-removed image."
+        no_image_data: "No provider returned image data for the background removal step."
+      verification_service:
+        no_models: "Assign at least one vision verification model before requesting candidate review."
+        no_feedback: "No provider returned verification feedback for this candidate."
+      generation_orchestrator:
+        no_models: "Assign at least one vision generation model before requesting resume image generation."
+        no_generated_image: "No provider returned a reusable generated image."
       selection_service:
         asset_user_mismatch: "Selected photo does not belong to the same user as the resume."
+    cloud_import_provider_catalog:
+      providers:
+        google_drive:
+          label: "Google Drive"
+          description: "Browse a Drive file after provider auth is wired and keep the imported file attached to the draft."
+        dropbox:
+          label: "Dropbox"
+          description: "Choose a Dropbox file after provider auth is wired and keep the imported file attached to the draft."
+      feedback:
+        provider_unavailable: "Cloud import provider is not available."
+        configured: "%{provider} import is not connected yet. Provider auth handoff is the next rollout step."
+        setup_required: "%{provider} import is not configured. Add %{env_vars} to enable this connector."
     entries_controller:
       created: "Entry added."
       updated: "Entry updated."
