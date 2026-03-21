@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# Creates a GitHub issue from workflow findings.
+# Idempotent: searches for existing open issue with same title before creating.
+# Supports screenshot upload: screenshots are pushed to the 'screenshots' branch
+# and embedded in the issue body as images.
+#
+# Usage: bin/gh-bridge/create-issue \
+#   --workflow "template-audit" \
+#   --key "MOD-006" \
+#   --title "Page count overflow on Modern template full profile" \
+#   --severity "medium" \
+#   --domain "templates" \
+#   --type "discrepancy" \
+#   --body "Markdown body text" \
+#   [--body-file "/path/to/issue_body.md"] \
+#   [--screenshot "/path/to/screenshot.png"] \
+#   [--screenshot "/path/to/another.png"]
+#
+# Outputs: GitHub issue number
+
+set -euo pipefail
+
+WORKFLOW=""
+KEY=""
+TITLE=""
+SEVERITY=""
+DOMAIN=""
+TYPE=""
+BODY=""
+BODY_FILE=""
+SCREENSHOTS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow)   WORKFLOW="$2";    shift 2 ;;
+    --key)        KEY="$2";        shift 2 ;;
+    --title)      TITLE="$2";      shift 2 ;;
+    --severity)   SEVERITY="$2";   shift 2 ;;
+    --domain)     DOMAIN="$2";     shift 2 ;;
+    --type)       TYPE="$2";       shift 2 ;;
+    --body)       BODY="$2";       shift 2 ;;
+    --body-file)  BODY_FILE="$2";  shift 2 ;;
+    --screenshot) SCREENSHOTS+=("$2"); shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$WORKFLOW" ] || [ -z "$KEY" ] || [ -z "$TITLE" ]; then
+  echo "ERROR: --workflow, --key, and --title are required." >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+FULL_TITLE="[${WORKFLOW}] ${TITLE} (${KEY})"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Check for existing open issue with the same title
+EXISTING=$(gh issue list --repo "$REPO" --state open --search "\"${FULL_TITLE}\"" --json number,title -q ".[] | select(.title == \"${FULL_TITLE}\") | .number" 2>/dev/null || true)
+
+if [ -n "$EXISTING" ]; then
+  # Update existing issue with new screenshots if provided
+  if [ ${#SCREENSHOTS[@]} -gt 0 ]; then
+    SCREENSHOT_BODY="## Updated Screenshots"$'\n'
+    for ss in "${SCREENSHOTS[@]}"; do
+      if [ -f "$ss" ]; then
+        URL=$("$SCRIPT_DIR/upload-screenshot" --file "$ss" --key "${WORKFLOW}-${KEY}" 2>/dev/null || true)
+        if [ -n "$URL" ]; then
+          SCREENSHOT_BODY="${SCREENSHOT_BODY}"$'\n'"![${KEY}](${URL})"$'\n'
+        fi
+      fi
+    done
+    gh issue comment "$EXISTING" --repo "$REPO" --body "$SCREENSHOT_BODY" 2>/dev/null || true
+  fi
+  echo "$EXISTING"
+  exit 0
+fi
+
+# Build label list
+LABELS="workflow:${WORKFLOW},status:open"
+[ -n "$SEVERITY" ] && LABELS="${LABELS},severity:${SEVERITY}"
+[ -n "$DOMAIN" ]   && LABELS="${LABELS},domain:${DOMAIN}"
+[ -n "$TYPE" ]     && LABELS="${LABELS},type:${TYPE}"
+
+# Build body content
+BODY_CONTENT=""
+if [ -n "$BODY_FILE" ] && [ -f "$BODY_FILE" ]; then
+  BODY_CONTENT=$(cat "$BODY_FILE")
+elif [ -n "$BODY" ]; then
+  BODY_CONTENT="$BODY"
+else
+  BODY_CONTENT="## Finding
+
+**Workflow**: \`/${WORKFLOW}\`
+**Tracking key**: \`${KEY}\`
+**Severity**: ${SEVERITY:-unclassified}
+**Domain**: ${DOMAIN:-unclassified}
+
+_Describe the finding here._"
+fi
+
+# Upload screenshots and append to body
+if [ ${#SCREENSHOTS[@]} -gt 0 ]; then
+  BODY_CONTENT="${BODY_CONTENT}"$'\n\n'"## Screenshots"$'\n'
+  for ss in "${SCREENSHOTS[@]}"; do
+    if [ -f "$ss" ]; then
+      URL=$("$SCRIPT_DIR/upload-screenshot" --file "$ss" --key "${WORKFLOW}-${KEY}" 2>/dev/null || true)
+      if [ -n "$URL" ]; then
+        BODY_CONTENT="${BODY_CONTENT}"$'\n'"![${KEY}](${URL})"$'\n'
+      fi
+    fi
+  done
+fi
+
+# Create the issue
+ISSUE_URL=$(gh issue create \
+  --repo "$REPO" \
+  --title "$FULL_TITLE" \
+  --body "$BODY_CONTENT" \
+  --label "$LABELS" 2>/dev/null)
+
+ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oP '\d+$')
+echo "$ISSUE_NUMBER"

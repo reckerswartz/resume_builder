@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Updates an existing GitHub issue with progress notes and status label changes.
+#
+# Usage: bin/gh-bridge/update-issue \
+#   --issue 42 \
+#   [--status "in-progress"] \
+#   [--comment "Progress update text"] \
+#   [--comment-file "/path/to/notes.md"] \
+#   [--add-label "coordination:shared-file"] \
+#   [--remove-label "status:open"]
+#
+# Outputs: issue number
+
+set -euo pipefail
+
+ISSUE=""
+STATUS=""
+COMMENT=""
+COMMENT_FILE=""
+ADD_LABELS=""
+REMOVE_LABELS=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --issue)        ISSUE="$2";        shift 2 ;;
+    --status)       STATUS="$2";       shift 2 ;;
+    --comment)      COMMENT="$2";      shift 2 ;;
+    --comment-file) COMMENT_FILE="$2"; shift 2 ;;
+    --add-label)    ADD_LABELS="${ADD_LABELS:+${ADD_LABELS},}$2"; shift 2 ;;
+    --remove-label) REMOVE_LABELS="${REMOVE_LABELS:+${REMOVE_LABELS},}$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$ISSUE" ]; then
+  echo "ERROR: --issue is required." >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+# Handle status label transition
+if [ -n "$STATUS" ]; then
+  # Remove all existing status labels
+  for old_status in open in-progress needs-review verified blocked deferred; do
+    gh issue edit "$ISSUE" --repo "$REPO" --remove-label "status:${old_status}" 2>/dev/null || true
+  done
+  # Add the new status label
+  gh issue edit "$ISSUE" --repo "$REPO" --add-label "status:${STATUS}" 2>/dev/null || true
+fi
+
+# Add extra labels
+if [ -n "$ADD_LABELS" ]; then
+  gh issue edit "$ISSUE" --repo "$REPO" --add-label "$ADD_LABELS" 2>/dev/null || true
+fi
+
+# Remove labels
+if [ -n "$REMOVE_LABELS" ]; then
+  IFS=',' read -ra LABELS_ARR <<< "$REMOVE_LABELS"
+  for lbl in "${LABELS_ARR[@]}"; do
+    gh issue edit "$ISSUE" --repo "$REPO" --remove-label "$lbl" 2>/dev/null || true
+  done
+fi
+
+# Add comment
+if [ -n "$COMMENT_FILE" ] && [ -f "$COMMENT_FILE" ]; then
+  gh issue comment "$ISSUE" --repo "$REPO" --body-file "$COMMENT_FILE" 2>/dev/null || true
+elif [ -n "$COMMENT" ]; then
+  gh issue comment "$ISSUE" --repo "$REPO" --body "$COMMENT" 2>/dev/null || true
+fi
+
+echo "$ISSUE"

@@ -431,6 +431,31 @@ en:
         mid_to_senior: "Mid to senior"
         growth_stage: "Growth stage"
     experience_step_state:
+      section_guidance:
+        early_career:
+          title: "Every role counts"
+          description: "Internships, campus work, tutoring, volunteering, and freelance projects all demonstrate real skills. Focus on responsibilities, collaboration, and measurable contributions."
+          badge: "Early-career friendly"
+          helper_text: "Use nearby examples when the category feels too narrow. The goal is to show credible work, not to force one job-title pattern."
+          role_chips:
+            - "Internships"
+            - "Volunteering"
+            - "Teaching assistant"
+            - "Tutor"
+            - "Campus work"
+            - "Freelance"
+        experienced:
+          title: "Lead with impact"
+          description: "Highlight leadership, ownership, and measurable outcomes. Show how you drove projects, mentored others, and delivered business results."
+          badge: "Role-aware"
+          helper_text: "Quantify achievements where possible. Employers scan for scope, scale, and outcomes before reading details."
+          role_chips:
+            - "Leadership"
+            - "Strategy"
+            - "Cross-functional"
+            - "Revenue impact"
+            - "Team growth"
+            - "Process improvement"
       eyebrow: "Role-aware bullet help"
       title_with_query: "Bullet ideas for %{query}"
       title_without_query: "Bullet ideas that still count"

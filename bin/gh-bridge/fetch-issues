@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Fetches open GitHub issues filtered by workflow, domain, severity, or status.
+# This is the primary state-reading command — all workflow state lives on GitHub.
+#
+# Usage:
+#   bin/gh-bridge/fetch-issues                              # all open issues
+#   bin/gh-bridge/fetch-issues --workflow template-audit     # by workflow
+#   bin/gh-bridge/fetch-issues --domain templates            # by domain
+#   bin/gh-bridge/fetch-issues --severity high               # by severity
+#   bin/gh-bridge/fetch-issues --status in-progress          # by status
+#   bin/gh-bridge/fetch-issues --state closed --limit 10     # closed issues
+#   bin/gh-bridge/fetch-issues --next                        # next issue to process (oldest open)
+#   bin/gh-bridge/fetch-issues --json                        # JSON output for scripting
+#
+# Outputs: issue list (human-readable or JSON)
+
+set -euo pipefail
+
+WORKFLOW=""
+DOMAIN=""
+SEVERITY=""
+STATUS=""
+STATE="open"
+LIMIT="50"
+NEXT=""
+JSON_OUT=""
+LABELS=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow) WORKFLOW="$2";  shift 2 ;;
+    --domain)   DOMAIN="$2";   shift 2 ;;
+    --severity) SEVERITY="$2"; shift 2 ;;
+    --status)   STATUS="$2";   shift 2 ;;
+    --state)    STATE="$2";    shift 2 ;;
+    --limit)    LIMIT="$2";    shift 2 ;;
+    --next)     NEXT="true";   shift ;;
+    --json)     JSON_OUT="true"; shift ;;
+    --label)    LABELS="${LABELS:+${LABELS},}$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+# Build label filter
+LABEL_FILTER=""
+[ -n "$WORKFLOW" ] && LABEL_FILTER="${LABEL_FILTER:+${LABEL_FILTER},}workflow:${WORKFLOW}"
+[ -n "$DOMAIN" ]   && LABEL_FILTER="${LABEL_FILTER:+${LABEL_FILTER},}domain:${DOMAIN}"
+[ -n "$SEVERITY" ] && LABEL_FILTER="${LABEL_FILTER:+${LABEL_FILTER},}severity:${SEVERITY}"
+[ -n "$STATUS" ]   && LABEL_FILTER="${LABEL_FILTER:+${LABEL_FILTER},}status:${STATUS}"
+[ -n "$LABELS" ]   && LABEL_FILTER="${LABEL_FILTER:+${LABEL_FILTER},}${LABELS}"
+
+# Next mode: return the single oldest open issue (FIFO queue)
+if [ -n "$NEXT" ]; then
+  RESULT=$(gh issue list --repo "$REPO" --state open \
+    ${LABEL_FILTER:+--label "$LABEL_FILTER"} \
+    --limit 1 --json number,title,labels,createdAt,body \
+    --jq 'sort_by(.createdAt) | .[0]' 2>/dev/null)
+
+  if [ -z "$RESULT" ] || [ "$RESULT" = "null" ]; then
+    echo "No issues in queue."
+    exit 0
+  fi
+  echo "$RESULT"
+  exit 0
+fi
+
+# Standard list
+if [ -n "$JSON_OUT" ]; then
+  gh issue list --repo "$REPO" --state "$STATE" \
+    ${LABEL_FILTER:+--label "$LABEL_FILTER"} \
+    --limit "$LIMIT" \
+    --json number,title,labels,state,createdAt,updatedAt,assignees 2>/dev/null
+else
+  gh issue list --repo "$REPO" --state "$STATE" \
+    ${LABEL_FILTER:+--label "$LABEL_FILTER"} \
+    --limit "$LIMIT" 2>/dev/null
+fi

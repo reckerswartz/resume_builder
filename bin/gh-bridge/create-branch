@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Creates a working branch for a workflow fix.
+# Idempotent: switches to existing branch if it already exists.
+#
+# Usage: bin/gh-bridge/create-branch \
+#   --workflow "template-audit" \
+#   --key "MOD-006-page-count-overflow" \
+#   [--base "main"]
+#
+# Outputs: branch name
+
+set -euo pipefail
+
+WORKFLOW=""
+KEY=""
+BASE="main"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow) WORKFLOW="$2"; shift 2 ;;
+    --key)      KEY="$2";     shift 2 ;;
+    --base)     BASE="$2";    shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$WORKFLOW" ] || [ -z "$KEY" ]; then
+  echo "ERROR: --workflow and --key are required." >&2
+  exit 1
+fi
+
+# Sanitize branch name: lowercase, replace underscores with hyphens, max 80 chars
+BRANCH="${WORKFLOW}/${KEY}"
+BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | cut -c1-80)
+
+# Check if branch already exists locally
+if git show-ref --verify --quiet "refs/heads/${BRANCH}" 2>/dev/null; then
+  git checkout "$BRANCH" 2>/dev/null
+  echo "$BRANCH"
+  exit 0
+fi
+
+# Check if branch exists on remote
+if git ls-remote --heads origin "$BRANCH" 2>/dev/null | grep -q "$BRANCH"; then
+  git fetch origin "$BRANCH" 2>/dev/null
+  git checkout -b "$BRANCH" "origin/${BRANCH}" 2>/dev/null
+  echo "$BRANCH"
+  exit 0
+fi
+
+# Create new branch from base
+git fetch origin "$BASE" 2>/dev/null || true
+git checkout -b "$BRANCH" "origin/${BASE}" 2>/dev/null || git checkout -b "$BRANCH" "$BASE" 2>/dev/null
+echo "$BRANCH"

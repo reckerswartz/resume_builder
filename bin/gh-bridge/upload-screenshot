@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Uploads a screenshot to a dedicated 'screenshots' branch and returns the raw URL.
+# The URL can then be embedded in GitHub issue comments as ![img](url).
+#
+# Usage: bin/gh-bridge/upload-screenshot \
+#   --file "tmp/screenshots/template-audit-modern.png" \
+#   --key "template-audit-modern" \
+#   [--message "Modern template audit screenshot"]
+#
+# Outputs: raw.githubusercontent.com URL of the uploaded image
+
+set -euo pipefail
+
+FILE=""
+KEY=""
+MESSAGE="Add workflow screenshot"
+BRANCH="screenshots"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --file)    FILE="$2";    shift 2 ;;
+    --key)     KEY="$2";     shift 2 ;;
+    --message) MESSAGE="$2"; shift 2 ;;
+    --branch)  BRANCH="$2";  shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
+  echo "ERROR: --file is required and must exist." >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
+FILENAME="${KEY:-screenshot}-${TIMESTAMP}.png"
+DEST_PATH="screenshots/${FILENAME}"
+
+# Ensure the screenshots branch exists
+if ! git ls-remote --heads origin "$BRANCH" 2>/dev/null | grep -q "$BRANCH"; then
+  # Create orphan branch
+  git checkout --orphan "$BRANCH" 2>/dev/null
+  git rm -rf . 2>/dev/null || true
+  echo "# Workflow Screenshots" > README.md
+  git add README.md
+  git commit -m "Initialize screenshots branch" 2>/dev/null
+  git push origin "$BRANCH" 2>/dev/null
+  git checkout - 2>/dev/null
+fi
+
+# Upload the file using GitHub API (contents endpoint)
+CONTENT=$(base64 -w 0 "$FILE")
+RESPONSE=$(gh api "repos/${REPO}/contents/${DEST_PATH}" \
+  --method PUT \
+  --field message="${MESSAGE}" \
+  --field content="${CONTENT}" \
+  --field branch="${BRANCH}" \
+  --jq '.content.download_url' 2>/dev/null || true)
+
+if [ -n "$RESPONSE" ] && [ "$RESPONSE" != "null" ]; then
+  echo "$RESPONSE"
+else
+  # Fallback: construct URL manually
+  echo "https://raw.githubusercontent.com/${REPO}/${BRANCH}/${DEST_PATH}"
+fi

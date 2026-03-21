@@ -1,4 +1,6 @@
 <% if current_step[:key] == "experience" %>
+  <% guidance = resume_experience_step_state(resume).section_guidance %>
+
   <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
     <%= render Ui::StepHeaderComponent.new(
       title: current_step[:title],
@@ -9,9 +11,7 @@
       </div>
     <% end %>
   <% end %>
-<% end %>
 
-<% if current_step[:key] == "experience" %>
   <%= render Ui::SurfaceCardComponent.new(
     tag: :details,
     padding: :none,
@@ -19,18 +19,18 @@
     html_options: { id: "experience-step-tips" }
   ) do %>
     <summary class="flex cursor-pointer list-none items-center justify-between gap-3 border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-3 [&::-webkit-details-marker]:hidden">
-      <span class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_section_step.experience_guidance.title") %></span>
-      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_section_step.experience_guidance.badge") %></span>
+      <span class="text-sm font-semibold text-ink-950"><%= guidance[:title] %></span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= guidance[:badge] %></span>
     </summary>
 
     <div class="px-6 py-6">
       <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
-        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_section_step.experience_guidance.helper_text") %></p>
+        <p class="text-sm leading-6 text-ink-700/80"><%= guidance[:description] %></p>
+        <p class="text-sm leading-6 text-ink-700/80"><%= guidance[:helper_text] %></p>
         <div class="flex flex-wrap gap-2">
-          <%= link_to t("resumes.editor_section_step.experience_guidance.internships"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
-          <%= link_to t("resumes.editor_section_step.experience_guidance.volunteering"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
-          <%= link_to t("resumes.editor_section_step.experience_guidance.teaching_assistant"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
-          <%= link_to t("resumes.editor_section_step.experience_guidance.tutor"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
+          <% guidance[:role_chips].each do |chip| %>
+            <span class="<%= ui_badge_classes(:info) %>"><%= chip %></span>
+          <% end %>
         </div>
       </div>
     </div>

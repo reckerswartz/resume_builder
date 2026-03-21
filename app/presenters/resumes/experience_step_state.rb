@@ -4,6 +4,16 @@ module Resumes
       @resume = resume
     end
 
+    def section_guidance
+      {
+        title: section_guidance_title,
+        description: section_guidance_description,
+        badge: section_guidance_badge,
+        helper_text: section_guidance_helper_text,
+        role_chips: section_guidance_role_chips
+      }
+    end
+
     def suggestions_for(entry)
       query = query_for(entry)
       state = catalog_state_for(entry)
@@ -63,6 +73,32 @@ module Resumes
 
       def early_career?
         %w[no_experience less_than_3_years].include?(resume.experience_level.to_s)
+      end
+
+      def experience_tier
+        return :early_career if early_career?
+
+        :experienced
+      end
+
+      def section_guidance_title
+        I18n.t("resumes.experience_step_state.section_guidance.#{experience_tier}.title")
+      end
+
+      def section_guidance_description
+        I18n.t("resumes.experience_step_state.section_guidance.#{experience_tier}.description")
+      end
+
+      def section_guidance_badge
+        I18n.t("resumes.experience_step_state.section_guidance.#{experience_tier}.badge")
+      end
+
+      def section_guidance_helper_text
+        I18n.t("resumes.experience_step_state.section_guidance.#{experience_tier}.helper_text")
+      end
+
+      def section_guidance_role_chips
+        I18n.t("resumes.experience_step_state.section_guidance.#{experience_tier}.role_chips")
       end
 
       def presented_result(result)

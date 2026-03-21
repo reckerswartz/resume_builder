@@ -9,12 +9,17 @@ This workflow operates as a repeating cycle: **Investigate → Diagnose → Fix 
 ### Phase 1: Investigate & Regression Baseline
 
 1. Treat any text supplied after `/smart-fix` as the issue summary, failing spec, error message, stack trace, or affected user flow.
-2. Start with `@error-detective` to normalize the error signature, affected flow, suspected files, and highest-value next checks.
-3. Check for pending migrations with `bin/rails db:migrate:status` — pending migrations are a frequent root cause of runtime errors and false test failures in this project.
-4. Then invoke `@debugger` to reproduce the issue, identify the most likely root cause, and decide whether a code change is justified.
-5. **Regression baseline**: if this bug or flow was previously fixed, verify whether the issue has resurfaced and whether adjacent recently-changed files are implicated before starting new changes.
-6. If the affected flow touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before implementing a UI-facing fix.
-7. If the diagnosis is still ambiguous after those two passes, stop and ask the user for the smallest missing detail needed to proceed.
+2. **Read current state from GitHub** to check for related bug issues:
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow smart-fix
+   ```
+3. Start with `@error-detective` to normalize the error signature, affected flow, suspected files, and highest-value next checks.
+4. Check for pending migrations with `bin/rails db:migrate:status`.
+5. Then invoke `@debugger` to reproduce the issue, identify the most likely root cause, and decide whether a code change is justified.
+6. **Regression baseline**: check GitHub for previously-fixed bugs on the same flow.
+7. If the affected flow touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+8. If the diagnosis is still ambiguous, stop and ask the user for the smallest missing detail.
 
 ### Phase 2: Diagnose & Classify
 

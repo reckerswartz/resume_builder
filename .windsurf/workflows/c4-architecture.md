@@ -9,9 +9,13 @@ This workflow operates as a repeating cycle: **Map → Document → Validate →
 ### Phase 1: Context & Regression Baseline
 
 1. Treat any text supplied after `/c4-architecture` as the target scope, desired output directory, mode (`full-refresh`, `incremental`, `validate-only`, or `scope-specific`), exclusions, or architecture focus.
-2. Invoke `@c4-architecture`.
-3. Start by reading existing documentation: `docs/architecture_overview.md`, `docs/application_documentation_guidelines.md`, `.windsurfrules`, and any prior `C4-Documentation/` output. If prior docs exist, treat this invocation as an update cycle — identify what has changed since the last documentation pass.
-4. **Regression baseline**: before documenting new areas, compare the most recent architecture outputs against the live code to identify stale diagrams, renamed modules, missing data flows, or outdated boundaries. Correct previously-documented drift first so new work builds on a truthful baseline.
+2. **Read current state from GitHub** to check for related architecture issues:
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow c4-architecture
+   ```
+3. Invoke `@c4-architecture`. Read `docs/architecture_overview.md`, `docs/application_documentation_guidelines.md`, `.windsurfrules`, and any prior `C4-Documentation/` output.
+4. **Regression baseline**: compare architecture outputs against live code. Correct drift first.
 
 ### Phase 2: Map, Discover & Identify Drift
 

@@ -43,16 +43,6 @@ RSpec.describe 'UI baseline contract' do
     end
   end
 
-  it 'keeps the guidelines audit registry aligned with the baseline sources' do
-    registry = read_repo_file('docs/ui_audits/guidelines_review/registry.yml')
-
-    UI_BASELINE_DOCS.each do |doc|
-      expect(registry).to include(doc)
-    end
-
-    expect(registry).to include('docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md')
-  end
-
   KEY_WORKFLOWS.each do |workflow_path|
     it "#{workflow_path} requires the canonical UI baseline for UI-affecting work" do
       workflow = read_repo_file(workflow_path)

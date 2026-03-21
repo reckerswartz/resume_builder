@@ -6,13 +6,17 @@ description: Turn a Rails feature spec into a small-PR TDD implementation plan, 
 
 This workflow is one phase of the repeating feature lifecycle: **Spec → Review → Plan → Implement → Validate → Refine plan**. Each invocation produces or updates an implementation plan. The plan evolves as implementation progresses, validation uncovers follow-up work, and new requirements emerge.
 
-### Phase 1: Context, Prior Plans & Regression Baseline
+### Phase 1: Context & Baseline
 
 1. Treat any text supplied after `/feature-plan` as the target spec path or feature context.
-2. Invoke `@feature-plan`.
-3. Read the target spec before planning. If no spec is identified, ask the user which spec to plan from. Also read `.windsurfrules` and `docs/architecture_overview.md` for baseline context. If the plan affects views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before defining PRs.
-4. **Check for existing plans**: if this feature already has an implementation plan (in the spec doc or a separate plan file), treat this invocation as a plan update — incorporate completed PRs, implementation learnings, and newly discovered requirements rather than starting from scratch.
-5. **Regression baseline**: if implementation has already started, compare the current plan against completed work, validated behavior, and any reopened issues so the next PR queue reflects the live state rather than the original draft assumptions.
+2. **Read current state from GitHub:**
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow feature-plan
+   ```
+3. Invoke `@feature-plan`. Read the target spec, `.windsurfrules`, `docs/architecture_overview.md`. If the plan affects UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+4. Check GitHub for existing plan issues on the same feature. If found, treat as a plan update.
+5. **Regression baseline**: compare against completed work and reopened issues on GitHub.
 
 ### Phase 2: Plan & Prioritize PRs
 

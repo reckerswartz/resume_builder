@@ -1,18 +1,21 @@
 ---
-description: Review a Rails feature spec, score its readiness, and identify missing requirements or scenarios, as part of the continuous Spec → Review → Plan → Implement → Validate lifecycle.
+description: Review a Rails feature spec, score its readiness, and identify gaps, as part of the continuous Spec → Review → Plan → Implement → Validate lifecycle.
 ---
 
 ## Continuous Feature Lifecycle — Review Phase
 
-This workflow is one phase of the repeating feature lifecycle: **Spec → Review → Plan → Implement → Validate → Refine spec**. Each invocation scores the spec and identifies gaps. The cycle continues as the spec is refined, implementation feedback arrives, and previously-resolved gaps are checked for drift.
+This workflow is one phase of the repeating feature lifecycle: **Spec → Review → Plan → Implement → Validate → Refine spec**. All state is tracked on GitHub Issues.
 
-### Phase 1: Context, Prior Reviews & Regression Baseline
+### Phase 1: Context & Baseline
 
 1. Treat any text supplied after `/feature-review` as the target spec path or feature context.
-2. Invoke `@feature-review`.
-3. Read the target spec before reviewing it. If no spec is identified, ask the user which spec to review. Also read `.windsurfrules` for baseline conventions. If the feature touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before scoring readiness.
-4. **Check for prior reviews**: if this spec has been reviewed before, compare the current version against prior review findings. Track which gaps have been addressed and which remain open.
-5. **Regression baseline**: if the feature has already been planned or partially implemented, compare the spec against implementation feedback and current app behavior so reopened gaps are captured before scoring readiness.
+2. **Read current state from GitHub:**
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow feature-review
+   ```
+3. Invoke `@feature-review`. Read the target spec, `.windsurfrules`. If the feature touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+4. Check GitHub for prior review issues on the same feature. Track which gaps have been addressed.
 
 ### Phase 2: Score, Identify & Prioritize Gaps
 
