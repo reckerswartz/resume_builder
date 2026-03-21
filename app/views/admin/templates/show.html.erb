@@ -4,7 +4,9 @@
 <% artifact_review_groups = template_artifact_review_groups(@template) %>
 <% artifact_review_tone = template_artifact_review_tone(@template) %>
 <% current_implementation = template_current_implementation(@template) %>
+<% seed_baseline = template_seed_baseline(@template) %>
 <% draft_candidates = template_candidate_implementations(@template) %>
+<% historical_implementations = template_historical_implementations(@template) %>
 <% validation_runs = template_recent_validation_runs(@template) %>
 <% section_links = [
      { id: "shared-preview", label: t("admin.templates.show.navigation.sections.shared_preview.label"), caption: t("admin.templates.show.navigation.sections.shared_preview.caption") },
@@ -316,6 +318,49 @@
             </div>
           </div>
 
+          <div class="<%= ui_inset_panel_classes(tone: template_seed_baseline_tone(@template)) %>">
+            <div class="space-y-4">
+              <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.artifact_review.seed_baseline.title") %></p>
+                  <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= template_seed_baseline_detail(@template) %></p>
+                </div>
+
+                <span class="<%= ui_badge_classes(template_seed_baseline_tone(@template)) %>"><%= template_seed_baseline_status_label(@template) %></span>
+              </div>
+
+              <% if seed_baseline[:available] %>
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.implementation") %></p>
+                    <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= [seed_baseline[:implementation_name], seed_baseline[:implementation_identifier]].compact.join(" · ") %></p>
+                  </div>
+
+                  <% if seed_baseline[:source_artifact_identifier].present? %>
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.source_artifact") %></p>
+                      <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= seed_baseline[:source_artifact_identifier] %></p>
+                    </div>
+                  <% end %>
+
+                  <% if seed_baseline[:seeded_at].present? %>
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.seeded_at") %></p>
+                      <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(seed_baseline[:seeded_at], format: :long) %></p>
+                    </div>
+                  <% end %>
+
+                  <% if seed_baseline[:artifact_identifier].present? %>
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.seed_snapshot") %></p>
+                      <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= [seed_baseline[:artifact_identifier], seed_baseline[:artifact_version_label]].compact.join(" · ") %></p>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
           <div class="grid gap-4 xl:grid-cols-2">
             <% artifact_review_groups.each do |group| %>
               <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
@@ -453,6 +498,10 @@
             label: t("admin.templates.show.implementation_validation.badges.draft_candidates", count: draft_candidates.size),
             tone: :info
           } : nil),
+          (historical_implementations.any? ? {
+            label: t("admin.templates.show.implementation_validation.badges.history_records", count: historical_implementations.size),
+            tone: :neutral
+          } : nil),
           {
             label: t("admin.templates.show.implementation_validation.badges.validation_runs", count: validation_runs.size),
             tone: validation_runs.any? ? :info : :neutral
@@ -494,6 +543,46 @@
 
                     <% if current_implementation[:metadata].present? %>
                       <p class="text-sm leading-6 text-ink-700/80"><%= current_implementation.fetch(:metadata).map { |key, value| "#{key.to_s.tr('_', ' ').titleize}: #{value}" }.join(" · ") %></p>
+                    <% end %>
+
+                    <div class="<%= ui_inset_panel_classes(tone: template_implementation_promotion_tone(current_implementation)) %>">
+                      <div class="space-y-3">
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div>
+                            <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.implementation_card.promotion_title") %></p>
+                            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_implementation_promotion_message(current_implementation) %></p>
+                          </div>
+
+                          <% if current_implementation[:next_promotion_target].present? %>
+                            <span class="<%= ui_badge_classes(:neutral) %>"><%= template_lifecycle_status_label(current_implementation[:next_promotion_target]) %></span>
+                          <% end %>
+                        </div>
+
+                        <% promotion_action_label = template_implementation_promotion_action_label(current_implementation) %>
+                        <% if promotion_action_label.present? && current_implementation[:promotion_ready] %>
+                          <div class="flex flex-wrap gap-2">
+                            <%= button_to promotion_action_label, admin_template_implementation_promotion_path(@template, current_implementation.fetch(:id)), params: { promotion: { target_status: current_implementation.fetch(:next_promotion_target) } }, form_class: "inline-flex", class: ui_button_classes(:primary, size: :sm) %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+
+                    <% if current_implementation[:validated_at].present? || current_implementation[:seeded_at].present? %>
+                      <div class="grid gap-3 sm:grid-cols-2">
+                        <% if current_implementation[:validated_at].present? %>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.validated_at") %></p>
+                            <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(current_implementation[:validated_at], format: :long) %></p>
+                          </div>
+                        <% end %>
+
+                        <% if current_implementation[:seeded_at].present? %>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.seeded_at") %></p>
+                            <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(current_implementation[:seeded_at], format: :long) %></p>
+                          </div>
+                        <% end %>
+                      </div>
                     <% end %>
 
                     <details class="overflow-hidden rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/92">
@@ -671,7 +760,7 @@
                               <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.record_pass"), admin_template_implementation_validation_runs_path(@template, candidate.fetch(:id)), params: { validation_run: { validation_type: "manual_review", status: "passed" } }, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
                               <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.record_follow_up"), admin_template_implementation_validation_runs_path(@template, candidate.fetch(:id)), params: { validation_run: { validation_type: "manual_review", status: "needs_review" } }, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
                               <% if candidate[:promotion_ready] %>
-                                <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.promote"), admin_template_implementation_promotion_path(@template, candidate.fetch(:id)), form_class: "inline-flex", class: ui_button_classes(:primary, size: :sm) %>
+                                <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.promote"), admin_template_implementation_promotion_path(@template, candidate.fetch(:id)), params: { promotion: { target_status: candidate.fetch(:next_promotion_target) } }, form_class: "inline-flex", class: ui_button_classes(:primary, size: :sm) %>
                               <% end %>
                             </div>
                           </div>
@@ -710,6 +799,87 @@
                 <%= render Ui::EmptyStateComponent.new(
                   title: t("admin.templates.show.implementation_validation.draft_candidates.empty_title"),
                   description: t("admin.templates.show.implementation_validation.draft_candidates.empty_description"),
+                  padding: :sm,
+                  tone: :subtle,
+                  align: :left,
+                  title_size: :sm
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.history.title") %></p>
+                <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.history.description") %></p>
+              </div>
+
+              <% if historical_implementations.any? %>
+                <div class="space-y-3">
+                  <% historical_implementations.each do |implementation| %>
+                    <div class="<%= ui_inset_panel_classes(tone: template_implementation_history_tone(implementation)) %>">
+                      <div class="space-y-4">
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div>
+                            <p class="text-sm font-medium text-ink-950"><%= implementation.fetch(:name) %></p>
+                            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= implementation.fetch(:identifier) %></p>
+                            <% summary = template_implementation_history_summary(implementation) %>
+                            <% if summary.present? %>
+                              <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= summary %></p>
+                            <% end %>
+                          </div>
+
+                          <div class="flex flex-wrap gap-2">
+                            <span class="<%= ui_badge_classes(template_implementation_status_tone(implementation.fetch(:status, nil))) %>"><%= template_lifecycle_status_label(implementation.fetch(:status, nil)) %></span>
+                            <span class="<%= ui_badge_classes(:neutral) %>"><%= implementation.fetch(:renderer_family).to_s.tr("_", " ").titleize %></span>
+                            <% if (archived_from_badge_label = template_implementation_archived_from_badge_label(implementation)).present? %>
+                              <span class="<%= ui_badge_classes(:neutral) %>"><%= archived_from_badge_label %></span>
+                            <% end %>
+                          </div>
+                        </div>
+
+                        <p class="text-sm leading-6 text-ink-700/80"><%= template_implementation_history_message(implementation) %></p>
+
+                        <% archive_action_label = template_implementation_archive_action_label(implementation) %>
+                        <% if archive_action_label.present? %>
+                          <div class="flex flex-wrap gap-2">
+                            <%= button_to archive_action_label, admin_template_implementation_archive_path(@template, implementation.fetch(:id)), form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+                          </div>
+                        <% end %>
+
+                        <% if implementation[:validated_at].present? || implementation[:seeded_at].present? || implementation[:archived_at].present? %>
+                          <div class="grid gap-3 sm:grid-cols-3">
+                            <% if implementation[:validated_at].present? %>
+                              <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.validated_at") %></p>
+                                <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(implementation[:validated_at], format: :long) %></p>
+                              </div>
+                            <% end %>
+
+                            <% if implementation[:seeded_at].present? %>
+                              <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.seeded_at") %></p>
+                                <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(implementation[:seeded_at], format: :long) %></p>
+                              </div>
+                            <% end %>
+
+                            <% if implementation[:archived_at].present? %>
+                              <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.archived_at") %></p>
+                                <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(implementation[:archived_at], format: :long) %></p>
+                              </div>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <%= render Ui::EmptyStateComponent.new(
+                  title: t("admin.templates.show.implementation_validation.history.empty_title"),
+                  description: t("admin.templates.show.implementation_validation.history.empty_description"),
                   padding: :sm,
                   tone: :subtle,
                   align: :left,

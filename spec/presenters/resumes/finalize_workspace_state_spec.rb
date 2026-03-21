@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Resumes::FinalizeWorkspaceState do
   let(:view_context) { instance_double('view_context') }
 
-  describe '#font_scale_options and #density_options' do
+  describe '#font_scale_options and shared spacing option groups' do
     it 'prepends template-default options before the explicit shared formatting presets' do
       template = create(
         :template,
@@ -18,6 +18,40 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
       expect(state.font_scale_options).to include(['Base', 'base'], ['Large', 'lg'])
       expect(state.density_options.first).to eq(['Template default (Compact)', ''])
       expect(state.density_options).to include(['Comfortable', 'comfortable'], ['Relaxed', 'relaxed'])
+      expect(state.section_spacing_options.first).to eq(['Template default (Tight)', ''])
+      expect(state.section_spacing_options).to include(['Standard', 'standard'], ['Relaxed', 'relaxed'])
+      expect(state.paragraph_spacing_options.first).to eq(['Template default (Tight)', ''])
+      expect(state.paragraph_spacing_options).to include(['Standard', 'standard'], ['Relaxed', 'relaxed'])
+      expect(state.line_spacing_options.first).to eq(['Template default (Standard)', ''])
+      expect(state.line_spacing_options).to include(['Tight', 'tight'], ['Relaxed', 'relaxed'])
+    end
+  end
+
+  describe '#selected_section_spacing, #selected_paragraph_spacing, and #selected_line_spacing' do
+    it 'returns the explicit resume settings values when present' do
+      template = create(
+        :template,
+        name: 'Modern Clean',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern-clean')
+      )
+      resume = create(
+        :resume,
+        template: template,
+        settings: {
+          'accent_color' => '#0F766E',
+          'show_contact_icons' => true,
+          'page_size' => 'A4',
+          'section_spacing' => 'tight',
+          'paragraph_spacing' => 'standard',
+          'line_spacing' => 'relaxed'
+        }
+      )
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      expect(state.selected_section_spacing).to eq('tight')
+      expect(state.selected_paragraph_spacing).to eq('standard')
+      expect(state.selected_line_spacing).to eq('relaxed')
     end
   end
 

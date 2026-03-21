@@ -150,6 +150,29 @@ RSpec.describe 'Admin::Templates', type: :request do
         render_profile: template.normalized_layout_config,
         metadata: { 'pixel_status' => 'close', 'open_discrepancy_count' => 2 }
       )
+      historical_implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'validated',
+        renderer_family: 'editorial-split',
+        render_profile: template.normalized_layout_config,
+        validated_at: Time.zone.local(2026, 3, 20, 16, 15)
+      )
+      archived_implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'archived',
+        renderer_family: 'editorial-split',
+        render_profile: template.normalized_layout_config,
+        metadata: {
+          'archived_at' => Time.zone.local(2026, 3, 21, 17, 0).iso8601,
+          'archived_from_status' => 'stable'
+        },
+        validated_at: Time.zone.local(2026, 3, 19, 16, 15),
+        seeded_at: Time.zone.local(2026, 3, 20, 16, 15)
+      )
       create(
         :template_validation_run,
         template: template,
@@ -177,10 +200,88 @@ RSpec.describe 'Admin::Templates', type: :request do
       expect(response_body).to include('Implementation Stable')
       expect(response_body).to include('Current implementation')
       expect(response_body).to include('Recent validation runs')
+      expect(response_body).to include('Lifecycle promotion')
+      expect(response_body).to include('Promote to seeded')
+      expect(response_body).to include('Lifecycle history')
+      expect(response_body).to include(historical_implementation.identifier)
+      expect(response_body).to include(archived_implementation.identifier)
+      expect(response_body).to include('Archive implementation')
+      expect(response_body).to include('Archived from Stable')
       expect(response_body).to include('Artifact audit')
       expect(response_body).to include('Pixel Close')
       expect(response_body).to include('2 open discrepancies')
       expect(response_body).to include('reference.png')
+    end
+
+    it 'renders the next lifecycle action for a validated current implementation' do
+      template = create(:template, name: 'Editorial Split', slug: 'editorial-split', active: true)
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'reference_design',
+        lineage_kind: 'source',
+        name: 'Behance capture'
+      )
+      create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'validated',
+        renderer_family: 'editorial-split',
+        render_profile: template.normalized_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 19, 30)
+      )
+
+      get admin_template_path(template)
+      response_body = CGI.unescapeHTML(response.body)
+
+      expect(response).to have_http_status(:ok)
+      expect(response_body).to include('Promote to stable')
+      expect(response_body).to include('validated implementation can now be promoted to stable')
+    end
+
+    it 'renders the seed baseline panel when a seeded implementation has a matching seed snapshot' do
+      template = create(:template, name: 'Editorial Split', slug: 'editorial-split', active: true)
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'reference_design',
+        lineage_kind: 'source',
+        name: 'Behance capture'
+      )
+      implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'seeded',
+        renderer_family: 'editorial-split',
+        render_profile: template.normalized_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 18, 15),
+        seeded_at: Time.zone.local(2026, 3, 21, 19, 0)
+      )
+      seed_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'seed_snapshot',
+        lineage_kind: 'derived',
+        parent_artifact: source_artifact,
+        name: implementation.name,
+        version_label: "#{implementation.identifier}-seeded",
+        metadata: {
+          'artifact_role' => 'seeded_implementation_snapshot',
+          'template_implementation_identifier' => implementation.identifier,
+          'source_artifact_identifier' => source_artifact.identifier
+        }
+      )
+
+      get admin_template_path(template)
+      response_body = CGI.unescapeHTML(response.body)
+
+      expect(response).to have_http_status(:ok)
+      expect(response_body).to include('Seed baseline ready')
+      expect(response_body).to include('Seed baseline')
+      expect(response_body).to include('matching seed snapshot ready for durable seed and demo flows')
+      expect(response_body).to include(seed_artifact.identifier)
     end
 
     it 'renders draft candidates and candidate creation actions when reviewed source artifacts exist' do
@@ -339,13 +440,72 @@ RSpec.describe 'Admin::Templates', type: :request do
       )
 
       expect do
-        post admin_template_implementation_promotion_path(template, draft_candidate)
+        post admin_template_implementation_promotion_path(template, draft_candidate), params: { promotion: { target_status: 'validated' } }
       end.to change { draft_candidate.reload.status }.from('draft').to('validated')
         .and change { template.template_artifacts.where(artifact_type: 'version_snapshot').count }.by(1)
 
       expect(response).to redirect_to(admin_template_path(template, anchor: 'implementation-validation'))
-      expect(flash[:notice]).to eq("#{draft_candidate.name} promoted to a render-ready validated implementation.")
+      expect(flash[:notice]).to eq("#{draft_candidate.name} promoted to Validated.")
       expect(draft_candidate.reload.validated_at).to eq(validation_run.validated_at)
+    end
+
+    it 'promotes a validated implementation to stable' do
+      template = create(:template, name: 'Editorial Split', slug: 'editorial-split')
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'reference_design',
+        lineage_kind: 'source',
+        name: 'Behance capture'
+      )
+      implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'validated',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 19, 15)
+      )
+
+      expect do
+        post admin_template_implementation_promotion_path(template, implementation), params: { promotion: { target_status: 'stable' } }
+      end.to change { implementation.reload.status }.from('validated').to('stable')
+        .and change { template.template_artifacts.where(artifact_type: 'version_snapshot').count }.by(1)
+
+      expect(response).to redirect_to(admin_template_path(template, anchor: 'implementation-validation'))
+      expect(flash[:notice]).to eq("#{implementation.name} promoted to Stable.")
+      expect(implementation.reload.validated_at).to eq(Time.zone.local(2026, 3, 21, 19, 15))
+    end
+
+    it 'promotes a stable implementation to seeded and records a seed snapshot' do
+      template = create(:template, name: 'Editorial Split', slug: 'editorial-split')
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'reference_design',
+        lineage_kind: 'source',
+        name: 'Behance capture'
+      )
+      implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'stable',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 19, 15),
+        seeded_at: nil
+      )
+
+      expect do
+        post admin_template_implementation_promotion_path(template, implementation), params: { promotion: { target_status: 'seeded' } }
+      end.to change { implementation.reload.status }.from('stable').to('seeded')
+        .and change { template.template_artifacts.where(artifact_type: 'seed_snapshot').count }.by(1)
+
+      expect(response).to redirect_to(admin_template_path(template, anchor: 'implementation-validation'))
+      expect(flash[:notice]).to eq("#{implementation.name} promoted to Seeded.")
+      expect(implementation.reload.seeded_at).to be_present
     end
 
     it 'rejects promotion when the draft candidate has no passed validation run' do
@@ -376,11 +536,82 @@ RSpec.describe 'Admin::Templates', type: :request do
       )
 
       expect do
-        post admin_template_implementation_promotion_path(template, draft_candidate)
+        post admin_template_implementation_promotion_path(template, draft_candidate), params: { promotion: { target_status: 'validated' } }
       end.not_to change { draft_candidate.reload.status }
 
       expect(response).to redirect_to(admin_template_path(template, anchor: 'implementation-validation'))
       expect(flash[:alert]).to eq('Record a passed validation run before promoting this draft implementation.')
+    end
+  end
+
+  describe 'POST /admin/templates/:template_id/implementations/:implementation_id/archive' do
+    it 'archives a superseded render-ready implementation' do
+      template = create(:template, name: 'Editorial Split', slug: 'editorial-split')
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'reference_design',
+        lineage_kind: 'source',
+        name: 'Behance capture'
+      )
+      create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'seeded',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 19, 15),
+        seeded_at: Time.zone.local(2026, 3, 21, 20, 0)
+      )
+      historical_implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'validated',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 20, 18, 0)
+      )
+
+      expect do
+        post admin_template_implementation_archive_path(template, historical_implementation)
+      end.to change { historical_implementation.reload.status }.from('validated').to('archived')
+
+      expect(response).to redirect_to(admin_template_path(template, anchor: 'implementation-validation'))
+      expect(flash[:notice]).to eq("#{historical_implementation.name} archived.")
+      expect(historical_implementation.reload.metadata).to include(
+        'archived_from_status' => 'validated'
+      )
+      expect(historical_implementation.metadata['archived_at']).to be_present
+    end
+
+    it 'rejects archiving the current implementation' do
+      template = create(:template, name: 'Editorial Split', slug: 'editorial-split')
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'reference_design',
+        lineage_kind: 'source',
+        name: 'Behance capture'
+      )
+      current_implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'seeded',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 19, 15),
+        seeded_at: Time.zone.local(2026, 3, 21, 20, 0)
+      )
+
+      expect do
+        post admin_template_implementation_archive_path(template, current_implementation)
+      end.not_to change { current_implementation.reload.status }
+
+      expect(response).to redirect_to(admin_template_path(template, anchor: 'implementation-validation'))
+      expect(flash[:alert]).to eq('The current implementation cannot be archived from this flow.')
     end
   end
 

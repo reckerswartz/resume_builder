@@ -212,6 +212,11 @@ It also stores:
 Current shared helpers include:
 
 - `accent_color`
+- `section_stack_classes`
+- `entry_body_spacing_class`
+- `summary_margin_top_class`
+- `body_leading_class`
+- `relaxed_body_leading_class`
 - `contact_items`
 - `full_name`
 - `section_entries(section)`
@@ -225,11 +230,28 @@ Current shared helpers include:
 
 Reads:
 
-- `template.layout_config["accent_color"]`
+- `resume.settings["accent_color"]`
 
 with fallback:
 
-- `#0F172A`
+- `template.render_layout_config["accent_color"]`
+
+#### Spacing and typography helpers
+
+Shared spacing and typography helpers combine:
+
+- template defaults from `template.render_layout_config`
+- explicit per-resume finalize overrides stored in `resume.settings`
+
+Today those helpers cover:
+
+- `font_scale`
+- `density`
+- `section_spacing`
+- `paragraph_spacing`
+- `line_spacing`
+
+This is what keeps the builder preview, standalone preview, and PDF export aligned when the user changes output formatting in the finalize step.
 
 #### `contact_items`
 
@@ -299,6 +321,13 @@ Templates currently read from:
 - `resume.headline`
 - `resume.summary`
 - `resume.template`
+- `resume.accent_color`
+- `resume.font_scale`
+- `resume.density`
+- `resume.section_spacing`
+- `resume.paragraph_spacing`
+- `resume.line_spacing`
+- `resume.hidden_section_types`
 - `resume.user.display_name` as a fallback
 - `resume.ordered_sections`
 - `resume.contact_field(...)`
@@ -307,7 +336,7 @@ Templates currently read from:
 
 Templates iterate through:
 
-- `resume.ordered_sections`
+- `BaseComponent#visible_sections`, which derives from `resume.ordered_sections` and `resume.hidden_section_types`
 
 They use:
 
@@ -446,18 +475,27 @@ This is one of the most important distinctions in the current system.
 Confirmed active inputs:
 
 - `template.slug` controls component resolution
-- `template.layout_config["accent_color"]` controls accent color in template rendering
+- `template.render_layout_config["accent_color"]` provides the accent fallback used by template rendering
+- `template.render_layout_config["font_scale"]` provides the typography default used by template rendering
+- `template.render_layout_config["density"]` provides the density default used by template rendering
+- `template.render_layout_config["section_spacing"]` provides the section-spacing default used by template rendering
+- `template.render_layout_config["paragraph_spacing"]` provides the paragraph-spacing default used by template rendering
+- `template.render_layout_config["line_spacing"]` provides the line-spacing default used by template rendering
+- `resume.settings["accent_color"]` overrides accent color when present
+- `resume.settings["font_scale"]` overrides shared typography scale when present
+- `resume.settings["density"]` overrides shared density scale when present
+- `resume.settings["section_spacing"]` overrides section spacing when present
+- `resume.settings["paragraph_spacing"]` overrides paragraph spacing when present
+- `resume.settings["line_spacing"]` overrides line spacing when present
+- `resume.settings["hidden_sections"]` controls output visibility through `BaseComponent#visible_sections`
 
 ### Configuration That Is Stored and Displayed, but Not Currently Used by the Renderer
 
 Currently stored/admin-visible but not consumed by the template components or resolver:
 
 - `template.layout_config["variant"]`
-- `template.layout_config["font_scale"]`
 
 `variant` is currently informational/admin-facing and does not select the component class.
-
-`font_scale` is currently informational/admin-facing and is not applied by either concrete template component.
 
 ## Important Current Gaps and Nuances
 
@@ -472,21 +510,7 @@ Example:
 
 Current behavior would still render the `modern` component, because slug wins.
 
-### Per-Resume Accent Color Is Not the Same as Template Accent Color
-
-The resume builder finalize step exposes:
-
-- `resume.settings["accent_color"]`
-
-However, the current template components read:
-
-- `template.layout_config["accent_color"]`
-
-They do **not** currently read the resume-level accent color setting.
-
-That means the render-time accent color is template-driven, not per-resume driven.
-
-### Other Resume Display Settings Are Not Currently Template Inputs
+### Some Finalize Settings Still Sit Outside the Template Body
 
 The builder also stores resume settings such as:
 

@@ -1,34 +1,34 @@
 <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
   <%= render Ui::MetricCardComponent.new(
-    label: "Jobs in scope",
+    label: t("admin.job_logs.index.metrics.jobs_in_scope.label"),
     value: job_log_stats.total,
-    description: "#{pluralize(job_log_stats.completed, "completed job")} with the current filters."
+    description: t("admin.job_logs.index.metrics.jobs_in_scope.description", completed_jobs: pluralize(job_log_stats.completed, "completed job"))
   ) %>
 
   <%= render Ui::MetricCardComponent.new(
-    label: "Failure rate",
+    label: t("admin.job_logs.index.metrics.failure_rate.label"),
     value: number_to_percentage(job_log_stats.failure_rate, precision: 1),
-    description: "#{pluralize(job_log_stats.failed, "failed job")} out of #{pluralize(job_log_stats.completed, "completed job")}."
+    description: t("admin.job_logs.index.metrics.failure_rate.description", failed_jobs: pluralize(job_log_stats.failed, "failed job"), completed_jobs: pluralize(job_log_stats.completed, "completed job"))
   ) %>
 
   <%= render Ui::MetricCardComponent.new(
-    label: "Average runtime",
+    label: t("admin.job_logs.index.metrics.average_runtime.label"),
     value: job_duration_label(job_log_stats.average_duration_seconds),
-    description: "Based on jobs that recorded a finish duration."
+    description: t("admin.job_logs.index.metrics.average_runtime.description")
   ) %>
 
   <%= render Ui::MetricCardComponent.new(
-    label: "Throughput",
+    label: t("admin.job_logs.index.metrics.throughput.label"),
     value: throughput_label(job_log_stats.completed_last_hour),
-    description: "#{pluralize(job_log_stats.stale_running, "stale running job")} need attention."
+    description: t("admin.job_logs.index.metrics.throughput.description", stale_jobs: pluralize(job_log_stats.stale_running, "stale running job"))
   ) %>
 </div>
 
 <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
   <%= render Ui::DashboardPanelComponent.new(
-    eyebrow: "Direct lookup",
-    title: "Paste an Active Job ID",
-    description: "Use the search box below to jump straight to the job you pushed for later debugging.",
+    eyebrow: t("admin.job_logs.index.lookup.eyebrow"),
+    title: t("admin.job_logs.index.lookup.title"),
+    description: t("admin.job_logs.index.lookup.description"),
     padding: :sm,
     density: :compact
   ) do %>
@@ -44,15 +44,15 @@
         <p class="text-sm font-medium text-ink-950"><%= exact_match_job_log.job_type %></p>
         <p class="mt-1 break-all text-sm text-ink-700/80"><%= exact_match_job_log.active_job_id %></p>
         <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-ink-700/80">
-          <span>Queue: <%= exact_match_job_log.queue_name %></span>
-          <span>Created: <%= l(exact_match_job_log.created_at, format: :short) %></span>
-          <%= link_to "Open detail", admin_job_log_path(exact_match_job_log), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %>
+          <span><%= t("admin.job_logs.index.lookup.result.queue", queue_name: exact_match_job_log.queue_name) %></span>
+          <span><%= t("admin.job_logs.index.lookup.result.created", created_at: l(exact_match_job_log.created_at, format: :short)) %></span>
+          <%= link_to t("admin.job_logs.index.lookup.result.open_detail"), admin_job_log_path(exact_match_job_log), class: ui_button_classes(:secondary, size: :sm), data: { turbo_frame: "_top" } %>
         </div>
       </div>
     <% elsif query.present? %>
       <div class="mt-4">
         <%= render Ui::EmptyStateComponent.new(
-          description: "No exact `active_job_id` matched `#{query}`. Broad search results are listed below.",
+          description: t("admin.job_logs.index.lookup.empty_state.no_exact_match", query: query),
           padding: :sm,
           tone: :subtle,
           align: :left
@@ -61,7 +61,7 @@
     <% else %>
       <div class="mt-4">
         <%= render Ui::EmptyStateComponent.new(
-          description: "Paste an `active_job_id` into the search box to find a single execution quickly.",
+          description: t("admin.job_logs.index.lookup.empty_state.prompt"),
           padding: :sm,
           tone: :subtle,
           align: :left
@@ -71,23 +71,23 @@
   <% end %>
 
   <%= render Ui::DashboardPanelComponent.new(
-    eyebrow: "Queue runtime",
-    title: "Solid Queue overview",
-    description: "Inspect backlog, running work, failures, and worker health before drilling into a specific execution.",
+    eyebrow: t("admin.job_logs.index.queue_overview.eyebrow"),
+    title: t("admin.job_logs.index.queue_overview.title"),
+    description: t("admin.job_logs.index.queue_overview.description"),
     padding: :sm,
     density: :compact
   ) do %>
     <div class="flex items-start justify-between gap-4">
       <div></div>
       <% unless queue_overview.unavailable? %>
-        <span class="<%= ui_badge_classes(queue_state_badge_tone(queue_overview.failed.positive? ? :failed : :running)) %>"><%= queue_overview.backlog %> backlog</span>
+        <span class="<%= ui_badge_classes(queue_state_badge_tone(queue_overview.failed.positive? ? :failed : :running)) %>"><%= t("admin.job_logs.index.queue_overview.backlog_badge", count: queue_overview.backlog) %></span>
       <% end %>
     </div>
 
     <% if queue_overview.unavailable? %>
       <div class="mt-4">
         <%= render Ui::EmptyStateComponent.new(
-          description: queue_overview.error_message,
+          description: t("admin.job_logs.index.queue_overview.unavailable_message"),
           padding: :sm,
           tone: :subtle,
           align: :left
@@ -96,30 +96,30 @@
     <% else %>
       <div class="mt-4 grid gap-3 sm:grid-cols-2">
         <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Backlog",
+          eyebrow: t("admin.job_logs.index.queue_overview.cards.backlog.eyebrow"),
           title: queue_overview.backlog,
-          description: "#{queue_overview.queued} ready, #{queue_overview.scheduled} scheduled, #{queue_overview.blocked} blocked",
+          description: t("admin.job_logs.index.queue_overview.cards.backlog.description", queued: queue_overview.queued, scheduled: queue_overview.scheduled, blocked: queue_overview.blocked),
           tone: queue_overview.backlog.positive? ? :subtle : :success,
           padding: :sm
         ) %>
         <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Running now",
+          eyebrow: t("admin.job_logs.index.queue_overview.cards.running.eyebrow"),
           title: queue_overview.running,
-          description: "#{pluralize(queue_overview.processes, "worker process")} connected.",
+          description: t("admin.job_logs.index.queue_overview.cards.running.description", worker_processes: pluralize(queue_overview.processes, "worker process")),
           tone: queue_overview.running.positive? ? :subtle : :success,
           padding: :sm
         ) %>
         <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Queue failures",
+          eyebrow: t("admin.job_logs.index.queue_overview.cards.failures.eyebrow"),
           title: queue_overview.failed,
-          description: "Solid Queue failed execution rows waiting for retry or cleanup.",
+          description: t("admin.job_logs.index.queue_overview.cards.failures.description"),
           tone: queue_overview.failed.positive? ? :default : :success,
           padding: :sm
         ) %>
         <%= render Ui::WidgetCardComponent.new(
-          eyebrow: "Worker health",
+          eyebrow: t("admin.job_logs.index.queue_overview.cards.worker_health.eyebrow"),
           title: "#{queue_overview.processes - queue_overview.stale_processes}/#{queue_overview.processes}",
-          description: "#{pluralize(queue_overview.stale_processes, "stale worker")} missed recent heartbeats.",
+          description: t("admin.job_logs.index.queue_overview.cards.worker_health.description", stale_workers: pluralize(queue_overview.stale_processes, "stale worker")),
           tone: queue_overview.stale_processes.positive? ? :default : :success,
           padding: :sm
         ) %>

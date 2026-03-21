@@ -15,6 +15,9 @@ RSpec.describe ResumeTemplates::Catalog do
         'accent_color' => '#4338CA',
         'font_scale' => 'base',
         'density' => 'comfortable',
+        'section_spacing' => 'standard',
+        'paragraph_spacing' => 'standard',
+        'line_spacing' => 'standard',
         'column_count' => 'two_column',
         'theme_tone' => 'indigo',
         'supports_headshot' => false,
@@ -30,6 +33,9 @@ RSpec.describe ResumeTemplates::Catalog do
         'accent_color' => '#D7F038',
         'font_scale' => 'sm',
         'density' => 'compact',
+        'section_spacing' => 'standard',
+        'paragraph_spacing' => 'standard',
+        'line_spacing' => 'standard',
         'column_count' => 'two_column',
         'theme_tone' => 'lime',
         'supports_headshot' => true,
@@ -54,6 +60,9 @@ RSpec.describe ResumeTemplates::Catalog do
       expect(described_class.family_label('legacy')).to eq('Legacy')
       expect(described_class.font_scale_label('base')).to eq('Base')
       expect(described_class.density_label('comfortable')).to eq('Comfortable')
+      expect(described_class.section_spacing_label('tight')).to eq('Tight')
+      expect(described_class.paragraph_spacing_label('standard')).to eq('Standard')
+      expect(described_class.line_spacing_label('relaxed')).to eq('Relaxed')
       expect(described_class.column_count_label('two_column')).to eq('2 columns')
       expect(described_class.theme_tone_label('lime')).to eq('Lime')
       expect(described_class.shell_style_label('card')).to eq('Card')
@@ -63,6 +72,9 @@ RSpec.describe ResumeTemplates::Catalog do
       expect(described_class.section_heading_style_label('marker')).to eq('Marker')
       expect(described_class.sidebar_position_label('left')).to eq('Left')
       expect(described_class.density_options).to include(['Compact', 'compact'], ['Comfortable', 'comfortable'], ['Relaxed', 'relaxed'])
+      expect(described_class.section_spacing_options).to include(['Tight', 'tight'], ['Standard', 'standard'], ['Relaxed', 'relaxed'])
+      expect(described_class.paragraph_spacing_options).to include(['Tight', 'tight'], ['Standard', 'standard'], ['Relaxed', 'relaxed'])
+      expect(described_class.line_spacing_options).to include(['Tight', 'tight'], ['Standard', 'standard'], ['Relaxed', 'relaxed'])
       expect(described_class.shell_style_options).to include(['Flat', 'flat'], ['Card', 'card'])
     end
   end

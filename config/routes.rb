@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       resources :implementations, only: [], param: :id do
         resources :validation_runs, only: :create, controller: "template_implementation_validation_runs"
         resource :promotion, only: :create, controller: "template_implementation_promotions"
+        resource :archive, only: :create, controller: "template_implementation_archives"
       end
     end
   end

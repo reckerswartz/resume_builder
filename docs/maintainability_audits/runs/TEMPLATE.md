@@ -5,7 +5,7 @@ This file records one execution of the maintainability audit workflow, including
 ## Status
 
 - Run timestamp: `[timestamp]`
-- Mode: `[review-only | implement-next | re-review | close-area]`
+- Mode: `[review-only | implement-next | re-review | close-area | full-cycle]`
 - Trigger: `[user request or automation context]`
 - Result: `[complete | partial | blocked]`
 - Registry updated: `[yes | no]`
@@ -27,6 +27,17 @@ This file records one execution of the maintainability audit workflow, including
 ## Pending
 
 - `[pending item]`
+
+## Overview updates
+
+- Audited files added or confirmed:
+  - `[file]`
+- Completed files or areas advanced:
+  - `[file, area, or none]`
+- Lane completed in this cycle:
+  - `[structural | verification | review-only]`
+- Next preferred lane:
+  - `[structural | verification | review-only]`
 
 ## Area summary
 

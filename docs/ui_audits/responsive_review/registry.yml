@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T03:45:14Z"
+updated_at: "2026-03-21T21:23:26Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/responsive_review/README.md"
   page_doc_template: "docs/ui_audits/responsive_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/responsive_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-finalize-picker-scroll-fatigue/00-overview.md"
+  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-review-only-remaining-improved-pages/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   commit_policy: "metadata_only"
@@ -64,9 +64,8 @@ inventory_notes:
     - "docs/ui_audits/2026-03-20/resumebuilder-saas-ux-audit/README.md"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope:
-    - "resume-builder-experience"
-  reason: "Full inventory audit complete. The finalize-step-template-picker-scroll-fatigue issue is now closed, leaving 1 medium structural issue open (experience-step-long-scroll-fatigue). Re-review finalize and setup pages after future shared template-picker changes."
+  recommended_scope: []
+  reason: "No improved responsive backlog remains. Return to /responsive-ui-audit review-only after future shared UI changes or when you want a fresh discovery sweep across recently changed surfaces."
 pages:
   - page_key: "home"
     title: "Home"
@@ -103,15 +102,21 @@ pages:
     auth_context: "guest"
     page_family: "public_auth"
     priority: "medium"
-    status: "improved"
+    status: "closed"
     page_doc_path: "docs/ui_audits/responsive_review/pages/create-account.md"
     open_issue_keys: []
     closed_issue_keys:
       - "create-account-nil-current-user-crash"
-    last_audited_at: "2026-03-21T02:40:00Z"
-    last_changed_at: "2026-03-21T02:40:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-public-auth-batch/00-overview.md"
-    next_step: "No responsive issues remain."
+    last_audited_at: "2026-03-21T21:14:25Z"
+    last_changed_at: "2026-03-21T21:14:25Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-create-account-close-page/00-overview.md"
+    next_step: "Closed. Re-review after future public-auth shell or registration-form changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-21T21:14:25Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "password-reset-request", title: "Password reset request", path: "/passwords/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "reviewed", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "deferred", open_issue_keys: [] }
   - page_key: "resumes-index"
@@ -170,19 +175,46 @@ pages:
     auth_context: "authenticated_user"
     page_family: "templates"
     priority: "medium"
-    status: "improved"
+    status: "closed"
     page_doc_path: "docs/ui_audits/responsive_review/pages/templates-index.md"
     open_issue_keys: []
     closed_issue_keys:
       - "templates-index-mobile-first-fold-density"
-    last_audited_at: "2026-03-21T02:19:00Z"
-    last_changed_at: "2026-03-21T02:19:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-templates-index/00-overview.md"
-    next_step: "No material issues remain. Re-review after major marketplace card or filter changes."
+    last_audited_at: "2026-03-21T21:09:03Z"
+    last_changed_at: "2026-03-21T21:09:03Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-templates-index-close-page/00-overview.md"
+    next_step: "Closed. Re-review after future marketplace layout, filter-tray, or quick-choice sidebar changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-21T21:09:03Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "template-show", title: "Template detail", path: "/templates/:id", access_level: "authenticated", auth_context: "authenticated_user", page_family: "templates", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:54:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-mixed-pages-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "resume-source-import", title: "Resume source import launcher", path: "/resume_source_imports/:provider", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "low", status: "improved", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [], closed_issue_keys: ["source-import-mobile-overflow"] }
+  - page_key: "resume-source-import"
+    title: "Resume source import launcher"
+    path: "/resume_source_imports/:provider"
+    access_level: "authenticated"
+    auth_context: "authenticated_user"
+    page_family: "workspace"
+    priority: "low"
+    status: "closed"
+    page_doc_path: "docs/ui_audits/responsive_review/pages/resume-source-import.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "source-import-mobile-overflow"
+    last_audited_at: "2026-03-21T21:23:26Z"
+    last_changed_at: "2026-03-21T21:23:26Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-review-only-remaining-improved-pages/00-overview.md"
+    next_step: "Closed. Re-review after future source-import launcher or shared public/workspace shell changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T21:23:26Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "resume-builder-source", title: "Resume builder source step", path: "/resumes/:id/edit?step=source", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:47:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "resume-builder-heading", title: "Resume builder heading step", path: "/resumes/:id/edit?step=heading", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:51:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch-2/00-overview.md", open_issue_keys: [] }
+  - { page_key: "resume-builder-heading", title: "Resume builder heading step", path: "/resumes/:id/edit?step=heading", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T20:44:49Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-mobile-preview-rail/00-overview.md", open_issue_keys: [] }
   - { page_key: "resume-builder-personal-details", title: "Resume builder personal details step", path: "/resumes/:id/edit?step=personal_details", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:51:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch-2/00-overview.md", open_issue_keys: [] }
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
@@ -191,18 +223,24 @@ pages:
     auth_context: "authenticated_user_with_resume"
     page_family: "builder"
     priority: "high"
-    status: "improved"
+    status: "closed"
     page_doc_path: "docs/ui_audits/responsive_review/pages/resume-builder-experience.md"
-    open_issue_keys:
-      - "experience-step-long-scroll-fatigue"
+    open_issue_keys: []
     closed_issue_keys:
       - "experience-mobile-horizontal-overflow"
       - "experience-step-first-fold-density"
-    last_audited_at: "2026-03-21T01:52:00Z"
-    last_changed_at: "2026-03-21T01:52:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-first-fold-density/00-overview.md"
-    next_step: "Remaining long-scroll fatigue is medium severity. Return after admin-settings or when a builder-wide density pass is warranted."
-  - { page_key: "resume-builder-education", title: "Resume builder education step", path: "/resumes/:id/edit?step=education", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:47:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch/00-overview.md", open_issue_keys: [] }
+      - "experience-step-long-scroll-fatigue"
+    last_audited_at: "2026-03-21T20:51:46Z"
+    last_changed_at: "2026-03-21T20:51:46Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-close-page/00-overview.md"
+    next_step: "Closed. Re-review after future shared preview-rail or edit-layout changes."
+    cycle_count: 5
+    last_cycle_date: "2026-03-21T20:51:46Z"
+    issues_found: 3
+    issues_resolved: 3
+    issues_remaining: 0
+    regression_detected: false
+  - { page_key: "resume-builder-education", title: "Resume builder education step", path: "/resumes/:id/edit?step=education", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T20:44:49Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-mobile-preview-rail/00-overview.md", open_issue_keys: [] }
   - { page_key: "resume-builder-skills", title: "Resume builder skills step", path: "/resumes/:id/edit?step=skills", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:47:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:51:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch-2/00-overview.md", open_issue_keys: [] }
   - page_key: "resume-builder-finalize"
@@ -212,17 +250,17 @@ pages:
     auth_context: "authenticated_user_with_resume"
     page_family: "builder"
     priority: "high"
-    status: "improved"
+    status: "closed"
     page_doc_path: "docs/ui_audits/responsive_review/pages/resume-builder-finalize.md"
     open_issue_keys: []
     closed_issue_keys:
       - "finalize-step-template-picker-scroll-fatigue"
-    last_audited_at: "2026-03-21T03:45:14Z"
-    last_changed_at: "2026-03-21T03:45:14Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-finalize-picker-scroll-fatigue/00-overview.md"
-    next_step: "No tracked responsive issues remain. Re-review after major finalize-step, preview-rail, or shared template-picker changes; page is closable."
-    cycle_count: 2
-    last_cycle_date: "2026-03-21T03:45:14Z"
+    last_audited_at: "2026-03-21T20:59:24Z"
+    last_changed_at: "2026-03-21T20:59:24Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-finalize-close-page/00-overview.md"
+    next_step: "Closed. Re-review after future finalize-step, preview-rail, or shared template-picker changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T20:59:24Z"
     issues_found: 1
     issues_resolved: 1
     issues_remaining: 0
@@ -243,8 +281,50 @@ pages:
     next_step: "No issues found. Re-review after major dashboard metric or activity feed changes."
   - { page_key: "admin-templates-index", title: "Admin templates index", path: "/admin/templates", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:54:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-mixed-pages-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-template-show", title: "Admin template detail", path: "/admin/templates/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "admin-template-new", title: "Admin template new", path: "/admin/templates/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "improved", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [], closed_issue_keys: ["admin-template-form-mobile-overflow"] }
-  - { page_key: "admin-template-edit", title: "Admin template edit", path: "/admin/templates/:id/edit", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "improved", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [], closed_issue_keys: ["admin-template-form-mobile-overflow"] }
+  - page_key: "admin-template-new"
+    title: "Admin template new"
+    path: "/admin/templates/new"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "medium"
+    status: "closed"
+    page_doc_path: "docs/ui_audits/responsive_review/pages/admin-template-new.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "admin-template-form-mobile-overflow"
+    last_audited_at: "2026-03-21T21:23:26Z"
+    last_changed_at: "2026-03-21T21:23:26Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-review-only-remaining-improved-pages/00-overview.md"
+    next_step: "Closed. Re-review after future shared admin template form, admin shell, or preview-sidebar changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T21:23:26Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
+  - page_key: "admin-template-edit"
+    title: "Admin template edit"
+    path: "/admin/templates/:id/edit"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "medium"
+    status: "closed"
+    page_doc_path: "docs/ui_audits/responsive_review/pages/admin-template-edit.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "admin-template-form-mobile-overflow"
+    last_audited_at: "2026-03-21T21:23:26Z"
+    last_changed_at: "2026-03-21T21:23:26Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-review-only-remaining-improved-pages/00-overview.md"
+    next_step: "Closed. Re-review after future shared admin template form, admin shell, or preview-sidebar changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T21:23:26Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "admin-llm-providers-index", title: "Admin LLM providers index", path: "/admin/llm_providers", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:56:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-index-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-llm-provider-show", title: "Admin LLM provider detail", path: "/admin/llm_providers/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:54:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-mixed-pages-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-llm-provider-new", title: "Admin LLM provider new", path: "/admin/llm_providers/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [] }
@@ -260,7 +340,7 @@ pages:
     auth_context: "admin"
     page_family: "admin"
     priority: "high"
-    status: "improved"
+    status: "closed"
     page_doc_path: "docs/ui_audits/responsive_review/pages/admin-settings.md"
     open_issue_keys: []
     closed_issue_keys:
@@ -268,10 +348,16 @@ pages:
       - "admin-settings-mobile-horizontal-overflow"
       - "admin-settings-extreme-scroll-height"
       - "admin-settings-llm-assignment-scan-fatigue"
-    last_audited_at: "2026-03-21T02:09:00Z"
-    last_changed_at: "2026-03-21T02:09:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-settings-disclosure/00-overview.md"
-    next_step: "All tracked issues are resolved. Page is closable."
+    last_audited_at: "2026-03-21T21:02:50Z"
+    last_changed_at: "2026-03-21T21:02:50Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-settings-close-page/00-overview.md"
+    next_step: "Closed. Re-review after future admin-settings, shared admin-shell, or verification-disclosure changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T21:02:50Z"
+    issues_found: 4
+    issues_resolved: 4
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "admin-job-logs-index", title: "Admin job logs index", path: "/admin/job_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:56:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-index-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-job-log-show", title: "Admin job log detail", path: "/admin/job_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:58:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-observability-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-error-logs-index", title: "Admin error logs index", path: "/admin/error_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:58:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-observability-batch/00-overview.md", open_issue_keys: [] }

@@ -1,6 +1,5 @@
 <% layout_metadata = template_layout_metadata(template) %>
-<% preview_resume = template_preview_resume(template) %>
-<% template_card = layout_metadata.merge(template: template, preview_resume: preview_resume) %>
+<% template_card = template_cards_for_builder(selected_template: template, templates: [template]).first %>
 <% template_sections = [
      { id: "template-identity", label: "Template identity", caption: "Name, slug, and description" },
      { id: "layout-system", label: "Layout system", caption: "Family, typography, density, and accent" },

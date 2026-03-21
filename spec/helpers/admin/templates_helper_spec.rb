@@ -78,6 +78,64 @@ RSpec.describe Admin::TemplatesHelper, type: :helper do
       expect(helper.template_artifact_review_implementation_badge_label(template)).to eq('1 draft candidate')
       expect(helper.template_artifact_review_implementation_badge_tone(template)).to eq(:info)
     end
+
+    it 'surfaces the seed baseline state when a seeded implementation has a matching seed snapshot' do
+      template = create(:template, slug: 'editorial-split')
+      source_artifact = create(:template_artifact, template: template, artifact_type: 'reference_design', lineage_kind: 'source', name: 'Behance capture')
+      implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'seeded',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 18, 15),
+        seeded_at: Time.zone.local(2026, 3, 21, 19, 0)
+      )
+      create(
+        :template_artifact,
+        template: template,
+        artifact_type: 'seed_snapshot',
+        lineage_kind: 'derived',
+        parent_artifact: source_artifact,
+        name: implementation.name,
+        version_label: "#{implementation.identifier}-seeded",
+        metadata: {
+          'artifact_role' => 'seeded_implementation_snapshot',
+          'template_implementation_identifier' => implementation.identifier,
+          'source_artifact_identifier' => source_artifact.identifier
+        }
+      )
+
+      expect(helper.template_artifact_review_title(template)).to eq('Seed baseline ready')
+      expect(helper.template_seed_baseline_status_label(template)).to eq('Seed baseline ready')
+      expect(helper.template_seed_baseline_detail(template)).to include('matching seed snapshot ready')
+      expect(helper.template_seed_baseline_tone(template)).to eq(:success)
+      expect(helper.template_artifact_review_tone(template)).to eq(:success)
+    end
+  end
+
+  describe '#template_seed_baseline_status_label' do
+    it 'reports missing snapshot follow-up for a seeded implementation without a matching seed snapshot' do
+      template = create(:template, slug: 'editorial-split')
+      source_artifact = create(:template_artifact, template: template, artifact_type: 'reference_design', lineage_kind: 'source', name: 'Behance capture')
+      create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: 'seeded',
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 18, 15),
+        seeded_at: Time.zone.local(2026, 3, 21, 19, 0)
+      )
+
+      expect(helper.template_artifact_review_title(template)).to eq('Seed snapshot follow-up needed')
+      expect(helper.template_seed_baseline_status_label(template)).to eq('Seed snapshot missing')
+      expect(helper.template_seed_baseline_detail(template)).to include('no active seed snapshot matches it yet')
+      expect(helper.template_seed_baseline_tone(template)).to eq(:warning)
+      expect(helper.template_artifact_review_tone(template)).to eq(:warning)
+    end
   end
 
   describe '#template_candidate_summary' do
@@ -85,6 +143,20 @@ RSpec.describe Admin::TemplatesHelper, type: :helper do
       timestamp = Time.zone.local(2026, 3, 21, 12, 30)
 
       summary = helper.template_candidate_summary(
+        source_artifact_identifier: 'editorial-split-reference-design-behance-capture',
+        created_at: timestamp
+      )
+
+      expect(summary).to include('Source artifact: editorial-split-reference-design-behance-capture')
+      expect(summary).to include(I18n.l(timestamp, format: :long))
+    end
+  end
+
+  describe '#template_implementation_history_summary' do
+    it 'formats the linked source artifact identifier and created timestamp for history rows' do
+      timestamp = Time.zone.local(2026, 3, 21, 12, 30)
+
+      summary = helper.template_implementation_history_summary(
         source_artifact_identifier: 'editorial-split-reference-design-behance-capture',
         created_at: timestamp
       )
@@ -109,6 +181,43 @@ RSpec.describe Admin::TemplatesHelper, type: :helper do
       expect(helper.template_candidate_latest_validation_label(candidate)).to eq("Manual Review · Passed · #{I18n.l(timestamp, format: :long)}")
       expect(helper.template_candidate_latest_validation_tone(candidate)).to eq(:success)
       expect(helper.template_candidate_promotion_message(candidate)).to include('passed review is recorded')
+    end
+  end
+
+  describe '#template_implementation_promotion_message' do
+    it 'describes the next lifecycle step for a validated implementation' do
+      implementation = { status: 'validated', next_promotion_target: 'stable' }
+
+      expect(helper.template_implementation_promotion_message(implementation)).to include('promoted to stable')
+      expect(helper.template_implementation_promotion_action_label(implementation)).to eq('Promote to stable')
+      expect(helper.template_implementation_promotion_tone(implementation)).to eq(:info)
+    end
+
+    it 'describes a seeded implementation as complete' do
+      implementation = { status: 'seeded', next_promotion_target: nil }
+
+      expect(helper.template_implementation_promotion_message(implementation)).to include('already been seeded')
+      expect(helper.template_implementation_promotion_action_label(implementation)).to be_nil
+      expect(helper.template_implementation_promotion_tone(implementation)).to eq(:success)
+    end
+  end
+
+  describe '#template_implementation_history_message' do
+    it 'describes a superseded render-ready implementation as archiveable' do
+      implementation = { status: 'validated', archivable: true }
+
+      expect(helper.template_implementation_history_message(implementation)).to include('can be archived')
+      expect(helper.template_implementation_archive_action_label(implementation)).to eq('Archive implementation')
+      expect(helper.template_implementation_history_tone(implementation)).to eq(:info)
+    end
+
+    it 'describes an archived implementation as historical reference' do
+      implementation = { status: 'archived', archived_from_status: 'stable', archivable: false }
+
+      expect(helper.template_implementation_history_message(implementation)).to include('after its Stable lifecycle stage')
+      expect(helper.template_implementation_archive_action_label(implementation)).to be_nil
+      expect(helper.template_implementation_archived_from_badge_label(implementation)).to eq('Archived from Stable')
+      expect(helper.template_implementation_history_tone(implementation)).to eq(:neutral)
     end
   end
 

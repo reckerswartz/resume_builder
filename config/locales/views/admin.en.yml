@@ -225,6 +225,53 @@ en:
         ready_detail: "Ready to be assigned from the settings hub."
 
     llm_models:
+      index:
+        page_header:
+          eyebrow: "Admin"
+          title: "LLM models"
+          description: "Review model readiness, provider state, and workflow coverage."
+          actions:
+            platform_settings: "Platform settings"
+            manage_providers: "Manage providers"
+            new_model: "New model"
+        summary:
+          panel:
+            eyebrow: "Model registry"
+            title: "Model index snapshot"
+            description:
+              filtered: "Showing %{count} models matching the current filters."
+              unfiltered: "Review model readiness, assignment coverage, and catalog source across the registry."
+            actions:
+              clear_filters: "Clear filters"
+              platform_settings: "Platform settings"
+            filter_badges:
+              query: "Query: %{query}"
+              status: "Status: %{status}"
+              capability: "Capability: %{capability}"
+            guidance: "Use search, status, and capability filters to isolate models that are ready for assignment or still blocked by provider setup."
+          cards:
+            matches:
+              eyebrow: "Matches"
+              description: "Models currently returned by the active filter set."
+              badge: "%{count} on this page"
+            ready:
+              eyebrow: "Ready for orchestration"
+              description: "Models in the active filter set with an active record and a request-ready provider."
+              badges:
+                ready: "Ready"
+                empty: "None ready"
+            assigned:
+              eyebrow: "Assigned roles"
+              description: "Models in the active filter set already connected to one or more orchestration roles."
+              badges:
+                assigned: "In use"
+                unassigned: "Unassigned"
+            attention:
+              eyebrow: "Needs attention"
+              description: "Models in the active filter set blocked by inactive state or provider readiness follow-up."
+              badges:
+                synced: "%{count} synced"
+                pending: "Catalog pending"
       show:
         status_labels:
           active: "Active"
@@ -332,6 +379,426 @@ en:
       model_created: "LLM model created."
       model_updated: "LLM model updated."
       model_deleted: "LLM model deleted."
+    job_logs:
+      index:
+        page_header:
+          eyebrow: "Admin"
+          title: "Job logs"
+          description: "Review background jobs, queue health, and failures."
+          badges:
+            stale_running:
+              one: "%{count} stale running job"
+              other: "%{count} stale running jobs"
+        metrics:
+          jobs_in_scope:
+            label: "Jobs in scope"
+            description: "%{completed_jobs} with the current filters."
+          failure_rate:
+            label: "Failure rate"
+            description: "%{failed_jobs} out of %{completed_jobs}."
+          average_runtime:
+            label: "Average runtime"
+            description: "Based on jobs that recorded a finish duration."
+          throughput:
+            label: "Throughput"
+            description: "%{stale_jobs} need attention."
+        lookup:
+          eyebrow: "Direct lookup"
+          title: "Find a job by reference"
+          description: "Use the search box below to jump straight to one recorded execution when you have its job reference."
+          result:
+            queue: "Queue: %{queue_name}"
+            created: "Created: %{created_at}"
+            open_detail: "Open detail"
+          empty_state:
+            no_exact_match: "No exact job reference matched `%{query}`. Broader search results are listed below."
+            prompt: "Enter a job reference in the search box to find one recorded execution quickly."
+        queue_overview:
+          eyebrow: "Queue health"
+          title: "Queue overview"
+          description: "Inspect backlog, running work, failures, and worker health before drilling into a specific execution."
+          backlog_badge: "%{count} backlog"
+          unavailable_message: "Queue health data is unavailable in this environment."
+          cards:
+            backlog:
+              eyebrow: "Backlog"
+              description: "%{queued} ready, %{scheduled} scheduled, %{blocked} blocked"
+            running:
+              eyebrow: "Running now"
+              description: "%{worker_processes} connected."
+            failures:
+              eyebrow: "Queue failures"
+              description: "Failed queue entries waiting for retry or cleanup."
+            worker_health:
+              eyebrow: "Worker health"
+              description: "%{stale_workers} missed recent heartbeats."
+        filters:
+          eyebrow: "Filter job logs"
+          description: "Search by job type, queue, or job reference, then narrow the list by lifecycle state before drilling into run details."
+          actions:
+            clear_filters: "Clear filters"
+            apply: "Apply"
+          fields:
+            query_label: "Search job logs"
+            query_placeholder: "Search by job, queue, or job reference"
+            status_label: "Status"
+            all_statuses: "All statuses"
+        table:
+          missing_job_reference: "No job reference recorded"
+      helper:
+        runtime_labels:
+          unavailable: "Queue data unavailable"
+          missing_record: "No live queue record"
+        runtime_descriptions:
+          unavailable: "Live queue details are unavailable in this environment."
+          missing_queue_record: "No matching live queue record was found for this job reference. The job log below still shows the recorded lifecycle history."
+          missing_job_reference: "No job reference was recorded for this log, so live queue lookup is unavailable."
+          worker_owner: "Worker %{worker} currently owns this job."
+          orphaned_claimed: "This in-progress queue record no longer has a worker heartbeat and can be returned to the pending queue if needed."
+          failed: "The live queue still shows this job as failed."
+          finished: "The live queue marks this job as finished."
+          scheduled: "The job is scheduled and waiting for its start window."
+          blocked: "The job is paused by concurrency or dependency rules."
+          queued: "The job is waiting in the pending queue."
+          running: "The job is marked as running, but no worker details are attached here."
+          default: "Live queue details are available for this job."
+        worker:
+          no_worker_attached: "No worker attached"
+        related_error_descriptions:
+          available: "Captured error details are available for full context and backtrace review."
+          reference_only: "An error reference was recorded, but no matching error log is currently available."
+          failed_without_reference: "This failed job did not capture a related error reference."
+          none: "No related error reference was captured for this job log."
+        controls:
+          labels:
+            return_to_pending_queue: "Return to pending queue"
+            requeue_as_new: "Requeue as new job"
+          summaries:
+            retry_requeue_discard: "Retry keeps the same job reference, requeue creates a new job reference, and discard removes the failed queue entry while keeping this log for debugging."
+            retry_only: "Retry keeps the same job reference for this failed queue entry."
+            requeue_from_failure: "Requeue creates a new job reference from the stored payload."
+            orphaned_requeue: "This stalled running job can be returned to the pending queue because no worker process is attached."
+            discardable: "This queue entry can be removed safely because no active worker currently owns it."
+            running_locked: "Active running jobs cannot be changed safely while a worker still owns them."
+          confirmations:
+            orphaned: "Return this stalled job to the pending queue?"
+            requeue_failed: "Create a new queue attempt for this failed job? The original failure log will remain available."
+            requeue_default: "Create a new queue attempt for this job?"
+            discard: "Remove this queue entry? The job log will remain available for debugging."
+      show:
+        actions:
+          retry: "Retry job"
+          retry_confirm: "Retry this failed job while keeping the same job reference?"
+          discard: "Discard queue entry"
+        page_header:
+          eyebrow: "Job log"
+          description: "Check lifecycle state, live queue status, and related error context before opening deeper payload details."
+          badges:
+            stale_running: "Stale running"
+          actions:
+            back: "Back to job logs"
+            open_related_error: "Open related error"
+            error_logs: "Error logs"
+        triage:
+          pill: "Fast triage"
+          title: "Review this job"
+          description: "Start with live queue blockers and related error context, then decide whether a safe follow-up action or deeper payload review is needed."
+          titles:
+            warning: "Needs operator follow-up"
+            neutral: "Review queue details"
+            success: "Queue details look healthy"
+          badges:
+            safe_action_count:
+              one: "%{count} safe action"
+              other: "%{count} safe actions"
+            read_only: "Read-only"
+            related_error: "Related error"
+            error_reference: "Error reference"
+            no_related_error: "No related error"
+            ready: "Ready"
+            attention: "Attention"
+            follow_up: "Follow-up"
+          items:
+            stale_running:
+              label: "Stale running job"
+              detail: "This job has been marked as running for more than 15 minutes. Review the live queue status and worker heartbeat before taking action."
+            queue_unavailable: "Live queue details unavailable"
+            queue_missing: "No live queue record found"
+            orphaned_running: "Stalled running job"
+            retryable_failed:
+              label: "Failed attempt can be retried"
+              detail: "Retry keeps the same job reference, requeue creates a new job reference, and discard removes the failed queue entry while keeping this log for debugging."
+            live_queue_available: "Live queue details available"
+            related_error_available:
+              label: "Related error available"
+              detail: "Open %{reference_id} for the full captured error context and backtrace."
+            related_error_reference:
+              label: "Error reference recorded"
+              detail: "Reference %{reference_id} was captured in the job log, but no matching error log is currently available."
+        navigation:
+          pill: "Job sections"
+          title: "Jump to details"
+          description: "Move between follow-up actions, live queue status, and captured payloads without re-scanning the full page."
+          sections:
+            follow_up:
+              label: "Follow-up actions"
+              caption: "Retry, requeue, discard, and action guidance"
+            live_queue:
+              label: "Live queue status"
+              caption: "Lifecycle, queue status, worker heartbeat, and references"
+            payloads:
+              label: "Captured payloads"
+              caption: "Queue details, input, output, and error payloads"
+          related_error:
+            title: "Related error"
+            missing_reference: "No error reference"
+        follow_up_section:
+          title: "Follow-up actions"
+          eyebrow: "Safe actions"
+          description: "Use these actions only when the live queue status makes it safe to retry, requeue, or discard the job."
+          summary:
+            title: "Safe actions"
+            safe_action_count:
+              one: "%{count} safe action"
+              other: "%{count} safe actions"
+            no_safe_action: "No safe action"
+            error_reference_recorded: "Error reference recorded"
+            no_error_reference: "No error reference"
+          empty_state:
+            title: "No safe follow-up available"
+            description: "This job is read-only right now because the live queue status does not support a safe admin action."
+        live_queue_section:
+          title: "Live queue status"
+          eyebrow: "Current processing state"
+          description: "Inspect the stored job log alongside the current queue record and worker heartbeat information."
+          cards:
+            status: "Live queue status"
+            job_reference: "Job reference"
+            duration: "Duration"
+            queue_name: "Queue name"
+            related_error_reference: "Related error reference"
+            none: "None"
+            no_matching_error: "No matching error log is currently available."
+            no_related_error: "No related error reference was captured."
+          details:
+            title: "Lifecycle and worker details"
+            description: "Open deeper timing, queue-record, and worker-heartbeat details only when the fast triage summary is not enough."
+            badge: "Deep detail"
+            fields:
+              created_at: "Created at"
+              started_at: "Started at"
+              finished_at: "Finished at"
+              queue_record: "Queue record"
+              worker_process: "Worker process"
+              last_heartbeat: "Last heartbeat"
+        payloads_section:
+          title: "Captured payloads"
+          eyebrow: "Debug data"
+          description: "Review the application log payloads captured for this job together with any available live queue details."
+          badges:
+            queue_details_available: "Queue details available"
+            log_payload_only: "Log payload only"
+            error_reference_recorded: "Error reference recorded"
+            no_error_reference: "No error reference"
+          intro:
+            title: "Captured payloads"
+            description: "Open these payload groups only when the fast triage and live queue summary are not enough for debugging."
+          queue_record:
+            title: "Queue record payload"
+            description: "Current queue record and serialized arguments."
+            badge: "Reference only"
+            code_block_title: "Queue record payload"
+          application_payloads:
+            title: "Application payloads"
+            description: "Serialized input, output, and stored failure details captured by the job log."
+            badge: "Reference only"
+            input_title: "Input"
+            input_description: "Serialized input captured from the enqueue and perform lifecycle."
+            output_title: "Output"
+            output_description: "Structured job output captured by the job log."
+            errors_title: "Errors"
+            errors_description: "Failure details stored on the job log record."
+          deep_queue_details:
+            title: "Deep queue details"
+            description: "Lower-priority queue failure and worker-process detail for deeper investigation."
+            badge: "Deep detail"
+            failure_title: "Queue failure details"
+            failure_description: "Failure details still present in the live queue record."
+            worker_title: "Worker process details"
+            worker_description: "Observed process metadata for the worker currently attached to this queue entry."
+    error_logs:
+      helper:
+        source_descriptions:
+          job: "Captured during background processing with related job details when available."
+          request: "Captured during a page request with safe path and signed-in user details when available."
+        primary_reference_labels:
+          missing_job: "No job reference recorded"
+          missing_request: "No request reference recorded"
+        primary_reference_descriptions:
+          queue: "Queue: %{queue_name}"
+          missing_job: "No job details recorded."
+          user: "User %{user_id}"
+          missing_request: "No request details recorded."
+        related_job:
+          fallback: "Job log #%{id}"
+          none: "No related job log"
+      index:
+        page_header:
+          eyebrow: "Admin"
+          title: "Error logs"
+          description: "Review captured application errors, recorded references, and related page or job details."
+        filters:
+          eyebrow: "Filter error logs"
+          description: "Search by error reference, error class, message text, or recorded references before narrowing to page or background issues."
+          actions:
+            clear_filters: "Clear filters"
+            apply: "Apply"
+          fields:
+            query_label: "Search error logs"
+            query_placeholder: "Search by error, message, or recorded reference"
+            source_label: "Source"
+            all_sources: "All sources"
+        panels:
+          source_scope_all: "All sources"
+          metrics:
+            errors_in_scope:
+              label: "Errors in scope"
+              description: "Captured incidents matching the current search and source filters."
+            request_issues:
+              label: "Page request issues"
+              description: "Issues captured during page requests with safe request details when available."
+            job_issues:
+              label: "Background job issues"
+              description: "Issues captured during background processing with related job details when available."
+            backtrace_coverage:
+              label: "Backtrace coverage"
+              description: "Logs with at least one captured stack frame in the current scope."
+              empty: "No error logs are currently in scope."
+          correlation:
+            eyebrow: "Correlation guide"
+            title: "Search by error or job reference"
+            description: "Use the search box to jump between error references, request references, job references, error classes, or message text without leaving the table view."
+            current_query_title: "Current query"
+            current_query_description: "The filtered table below keeps broader matches visible while you narrow to the exact incident you want."
+            empty_state: "Search by `ERR-...`, request reference, or job reference when you need to pivot quickly between page and background issue trails."
+          source_mix:
+            eyebrow: "Source mix"
+            title: "Page and job signals"
+            description: "Use the source filter to isolate page-request incidents from background-processing issues before drilling into individual records."
+            request_context:
+              eyebrow: "Page requests"
+              description: "Look for request references, methods, paths, or users when following page-request issues."
+            job_context:
+              eyebrow: "Background jobs"
+              description: "Look for job references, queue names, and related job logs when following background issues."
+      show:
+        guidance_items:
+          source:
+            job: "Background job issue"
+            request: "Page request issue"
+          related_job:
+            label: "Related job log available"
+            detail: "Open %{reference} to inspect the related job details and captured payloads tied to this error."
+            fallback_reference: "job log #%{id}"
+          recorded_job_reference:
+            label: "Job log reference recorded"
+            detail: "This error recorded job log #%{id}, but no matching job log is currently available."
+          no_backtrace:
+            label: "No backtrace captured"
+            detail: "This incident still includes structured context, but no stack frames were stored."
+        page_header:
+          eyebrow: "Error log"
+          description: "Review source, message, timing, and related references before opening raw context or backtrace."
+          badges:
+            related_job: "Related job"
+            no_backtrace: "No backtrace"
+          actions:
+            back: "Back to error logs"
+            open_related_job: "Open related job log"
+            job_logs: "Job logs"
+        triage:
+          pill: "Fast triage"
+          title: "Review this error"
+          description: "Start with the captured message, source, and related job details before opening raw context or stack frames."
+          titles:
+            correlation_available: "Correlation available"
+            structured_only: "Structured context only"
+            review_context: "Review incident context"
+          badges:
+            related_job: "Related job"
+            job_context: "Job context"
+            request_context: "Page request"
+            no_backtrace: "No backtrace"
+            linked: "Linked"
+            attention: "Attention"
+            source: "Source"
+            noted: "Noted"
+          message_title: "Message"
+        navigation:
+          pill: "Error sections"
+          title: "Jump to details"
+          description: "Move between quick facts, structured context, and backtrace detail without re-scanning the whole incident page."
+          correlation:
+            title: "Correlation"
+          sections:
+            incident_summary:
+              label: "Incident summary"
+              caption: "Message, source, timing, and correlation"
+            captured_context:
+              label: "Captured context"
+              caption: "Structured request or job details"
+            backtrace:
+              label: "Backtrace"
+              caption: "Captured stack frames and debugging trail"
+        incident_summary:
+          title: "Incident summary"
+          eyebrow: "Captured issue"
+          description: "Review the core error message, timing, source, and any related request or job references tied to this incident."
+          badges:
+            related_job: "Related job"
+            standalone: "Standalone"
+          cards:
+            error_class: "Error class"
+            source: "Source"
+            occurred_at: "Occurred at"
+            duration: "Duration"
+            job_reference: "Job reference"
+            request_reference: "Request reference"
+            correlation_summary: "Correlation summary"
+        captured_context:
+          title: "Captured context"
+          eyebrow: "Structured details"
+          description: "Inspect the structured request or job payload recorded with this incident and use related links to move into adjacent observability pages."
+          badges:
+            job_context: "Job context"
+            request_context: "Page request"
+            job_log_available: "Job log available"
+            no_related_job_log: "No related job log"
+          cards:
+            request_path: "Request path"
+            user_id: "User ID"
+            related_job: "Related job"
+          details:
+            title: "Structured context"
+            description: "Open the raw captured payload only when the quick facts above are not enough for triage."
+            badge: "Reference only"
+            code_block_title: "Context"
+            code_block_description: "Structured payload recorded when the error log was captured."
+        backtrace:
+          title: "Backtrace"
+          eyebrow: "Stack frames"
+          description: "Review the captured stack frames or confirm when only structured context is available for this incident."
+          badges:
+            no_backtrace: "No backtrace"
+          available:
+            title: "Captured frames are available"
+            description: "Open the raw stack frames only when the incident summary and structured context are not enough for debugging."
+            detail_title: "Backtrace"
+            detail_description: "Captured stack frames for this incident."
+            badge: "Deep detail"
+          empty:
+            title: "No backtrace"
+            description: "No stack frames were stored for this incident. Use the captured context above to continue the investigation."
     templates:
       show:
         navigation:
@@ -361,6 +828,8 @@ en:
                 other: "%{count} draft candidates in progress"
               review_ready: "Ready for lifecycle review"
               validation_follow_up: "Validation follow-up needed"
+              seed_baseline_follow_up: "Seed snapshot follow-up needed"
+              seed_baseline_ready: "Seed baseline ready"
           title: "Artifact review"
           eyebrow: "Captured references"
           description: "Inspect stored source captures, documentation notes, and validation artifacts before promoting new implementation work."
@@ -384,6 +853,16 @@ en:
             implementation_ready: "Implementation %{status}"
           actions:
             create_candidate: "Create draft candidate"
+          seed_baseline:
+            title: "Seed baseline"
+            states:
+              ready: "Seed baseline ready"
+              missing: "Seed snapshot missing"
+              unavailable: "No seeded baseline yet"
+            descriptions:
+              ready: "This template has a seeded implementation and matching seed snapshot ready for durable seed and demo flows."
+              missing: "The current implementation is seeded, but no active seed snapshot matches it yet. Record the seed snapshot before relying on this baseline for durable seed flows."
+              unavailable: "Promote a stable implementation to seeded when you are ready to mark a durable seed and demo baseline."
           groups:
             source_artifacts:
               title: "Source artifacts"
@@ -414,6 +893,9 @@ en:
             draft_candidates:
               one: "%{count} draft candidate"
               other: "%{count} draft candidates"
+            history_records:
+              one: "%{count} history item"
+              other: "%{count} history items"
             validation_runs:
               one: "%{count} validation run"
               other: "%{count} validation runs"
@@ -422,11 +904,19 @@ en:
             description: "The shared renderer adopts this implementation profile whenever a render-ready record is available."
             actions:
               create_candidate: "Create draft from latest source"
+              promote_to_stable: "Promote to stable"
+              promote_to_seeded: "Promote to seeded"
             empty_title: "No render-ready implementation yet"
             empty_description: "Source artifacts can exist before a validated implementation profile is recorded."
             reference_badge: "Reference only"
+            promotion_title: "Lifecycle promotion"
             render_profile_title: "Stored render profile"
             render_profile_description: "This normalized profile is what the shared renderer can adopt without mutating the stored source artifacts."
+            guidance:
+              stable_ready: "This validated implementation can now be promoted to stable when you want to lock it as the shared baseline."
+              seeded_ready: "This stable implementation can now be promoted to seeded when you want to mark it ready for durable seed and demo flows."
+              seeded_complete: "This implementation has already been seeded and is the most durable lifecycle record available for this template."
+              no_further_promotion: "No further lifecycle promotion is available for this implementation."
           draft_candidates:
             title: "Draft candidates"
             description: "These implementation snapshots are isolated from live rendering until validation promotes one to a render-ready state."
@@ -446,6 +936,17 @@ en:
               promote: "Promote to validated"
             render_profile_title: "Candidate render profile"
             render_profile_description: "Draft candidates begin from the currently resolved render profile and stay isolated from live rendering until validation."
+          history:
+            title: "Lifecycle history"
+            description: "Superseded validated, stable, seeded, and archived records stay visible here so implementation history remains easy to audit."
+            empty_title: "No lifecycle history yet"
+            empty_description: "Prior render-ready records will appear here once a newer implementation supersedes them or they are archived for cleanup."
+            archived_from_badge: "Archived from %{status}"
+            guidance:
+              archive_ready: "This superseded implementation is no longer the active baseline and can be archived when you want to keep the history tidy."
+              archived: "This implementation was archived after its %{status} lifecycle stage and remains available as historical reference."
+            actions:
+              archive: "Archive implementation"
           validation_runs:
             title: "Recent validation runs"
             description: "Keep the latest review trail visible even when implementation work is still in progress."
@@ -469,6 +970,9 @@ en:
           renderer_family: "Renderer family"
           validator: "Validator"
           validated_at: "Validated at"
+          seeded_at: "Seeded at"
+          archived_at: "Archived at"
+          seed_snapshot: "Seed snapshot"
           validation_type: "Validation type"
           implementation: "Implementation"
           identifier: "Identifier"
@@ -490,5 +994,8 @@ en:
     template_implementation_validation_runs_controller:
       validation_recorded: "%{validation_type} recorded for %{implementation_name} as %{status}."
     template_implementation_promotions_controller:
-      implementation_promoted: "%{implementation_name} promoted to a render-ready validated implementation."
-      implementation_already_promoted: "%{implementation_name} is already render-ready."
+      implementation_promoted: "%{implementation_name} promoted to %{target_status}."
+      implementation_already_promoted: "%{implementation_name} is already at %{target_status}."
+    template_implementation_archives_controller:
+      implementation_archived: "%{implementation_name} archived."
+      implementation_already_archived: "%{implementation_name} is already archived."

@@ -18,9 +18,9 @@ module Admin::ErrorLogsHelper
 
   def error_log_source_description(error_log)
     if error_log.job?
-      "Captured from a background job execution and enriched with queue/job context when available."
+      I18n.t("admin.error_logs.helper.source_descriptions.job")
     else
-      "Captured from the HTTP request cycle with request-safe controller, path, and user context."
+      I18n.t("admin.error_logs.helper.source_descriptions.request")
     end
   end
 
@@ -36,17 +36,23 @@ module Admin::ErrorLogsHelper
 
   def error_log_primary_reference_label(error_log)
     if error_log.job?
-      error_log.context["active_job_id"].presence || "No active job ID"
+      error_log.context["active_job_id"].presence || I18n.t("admin.error_logs.helper.primary_reference_labels.missing_job")
     else
-      error_log.context["request_id"].presence || "No request ID"
+      error_log.context["request_id"].presence || I18n.t("admin.error_logs.helper.primary_reference_labels.missing_request")
     end
   end
 
   def error_log_primary_reference_description(error_log)
     if error_log.job?
-      [ error_log.context["job_type"].presence, ("Queue: #{error_log.context["queue_name"]}" if error_log.context["queue_name"].present?) ].compact.join(" · ").presence || "No queue metadata recorded."
+      [
+        error_log.context["job_type"].presence,
+        (I18n.t("admin.error_logs.helper.primary_reference_descriptions.queue", queue_name: error_log.context["queue_name"]) if error_log.context["queue_name"].present?)
+      ].compact.join(" · ").presence || I18n.t("admin.error_logs.helper.primary_reference_descriptions.missing_job")
     else
-      [ error_log_request_summary(error_log), ("User #{error_log.context["user_id"]}" if error_log.context["user_id"].present?) ].compact.join(" · ").presence || "No request metadata recorded."
+      [
+        error_log_request_summary(error_log),
+        (I18n.t("admin.error_logs.helper.primary_reference_descriptions.user", user_id: error_log.context["user_id"]) if error_log.context["user_id"].present?)
+      ].compact.join(" · ").presence || I18n.t("admin.error_logs.helper.primary_reference_descriptions.missing_request")
     end
   end
 
@@ -61,8 +67,8 @@ module Admin::ErrorLogsHelper
   def error_log_related_job_label(error_log)
     related_job_log = error_log_related_job_log(error_log)
     return related_job_log.active_job_id if related_job_log&.active_job_id.present?
-    return "Job log ##{error_log.context["job_log_id"]}" if error_log.context["job_log_id"].present?
+    return I18n.t("admin.error_logs.helper.related_job.fallback", id: error_log.context["job_log_id"]) if error_log.context["job_log_id"].present?
 
-    error_log.context["active_job_id"].presence || "No related job log"
+    error_log.context["active_job_id"].presence || I18n.t("admin.error_logs.helper.related_job.none")
   end
 end

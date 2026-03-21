@@ -100,9 +100,9 @@ RSpec.describe 'Resume template PDF rendering' do
     end
   end
 
-  it 'applies font scale and density overrides through the shared rendered HTML path' do
+  it 'applies font scale, density, and spacing overrides through the shared rendered HTML path' do
     resume = build_resume_for(family: 'modern', accent_color: '#0F172A')
-    resume.update!(settings: resume.settings.merge('font_scale' => 'lg', 'density' => 'relaxed'))
+    resume.update!(settings: resume.settings.merge('font_scale' => 'lg', 'density' => 'relaxed', 'section_spacing' => 'tight', 'paragraph_spacing' => 'tight', 'line_spacing' => 'tight'))
 
     html = ApplicationController.render(
       template: 'resumes/pdf',
@@ -110,9 +110,108 @@ RSpec.describe 'Resume template PDF rendering' do
       assigns: { resume: resume }
     )
 
+    document = Nokogiri::HTML.parse(html)
+    summary_paragraph = document.css('p').find { |node| node.text.include?('Built a flexible resume system with shared preview and export rendering.') }
+    section_stack = document.css('div').find do |node|
+      class_names = node['class'].to_s.split
+      class_names.include?('mt-7') && class_names.include?('space-y-7')
+    end
+
     expect(html).to include('text-5xl')
     expect(html).to include('p-10 sm:p-12')
-    expect(html).to include('mt-10 space-y-10')
+    expect(section_stack).to be_present
+    expect(summary_paragraph).to be_present
+    expect(summary_paragraph['class'].to_s.split).to include('mt-4', 'leading-5')
+  end
+
+  it 'renders ATS Minimal section headings with stronger hierarchy than entry titles' do
+    resume = build_resume_for(family: 'ats-minimal', accent_color: '#334155')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+    experience_heading = document.css('h2').find { |node| node.text.strip == 'Experience' }
+
+    expect(experience_heading).to be_present
+
+    heading_classes = experience_heading['class'].to_s.split
+
+    expect(heading_classes).to include('text-lg', 'font-semibold', 'uppercase', 'tracking-[0.18em]', 'text-slate-700')
+    expect(heading_classes).not_to include('text-slate-500')
+  end
+
+  it 'renders ATS Minimal entries with a reserved trailing date column and no-wrap date range' do
+    resume = build_resume_for(family: 'ats-minimal', accent_color: '#334155')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+    experience_article = document.css('article').find { |node| node.text.include?('Lead Platform Engineer') }
+
+    expect(experience_article).to be_present
+
+    header_layout = experience_article.at_css('div[class*="sm:grid-cols-"]')
+    date_range = experience_article.at_css('div.whitespace-nowrap')
+
+    expect(header_layout['class']).to include('sm:grid', 'sm:grid-cols-[minmax(0,1fr)_auto]', 'sm:gap-x-6')
+    expect(date_range).to be_present
+    expect(date_range.text).to include('2021 - 2024')
+  end
+
+  it 'renders ATS Minimal header and section rules with stronger accent visibility' do
+    resume = build_resume_for(family: 'ats-minimal', accent_color: '#334155')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+    header = document.at_css('header')
+    section_rule = document.at_css('section div span.h-0\.5.w-10')
+    section_trailing_rule = document.at_css('section div span.h-0\.5.flex-1')
+
+    expect(header).to be_present
+    expect(header['class']).to include('border-b-2')
+    expect(header['style']).to include('border-color: #33415566')
+
+    expect(section_rule).to be_present
+    expect(section_rule['style']).to include('background-color: #334155')
+
+    expect(section_trailing_rule).to be_present
+    expect(section_trailing_rule['style']).to include('background-color: #33415544')
+  end
+
+  it 'renders Sidebar Accent with a narrower desktop sidebar ratio for the main content column' do
+    resume = build_resume_for(family: 'sidebar-accent', accent_color: '#4338CA')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+    grid = document.at_css('div.sidebar-accent-layout')
+    main_column = grid&.at_css('div[class*="lg:order-"]')
+    sidebar = grid&.at_css('aside')
+
+    expect(grid).to be_present
+    expect(grid['class']).to include('sidebar-accent-layout')
+    expect(main_column).to be_present
+    expect(sidebar).to be_present
+    expect(main_column['class']).to include('lg:col-span-1')
+    expect(main_column['class']).not_to include('lg:col-span-2')
+    expect(sidebar['style']).to include('background-color: #4338CA15')
   end
 
   it 'renders an attached headshot for the editorial split family through the shared PDF template' do

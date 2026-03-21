@@ -20,7 +20,7 @@
 | healthcare-administrator | minimal | audit-healthcare-administrator-classic-minimal | Experience(8), Education(2), Skills(15) | ~4 | audited |
 
 ## Findings summary
-
+  
 - **Console errors**: None
 - **Hidden sections**: Working correctly — minimal mode suppresses Projects, Certifications, Languages
 - **Section visibility**: All expected sections rendered in both modes
@@ -30,7 +30,7 @@
 - **Entry layout**: List style without card borders (correct)
 - **Accent color**: #1D4ED8 blue applied to header rule and section headings
 - **Shared fixes verified**: MOD-005 page-break CSS applies, MOD-007 language levels show in entries
-- **Regression baseline**: Post-fix re-review confirmed the shared Tailwind utility regression no longer affects the 3px header rule or tightened section/headline tracking
+- **Regression baseline**: Local shared/template edits were re-reviewed with no new drift. The 3px header rule, tightened tracking, and list hierarchy all remained intact.
 
 ## Discrepancies
 
@@ -58,6 +58,7 @@
 
 - `docs/template_audits/artifacts/classic/senior-engineer-full/2026-03-21-preview.png`
 - `docs/template_audits/artifacts/classic/senior-engineer-full/2026-03-21T03-42-23Z-postfix.png`
+- `docs/template_audits/artifacts/classic/senior-engineer-full/2026-03-21T20-40-51Z-review.png`
 - `docs/template_audits/artifacts/classic/healthcare-administrator-minimal/2026-03-21-preview.png`
 
 ## Changelog
@@ -65,3 +66,4 @@
 - **2026-03-21** — Initial audit with senior-engineer (full) and healthcare-administrator (minimal) profiles. 5 discrepancies identified (all minor). Hidden sections verified. Shared page-break and language-level fixes confirmed working.
 - **2026-03-21** — All 5 discrepancies resolved in one batch. Advanced to `close`.
 - **2026-03-21** — Re-reviewed after the shared Tailwind utility fix. Header rule and tracking utilities render correctly again, no console errors were observed, and `pixel_perfect` status remains intact.
+- **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. The full preview stayed free of horizontal overflow, the header rule and compact tracking remained intact, and no resolved discrepancies resurfaced.

@@ -78,7 +78,7 @@ RSpec.describe 'Resumes', type: :request do
   end
 
   describe 'GET /resumes/new' do
-    it 'keeps the fast-start template picker copy on the setup form' do
+    it 'keeps the fast-start template picker copy inside a collapsed template disclosure on the setup form' do
       template
 
       get new_resume_path, params: {
@@ -91,9 +91,17 @@ RSpec.describe 'Resumes', type: :request do
       }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('template-picker-compact')
-      expect(response.body).to include(I18n.t('resumes.template_picker_compact.fast_start_pill'))
-      expect(response.body).to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
+      document = Nokogiri::HTML.parse(response.body)
+      template_disclosure = document.at_css('details[data-resume-template-disclosure]')
+
+      expect(template_disclosure).to be_present
+      expect(template_disclosure['open']).to be_nil
+      expect(template_disclosure.at_css('summary').text).to include(I18n.t('resumes.form.template_disclosure_summary'))
+      expect(template_disclosure.at_css('summary').text).to include(I18n.t('resumes.form.template_disclosure_badge'))
+      expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.fast_start_pill'))
+      expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
+      expect(template_disclosure.text).to include(I18n.t('resumes.form.template_disclosure_description', template: template.name))
+      expect(template_disclosure.at_css('.template-picker-compact')).to be_present
       expect(response.body).not_to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
     end
 
@@ -125,6 +133,79 @@ RSpec.describe 'Resumes', type: :request do
     end
   end
 
+  describe 'GET /resumes' do
+    it 'keeps workspace cards focused on status badges and actions' do
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        title: 'Customer Success Resume',
+        slug: 'internal-workspace-slug',
+        source_mode: 'scratch'
+      )
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      card = document.css('article').find { |article| article.at_css('h2')&.text.to_s.squish == resume.title }
+      metadata_badges = card.xpath('./div[2]/div[1]/div[2]/span').map { |element| element.text.squish }
+      action_row = card.xpath('./div[2]/div[2]').first
+
+      expect(card).to be_present
+      expect(metadata_badges.size).to eq(2)
+      expect(metadata_badges.grep(/Updated/).size).to eq(1)
+      expect(metadata_badges).to include(I18n.t('resumes.resume_card.metadata_badges.source_mode.scratch'))
+      expect(action_row.css('p')).to be_empty
+      expect(action_row.css('a, button').map { |element| element.text.squish }).to eq([
+        I18n.t('resumes.resume_card.actions.edit'),
+        I18n.t('resumes.resume_card.actions.preview'),
+        I18n.t('resumes.resume_card.actions.delete')
+      ])
+      expect(card.text).not_to include(resume.slug)
+    end
+
+    it 'shows review-ready guidance without a duplicate create action when every resume is ready' do
+      create(:resume, user:, template:, title: 'Ready Resume One')
+      create(:resume, user:, template:, title: 'Ready Resume Two')
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      workspace_aside = document.css('main aside').last
+
+      expect(workspace_aside).to be_present
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.review_ready.title'))
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.review_ready.description'))
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.review_ready.counts_summary', count: 2))
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.review_ready.focus_note'))
+      expect(workspace_aside.css('a, button').map { |element| element.text.squish }).to be_empty
+      expect(workspace_aside.text).not_to include(I18n.t('resumes.index.quick_actions.create_resume'))
+    end
+
+    it 'keeps the quick-create rail when the workspace still has drafts in progress' do
+      create(:resume, user:, template:, title: 'Ready Resume')
+      create(:resume, user:, template:, title: 'Draft Resume', summary: '')
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      workspace_aside = document.css('main aside').last
+
+      expect(workspace_aside).to be_present
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.title'))
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.description'))
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.counts_summary', ready_count: 1, draft_count: 1))
+      expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.focus_note'))
+      expect(workspace_aside.css('a, button').map { |element| element.text.squish }).to include(I18n.t('resumes.index.quick_actions.create_resume'))
+    end
+  end
+
   describe 'GET /resumes/:id/edit' do
     it 'preserves locale query params in builder navigation and preview handoff links' do
       resume = create(:resume, user:, template:)
@@ -139,15 +220,106 @@ RSpec.describe 'Resumes', type: :request do
       expect(hrefs).to include(edit_resume_path(resume, step: 'education', locale: :en))
     end
 
-    it 'hides the extra mobile preview panel on section-based builder steps while keeping preview navigation in the builder chrome' do
+    it 'hides the extra mobile preview panel on section-based builder steps while collapsing secondary builder actions and repeated section-type cues' do
       resume = create(:resume, user:, template:)
 
       get edit_resume_path(resume), params: { step: 'experience' }
 
       expect(response).to have_http_status(:ok)
+      experience_document = Nokogiri::HTML.parse(response.body)
+      experience_preview_frame = experience_document.at_css("turbo-frame##{ActionView::RecordIdentifier.dom_id(resume, :preview)}")
+      experience_primary_actions = experience_document.css('[data-builder-primary-actions] a').map { |link| link.text.squish }
+      experience_secondary_actions = experience_document.at_css('details[data-builder-secondary-actions]')
+      experience_examples_link = experience_document.at_css('a[href="#experience-step-tips"]')
+      expect(response.body).not_to include(%(id="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
       expect(response.body).not_to include(I18n.t('resumes.edit.mobile_preview_panel.title'))
-      expect(response.body).to include(I18n.t('resume_builder.editor_state.navigation.preview'))
-      expect(response.body).to include(I18n.t('resume_builder.editor_state.navigation.next', step: 'Education'))
+      expect(experience_preview_frame).to be_present
+      expect(experience_preview_frame.ancestors('div').map { |node| node['class'].to_s }).to include('hidden xl:block')
+      expect(experience_primary_actions).to eq([
+        I18n.t('resume_builder.editor_state.navigation.go_back'),
+        I18n.t('resume_builder.editor_state.navigation.next', step: 'Education')
+      ])
+      expect(experience_secondary_actions).to be_present
+      expect(experience_secondary_actions.at_css('summary').text).to include(I18n.t('resume_builder.editor_state.navigation.more_actions'))
+      expect(experience_secondary_actions.css('a').map { |link| link.text.squish }).to eq([
+        I18n.t('resume_builder.editor_state.navigation.back_to_workspace'),
+        I18n.t('resume_builder.editor_state.navigation.preview')
+      ])
+      expect(experience_examples_link).to be_present
+      expect(experience_examples_link.parent.css('span')).to be_empty
+      expect(experience_document.css('[data-entry-section-type-badge]')).to be_empty
+
+      get edit_resume_path(resume), params: { step: 'heading' }
+
+      expect(response).to have_http_status(:ok)
+      heading_document = Nokogiri::HTML.parse(response.body)
+      heading_preview_frame = heading_document.at_css("turbo-frame##{ActionView::RecordIdentifier.dom_id(resume, :preview)}")
+      heading_primary_actions = heading_document.css('[data-builder-primary-actions] a').map { |link| link.text.squish }
+      expect(response.body).to include(I18n.t('resumes.edit.mobile_preview_panel.title'))
+      expect(heading_preview_frame).to be_present
+      expect(heading_preview_frame.ancestors('div').map { |node| node['class'].to_s }).not_to include('hidden xl:block')
+      expect(heading_document.at_css('details[data-builder-secondary-actions]')).to be_nil
+      expect(heading_primary_actions).to include(
+        I18n.t('resume_builder.editor_state.navigation.back_to_workspace'),
+        I18n.t('resume_builder.editor_state.navigation.preview'),
+        I18n.t('resume_builder.editor_state.navigation.go_back')
+      )
+    end
+
+    it 'keeps non-experience section steps focused without a duplicate step header card' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'education' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      step_content = document.at_css("##{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}")
+
+      expect(step_content).to be_present
+      expect(step_content.element_children.map(&:name)).to eq([ 'section' ])
+
+      expect(step_content.element_children.first['id']).to eq(ActionView::RecordIdentifier.dom_id(resume, :step_sections))
+      expect(response.body.scan(I18n.t('resume_builder.step_registry.steps.education.description')).size).to eq(1)
+      expect(document.at_css('a[href="#experience-step-tips"]')).to be_nil
+      expect(document.at_css('[data-experience-entry-guidance]')).to be_nil
+    end
+
+    it 'recommends finalize on the education step when the tracked builder flow is already complete' do
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        summary: 'Short summary',
+        contact_details: {
+          'full_name' => 'Pat Kumar',
+          'email' => 'pat@example.com'
+        }
+      )
+      experience_section = create(:section, resume:, section_type: 'experience', title: 'Experience')
+      education_section = create(:section, resume:, section_type: 'education', title: 'Education')
+      skills_section = create(:section, resume:, section_type: 'skills', title: 'Skills')
+      create(:entry, section: experience_section, content: { 'title' => 'Designer' })
+      create(:entry, section: education_section, content: { 'degree' => 'B.Des' })
+      create(:entry, section: skills_section, content: { 'name' => 'Figma' })
+
+      get edit_resume_path(resume), params: { step: 'education' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      primary_actions = document.css('[data-builder-primary-actions] a').map { |link| link.text.squish }
+      next_move_card = document.css('article').find do |article|
+        article.at_css('p')&.text.to_s.squish == I18n.t('resume_builder.editor_state.next_step_card.eyebrow')
+      end
+
+      expect(primary_actions).to eq([
+        I18n.t('resume_builder.editor_state.navigation.go_back'),
+        I18n.t('resume_builder.editor_state.navigation.next', step: 'Finalize')
+      ])
+      expect(next_move_card).to be_present
+      expect(next_move_card.text).to include(I18n.t('resume_builder.editor_state.next_step_card.finalize_title'))
+      expect(next_move_card.text).to include(I18n.t('resume_builder.editor_state.next_step_card.finalize_description'))
     end
 
     it 'uses compact finalize picker copy without reusing fast-start wording' do
@@ -156,18 +328,37 @@ RSpec.describe 'Resumes', type: :request do
       get edit_resume_path(resume), params: { step: 'finalize' }
 
       expect(response).to have_http_status(:ok)
+      expect(Nokogiri::HTML.parse(response.body).at_css('details[data-builder-secondary-actions]')).to be_nil
+      expect(response.body).to include(%(id="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
       expect(response.body).to include('template-picker-compact')
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_pill'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.browse_all_templates'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.section_spacing'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.paragraph_spacing'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.line_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
       expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
+
+      document = Nokogiri::HTML.parse(response.body)
+
+      expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
+      expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present
+      expect(document.at_css('select[name="resume[settings][line_spacing]"]')).to be_present
     end
 
     it 'collapses the shared add-section form on populated section steps' do
-      resume = create(:resume, user:, template:)
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        intake_details: {
+          'experience_level' => 'less_than_3_years',
+          'student_status' => 'student'
+        }
+      )
       create(:section, resume:, title: 'Experience', section_type: 'experience')
 
       get edit_resume_path(resume), params: { step: 'experience' }
@@ -176,10 +367,102 @@ RSpec.describe 'Resumes', type: :request do
 
       document = Nokogiri::HTML.parse(response.body)
       disclosure = document.at_css("details##{ActionView::RecordIdentifier.dom_id(resume, :add_section_form)}")
+      experience_guidance = document.at_css('[data-experience-entry-guidance]')
+      highlights_textarea = document.at_css('textarea[data-experience-suggestions-target="input"]')
 
       expect(disclosure).to be_present
       expect(disclosure.attribute('open')).to be_nil
       expect(disclosure.text).to include(I18n.t('resumes.section_form.summary_action'))
+      expect(experience_guidance).to be_present
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.eyebrow'))
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.badges.early_career'))
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.teaching_assistant'))
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.tutor'))
+      expect(highlights_textarea).to be_present
+      expect(highlights_textarea['name']).to include('[highlights_text]')
+    end
+
+    it 'collapses section header actions on section-step pages while keeping finalize inline' do
+      resume = create(:resume, user:, template:)
+      create(:section, resume:, title: 'Experience', section_type: 'experience')
+      create(:section, resume:, title: 'Education', section_type: 'education')
+      create(:section, resume:, title: 'Projects', section_type: 'projects')
+
+      get edit_resume_path(resume), params: { step: 'experience' }
+
+      expect(response).to have_http_status(:ok)
+
+      experience_document = Nokogiri::HTML.parse(response.body)
+      experience_section_actions = experience_document.at_css('details[data-section-header-actions]')
+
+      expect(experience_section_actions).to be_present
+      expect(experience_document.at_css('[data-section-header-inline-actions]')).to be_nil
+      expect(experience_section_actions.at_css('summary').text).to include(I18n.t('resumes.section_editor.actions.summary'))
+      expect(experience_section_actions.css('form button').map { |button| button.text.squish }).to eq([
+        I18n.t('resumes.section_editor.actions.up'),
+        I18n.t('resumes.section_editor.actions.down'),
+        I18n.t('resumes.section_editor.actions.remove')
+      ])
+
+      get edit_resume_path(resume), params: { step: 'education' }
+
+      expect(response).to have_http_status(:ok)
+
+      education_document = Nokogiri::HTML.parse(response.body)
+      education_section_actions = education_document.at_css('details[data-section-header-actions]')
+
+      expect(education_section_actions).to be_present
+      expect(education_document.at_css('[data-section-header-inline-actions]')).to be_nil
+      expect(education_section_actions.at_css('summary').text).to include(I18n.t('resumes.section_editor.actions.summary'))
+
+      get edit_resume_path(resume), params: { step: 'finalize' }
+
+      expect(response).to have_http_status(:ok)
+
+      finalize_document = Nokogiri::HTML.parse(response.body)
+      finalize_inline_actions = finalize_document.at_css('[data-section-header-inline-actions]')
+
+      expect(finalize_document.at_css('details[data-section-header-actions]')).to be_nil
+      expect(finalize_inline_actions).to be_present
+      expect(finalize_inline_actions.css('form button').map { |button| button.text.squish }).to eq([
+        I18n.t('resumes.section_editor.actions.up'),
+        I18n.t('resumes.section_editor.actions.down'),
+        I18n.t('resumes.section_editor.actions.remove')
+      ])
+    end
+
+    it 'hides redundant default section titles on section-step pages while preserving custom titles' do
+      resume = create(:resume, user:, template:)
+      experience_section = create(:section, resume:, title: ResumeBuilder::SectionRegistry.title_for('experience'), section_type: 'experience')
+      create(:section, resume:, title: ResumeBuilder::SectionRegistry.title_for('education'), section_type: 'education')
+
+      get edit_resume_path(resume), params: { step: 'experience' }
+
+      expect(response).to have_http_status(:ok)
+
+      experience_document = Nokogiri::HTML.parse(response.body)
+      experience_titles = experience_document.at_css("section##{ActionView::RecordIdentifier.dom_id(resume, :step_sections)}").css('h4').map { |element| element.text.squish }
+
+      expect(experience_titles).to be_empty
+
+      get edit_resume_path(resume), params: { step: 'education' }
+
+      expect(response).to have_http_status(:ok)
+
+      education_document = Nokogiri::HTML.parse(response.body)
+      education_titles = education_document.at_css("section##{ActionView::RecordIdentifier.dom_id(resume, :step_sections)}").css('h4').map { |element| element.text.squish }
+
+      expect(education_titles).to be_empty
+
+      experience_section.update!(title: 'Leadership Experience')
+
+      get edit_resume_path(resume), params: { step: 'experience' }
+
+      expect(response).to have_http_status(:ok)
+
+      updated_titles = Nokogiri::HTML.parse(response.body).at_css("section##{ActionView::RecordIdentifier.dom_id(resume, :step_sections)}").css('h4').map { |element| element.text.squish }
+
+      expect(updated_titles).to include('Leadership Experience')
     end
 
     it 'opens the shared add-section form when the current step has no sections yet' do

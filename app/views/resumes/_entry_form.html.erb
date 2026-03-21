@@ -1,9 +1,13 @@
 <% persisted = entry.persisted? %>
 <% disclosure_storage_key = persisted ? "resume-builder:entry:#{entry.id}" : "resume-builder:section:#{section.id}:new-entry" %>
 <% disclosure_default_open = !persisted && section.ordered_entries.none? %>
-<% form_options = persisted ? { data: { controller: "autosave", autosave_delay_value: 350, action: "input->autosave#queue change->autosave#queue" } } : {} %>
+<% experience_entry = section.section_type == "experience" %>
+<% form_data = persisted ? { controller: "autosave", autosave_delay_value: 350, action: "input->autosave#queue change->autosave#queue" } : {} %>
+<% form_data[:controller] = [form_data[:controller], ("experience-suggestions" if experience_entry)].compact.join(" ") if experience_entry %>
+<% form_options = form_data.any? ? { data: form_data } : {} %>
 <% entry_url = persisted ? resume_section_entry_path(resume, section, entry, **resume_builder_step_params) : resume_section_entries_path(resume, section, **resume_builder_step_params) %>
 <% section_type_label = ResumeBuilder::SectionRegistry.title_for(section.section_type) %>
+<% show_section_type_badge = local_assigns.fetch(:show_section_type_badge, true) %>
 <% card_options = {
   id: persisted ? dom_id(entry, :sortable_item) : dom_id(section, :new_entry),
   data: {
@@ -40,7 +44,9 @@
 
         <div class="mt-4 flex flex-wrap gap-2 text-xs font-medium text-ink-700/70">
           <span class="<%= ui_badge_classes(:neutral) %>"><%= persisted ? t("resumes.entry_form.badges.live_entry") : t("resumes.entry_form.badges.new_entry") %></span>
-          <span class="<%= ui_badge_classes(:info) %>"><%= section_type_label %></span>
+          <% if show_section_type_badge %>
+            <span class="<%= ui_badge_classes(:info) %>" data-entry-section-type-badge><%= section_type_label %></span>
+          <% end %>
           <% if persisted %>
             <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.entry_form.badges.drag_to_reorder") %></span>
           <% end %>
@@ -71,11 +77,21 @@
     <% end %>
 
     <%= form_with model: [resume, section, entry], url: entry_url, class: "grid gap-4 sm:grid-cols-2", **form_options do |form| %>
+      <% if experience_entry %>
+        <div class="sm:col-span-2">
+          <%= render "resumes/experience_entry_guidance", resume: resume, entry: entry %>
+        </div>
+      <% end %>
+
       <% entry_fields_for(section).each do |field| %>
         <div class="<%= entry_field_text_area?(field) || entry_field_checkbox?(field) ? 'sm:col-span-2' : '' %>">
           <%= label_tag "#{form.object_name}_content_#{field[:key]}", field[:label], class: ui_label_classes %>
           <% if entry_field_text_area?(field) %>
-            <%= text_area_tag "#{form.object_name}[content][#{field[:key]}]", entry_field_value(entry, field[:key]), rows: 4, id: "#{form.object_name}_content_#{field[:key]}", class: ui_input_classes %>
+            <% textarea_options = { rows: 4, id: "#{form.object_name}_content_#{field[:key]}", class: ui_input_classes } %>
+            <% if experience_entry && field[:key] == "highlights_text" %>
+              <% textarea_options[:data] = { experience_suggestions_target: "input" } %>
+            <% end %>
+            <%= text_area_tag "#{form.object_name}[content][#{field[:key]}]", entry_field_value(entry, field[:key]), **textarea_options %>
           <% elsif entry_field_checkbox?(field) %>
             <div class="mt-2 <%= ui_inset_panel_classes %>">
               <%= hidden_field_tag "#{form.object_name}[content][#{field[:key]}]", false %>

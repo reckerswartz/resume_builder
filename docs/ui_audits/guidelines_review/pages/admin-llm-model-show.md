@@ -6,11 +6,11 @@
 - Path: `/admin/llm_models/:id`
 - Access level: admin
 - Page family: admin
-- Status: `reviewed`
+- Status: `compliant`
 - Compliance score: 95
-- Last audited: `2026-03-21T03:43:07Z`
-- Latest run: `docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-review/00-overview.md`
-- Artifact root: `tmp/ui_audit_artifacts/2026-03-21T03-43-07Z/admin-llm-model-show/guidelines`
+- Last audited: `2026-03-21T21:09:22Z`
+- Latest run: `docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-admin-close-page/00-overview.md`
+- Artifact root: `tmp/ui_audit_artifacts/2026-03-21T21-09-21Z/admin-llm-model-show/guidelines`
 
 ## Compliance scorecard
 
@@ -27,16 +27,20 @@
 
 ## Open issue keys
 
-(none)
+- None.
+
+## Closed issue keys
+
+- None.
 
 ## Pending
 
-(none — essentially compliant)
+- None. This page is closed for the current audit cycle; re-review after shared admin detail surfaces or helper copy change.
 
 ## Verification
 
 - Playwright review:
-  - `tmp/ui_audit_artifacts/2026-03-21T03-43-07Z/admin-llm-model-show/guidelines/accessibility_snapshot.md`
+  - `tmp/ui_audit_artifacts/2026-03-21T21-09-21Z/admin-llm-model-show/guidelines/accessibility_snapshot.md`
 - Notes:
-  - Reviewed against `LlmModel` record `1` (`Yi Large`).
-  - Zero console errors or warnings during the review pass.
+  - Close-page verification reviewed `LlmModel` record `1` (`Yi Large`) and confirmed the triage-first layout, section rail, and grouped operational panels remain stable.
+  - Zero console errors or warnings during the close-page pass.

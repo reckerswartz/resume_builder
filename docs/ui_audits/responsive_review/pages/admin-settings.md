@@ -11,11 +11,11 @@ This file tracks the responsive review history for the admin settings hub.
 - Auth context: `admin`
 - Page family: `admin`
 - Priority: `high`
-- Status: `improved`
-- Last audited: `2026-03-21T02:09:00Z`
-- Last changed: `2026-03-21T02:09:00Z`
-- Latest run: `docs/ui_audits/responsive_review/runs/2026-03-21-admin-settings-disclosure/00-overview.md`
-- Artifact root: `Playwright MCP snapshots and measurements across core viewport preset`
+- Status: `closed`
+- Last audited: `2026-03-21T21:02:50Z`
+- Last changed: `2026-03-21T21:02:50Z`
+- Latest run: `docs/ui_audits/responsive_review/runs/2026-03-21-admin-settings-close-page/00-overview.md`
+- Artifact root: `tmp/ui_audit_artifacts/2026-03-21-admin-settings-close-page/`
 
 ## Page purpose
 
@@ -34,13 +34,15 @@ This file tracks the responsive review history for the admin settings hub.
 
 ## Current slice
 
-- Slice goal: `Collapse the LLM verification checkbox matrices behind <details> disclosures so the page is scannable without scrolling through 189 model cards.`
+- Slice goal: `Close the page after confirming the disclosure-based admin settings fixes remain stable across focused mobile, tablet, and desktop breakpoints.`
 - Viewports reviewed:
   - `390x844`
+  - `768x1024`
   - `1280x800`
 - Shared surfaces involved:
   - `app/views/admin/settings/show.html.erb`
   - `config/locales/views/admin.en.yml`
+  - `docs/ui_audits/responsive_review/registry.yml`
 
 ## Breakpoint findings
 
@@ -49,6 +51,10 @@ This file tracks the responsive review history for the admin settings hub.
 - `closed responsiveness The mobile horizontal overflow is resolved (375px scroll width on 375px client width).`
 - `closed hierarchy The page dropped from 42896px to 8760px scroll height (-80%) after collapsing the verification checkbox lists behind <details> disclosures.`
 - `closed noise The LLM model assignment checkboxes are now hidden by default and revealed on demand with a selection count badge.`
+
+### `768x1024`
+
+- `low hierarchy No horizontal overflow (753px scroll width on 753px client width). The page measures 5444px and the verification-model disclosures remain collapsed by default.`
 
 ### `1280x800`
 
@@ -80,20 +86,25 @@ This file tracks the responsive review history for the admin settings hub.
 - `Wrapped both text and vision verification checkbox lists in <details> elements with locale-backed selection count summaries, collapsing 189+ model cards by default.`
 - `Added verification_disclosure_summary locale keys for both text and vision workflows in config/locales/views/admin.en.yml.`
 - `Re-audited the admin settings page at mobile and desktop after the disclosure fix.`
+- `Re-verified the admin settings page in a focused close-page pass at 390x844, 768x1024, and 1280x800.`
+- `Confirmed the cloud import/provider copy and both verification disclosure summaries still render correctly with no Translation missing leakage.`
+- `Marked the page closed after confirming all tracked responsive issues remain resolved.`
 
 ## Pending
 
-- `No material responsive issues remain. The page is now scannable at all core viewports.`
+- `No page-local responsive work remains.`
+- `Re-review after future admin-settings, shared admin-shell, or verification-disclosure changes.`
 
 ## Verification
 
 - Playwright review:
-  - `Core viewport re-audit for /admin/settings after the disclosure fix.`
-  - `Verified no overflow at 390x844 and 1280x800.`
+  - `Focused close-page re-review for /admin/settings at 390x844, 768x1024, and 1280x800.`
 - Specs:
   - `bundle exec rspec spec/requests/admin/settings_spec.rb`
 - Notes:
-  - `RSpec passed with 3 examples and 0 failures.`
-  - `No console errors at any viewport.`
-  - `Mobile scroll height dropped from 42896px to 8760px (-80%).`
-  - `Desktop scroll height dropped from 26685px to 4441px (-83%).`
+  - `bundle exec rspec spec/requests/admin/settings_spec.rb passed with 3 examples and 0 failures.`
+  - `No console errors at any reviewed viewport.`
+  - `Translation missing text did not appear at any reviewed breakpoint.`
+  - `390x844: 375px client width / 375px scroll width / 8760px height; 2 verification disclosures present; 0 open by default.`
+  - `768x1024: 753px client width / 753px scroll width / 5444px height; 2 verification disclosures present; 0 open by default.`
+  - `1280x800: 1265px client width / 1265px scroll width / 4441px height; 2 verification disclosures present; 0 open by default.`

@@ -4,8 +4,8 @@
   "packageManager": "yarn@4.0.0",
   "scripts": {
     "build": "webpack --config webpack.config.js --mode production",
-    "build:dev": "webpack --config webpack.config.js --mode development",
-    "watch": "webpack --config webpack.config.js --watch --mode development"
+    "build:dev": "webpack --config webpack.config.js --mode development --no-cache",
+    "watch": "webpack --config webpack.config.js --watch --mode development --no-cache"
   },
   "dependencies": {
     "@hotwired/stimulus": "3.2.2",

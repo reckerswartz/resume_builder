@@ -122,6 +122,8 @@ module Admin::TemplatesHelper
     return :neutral if package.fetch(:implementation, {}).blank? && draft_candidates.blank?
 
     return :danger if latest_validation_status == "failed"
+    return :success if template_seed_baseline(template)[:ready]
+    return :warning if template_seed_baseline(template)[:missing_artifact]
     return :info if package.fetch(:implementation, {}).blank? && draft_candidates.any?
     return :neutral if latest_validation_status.blank? || latest_validation_status == "pending" || latest_validation_status == "needs_review"
 
@@ -138,6 +140,10 @@ module Admin::TemplatesHelper
       I18n.t("admin.templates.show.artifact_review.summary.states.implementation_follow_up")
     elsif package.fetch(:implementation, {}).blank? && draft_candidates.any?
       I18n.t("admin.templates.show.artifact_review.summary.states.draft_candidate_in_progress", count: draft_candidates.size)
+    elsif template_seed_baseline(template)[:missing_artifact]
+      I18n.t("admin.templates.show.artifact_review.summary.states.seed_baseline_follow_up")
+    elsif template_seed_baseline(template)[:ready]
+      I18n.t("admin.templates.show.artifact_review.summary.states.seed_baseline_ready")
     elsif template_artifact_review_tone(template) == :success
       I18n.t("admin.templates.show.artifact_review.summary.states.review_ready")
     else
@@ -153,6 +159,30 @@ module Admin::TemplatesHelper
       template_artifact_review_implementation_badge_label(template),
       I18n.t("admin.templates.show.artifact_review.badges.validation_runs", count: counts.fetch(:validation_runs))
     ].join(" · ")
+  end
+
+  def template_seed_baseline_status_label(template)
+    seed_baseline = template_seed_baseline(template)
+    return I18n.t("admin.templates.show.artifact_review.seed_baseline.states.ready") if seed_baseline[:ready]
+    return I18n.t("admin.templates.show.artifact_review.seed_baseline.states.missing") if seed_baseline[:missing_artifact]
+
+    I18n.t("admin.templates.show.artifact_review.seed_baseline.states.unavailable")
+  end
+
+  def template_seed_baseline_detail(template)
+    seed_baseline = template_seed_baseline(template)
+    return I18n.t("admin.templates.show.artifact_review.seed_baseline.descriptions.ready") if seed_baseline[:ready]
+    return I18n.t("admin.templates.show.artifact_review.seed_baseline.descriptions.missing") if seed_baseline[:missing_artifact]
+
+    I18n.t("admin.templates.show.artifact_review.seed_baseline.descriptions.unavailable")
+  end
+
+  def template_seed_baseline_tone(template)
+    seed_baseline = template_seed_baseline(template)
+    return :success if seed_baseline[:ready]
+    return :warning if seed_baseline[:missing_artifact]
+
+    :neutral
   end
 
   def template_artifact_review_implementation_badge_label(template)
@@ -200,8 +230,16 @@ module Admin::TemplatesHelper
     template_artifact_package(template).fetch(:implementation, {})
   end
 
+  def template_seed_baseline(template)
+    template_artifact_package(template).fetch(:seed_baseline, {})
+  end
+
   def template_candidate_implementations(template)
     Array(template_artifact_package(template).fetch(:candidate_implementations, []))
+  end
+
+  def template_historical_implementations(template)
+    Array(template_artifact_package(template).fetch(:historical_implementations, []))
   end
 
   def template_recent_validation_runs(template)
@@ -218,6 +256,13 @@ module Admin::TemplatesHelper
     [
       candidate[:source_artifact_identifier].presence && "#{I18n.t("admin.templates.show.fields.source_artifact")}: #{candidate[:source_artifact_identifier]}",
       template_candidate_created_at_label(candidate)
+    ].compact.join(" · ")
+  end
+
+  def template_implementation_history_summary(implementation)
+    [
+      implementation[:source_artifact_identifier].presence && "#{I18n.t("admin.templates.show.fields.source_artifact")}: #{implementation[:source_artifact_identifier]}",
+      (I18n.l(implementation[:created_at], format: :long) if implementation[:created_at].present?)
     ].compact.join(" · ")
   end
 
@@ -256,6 +301,69 @@ module Admin::TemplatesHelper
     else
       I18n.t("admin.templates.show.implementation_validation.draft_candidates.guidance.validation_required")
     end
+  end
+
+  def template_implementation_promotion_message(implementation)
+    case implementation[:next_promotion_target].to_s
+    when "stable"
+      I18n.t("admin.templates.show.implementation_validation.implementation_card.guidance.stable_ready")
+    when "seeded"
+      I18n.t("admin.templates.show.implementation_validation.implementation_card.guidance.seeded_ready")
+    else
+      if implementation[:status].to_s == "seeded"
+        I18n.t("admin.templates.show.implementation_validation.implementation_card.guidance.seeded_complete")
+      else
+        I18n.t("admin.templates.show.implementation_validation.implementation_card.guidance.no_further_promotion")
+      end
+    end
+  end
+
+  def template_implementation_promotion_action_label(implementation)
+    case implementation[:next_promotion_target].to_s
+    when "stable"
+      I18n.t("admin.templates.show.implementation_validation.implementation_card.actions.promote_to_stable")
+    when "seeded"
+      I18n.t("admin.templates.show.implementation_validation.implementation_card.actions.promote_to_seeded")
+    end
+  end
+
+  def template_implementation_promotion_tone(implementation)
+    return :success if implementation[:status].to_s == "seeded"
+    return :info if implementation[:next_promotion_target].present?
+
+    template_implementation_status_tone(implementation[:status])
+  end
+
+  def template_implementation_history_message(implementation)
+    if implementation[:status].to_s == "archived"
+      I18n.t(
+        "admin.templates.show.implementation_validation.history.guidance.archived",
+        status: template_lifecycle_status_label(implementation[:archived_from_status].presence || implementation[:status])
+      )
+    else
+      I18n.t("admin.templates.show.implementation_validation.history.guidance.archive_ready")
+    end
+  end
+
+  def template_implementation_history_tone(implementation)
+    return :neutral if implementation[:status].to_s == "archived"
+
+    template_implementation_status_tone(implementation[:status])
+  end
+
+  def template_implementation_archive_action_label(implementation)
+    return unless implementation[:archivable]
+
+    I18n.t("admin.templates.show.implementation_validation.history.actions.archive")
+  end
+
+  def template_implementation_archived_from_badge_label(implementation)
+    return if implementation[:archived_from_status].blank?
+
+    I18n.t(
+      "admin.templates.show.implementation_validation.history.archived_from_badge",
+      status: template_lifecycle_status_label(implementation[:archived_from_status])
+    )
   end
 
   def template_implementation_status_tone(status)

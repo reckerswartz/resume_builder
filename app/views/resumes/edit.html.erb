@@ -4,12 +4,16 @@
  <% builder_state = resume_builder_editor_state(@resume) %>
  <% preview_state = resume_builder_preview_state(@resume) %>
  <% preview_page_action = preview_state.preview_page_action %>
+ <% show_workspace_overview = builder_state.step_partial != "editor_section_step" %>
  <% show_mobile_preview_panel = builder_state.step_partial != "editor_section_step" %>
+ <% preview_wrapper_classes = builder_state.step_partial == "editor_section_step" ? "hidden xl:block" : "block" %>
 
  <section class="space-y-6">
-   <div class="hidden xl:block">
-     <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
-   </div>
+   <% if show_workspace_overview %>
+     <div class="hidden xl:block">
+       <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
+     </div>
+   <% end %>
 
   <% if show_mobile_preview_panel %>
     <div class="xl:hidden">
@@ -37,6 +41,8 @@
 
    <div class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_24rem] xl:items-start">
     <%= render "editor", resume: @resume, builder_state: builder_state %>
-     <%= render "preview", resume: @resume, preview_state: preview_state %>
+     <div class="<%= preview_wrapper_classes %>">
+       <%= render "preview", resume: @resume, preview_state: preview_state %>
+     </div>
    </div>
  </section>

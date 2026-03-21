@@ -6,6 +6,7 @@ This file tracks one maintainability hotspot or responsibility cluster from firs
 
 - Area key: `[area_key]`
 - Title: `[title]`
+- Lane: `[structural | verification]`
 - Path: `[path_or_scope]`
 - Category: `[controller | model | service | query | presenter | helper | component | view | job | policy | mixed]`
 - Priority: `[high | medium | low]`
@@ -34,9 +35,19 @@ This file tracks one maintainability hotspot or responsibility cluster from firs
 - Constraints:
   - `[constraint]`
 
+## File inventory
+
+- Audited files:
+  - `[file]`
+- Completed files:
+  - `[file or none]`
+- Remaining files or follow-up targets:
+  - `[file or none]`
+
 ## Current slice
 
 - Slice goal: `[goal]`
+- Round-robin reason: `[why this lane and file were selected now]`
 - Expected files to change:
   - `[file]`
   - `[file]`

@@ -1,5 +1,11 @@
 module ResumeTemplates
   class ArtifactPackage
+    NEXT_PROMOTION_TARGETS = {
+      "draft" => "validated",
+      "validated" => "stable",
+      "stable" => "seeded"
+    }.freeze
+
     def initialize(template:, implementation: nil)
       @template = template
       @implementation = implementation
@@ -9,7 +15,9 @@ module ResumeTemplates
       {
         template: template_payload,
         implementation: implementation_payload,
+        seed_baseline: seed_baseline_payload,
         candidate_implementations: candidate_implementations_payload,
+        historical_implementations: historical_implementations_payload,
         source_artifacts: source_artifacts_payload,
         derived_artifacts: derived_artifacts_payload,
         documentation_artifacts: documentation_artifacts_payload,
@@ -42,9 +50,22 @@ module ResumeTemplates
         implementation_payload_for(selected_implementation)
       end
 
+      def seed_baseline_payload
+        ResumeTemplates::SeedBaselineResolver.new(
+          template: template,
+          implementation: selected_implementation
+        ).call
+      end
+
       def candidate_implementations_payload
         template.template_implementations.where(status: "draft").most_recent_first.limit(5).map do |draft_candidate|
           implementation_payload_for(draft_candidate)
+        end
+      end
+
+      def historical_implementations_payload
+        historical_implementations_scope.limit(10).map do |historical_implementation|
+          implementation_payload_for(historical_implementation)
         end
       end
 
@@ -100,6 +121,7 @@ module ResumeTemplates
       def implementation_payload_for(template_implementation)
         validation_runs = template_implementation.template_validation_runs.recent.to_a
         latest_validation_run = validation_runs.first
+        next_promotion_target = next_promotion_target_for(template_implementation)
 
         {
           id: template_implementation.id,
@@ -114,10 +136,49 @@ module ResumeTemplates
           created_at: template_implementation.created_at,
           validated_at: template_implementation.validated_at,
           seeded_at: template_implementation.seeded_at,
+          archived_at: metadata_timestamp(template_implementation.metadata["archived_at"]),
+          archived_from_status: template_implementation.metadata["archived_from_status"],
           validation_runs_count: validation_runs.size,
-          promotion_ready: template_implementation.draft? && validation_runs.any?(&:successful?),
+          promotion_ready: promotion_ready?(template_implementation, validation_runs: validation_runs),
+          archivable: archivable?(template_implementation),
+          next_promotion_target: next_promotion_target,
           latest_validation_run: latest_validation_run.present? ? validation_run_payload_for(latest_validation_run) : nil
         }
+      end
+
+      def historical_implementations_scope
+        scope = template.template_implementations.where(status: %w[validated stable seeded archived])
+        scope = scope.where.not(id: selected_implementation.id) if selected_implementation.present?
+        scope.most_recent_first
+      end
+
+      def next_promotion_target_for(template_implementation)
+        NEXT_PROMOTION_TARGETS[template_implementation.status]
+      end
+
+      def archivable?(template_implementation)
+        template_implementation.render_ready? && template_implementation.id != selected_implementation&.id
+      end
+
+      def promotion_ready?(template_implementation, validation_runs:)
+        case template_implementation.status
+        when "draft"
+          validation_runs.any?(&:successful?)
+        when "validated", "stable"
+          true
+        else
+          false
+        end
+      end
+
+      def metadata_timestamp(value)
+        return if value.blank?
+
+        return value.in_time_zone if value.is_a?(Time) || value.is_a?(Date) || value.is_a?(DateTime) || value.class.name == "ActiveSupport::TimeWithZone"
+
+        Time.zone.parse(value.to_s)
+      rescue ArgumentError, TypeError
+        nil
       end
 
       def validation_run_payload_for(run)

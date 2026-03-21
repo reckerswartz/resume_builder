@@ -19,7 +19,7 @@
     </div>
 
     <% if resume.summary.present? %>
-      <p class="<%= [summary_margin_top_class, body_text_class, "max-w-3xl leading-7 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
+      <p class="<%= [summary_margin_top_class, body_text_class, relaxed_body_leading_class, "max-w-3xl text-slate-700"].join(" ") %>"><%= resume.summary %></p>
     <% end %>
   </header>
 
@@ -73,11 +73,11 @@
                 </div>
 
                 <% entry_body_paragraphs(entry).each do |paragraph| %>
-                  <p class="<%= [entry_body_spacing_class, body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= paragraph %></p>
+                  <p class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "text-slate-700"].join(" ") %>"><%= paragraph %></p>
                 <% end %>
 
                 <% if highlights.any? %>
-                  <ul class="<%= [entry_body_spacing_class, body_text_class, "space-y-2 leading-6 text-slate-700"].join(" ") %>">
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "space-y-2 text-slate-700"].join(" ") %>">
                     <% highlights.each do |highlight| %>
                       <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
                     <% end %>

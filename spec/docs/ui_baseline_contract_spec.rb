@@ -20,7 +20,8 @@ RSpec.describe 'UI baseline contract' do
     '.windsurf/workflows/maintainability-audit.md',
     '.windsurf/workflows/security-audit.md',
     '.windsurf/workflows/template-audit.md',
-    '.windsurf/workflows/behance-template-implementation.md'
+    '.windsurf/workflows/behance-template-implementation.md',
+    '.windsurf/workflows/resumebuilder-reference-rollout.md'
   ].freeze
 
   def read_repo_file(relative_path)

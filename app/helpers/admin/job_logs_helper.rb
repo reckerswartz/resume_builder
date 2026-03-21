@@ -46,10 +46,10 @@ module Admin::JobLogsHelper
   end
 
   def job_log_runtime_label(queue_snapshot)
-    return "Queue unavailable" if queue_snapshot.unavailable?
+    return I18n.t("admin.job_logs.helper.runtime_labels.unavailable") if queue_snapshot.unavailable?
     return queue_snapshot.state_label if queue_snapshot.found?
 
-    "Missing from queue runtime"
+    I18n.t("admin.job_logs.helper.runtime_labels.missing_record")
   end
 
   def job_log_runtime_tone(queue_snapshot)
@@ -61,69 +61,52 @@ module Admin::JobLogsHelper
   end
 
   def job_log_runtime_description(job_log, queue_snapshot)
-    return queue_snapshot.error_message.presence || Admin::JobMonitoringService::QUEUE_UNAVAILABLE_MESSAGE if queue_snapshot.unavailable?
+    return I18n.t("admin.job_logs.helper.runtime_descriptions.unavailable") if queue_snapshot.unavailable?
 
     unless queue_snapshot.found?
-      return "No matching Solid Queue runtime row was found for this active job ID. The application log still contains the tracked lifecycle data below." if job_log.active_job_id.present?
+      return I18n.t("admin.job_logs.helper.runtime_descriptions.missing_queue_record") if job_log.active_job_id.present?
 
-      return "No active job ID was recorded for this log, so queue runtime lookup is unavailable."
+      return I18n.t("admin.job_logs.helper.runtime_descriptions.missing_job_reference")
     end
 
-    return "Worker #{job_log_worker_label(queue_snapshot)} currently owns this execution." if queue_snapshot.process.present?
-    return "This claimed execution no longer has a worker heartbeat and can be returned to the ready queue if needed." if queue_snapshot.orphaned_claimed?
+    return I18n.t("admin.job_logs.helper.runtime_descriptions.worker_owner", worker: job_log_worker_label(queue_snapshot)) if queue_snapshot.process.present?
+    return I18n.t("admin.job_logs.helper.runtime_descriptions.orphaned_claimed") if queue_snapshot.orphaned_claimed?
 
     case queue_snapshot.state.to_s
     when "failed"
-      "The queue runtime still has a failed execution row for this job."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.failed")
     when "finished"
-      "The queue runtime marks this job as finished."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.finished")
     when "scheduled"
-      "The job is scheduled and waiting for its runtime window."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.scheduled")
     when "blocked"
-      "The job is blocked by concurrency or dependency rules."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.blocked")
     when "queued"
-      "The job is waiting in the ready queue."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.queued")
     when "running"
-      "The job is currently marked as running, but no worker details are attached here."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.running")
     else
-      "Queue runtime data is available for this job."
+      I18n.t("admin.job_logs.helper.runtime_descriptions.default")
     end
   end
 
   def job_log_worker_label(queue_snapshot)
     return "#{queue_snapshot.process.name} (PID #{queue_snapshot.process.pid})" if queue_snapshot.process.present?
-    return "No worker attached" if queue_snapshot.orphaned_claimed?
+    return I18n.t("admin.job_logs.helper.worker.no_worker_attached") if queue_snapshot.orphaned_claimed?
 
     "N/A"
   end
 
-  def job_log_related_error_reference(job_log)
-    job_log.error_details["reference_id"].presence
-  end
+  def job_log_related_error_state(job_log)
+    related_error_logs = @job_log_related_error_logs || {}
+    reference = job_log.error_details.to_h["reference_id"].presence
+    error_log_loaded = reference.blank? || related_error_logs.key?(reference)
 
-  def job_log_related_error_log(job_log)
-    reference = job_log_related_error_reference(job_log)
-    return if reference.blank?
-
-    @job_log_related_error_logs ||= {}
-    return @job_log_related_error_logs[reference] if @job_log_related_error_logs.key?(reference)
-
-    @job_log_related_error_logs[reference] = ErrorLog.find_by(reference_id: reference)
-  end
-
-  def job_log_related_error_description(job_log)
-    related_error_log = job_log_related_error_log(job_log)
-    related_error_reference = job_log_related_error_reference(job_log)
-
-    if related_error_log.present?
-      "Captured error log is available for full context and backtrace review."
-    elsif related_error_reference.present?
-      "Reference was recorded, but no matching error log is currently available."
-    elsif job_log.failed?
-      "This failed job did not capture a linked error reference."
-    else
-      "No related error reference was captured for this job log."
-    end
+    Admin::JobLogs::RelatedErrorState.new(
+      job_log: job_log,
+      error_log: related_error_logs[reference],
+      error_log_loaded: error_log_loaded
+    )
   end
 
   def formatted_debug_payload(value)
@@ -144,37 +127,37 @@ module Admin::JobLogsHelper
 
   def requeue_job_control_label(job_log, queue_snapshot)
     if orphaned_running_job_requeue_available?(job_log, queue_snapshot)
-      "Return to ready queue"
+      I18n.t("admin.job_logs.helper.controls.labels.return_to_pending_queue")
     else
-      "Requeue as new job"
+      I18n.t("admin.job_logs.helper.controls.labels.requeue_as_new")
     end
   end
 
   def job_control_summary(job_log, queue_snapshot)
     if retry_job_control_available?(queue_snapshot) && job_log.failed?
-      return "Retry keeps the same active job ID, requeue creates a fresh job ID, and discard clears the failed queue row while keeping this log for debugging."
+      return I18n.t("admin.job_logs.helper.controls.summaries.retry_requeue_discard")
     end
 
-    return "Retry keeps the same active job ID for a failed queue execution." if retry_job_control_available?(queue_snapshot)
-    return "Requeue creates a fresh active job ID from the stored payload." if job_log.failed?
-    return "This orphaned running job can be returned to the ready queue because no worker process is attached." if orphaned_running_job_requeue_available?(job_log, queue_snapshot)
-    return "This queue entry can be discarded safely because no active worker currently owns it." if discard_job_control_available?(queue_snapshot)
+    return I18n.t("admin.job_logs.helper.controls.summaries.retry_only") if retry_job_control_available?(queue_snapshot)
+    return I18n.t("admin.job_logs.helper.controls.summaries.requeue_from_failure") if job_log.failed?
+    return I18n.t("admin.job_logs.helper.controls.summaries.orphaned_requeue") if orphaned_running_job_requeue_available?(job_log, queue_snapshot)
+    return I18n.t("admin.job_logs.helper.controls.summaries.discardable") if discard_job_control_available?(queue_snapshot)
 
-    "Active running jobs cannot be safely mutated while a worker still owns them."
+    I18n.t("admin.job_logs.helper.controls.summaries.running_locked")
   end
 
   def requeue_job_control_confirm(job_log, queue_snapshot)
     if orphaned_running_job_requeue_available?(job_log, queue_snapshot)
-      "Return this orphaned job to the ready queue?"
+      I18n.t("admin.job_logs.helper.controls.confirmations.orphaned")
     elsif job_log.failed?
-      "Create a fresh queue attempt for this failed job? The original failure log will remain available."
+      I18n.t("admin.job_logs.helper.controls.confirmations.requeue_failed")
     else
-      "Create a fresh queue attempt for this job?"
+      I18n.t("admin.job_logs.helper.controls.confirmations.requeue_default")
     end
   end
 
   def discard_job_control_confirm
-    "Remove this queue entry? The application log will remain available for debugging."
+    I18n.t("admin.job_logs.helper.controls.confirmations.discard")
   end
 
   private
