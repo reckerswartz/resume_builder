@@ -92,6 +92,7 @@ en:
         need_account: "Need an account?"
         create_one: "Create one"
         caps_lock_hint: "Caps lock is on."
+        toggle_password_visibility: "Toggle password visibility"
   registrations:
     controller:
       workspace_ready: "Your workspace is ready."
@@ -123,6 +124,7 @@ en:
         already_have_account: "Already have an account?"
         sign_in: "Sign in"
         caps_lock_hint: "Caps lock is on."
+        toggle_password_visibility: "Toggle password visibility"
   passwords:
     controller:
       rate_limit_exceeded: "Try again later."

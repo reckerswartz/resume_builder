@@ -48,7 +48,7 @@ class Admin::LlmModelsController < Admin::BaseController
     authorize @llm_model
 
     if @llm_model.save
-      redirect_to admin_llm_model_path(@llm_model), notice: "LLM model created."
+      redirect_to admin_llm_model_path(@llm_model), notice: I18n.t("admin.llm_models_controller.model_created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -58,7 +58,7 @@ class Admin::LlmModelsController < Admin::BaseController
     authorize @llm_model
 
     if @llm_model.update(llm_model_params)
-      redirect_to admin_llm_model_path(@llm_model), notice: "LLM model updated."
+      redirect_to admin_llm_model_path(@llm_model), notice: I18n.t("admin.llm_models_controller.model_updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -68,7 +68,7 @@ class Admin::LlmModelsController < Admin::BaseController
     authorize @llm_model
 
     @llm_model.destroy!
-    redirect_to admin_llm_models_path, notice: "LLM model deleted.", status: :see_other
+    redirect_to admin_llm_models_path, notice: I18n.t("admin.llm_models_controller.model_deleted"), status: :see_other
   end
 
   private

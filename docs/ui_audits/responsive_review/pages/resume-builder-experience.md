@@ -12,10 +12,10 @@ This file tracks the responsive review history for the guided builder experience
 - Page family: `builder`
 - Priority: `high`
 - Status: `improved`
-- Last audited: `2026-03-21T00:15:00Z`
-- Last changed: `2026-03-21T00:15:00Z`
-- Latest run: `docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-overflow-density/00-overview.md`
-- Artifact root: `Playwright MCP screenshots: resume-builder-experience-*.png and resume-builder-experience-rerun-*.png`
+- Last audited: `2026-03-21T01:52:00Z`
+- Last changed: `2026-03-21T01:52:00Z`
+- Latest run: `docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-first-fold-density/00-overview.md`
+- Artifact root: `Playwright MCP snapshots and measurements across core viewport preset`
 
 ## Page purpose
 
@@ -34,46 +34,49 @@ This file tracks the responsive review history for the guided builder experience
 
 ## Current slice
 
-- Slice goal: `Remove the mobile overflow and lighten duplicated first-fold preview chrome on section-based experience editing.`
+- Slice goal: `Reduce mobile first-fold density by hiding the workspace overview and progress/next-move widget cards on small screens, bringing the builder step rail and section editor closer to the viewport top.`
 - Viewports reviewed:
   - `390x844`
   - `768x1024`
   - `1280x800`
   - `1440x900`
   - `1536x864`
-- Shared surfaces likely involved:
+- Shared surfaces involved:
   - `app/views/resumes/edit.html.erb`
-  - `app/views/resumes/_editor.html.erb`
-  - `app/views/resumes/_preview.html.erb`
+  - `app/views/resumes/_editor_chrome.html.erb`
 
 ## Breakpoint findings
 
 ### `390x844`
 
-- `closed responsiveness The mobile overflow is resolved after making the editor and preview turbo frames shrinkable (375px scroll width on a 375px client width after the fix; previously 392px on 375px).`
-- `high form_friction The page is still very tall on mobile (8017px scroll height after the fix), so the experience step still feels like multiple stacked workflows.`
-- `medium hierarchy The extra mobile preview panel is gone on section-based steps, which moves the builder chrome earlier in the page flow, but the step tabs and support cards still create a heavy first fold.`
+- `closed responsiveness The mobile overflow is resolved (375px scroll width on 375px client width).`
+- `closed hierarchy The builder step rail now starts at 632px (within the first fold), down from 1372px before the density fix. The workspace overview and progress/next-move cards are hidden on mobile.`
+- `medium form_friction The page is shorter (6796px scroll height, down from 7536px), but the experience step still has long-scroll fatigue from the section editor, experience guidance, add-section form, and preview rail stacked vertically.`
 
 ### `768x1024`
 
-- `high form_friction The page remains very tall at tablet width (5314px scroll height after the fix), so the builder still feels overloaded even without the extra preview panel.`
+- `medium form_friction The page dropped to 4857px scroll height (from 5289px). Still tall but the workspace overview and progress cards are hidden, bringing the section editor closer to the fold.`
 
 ### `1280x800`
 
-- `medium noise The page no longer overflows at any audited width, but it still carries two sticky/fixed regions and a 3436px scroll height at a common laptop width.`
+- `low noise Desktop layout is stable with the workspace overview and progress/next-move widget cards visible. No overflow. Scroll height 3473px.`
 
 ### `1440x900`
 
-- `medium hierarchy The preview rail remains useful, but the first fold still introduces multiple support panels before the section editor becomes the obvious primary task.`
+- `low hierarchy The preview rail remains useful and the layout is stable. All builder chrome visible. No overflow. Scroll height 3181px.`
+
+### `1536x864`
+
+- `low noise Stable at the widest core viewport. No overflow. Scroll height 3104px.`
 
 ## Open issue keys
 
 - `experience-step-long-scroll-fatigue`
-- `experience-step-first-fold-density`
 
 ## Closed issue keys
 
 - `experience-mobile-horizontal-overflow`
+- `experience-step-first-fold-density`
 
 ## Completed
 
@@ -82,20 +85,30 @@ This file tracks the responsive review history for the guided builder experience
 - `Made the editor and preview turbo frames shrinkable so the experience step no longer overflows horizontally on mobile.`
 - `Removed the extra mobile preview panel on section-based steps while keeping preview navigation in the builder chrome.`
 - `Re-audited the experience step across the core viewport preset after the fix slice.`
+- `Compressed the stacked mobile builder-step cards into a horizontal rail using stable builder-step classes backed by the served application stylesheet.`
+- `Fixed a nearby authenticated app-shell sidebar width drift so the desktop experience-step verification uses the intended 16rem shell column.`
+- `Re-audited the experience step across the core viewport preset after the mobile rail and shell-width fixes.`
+- `Hid the workspace overview (PageHeader) on mobile/tablet for all builder edit pages since the editor chrome already contains resume identity, step title, badges, and workspace/preview actions.`
+- `Hid the progress and next-move widget cards on mobile/tablet since the builder step rail already shows step status (Done/Current/Open) and provides adequate progress awareness.`
+- `Re-audited the experience step across the core viewport preset after the first-fold density fix.`
 
 ## Pending
 
-- `Reduce first-fold density by collapsing or deferring lower-priority support chrome on the experience step, especially the stacked step tabs and support cards.`
+- `Evaluate whether the remaining long-scroll fatigue justifies another builder pass or whether admin-settings is the next best target.`
 - `Evaluate whether add-section controls should stay in finalize rather than competing with the main experience editing surface.`
 
 ## Verification
 
 - Playwright review:
-  - `Core viewport pass with screenshot captures for 390x844, 768x1024, 1280x800, 1440x900, and 1536x864.`
-  - `Direct mobile snapshot review confirmed the horizontal overflow is gone and the extra preview panel is no longer rendered on the experience step.`
-  - `Core viewport re-audit screenshots were captured as resume-builder-experience-rerun-*.png.`
+  - `Core viewport re-audit for /resumes/6/edit?step=experience after the first-fold density fix.`
+  - `Also verified /resumes/6/edit?step=heading on mobile to confirm the fix applies across non-section builder steps.`
 - Specs:
-  - `bundle exec rspec spec/requests/resumes_spec.rb spec/presenters/resume_builder/editor_state_spec.rb`
+  - `bundle exec rspec spec/requests/resumes_spec.rb spec/presenters/resume_builder/editor_state_spec.rb spec/presenters/resume_builder/workspace_state_spec.rb spec/presenters/resume_builder/preview_state_spec.rb spec/components/ui/shared_density_components_spec.rb`
 - Notes:
-  - `RSpec passed with 14 examples and 0 failures.`
-  - `The next highest-value experience-step slice is still structural density reduction rather than another overflow repair.`
+  - `RSpec passed with 30 examples and 0 failures.`
+  - `At 390x844, the builder step rail moved from 1372px to 632px (within the first fold).`
+  - `At 390x844, total page height dropped from 7536px to 6796px (-740px).`
+  - `At 768x1024, total page height dropped from 5289px to 4857px (-432px).`
+  - `At all xl+ viewports, workspace overview and progress/next-move cards remain visible. No overflow at any breakpoint.`
+  - `No console errors at any viewport.`
+  - `The next highest-value slice is either the remaining experience-step long-scroll fatigue or moving to admin-settings.`

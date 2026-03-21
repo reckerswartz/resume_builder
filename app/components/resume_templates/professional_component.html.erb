@@ -19,18 +19,19 @@
       <% end %>
     </div>
 
-    <% if resume.summary.present? %>
-      <div class="<%= [summary_margin_top_class, "rounded-2xl border px-4 py-4"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("08") %>;">
-        <p class="<%= [body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
-      </div>
-    <% end %>
   </header>
 
+  <% if resume.summary.present? %>
+    <div class="<%= ["mt-6 rounded-2xl border-l-[3px] px-5 py-4"].join(" ") %>" style="border-color: <%= accent_color %>; background-color: <%= accent_color_with_alpha("06") %>;">
+      <p class="<%= [body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
+    </div>
+  <% end %>
+
   <div class="<%= section_stack_classes %>">
-    <% resume.ordered_sections.each do |section| %>
+    <% visible_sections.each do |section| %>
       <% entries = section_entries(section) %>
       <section>
-        <h2 class="<%= [section_heading_spacing_class, section_title_text_class, "border-b pb-2 font-semibold uppercase tracking-[0.18em]"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("33") %>; color: <%= accent_color %>;"><%= section.title %></h2>
+        <h2 class="<%= [section_heading_spacing_class, section_title_text_class, "border-b-2 border-l-[3px] pb-2 pl-3 font-semibold uppercase tracking-[0.12em]"].join(" ") %>" style="border-bottom-color: <%= accent_color_with_alpha("22") %>; border-left-color: <%= accent_color %>; color: <%= accent_color %>;"><%= section.title %></h2>
 
         <% if section.section_type == "skills" %>
           <div class="grid gap-2 sm:grid-cols-2">

@@ -140,11 +140,11 @@ en:
         needs: "Needs summary"
       missing_headline: "Add a headline to make the workspace and exported preview more scannable."
       grouping:
-        eyebrow: "Preview grouping"
+        eyebrow: "Draft overview"
         identity_pending: "Identity details pending"
         ready_description: "This draft is ready for a fast preview pass and final export checks."
         incomplete_description: "Finish the summary and identity details before moving into final preview and export review."
-        grouped_badge: "Preview + metadata grouped"
+        grouped_badge: "Ready for review"
       metadata_badges:
         updated_ago: "Updated %{time} ago"
         source_mode:
@@ -195,13 +195,13 @@ en:
       import_title: "Add source text or file now"
       import_description: "Start the draft with pasted text or an attached source file. You can still refine the structure, run autofill later, and keep the original upload attached from the builder."
       template_field_label: "Template"
-      template_picker_description: "Start with the selected look now. You can switch templates later from finalize without changing the resume content."
+      template_picker_description: "Choose a look for this draft. You can change it later from finalize."
       next_panel_eyebrow: "What happens next"
       next_panel_title_create: "Create the draft and start editing"
       next_panel_title_update: "Keep refining the draft"
       next_panel_description: "We’ll build starter sections for experience, education, skills, and projects, then take you into the guided editor."
       starter_sections_badge: "Starter sections included"
-      template_switch_later_badge: "Template switch later"
+      template_switch_later_badge: "Layout is flexible"
       steps:
         build_shell: "Create the draft shell with your starting title and template."
         guided_builder: "Land in the guided builder with starter sections ready to edit."
@@ -231,8 +231,8 @@ en:
         compact: "Selected template"
         default: "Selection summary"
       summary_notes:
-        compact: "Start with this look now and switch templates later from finalize without changing the draft content."
-        default: "You can switch templates later from the finalize step without losing the current resume content."
+        compact: "You can change this template later without losing content."
+        default: "You can change this template later without losing content."
       selection_badges:
         density: "Density: %{density}"
         columns: "Columns: %{columns}"
@@ -245,7 +245,7 @@ en:
         theme: "Theme: %{theme}"
         skills: "Skills: %{skills}"
         sidebar: "Sidebar: %{sections}"
-      accent_label: "Accent %{color}"
+      accent_label: "Accent: %{variant}"
       current_only_badge: "Current only"
       summary_detail: "%{shell} shell · %{headings} headings"
     template_picker_browser:
@@ -254,16 +254,21 @@ en:
       search_label: "Search"
       sort_label: "Sort"
       live_sample_label: "Live sample"
+      accent_variants_label: "Accent swatches"
+      accent_value: "%{variant} accent"
+      accent_swatch_label: "Select %{variant} accent"
       accent_description: "Keep the same resume content reusable if you change layouts later."
       empty_state:
         title: "No templates match those filters"
         description: "Try a different family, density, column, theme, or layout combination to bring more templates back into the gallery."
     template_picker_compact:
       fast_start_pill: "Fast start"
-      fast_start_description: "Start with the selected look now. Open the full browser only if you want to compare more options before editing."
+      fast_start_description: "Open the full browser only if you want to compare more options."
       open_marketplace: "Open marketplace"
       recommended_pill: "Recommended for this draft"
       recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
+      preview_selected_badge: "Selected"
+      expand_preview_hint: "Preview"
       browse_all_templates: "Browse all templates"
       browse_all_templates_description: "Filter by family, density, columns, theme, or layout"
     template_picker_summaries:

@@ -40,6 +40,8 @@ vendor/bundle/
 !/tmp/storage/.keep
 
 /public/assets
+/docs/template_audits/artifacts/
+/docs/templates/*.pdf
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key

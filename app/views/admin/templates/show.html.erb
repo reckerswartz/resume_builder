@@ -1,9 +1,17 @@
 <% layout_metadata = template_layout_metadata(@template) %>
 <% preview_resume = template_preview_resume(@template) %>
+<% artifact_review_counts = template_artifact_review_counts(@template) %>
+<% artifact_review_groups = template_artifact_review_groups(@template) %>
+<% artifact_review_tone = template_artifact_review_tone(@template) %>
+<% current_implementation = template_current_implementation(@template) %>
+<% draft_candidates = template_candidate_implementations(@template) %>
+<% validation_runs = template_recent_validation_runs(@template) %>
 <% section_links = [
-     { id: "shared-preview", label: "Shared preview", caption: "Live sample from the shared renderer" },
-     { id: "layout-profile", label: "Layout profile", caption: "Family, density, shell, and structure" },
-     { id: "configuration", label: "Configuration", caption: "Visibility and raw layout config" }
+     { id: "shared-preview", label: t("admin.templates.show.navigation.sections.shared_preview.label"), caption: t("admin.templates.show.navigation.sections.shared_preview.caption") },
+     { id: "layout-profile", label: t("admin.templates.show.navigation.sections.layout_profile.label"), caption: t("admin.templates.show.navigation.sections.layout_profile.caption") },
+     { id: "artifact-review", label: t("admin.templates.show.navigation.sections.artifact_review.label"), caption: t("admin.templates.show.navigation.sections.artifact_review.caption") },
+     { id: "implementation-validation", label: t("admin.templates.show.navigation.sections.implementation_validation.label"), caption: t("admin.templates.show.navigation.sections.implementation_validation.caption") },
+     { id: "configuration", label: t("admin.templates.show.navigation.sections.configuration.label"), caption: t("admin.templates.show.navigation.sections.configuration.caption") }
    ] %>
 <% review_items = [
      {
@@ -20,6 +28,11 @@
        label: "Shared preview",
        detail: "The live sample below uses the same renderer path as the builder preview and PDF export pipeline.",
        tone: :success
+     },
+     {
+       label: t("admin.templates.show.summary.review_items.artifact_coverage.label"),
+       detail: template_artifact_review_detail(@template),
+       tone: artifact_review_tone == :success ? :success : :neutral
      }
    ] %>
 <% review_tone = if !@template.active?
@@ -77,6 +90,11 @@
         <span class="<%= ui_badge_classes(template_status_badge_tone(@template)) %>"><%= template_status_label(@template) %></span>
         <span class="<%= ui_badge_classes(:neutral) %>">Columns: <%= layout_metadata.fetch(:column_count_label) %></span>
         <span class="<%= ui_badge_classes(:neutral) %>">Theme tone: <%= layout_metadata.fetch(:theme_tone_label) %></span>
+        <span class="<%= ui_badge_classes(artifact_review_counts.fetch(:source_artifacts).positive? ? :success : :warning) %>"><%= t("admin.templates.show.artifact_review.badges.sources", count: artifact_review_counts.fetch(:source_artifacts)) %></span>
+        <span class="<%= ui_badge_classes(template_artifact_review_implementation_badge_tone(@template)) %>"><%= template_artifact_review_implementation_badge_label(@template) %></span>
+        <% if draft_candidates.any? %>
+          <span class="<%= ui_badge_classes(:info) %>"><%= t("admin.templates.show.implementation_validation.badges.draft_candidates", count: draft_candidates.size) %></span>
+        <% end %>
       </div>
 
       <div class="space-y-3">
@@ -106,7 +124,7 @@
               Template sections
             </span>
             <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to details</h2>
-            <p class="mt-2 text-sm leading-6 text-ink-700/80">Move between the live preview, layout profile, and stored config without re-scanning the whole page.</p>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80">Move between the live preview, lifecycle review, and stored config without re-scanning the whole page.</p>
           </div>
 
           <div class="space-y-3">
@@ -126,6 +144,21 @@
               <span class="<%= ui_badge_classes(template_visibility_tone(@template)) %>"><%= template_visibility_label(@template) %></span>
               <span class="<%= ui_badge_classes(template_status_badge_tone(@template)) %>"><%= template_status_label(@template) %></span>
             </div>
+          </div>
+
+          <div class="<%= ui_inset_panel_classes(tone: artifact_review_tone == :success ? :success : :subtle) %>">
+            <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.artifact_review.title") %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_artifact_review_detail(@template) %></p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="<%= ui_badge_classes(artifact_review_counts.fetch(:source_artifacts).positive? ? :success : :warning) %>"><%= t("admin.templates.show.artifact_review.badges.sources", count: artifact_review_counts.fetch(:source_artifacts)) %></span>
+              <span class="<%= ui_badge_classes(template_artifact_review_implementation_badge_tone(@template)) %>"><%= template_artifact_review_implementation_badge_label(@template) %></span>
+              <span class="<%= ui_badge_classes(validation_runs.any? ? :info : :neutral) %>"><%= t("admin.templates.show.artifact_review.badges.validation_runs", count: artifact_review_counts.fetch(:validation_runs)) %></span>
+            </div>
+            <% if artifact_review_counts.fetch(:source_artifacts).positive? %>
+              <div class="mt-3">
+                <%= button_to t("admin.templates.show.implementation_validation.implementation_card.actions.create_candidate"), admin_template_implementation_candidates_path(@template), form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+              </div>
+            <% end %>
           </div>
 
           <div class="flex flex-wrap gap-2">
@@ -253,6 +286,438 @@
               <span class="<%= ui_badge_classes(template_headshot_metadata_tone(@template)) %>"><%= template_headshot_metadata_label(@template) %></span>
             </div>
           </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: t("admin.templates.show.artifact_review.title"),
+        anchor: "artifact-review",
+        eyebrow: t("admin.templates.show.artifact_review.eyebrow"),
+        description: t("admin.templates.show.artifact_review.description"),
+        badges: [
+          { label: t("admin.templates.show.artifact_review.badges.sources", count: artifact_review_counts.fetch(:source_artifacts)), tone: artifact_review_counts.fetch(:source_artifacts).positive? ? :success : :warning },
+          { label: template_artifact_review_implementation_badge_label(@template), tone: template_artifact_review_implementation_badge_tone(@template) },
+          { label: t("admin.templates.show.artifact_review.badges.validation_runs", count: artifact_review_counts.fetch(:validation_runs)), tone: validation_runs.any? ? :info : :neutral }
+        ]
+      ) do %>
+        <div class="space-y-4">
+          <div class="<%= ui_inset_panel_classes(tone: artifact_review_tone == :success ? :success : :subtle) %>">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= template_artifact_review_title(@template) %></p>
+                <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= template_artifact_review_detail(@template) %></p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <span class="<%= ui_badge_classes(artifact_review_counts.fetch(:source_artifacts).positive? ? :success : :warning) %>"><%= t("admin.templates.show.artifact_review.badges.sources", count: artifact_review_counts.fetch(:source_artifacts)) %></span>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.templates.show.artifact_review.badges.documentation_notes", count: artifact_review_counts.fetch(:documentation_artifacts)) %></span>
+                <span class="<%= ui_badge_classes(validation_runs.any? ? :info : :neutral) %>"><%= t("admin.templates.show.artifact_review.badges.validation_artifacts", count: artifact_review_counts.fetch(:validation_artifacts)) %></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid gap-4 xl:grid-cols-2">
+            <% artifact_review_groups.each do |group| %>
+              <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
+                <div class="space-y-4">
+                  <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p class="text-sm font-medium text-ink-950"><%= group.fetch(:title) %></p>
+                      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= group.fetch(:description) %></p>
+                    </div>
+
+                    <span class="<%= ui_badge_classes(group.fetch(:tone, :neutral)) %>"><%= group.fetch(:count_label) %></span>
+                  </div>
+
+                  <% if group.fetch(:artifacts).any? %>
+                    <div class="space-y-3">
+                      <% group.fetch(:artifacts).each do |artifact| %>
+                        <% attachment_summary = template_artifact_attachment_summary(artifact) %>
+                        <div class="<%= ui_inset_panel_classes(tone: group.fetch(:key) == :source_artifacts ? :success : :default) %>">
+                          <div class="space-y-4">
+                            <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                              <div class="min-w-0">
+                                <p class="text-sm font-medium text-ink-950"><%= artifact.fetch(:name) %></p>
+                                <% if artifact[:description].present? %>
+                                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= artifact[:description] %></p>
+                                <% end %>
+                              </div>
+
+                              <div class="flex flex-wrap gap-2">
+                                <span class="<%= ui_badge_classes(:neutral) %>"><%= template_artifact_type_label(artifact.fetch(:artifact_type)) %></span>
+                                <% if template_artifact_role_label(artifact).present? %>
+                                  <span class="<%= ui_badge_classes(:neutral) %>"><%= template_artifact_role_label(artifact) %></span>
+                                <% end %>
+                                <% if artifact[:has_attachment] %>
+                                  <span class="<%= ui_badge_classes(:info) %>"><%= t("admin.templates.show.fields.attachment") %></span>
+                                <% end %>
+                              </div>
+                            </div>
+
+                            <% if group.fetch(:key) == :source_artifacts %>
+                              <div class="flex flex-wrap gap-2">
+                                <%= button_to t("admin.templates.show.artifact_review.actions.create_candidate"), admin_template_implementation_candidates_path(@template), params: { source_artifact_id: artifact.fetch(:id) }, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+                              </div>
+                            <% end %>
+
+                            <div class="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.identifier") %></p>
+                                <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= artifact.fetch(:identifier) %></p>
+                              </div>
+
+                              <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.source_signature") %></p>
+                                <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= artifact.fetch(:source_signature) %></p>
+                              </div>
+
+                              <% if artifact[:source_url].present? %>
+                                <div class="sm:col-span-2">
+                                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.source_url") %></p>
+                                  <p class="mt-1 break-all text-sm leading-6">
+                                    <%= link_to artifact[:source_url], artifact[:source_url], target: "_blank", rel: "noreferrer", class: "text-ink-900 underline decoration-canvas-300 underline-offset-4 hover:text-ink-950" %>
+                                  </p>
+                                </div>
+                              <% end %>
+
+                              <% if artifact[:parent_identifier].present? %>
+                                <div>
+                                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.parent_artifact") %></p>
+                                  <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= artifact[:parent_identifier] %></p>
+                                </div>
+                              <% end %>
+
+                              <% if attachment_summary.present? %>
+                                <div>
+                                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.attachment") %></p>
+                                  <p class="mt-1 text-sm leading-6 text-ink-950"><%= attachment_summary %></p>
+                                </div>
+                              <% end %>
+                            </div>
+
+                            <% if artifact[:metadata].present? %>
+                              <details class="overflow-hidden rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/92">
+                                <summary class="cursor-pointer px-4 py-4">
+                                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                      <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.fields.metadata") %></p>
+                                      <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= attachment_summary.presence || group.fetch(:description) %></p>
+                                    </div>
+
+                                    <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.templates.show.fields.reference_only") %></span>
+                                  </div>
+                                </summary>
+
+                                <div class="border-t border-canvas-200/80 px-4 py-4">
+                                  <%= render Ui::CodeBlockComponent.new(
+                                    title: t("admin.templates.show.fields.metadata"),
+                                    description: group.fetch(:description),
+                                    body: JSON.pretty_generate(artifact.fetch(:metadata)),
+                                    wrap: true
+                                  ) %>
+                                </div>
+                              </details>
+                            <% end %>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <%= render Ui::EmptyStateComponent.new(
+                      title: group.fetch(:empty_title),
+                      description: group.fetch(:empty_description),
+                      padding: :sm,
+                      tone: :subtle,
+                      align: :left,
+                      title_size: :sm
+                    ) %>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render Ui::SettingsSectionComponent.new(
+        title: t("admin.templates.show.implementation_validation.title"),
+        anchor: "implementation-validation",
+        eyebrow: t("admin.templates.show.implementation_validation.eyebrow"),
+        description: t("admin.templates.show.implementation_validation.description"),
+        badges: [
+          {
+            label: current_implementation.present? ? template_lifecycle_status_label(current_implementation.fetch(:status, nil)) : t("admin.templates.show.implementation_validation.badges.no_implementation"),
+            tone: current_implementation.present? ? template_implementation_status_tone(current_implementation.fetch(:status, nil)) : :neutral
+          },
+          (draft_candidates.any? ? {
+            label: t("admin.templates.show.implementation_validation.badges.draft_candidates", count: draft_candidates.size),
+            tone: :info
+          } : nil),
+          {
+            label: t("admin.templates.show.implementation_validation.badges.validation_runs", count: validation_runs.size),
+            tone: validation_runs.any? ? :info : :neutral
+          }
+        ].compact
+      ) do %>
+        <div class="space-y-4">
+          <div class="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+          <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
+            <div class="space-y-4">
+              <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.implementation_card.title") %></p>
+                  <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.implementation_card.description") %></p>
+                </div>
+
+                <% if artifact_review_counts.fetch(:source_artifacts).positive? %>
+                  <%= button_to t("admin.templates.show.implementation_validation.implementation_card.actions.create_candidate"), admin_template_implementation_candidates_path(@template), form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+                <% end %>
+              </div>
+
+              <% if current_implementation.present? %>
+                <div class="<%= ui_inset_panel_classes(tone: template_implementation_status_tone(current_implementation.fetch(:status, nil)) == :success ? :success : :subtle) %>">
+                  <div class="space-y-4">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                      <div>
+                        <p class="text-base font-medium text-ink-950"><%= current_implementation.fetch(:name) %></p>
+                        <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= current_implementation.fetch(:identifier) %></p>
+                      </div>
+
+                      <div class="flex flex-wrap gap-2">
+                        <span class="<%= ui_badge_classes(template_implementation_status_tone(current_implementation.fetch(:status, nil))) %>"><%= template_lifecycle_status_label(current_implementation.fetch(:status, nil)) %></span>
+                        <span class="<%= ui_badge_classes(:neutral) %>"><%= current_implementation.fetch(:renderer_family).to_s.tr("_", " ").titleize %></span>
+                        <% if current_implementation[:source_artifact_identifier].present? %>
+                          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.templates.show.fields.source_artifact") %>: <%= current_implementation[:source_artifact_identifier] %></span>
+                        <% end %>
+                      </div>
+                    </div>
+
+                    <% if current_implementation[:metadata].present? %>
+                      <p class="text-sm leading-6 text-ink-700/80"><%= current_implementation.fetch(:metadata).map { |key, value| "#{key.to_s.tr('_', ' ').titleize}: #{value}" }.join(" · ") %></p>
+                    <% end %>
+
+                    <details class="overflow-hidden rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/92">
+                      <summary class="cursor-pointer px-4 py-4">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.implementation_card.render_profile_title") %></p>
+                            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.implementation_card.render_profile_description") %></p>
+                          </div>
+
+                          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.templates.show.implementation_validation.implementation_card.reference_badge") %></span>
+                        </div>
+                      </summary>
+
+                      <div class="border-t border-canvas-200/80 px-4 py-4">
+                        <%= render Ui::CodeBlockComponent.new(
+                          title: t("admin.templates.show.implementation_validation.implementation_card.render_profile_title"),
+                          description: t("admin.templates.show.implementation_validation.implementation_card.render_profile_description"),
+                          body: JSON.pretty_generate(current_implementation.fetch(:render_profile)),
+                          wrap: true
+                        ) %>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+              <% else %>
+                <%= render Ui::EmptyStateComponent.new(
+                  title: t("admin.templates.show.implementation_validation.implementation_card.empty_title"),
+                  description: t("admin.templates.show.implementation_validation.implementation_card.empty_description"),
+                  padding: :sm,
+                  tone: :subtle,
+                  align: :left,
+                  title_size: :sm
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.validation_runs.title") %></p>
+                <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.validation_runs.description") %></p>
+              </div>
+
+              <% if validation_runs.any? %>
+                <div class="space-y-3">
+                  <% validation_runs.each do |run| %>
+                    <div class="<%= ui_inset_panel_classes(tone: template_validation_status_tone(run.fetch(:status, nil)) == :success ? :success : :default) %>">
+                      <div class="space-y-3">
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div>
+                            <p class="text-sm font-medium text-ink-950"><%= template_lifecycle_status_label(run.fetch(:validation_type, nil)) %></p>
+                            <% summary = template_validation_run_metric_summary(run) %>
+                            <% if summary.present? %>
+                              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= summary %></p>
+                            <% end %>
+                          </div>
+
+                          <span class="<%= ui_badge_classes(template_validation_status_tone(run.fetch(:status, nil))) %>"><%= template_lifecycle_status_label(run.fetch(:status, nil)) %></span>
+                        </div>
+
+                        <div class="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.identifier") %></p>
+                            <p class="mt-1 break-all text-sm leading-6 text-ink-950"><%= run.fetch(:identifier) %></p>
+                          </div>
+
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.validator") %></p>
+                            <p class="mt-1 text-sm leading-6 text-ink-950"><%= run[:validator_name].presence || t("admin.templates.show.fields.not_recorded") %></p>
+                          </div>
+
+                          <% if run[:template_implementation_name].present? %>
+                            <div>
+                              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.implementation") %></p>
+                              <p class="mt-1 text-sm leading-6 text-ink-950"><%= [run[:template_implementation_name], run[:template_implementation_identifier]].compact.join(" · ") %></p>
+                            </div>
+                          <% end %>
+
+                          <% if run[:validated_at].present? %>
+                            <div>
+                              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.templates.show.fields.validated_at") %></p>
+                              <p class="mt-1 text-sm leading-6 text-ink-950"><%= I18n.l(run[:validated_at], format: :long) %></p>
+                            </div>
+                          <% end %>
+
+                          <% if run[:metadata].present? || run[:metrics].present? %>
+                            <details class="overflow-hidden rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/92 sm:col-span-2">
+                              <summary class="cursor-pointer px-4 py-4">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                  <div>
+                                    <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.validation_runs.metadata_title") %></p>
+                                    <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.validation_runs.metadata_description") %></p>
+                                  </div>
+
+                                  <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.templates.show.fields.reference_only") %></span>
+                                </div>
+                              </summary>
+
+                              <div class="border-t border-canvas-200/80 px-4 py-4">
+                                <%= render Ui::CodeBlockComponent.new(
+                                  title: t("admin.templates.show.implementation_validation.validation_runs.metadata_title"),
+                                  description: t("admin.templates.show.implementation_validation.validation_runs.metadata_description"),
+                                  body: JSON.pretty_generate({ metrics: run.fetch(:metrics), metadata: run.fetch(:metadata) }),
+                                  wrap: true
+                                ) %>
+                              </div>
+                            </details>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <%= render Ui::EmptyStateComponent.new(
+                  title: t("admin.templates.show.implementation_validation.validation_runs.empty_title"),
+                  description: t("admin.templates.show.implementation_validation.validation_runs.empty_description"),
+                  padding: :sm,
+                  tone: :subtle,
+                  align: :left,
+                  title_size: :sm
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
+          </div>
+
+          <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.draft_candidates.title") %></p>
+                <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.draft_candidates.description") %></p>
+              </div>
+
+              <% if draft_candidates.any? %>
+                <div class="space-y-3">
+                  <% draft_candidates.each do |candidate| %>
+                    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+                      <div class="space-y-4">
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div>
+                            <p class="text-sm font-medium text-ink-950"><%= candidate.fetch(:name) %></p>
+                            <% summary = template_candidate_summary(candidate) %>
+                            <% if summary.present? %>
+                              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= summary %></p>
+                            <% end %>
+                          </div>
+
+                          <div class="flex flex-wrap gap-2">
+                            <span class="<%= ui_badge_classes(:info) %>"><%= template_lifecycle_status_label(candidate.fetch(:status, nil)) %></span>
+                            <span class="<%= ui_badge_classes(:neutral) %>"><%= candidate.fetch(:renderer_family).to_s.tr("_", " ").titleize %></span>
+                          </div>
+                        </div>
+
+                        <% if candidate[:notes].present? %>
+                          <p class="text-sm leading-6 text-ink-700/80"><%= candidate[:notes] %></p>
+                        <% end %>
+
+                        <div class="<%= ui_inset_panel_classes(tone: template_candidate_latest_validation_tone(candidate)) %>">
+                          <div class="space-y-3">
+                            <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                              <div>
+                                <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.draft_candidates.validation.title") %></p>
+                                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_candidate_latest_validation_label(candidate) %></p>
+                              </div>
+
+                              <span class="<%= ui_badge_classes(template_candidate_latest_validation_tone(candidate)) %>"><%= pluralize(candidate[:validation_runs_count], "run") %></span>
+                            </div>
+
+                            <p class="text-sm leading-6 text-ink-700/80"><%= template_candidate_promotion_message(candidate) %></p>
+
+                            <div class="flex flex-wrap gap-2">
+                              <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.record_pass"), admin_template_implementation_validation_runs_path(@template, candidate.fetch(:id)), params: { validation_run: { validation_type: "manual_review", status: "passed" } }, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+                              <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.record_follow_up"), admin_template_implementation_validation_runs_path(@template, candidate.fetch(:id)), params: { validation_run: { validation_type: "manual_review", status: "needs_review" } }, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
+                              <% if candidate[:promotion_ready] %>
+                                <%= button_to t("admin.templates.show.implementation_validation.draft_candidates.actions.promote"), admin_template_implementation_promotion_path(@template, candidate.fetch(:id)), form_class: "inline-flex", class: ui_button_classes(:primary, size: :sm) %>
+                              <% end %>
+                            </div>
+                          </div>
+                        </div>
+
+                        <% if candidate[:metadata].present? %>
+                          <p class="text-sm leading-6 text-ink-700/80"><%= candidate.fetch(:metadata).map { |key, value| "#{key.to_s.tr('_', ' ').titleize}: #{value}" }.join(" · ") %></p>
+                        <% end %>
+
+                        <details class="overflow-hidden rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/92">
+                          <summary class="cursor-pointer px-4 py-4">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                              <div>
+                                <p class="text-sm font-medium text-ink-950"><%= t("admin.templates.show.implementation_validation.draft_candidates.render_profile_title") %></p>
+                                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("admin.templates.show.implementation_validation.draft_candidates.render_profile_description") %></p>
+                              </div>
+
+                              <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.templates.show.fields.reference_only") %></span>
+                            </div>
+                          </summary>
+
+                          <div class="border-t border-canvas-200/80 px-4 py-4">
+                            <%= render Ui::CodeBlockComponent.new(
+                              title: t("admin.templates.show.implementation_validation.draft_candidates.render_profile_title"),
+                              description: t("admin.templates.show.implementation_validation.draft_candidates.render_profile_description"),
+                              body: JSON.pretty_generate(candidate.fetch(:render_profile)),
+                              wrap: true
+                            ) %>
+                          </div>
+                        </details>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <%= render Ui::EmptyStateComponent.new(
+                  title: t("admin.templates.show.implementation_validation.draft_candidates.empty_title"),
+                  description: t("admin.templates.show.implementation_validation.draft_candidates.empty_description"),
+                  padding: :sm,
+                  tone: :subtle,
+                  align: :left,
+                  title_size: :sm
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       <% end %>
 

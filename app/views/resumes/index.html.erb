@@ -54,11 +54,7 @@
         </div>
 
         <div class="flex flex-col gap-2 text-sm">
-          <%= link_to t("resumes.index.quick_actions.create_resume"), new_resume_path, class: "#{ui_button_classes(:secondary)} w-full justify-start" %>
-          <%= link_to t("resumes.index.quick_actions.browse_templates"), templates_path, class: "#{ui_button_classes(:secondary)} w-full justify-start" %>
-          <% if current_user.admin? %>
-            <%= link_to t("resumes.index.quick_actions.open_admin_hub"), admin_root_path, class: "#{ui_button_classes(:secondary)} w-full justify-start" %>
-          <% end %>
+          <%= link_to t("resumes.index.quick_actions.create_resume"), new_resume_path, class: "#{ui_button_classes(:primary)} w-full justify-center" %>
         </div>
       </div>
     <% end %>

@@ -89,6 +89,36 @@ module ResumeBuilder
             ]
           }
         ]
+      },
+      "certifications" => {
+        builder_step: "finalize",
+        core: false,
+        fields: [
+          { key: "name" },
+          { key: "organization" },
+          { key: "start_date" },
+          { key: "details", as: :textarea }
+        ],
+        starter_entries: [
+          {
+            "name" => "AWS Solutions Architect",
+            "organization" => "Amazon Web Services",
+            "start_date" => "2023",
+            "details" => "Cloud architecture design and deployment."
+          }
+        ]
+      },
+      "languages" => {
+        builder_step: "finalize",
+        core: false,
+        fields: [
+          { key: "name" },
+          { key: "level" }
+        ],
+        starter_entries: [
+          { "name" => "English", "level" => "Native" },
+          { "name" => "Spanish", "level" => "Conversational" }
+        ]
       }
     }.freeze
 

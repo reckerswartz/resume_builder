@@ -12,7 +12,7 @@ module ResumeTemplates
     end
 
     def layout_config
-      @layout_config ||= ResumeTemplates::Catalog.normalize_layout_config(template.layout_config, fallback_family: template.slug)
+      @layout_config ||= template.render_layout_config
     end
 
     def family
@@ -20,10 +20,7 @@ module ResumeTemplates
     end
 
     def accent_color
-      @accent_color ||= ResumeTemplates::Catalog.normalized_accent_color(
-        (resume.settings || {})["accent_color"],
-        fallback: layout_config.fetch("accent_color")
-      )
+      @accent_color ||= resume.accent_color
     end
 
     def accent_color_with_alpha(alpha)
@@ -150,6 +147,22 @@ module ResumeTemplates
       layout_config.fetch("photo_slots", {}).fetch(slot_name.to_s, {})
     end
 
+    def hidden_sections
+      @hidden_sections ||= resume.hidden_section_types
+    end
+
+    def section_visible?(section)
+      !hidden_sections.include?(section.section_type.to_s)
+    end
+
+    def visible_sections
+      resume.ordered_sections.select { |section| section_visible?(section) && !empty_section?(section) }
+    end
+
+    def empty_section?(section)
+      section.entries.empty?
+    end
+
     def section_entries(section)
       section.ordered_entries
     end
@@ -159,7 +172,7 @@ module ResumeTemplates
     end
 
     def entry_subtitle(entry)
-      [ value_for(entry, "organization"), value_for(entry, "institution"), value_for(entry, "role") ].reject(&:blank?).join(" · ")
+      [ value_for(entry, "organization"), value_for(entry, "institution"), value_for(entry, "role"), value_for(entry, "level") ].reject(&:blank?).join(" · ")
     end
 
     def entry_location(entry)
@@ -184,7 +197,7 @@ module ResumeTemplates
     end
 
     def inline_skill_summary(section)
-      section_entries(section).map { |entry| skill_label(entry) }.join(" • ")
+      section_entries(section).map { |entry| skill_label(entry) }.join(" | ")
     end
 
     def date_range_for(entry)
@@ -203,11 +216,11 @@ module ResumeTemplates
 
     private
       def typography_scale
-        @typography_scale ||= ResumeTemplates::Catalog.typography_scale(layout_config.fetch("font_scale"))
+        @typography_scale ||= ResumeTemplates::Catalog.typography_scale(resume.font_scale)
       end
 
       def density_scale
-        @density_scale ||= ResumeTemplates::Catalog.density_scale(layout_config.fetch("density"))
+        @density_scale ||= ResumeTemplates::Catalog.density_scale(resume.density)
       end
 
       def contact_value(key)

@@ -11,7 +11,7 @@ RSpec.describe Resumes::Bootstrapper do
 
       expect(resume).to be_persisted
       expect(resume.slug).to eq('untitled-resume-2')
-      expect(resume.sections.count).to eq(4)
+      expect(resume.sections.count).to eq(ResumeBuilder::SectionRegistry.starter_sections.size)
     end
 
     it 'persists normalized intake details on the created resume' do
@@ -62,6 +62,25 @@ RSpec.describe Resumes::Bootstrapper do
         'nationality' => 'Indian',
         'marital_status' => '',
         'visa_status' => 'Requires sponsorship'
+      )
+    end
+
+    it 'uses the selected template render profile accent color in default settings' do
+      template = create(
+        :template,
+        name: 'Classic Ivory',
+        slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+      user = create(:user)
+
+      resume = described_class.new(user:).call(title: 'Classic Resume', template: template)
+
+      expect(resume).to be_persisted
+      expect(resume.settings).to include(
+        'accent_color' => template.render_layout_config.fetch('accent_color'),
+        'show_contact_icons' => true,
+        'page_size' => 'A4'
       )
     end
   end

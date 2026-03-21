@@ -18,7 +18,8 @@ class ResumesController < ApplicationController
     @resume = build_resume_draft(
       template: initial_template || builder_default_template,
       attributes: {
-        intake_details: requested_new_intake_details
+        intake_details: requested_new_intake_details,
+        settings: requested_new_settings
       }
     )
     flash.now[:alert] = controller_message(:choose_experience_level_first) if params[:step].to_s == "student" && @resume.experience_level != "less_than_3_years"
@@ -174,7 +175,7 @@ class ResumesController < ApplicationController
     end
 
     def draft_resume_attributes
-      permitted_resume_params.slice(:title, :headline, :summary, :source_mode, :source_text, :source_document, :headshot, :intake_details, :personal_details)
+      permitted_resume_params.slice(:title, :headline, :summary, :source_mode, :source_text, :source_document, :headshot, :settings, :intake_details, :personal_details)
     end
 
     def build_resume_draft(template:, attributes: {})
@@ -196,7 +197,14 @@ class ResumesController < ApplicationController
         :headshot,
         :remove_headshot,
         contact_details: {},
-        settings: {},
+        settings: [
+          :accent_color,
+          :page_size,
+          :show_contact_icons,
+          :font_scale,
+          :density,
+          { hidden_sections: [] }
+        ],
         intake_details: %i[experience_level student_status],
         personal_details: Resume::PERSONAL_DETAIL_FIELDS.map(&:to_sym)
       )
@@ -288,6 +296,16 @@ class ResumesController < ApplicationController
         .to_h
         .deep_stringify_keys
         .slice("experience_level", "student_status")
+    end
+
+    def requested_new_settings
+      raw_settings = params.fetch(:resume, {}).fetch(:settings, {})
+      raw_settings = raw_settings.to_unsafe_h if raw_settings.respond_to?(:to_unsafe_h)
+
+      raw_settings
+        .to_h
+        .deep_stringify_keys
+        .slice("accent_color")
     end
 
     def render_unavailable_template_selection_on_create

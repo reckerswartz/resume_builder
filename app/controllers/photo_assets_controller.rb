@@ -31,53 +31,21 @@ class PhotoAssetsController < ApplicationController
     authorize @photo_asset, :update?
     return redirect_to(return_to_path, alert: generation_unavailable_message) unless generation_enabled?
 
-    run = @photo_profile.photo_processing_runs.create!(
-      workflow_type: :background_remove,
-      status: :queued,
-      resume: resume_context,
-      template: resume_context&.template,
-      input_asset_ids: [ @photo_asset.id ],
-      selected_model_ids: LlmModelAssignment.ready_models_for("vision_generation").map(&:id)
-    )
-    PhotoBackgroundRemovalJob.perform_later(run.id, @photo_asset.id, current_user.id, resume_context&.id)
-
-    redirect_to return_to_path, notice: I18n.t("resumes.photo_library.controller.background_removal_started")
+    launch_processing_run("background_remove", notice_key: "background_removal_started")
   end
 
   def generate_for_template
     authorize @photo_asset, :update?
     return redirect_to(return_to_path, alert: generation_unavailable_message) unless generation_enabled?
-    return redirect_to(return_to_path, alert: I18n.t("resumes.photo_library.controller.resume_required")) if resume_context.blank?
 
-    run = @photo_profile.photo_processing_runs.create!(
-      workflow_type: :generate_for_template,
-      status: :queued,
-      resume: resume_context,
-      template: resume_context.template,
-      input_asset_ids: [ @photo_asset.id ],
-      selected_model_ids: LlmModelAssignment.ready_models_for("vision_generation").map(&:id)
-    )
-    ResumeTemplateImageGenerationJob.perform_later(run.id, @photo_asset.id, resume_context.id, current_user.id)
-
-    redirect_to return_to_path, notice: I18n.t("resumes.photo_library.controller.generation_started")
+    launch_processing_run("generate_for_template", notice_key: "generation_started")
   end
 
   def verify
     authorize @photo_asset, :update?
     return redirect_to(return_to_path, alert: verification_unavailable_message) unless verification_enabled?
-    return redirect_to(return_to_path, alert: I18n.t("resumes.photo_library.controller.resume_required")) if resume_context.blank?
 
-    run = @photo_profile.photo_processing_runs.create!(
-      workflow_type: :verify_candidate,
-      status: :queued,
-      resume: resume_context,
-      template: resume_context.template,
-      input_asset_ids: [ @photo_asset.id ],
-      selected_model_ids: LlmModelAssignment.ready_models_for("vision_verification").map(&:id)
-    )
-    PhotoVerificationJob.perform_later(run.id, @photo_asset.id, resume_context.id, current_user.id)
-
-    redirect_to return_to_path, notice: I18n.t("resumes.photo_library.controller.verification_started")
+    launch_processing_run("verify_candidate", notice_key: "verification_started")
   end
 
   private
@@ -115,6 +83,22 @@ class PhotoAssetsController < ApplicationController
 
       replacement_asset = @photo_profile.photo_assets.where.not(id: @photo_asset.id).ready_for_library.latest_first.first
       @photo_profile.update!(selected_source_photo_asset: replacement_asset)
+    end
+
+    def launch_processing_run(workflow_type, notice_key:)
+      result = Photos::ProcessingRunLauncher.new(
+        photo_profile: @photo_profile,
+        photo_asset: @photo_asset,
+        user: current_user,
+        workflow_type: workflow_type,
+        resume: resume_context
+      ).call
+
+      if result.success?
+        redirect_to return_to_path, notice: I18n.t("resumes.photo_library.controller.#{notice_key}")
+      else
+        redirect_to return_to_path, alert: result.error_message
+      end
     end
 
     def upload_notice(result)

@@ -16,25 +16,9 @@
       <div class="relative space-y-3">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t("registrations.new.included_eyebrow") %></p>
 
-        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-          <div class="flex items-start gap-3">
-            <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
-            <div>
-              <p class="text-sm font-semibold text-ink-950"><%= t("registrations.new.starter_draft.title") %></p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("registrations.new.starter_draft.description") %></p>
-            </div>
-          </div>
-        </div>
+        <%= render "shared/glyph_inset_card", glyph: :preview, title: t("registrations.new.starter_draft.title"), description: t("registrations.new.starter_draft.description") %>
 
-        <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-          <div class="flex items-start gap-3">
-            <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
-            <div>
-              <p class="text-sm font-semibold text-ink-950"><%= t("registrations.new.change_layouts.title") %></p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("registrations.new.change_layouts.description") %></p>
-            </div>
-          </div>
-        </div>
+        <%= render "shared/glyph_inset_card", glyph: :layers, title: t("registrations.new.change_layouts.title"), description: t("registrations.new.change_layouts.description") %>
       </div>
     <% end %>
   </div>
@@ -78,6 +62,7 @@
             } %>
           <button
             type="button"
+            aria-label="<%= t("registrations.new.form.toggle_password_visibility") %>"
             class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-700 transition hover:text-ink-950"
             data-action="password-field#toggle"
             data-password-field-target="toggle"></button>
@@ -99,6 +84,7 @@
             } %>
           <button
             type="button"
+            aria-label="<%= t("registrations.new.form.toggle_password_visibility") %>"
             class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-700 transition hover:text-ink-950"
             data-action="password-field#toggle"
             data-password-field-target="toggle"></button>
@@ -117,7 +103,7 @@
 
       <div class="space-y-3">
         <%= form.submit t("registrations.new.form.submit"), class: "#{ui_button_classes(:primary)} w-full sm:w-auto" %>
-        <p class="text-sm leading-6 text-ink-700/70"><%= t("registrations.new.form.already_have_account") %> <%= link_to t("registrations.new.form.sign_in"), new_session_path, class: "font-medium text-ink-950 underline decoration-canvas-300 underline-offset-4" %></p>
+        <p class="text-sm leading-6 text-ink-700/70"><%= t("registrations.new.form.already_have_account") %> <%= link_to t("registrations.new.form.sign_in"), new_session_path, class: ui_button_classes(:ghost) %></p>
       </div>
     <% end %>
   <% end %>

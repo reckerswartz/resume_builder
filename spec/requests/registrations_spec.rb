@@ -39,7 +39,7 @@ RSpec.describe 'Registrations', type: :request do
       end.to change(User, :count).by(1)
 
       expect(Resume.count).to eq(1)
-      expect(Resume.last.sections.count).to eq(4)
+      expect(Resume.last.sections.count).to eq(ResumeBuilder::SectionRegistry.starter_sections.size)
       expect(User.last).to be_admin
       expect(response).to redirect_to(resumes_path(locale: :en))
       expect(flash[:notice]).to eq(I18n.t('registrations.controller.workspace_ready'))

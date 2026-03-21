@@ -16,16 +16,16 @@ module Ui
     end
 
     def title_classes
-      [ "text-xl font-semibold tracking-tight", tone.to_sym == :danger ? "text-rose-900" : "text-slate-900" ].join(" ")
+      [ "text-xl font-semibold tracking-tight", tone.to_sym == :danger ? "text-rose-900" : "text-ink-950" ].join(" ")
     end
 
     def description_classes
-      [ "mt-2 text-sm", tone.to_sym == :danger ? "text-rose-700" : "text-slate-600" ].join(" ")
+      [ "mt-2 text-sm", tone.to_sym == :danger ? "text-rose-700" : "text-ink-700/80" ].join(" ")
     end
 
     def block_classes
       [
-        "mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-sm text-slate-100",
+        "mt-4 max-w-full overflow-x-auto rounded-2xl bg-ink-950 px-4 py-4 text-sm text-canvas-50",
         wrap ? "whitespace-pre-wrap break-words" : "whitespace-pre"
       ].join(" ")
     end

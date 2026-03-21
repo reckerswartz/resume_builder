@@ -32,5 +32,26 @@ RSpec.describe ResumeTemplates::ComponentResolver do
 
       expect(described_class.component_class_for(resume)).to eq(ResumeTemplates::ModernComponent)
     end
+
+    it 'prefers the render-ready implementation profile when selecting the component class' do
+      template = create(
+        :template,
+        slug: 'modern',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      create(
+        :template_implementation,
+        template: template,
+        status: 'validated',
+        renderer_family: 'classic',
+        render_profile: {
+          'family' => 'classic',
+          'accent_color' => '#1D4ED8'
+        }
+      )
+      resume = create(:resume, template: template)
+
+      expect(described_class.component_class_for(resume)).to eq(ResumeTemplates::ClassicComponent)
+    end
   end
 end

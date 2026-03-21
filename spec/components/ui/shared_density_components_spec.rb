@@ -68,19 +68,29 @@ RSpec.describe 'Shared density UI components' do
     it 'uses a horizontal mobile rail before switching back to the larger-screen grid' do
       component = described_class.new(items:, label: 'Builder steps')
 
-      expect(component.grid_classes).to include('overflow-x-auto')
-      expect(component.grid_classes).to include('snap-x')
-      expect(component.grid_classes).to include('sm:grid')
+      expect(component.grid_classes).to include('builder-step-tabs')
+      expect(component.grid_classes).to include('sm:grid-cols-2')
       expect(component.grid_classes).to include('xl:grid-cols-3')
     end
 
     it 'keeps mobile cards compact while preserving larger-screen sizing' do
       component = described_class.new(items:, label: 'Builder steps')
 
-      expect(component.link_classes(items.second)).to include('min-w-[11rem]')
-      expect(component.link_classes(items.second)).to include('sm:min-w-0')
-      expect(component.badge_classes(items.second)).to include('h-8')
-      expect(component.badge_classes(items.second)).to include('sm:h-9')
+      expect(component.link_classes(items.second)).to include('builder-step-tab')
+      expect(component.badge_classes(items.second)).to include('builder-step-tab-badge')
+      expect(component.link_classes(items.second)).to include('bg-ink-950')
+      expect(component.badge_classes(items.third)).to include('bg-canvas-100/88')
+    end
+  end
+
+  describe Ui::EmptyStateComponent do
+    it 'uses the shared canvas and mist palette for subtle empty states' do
+      component = described_class.new(title: 'Nothing here', description: 'Try another filter', tone: :subtle)
+
+      expect(component.wrapper_classes).to include('bg-canvas-100/88')
+      expect(component.wrapper_classes).to include('border-mist-200/80')
+      expect(component.title_classes).to include('text-ink-950')
+      expect(component.description_classes).to include('text-ink-700/80')
     end
   end
 end

@@ -1,18 +1,29 @@
 <% allowed_section_types = local_assigns.fetch(:allowed_section_types, nil) %>
+<% section_form_open = local_assigns.fetch(:open, false) %>
 
-<%= render Ui::DashboardPanelComponent.new(
-  title: t("resumes.section_form.title"),
-  description: t("resumes.section_form.description"),
-  padding: :sm
+<%= render Ui::SurfaceCardComponent.new(
+  tag: :details,
+  padding: :none,
+  extra_classes: "overflow-hidden",
+  html_options: { id: dom_id(resume, :add_section_form), open: section_form_open ? true : nil }.compact
 ) do %>
-  <div class="space-y-4">
-    <div class="flex flex-wrap gap-2">
+  <summary class="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 border-b border-canvas-200/80 bg-canvas-50/92 px-5 py-3 sm:px-6 [&::-webkit-details-marker]:hidden">
+    <div class="flex min-w-0 items-center gap-3">
       <span class="atelier-pill">
         <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
         <%= t("resumes.section_form.pill") %>
       </span>
-      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_form.add_flow_badge") %></span>
+      <span class="text-sm font-semibold text-ink-950"><%= t("resumes.section_form.title") %></span>
     </div>
+
+    <div class="flex items-center gap-2">
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_form.add_flow_badge") %></span>
+      <span class="text-sm text-ink-700/80"><%= t("resumes.section_form.summary_action") %></span>
+    </div>
+  </summary>
+
+  <div class="space-y-4 px-5 py-5 sm:px-6">
+    <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.section_form.description") %></p>
 
     <%= form_with model: [resume, Section.new], url: resume_sections_path(resume, **resume_builder_step_params), class: "grid gap-4 sm:grid-cols-[1fr_200px_auto] sm:items-end" do |form| %>
       <div>

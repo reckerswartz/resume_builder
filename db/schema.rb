@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_000200) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_035300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -280,6 +280,79 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_000200) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "template_artifacts", force: :cascade do |t|
+    t.string "artifact_type", null: false
+    t.text "content", default: "", null: false
+    t.datetime "created_at", null: false
+    t.text "description", default: "", null: false
+    t.string "identifier"
+    t.boolean "immutable_source", default: false, null: false
+    t.string "lineage_kind", default: "documentation", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name", null: false
+    t.bigint "parent_artifact_id"
+    t.string "source_signature"
+    t.string "source_url"
+    t.string "status", default: "active", null: false
+    t.bigint "template_id", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "validated_at"
+    t.string "version_label"
+    t.index ["artifact_type"], name: "index_template_artifacts_on_artifact_type"
+    t.index ["identifier"], name: "index_template_artifacts_on_identifier", unique: true
+    t.index ["immutable_source"], name: "index_template_artifacts_on_immutable_source"
+    t.index ["lineage_kind"], name: "index_template_artifacts_on_lineage_kind"
+    t.index ["parent_artifact_id"], name: "index_template_artifacts_on_parent_artifact_id"
+    t.index ["source_signature"], name: "index_template_artifacts_on_source_signature"
+    t.index ["source_url"], name: "index_template_artifacts_on_source_url"
+    t.index ["status"], name: "index_template_artifacts_on_status"
+    t.index ["template_id", "artifact_type"], name: "index_template_artifacts_on_template_id_and_artifact_type"
+    t.index ["template_id"], name: "index_template_artifacts_on_template_id"
+  end
+
+  create_table "template_implementations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "identifier", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name", null: false
+    t.text "notes", default: "", null: false
+    t.jsonb "render_profile", default: {}, null: false
+    t.string "renderer_family", null: false
+    t.datetime "seeded_at"
+    t.bigint "source_artifact_id"
+    t.string "status", default: "draft", null: false
+    t.bigint "template_id", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "validated_at"
+    t.index ["identifier"], name: "index_template_implementations_on_identifier", unique: true
+    t.index ["source_artifact_id"], name: "index_template_implementations_on_source_artifact_id"
+    t.index ["status"], name: "index_template_implementations_on_status"
+    t.index ["template_id", "status"], name: "index_template_implementations_on_template_id_and_status"
+    t.index ["template_id"], name: "index_template_implementations_on_template_id"
+  end
+
+  create_table "template_validation_runs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "identifier", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.jsonb "metrics", default: {}, null: false
+    t.text "notes", default: "", null: false
+    t.bigint "reference_artifact_id"
+    t.string "status", default: "pending", null: false
+    t.bigint "template_id", null: false
+    t.bigint "template_implementation_id"
+    t.datetime "updated_at", null: false
+    t.datetime "validated_at"
+    t.string "validation_type", null: false
+    t.string "validator_name"
+    t.index ["identifier"], name: "index_template_validation_runs_on_identifier", unique: true
+    t.index ["reference_artifact_id"], name: "index_template_validation_runs_on_reference_artifact_id"
+    t.index ["status"], name: "index_template_validation_runs_on_status"
+    t.index ["template_id", "validation_type"], name: "idx_on_template_id_validation_type_3f57bdb90b"
+    t.index ["template_id"], name: "index_template_validation_runs_on_template_id"
+    t.index ["template_implementation_id"], name: "index_template_validation_runs_on_template_implementation_id"
+  end
+
   create_table "templates", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
@@ -326,4 +399,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_000200) do
   add_foreign_key "resumes", "users"
   add_foreign_key "sections", "resumes"
   add_foreign_key "sessions", "users"
+  add_foreign_key "template_artifacts", "template_artifacts", column: "parent_artifact_id"
+  add_foreign_key "template_artifacts", "templates"
+  add_foreign_key "template_implementations", "template_artifacts", column: "source_artifact_id"
+  add_foreign_key "template_implementations", "templates"
+  add_foreign_key "template_validation_runs", "template_artifacts", column: "reference_artifact_id"
+  add_foreign_key "template_validation_runs", "template_implementations"
+  add_foreign_key "template_validation_runs", "templates"
 end

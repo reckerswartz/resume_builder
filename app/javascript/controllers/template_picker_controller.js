@@ -2,11 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "card", "cardGrid", "eyebrow", "supporting", "indicator", "badge", "summary", "filterButton", "resultsLabel", "emptyState", "searchInput", "sortSelect"]
+  static values = { accentFieldId: String }
 
   connect() {
     this.filters = this.defaultFilters()
     this.searchQuery = this.hasSearchInputTarget ? this.normalizedSearchValue(this.searchInputTarget.value) : ""
     this.sortValue = this.hasSortSelectTarget ? this.sortSelectTarget.value : this.defaultSortValue()
+    this.selectedAccentColors = this.initialAccentSelections()
 
     if (!this.inputTargets.some((input) => input.checked) && this.hasInputTarget) {
       this.inputTargets[0].checked = true
@@ -35,6 +37,26 @@ export default class extends Controller {
     this.update()
   }
 
+  selectAccentVariant(event) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const button = event.currentTarget
+    const { templateId, accentColor } = button.dataset
+    this.selectedAccentColors[templateId] = accentColor
+
+    const card = this.cardTargets.find((candidate) => candidate.dataset.templateId === templateId)
+    if (card) {
+      card.dataset.selectedAccentColor = accentColor
+    }
+
+    this.applyAccentVariantState(templateId)
+
+    if (templateId === this.selectedTemplateId) {
+      this.updateAccentField(accentColor, { dispatchChange: true })
+    }
+  }
+
   update() {
     const selectedTemplateId = this.selectedTemplateId
 
@@ -50,6 +72,9 @@ export default class extends Controller {
         element.setAttribute("aria-hidden", selected ? "false" : "true")
       })
     }
+
+    this.cardTargets.forEach((card) => this.applyAccentVariantState(card.dataset.templateId))
+    this.syncAccentFieldForSelectedTemplate(selectedTemplateId)
 
     this.applyFilters(selectedTemplateId)
   }
@@ -72,6 +97,16 @@ export default class extends Controller {
 
   classTokens(value) {
     return (value || "").split(/\s+/).filter(Boolean)
+  }
+
+  initialAccentSelections() {
+    return this.cardTargets.reduce((selections, card) => {
+      if (card.dataset.templateId) {
+        selections[card.dataset.templateId] = card.dataset.selectedAccentColor
+      }
+
+      return selections
+    }, {})
   }
 
   defaultFilters() {
@@ -182,6 +217,87 @@ export default class extends Controller {
 
   resultsLabelText(count) {
     return count === 1 ? "1 template shown" : `${count} templates shown`
+  }
+
+  applyAccentVariantState(templateId) {
+    const accentColor = this.accentColorFor(templateId)
+    const selectedButton = this.variantButtonsFor(templateId).find((button) => button.dataset.accentColor === accentColor)
+    if (!selectedButton) return
+
+    this.variantButtonsFor(templateId).forEach((button) => {
+      const selected = button.dataset.accentColor === accentColor
+      const selectedClasses = this.classTokens(button.dataset.selectedClasses)
+      const unselectedClasses = this.classTokens(button.dataset.unselectedClasses)
+
+      button.classList.remove(...selectedClasses, ...unselectedClasses)
+      button.classList.add(...(selected ? selectedClasses : unselectedClasses))
+      button.setAttribute("aria-pressed", selected ? "true" : "false")
+    })
+
+    this.variantPreviewsFor(templateId).forEach((preview) => {
+      preview.classList.toggle("hidden", preview.dataset.accentColor !== accentColor)
+    })
+
+    this.variantLabelsFor(templateId).forEach((label) => {
+      label.textContent = selectedButton.dataset.accentLabel || selectedButton.dataset.variantLabel || label.textContent
+    })
+
+    this.variantSwatchesFor(templateId).forEach((swatch) => {
+      swatch.style.backgroundColor = accentColor
+    })
+
+    this.variantPreviewLinksFor(templateId).forEach((link) => {
+      if (selectedButton.dataset.previewTemplatePath) {
+        link.href = selectedButton.dataset.previewTemplatePath
+      }
+    })
+  }
+
+  syncAccentFieldForSelectedTemplate(selectedTemplateId) {
+    if (!selectedTemplateId) return
+
+    this.updateAccentField(this.accentColorFor(selectedTemplateId))
+  }
+
+  updateAccentField(accentColor, { dispatchChange = false } = {}) {
+    const accentField = this.accentFieldElement
+    if (!accentField || !accentColor || accentField.value === accentColor) return
+
+    accentField.value = accentColor
+
+    if (dispatchChange) {
+      accentField.dispatchEvent(new Event("change", { bubbles: true }))
+    }
+  }
+
+  accentColorFor(templateId) {
+    return this.selectedAccentColors[templateId] || this.cardTargets.find((card) => card.dataset.templateId === templateId)?.dataset.selectedAccentColor || null
+  }
+
+  variantButtonsFor(templateId) {
+    return Array.from(this.element.querySelectorAll(`[data-template-variant-button="true"][data-template-id="${templateId}"]`))
+  }
+
+  variantPreviewsFor(templateId) {
+    return Array.from(this.element.querySelectorAll(`[data-template-variant-preview="true"][data-template-id="${templateId}"]`))
+  }
+
+  variantLabelsFor(templateId) {
+    return Array.from(this.element.querySelectorAll(`[data-template-variant-label="true"][data-template-id="${templateId}"]`))
+  }
+
+  variantSwatchesFor(templateId) {
+    return Array.from(this.element.querySelectorAll(`[data-template-variant-swatch="true"][data-template-id="${templateId}"]`))
+  }
+
+  variantPreviewLinksFor(templateId) {
+    return Array.from(this.element.querySelectorAll(`[data-template-variant-preview-link="true"][data-template-id="${templateId}"]`))
+  }
+
+  get accentFieldElement() {
+    if (!this.hasAccentFieldIdValue) return null
+
+    return document.getElementById(this.accentFieldIdValue)
   }
 
   get selectedTemplateId() {

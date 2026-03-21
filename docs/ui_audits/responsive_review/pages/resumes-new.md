@@ -12,10 +12,10 @@ This file tracks the responsive review history for the signed-in resume creation
 - Page family: `workspace`
 - Priority: `high`
 - Status: `reviewed`
-- Last audited: `2026-03-20T23:50:00Z`
-- Last changed: `none`
-- Latest run: `docs/ui_audits/responsive_review/runs/2026-03-20-initial-core-audit/00-overview.md`
-- Artifact root: `Playwright MCP screenshots: resumes-new-390x844.png, resumes-new-768x1024.png, resumes-new-1280x800.png, resumes-new-1440x900.png, resumes-new-1536x864.png`
+- Last audited: `2026-03-21T03:45:14Z`
+- Last changed: `2026-03-21T03:45:14Z`
+- Latest run: `docs/ui_audits/responsive_review/runs/2026-03-21-finalize-picker-scroll-fatigue/00-overview.md`
+- Artifact root: `tmp/ui_audit_artifacts/2026-03-21-finalize-picker-scroll-fatigue/`
 
 ## Page purpose
 
@@ -51,7 +51,7 @@ This file tracks the responsive review history for the signed-in resume creation
 
 ### `390x844`
 
-- `low clarity The page remains understandable on mobile and keeps the primary action sequence visible without horizontal clipping, but the full page still runs long once the template area expands.`
+- `low clarity The setup form remains understandable on mobile, keeps the fast-start compact picker collapsed by default, and shows no horizontal clipping after the shared compact-picker changes.`
 
 ### `768x1024`
 
@@ -73,16 +73,20 @@ This file tracks the responsive review history for the signed-in resume creation
 
 - `Audited the page across the core viewport preset during the first real /responsive-ui-audit batch.`
 - `Confirmed no horizontal overflow and no console/runtime errors in the first pass.`
+- `Cross-checked the setup form after the shared compact-picker changes used by the finalize step.`
+- `Confirmed the setup flow still uses the fast-start picker copy and keeps the full template browser collapsed by default.`
 
 ## Pending
 
-- `Re-review after any shared app-shell or template-picker density changes that materially affect the creation flow.`
+- `No issues found. Re-review after any future shared template-picker changes that materially affect the setup flow.`
 
 ## Verification
 
 - Playwright review:
-  - `Core viewport pass with screenshot captures for 390x844, 768x1024, 1280x800, 1440x900, and 1536x864.`
+  - `Initial core viewport pass with screenshot captures for 390x844, 768x1024, 1280x800, 1440x900, and 1536x864.`
+  - `Shared-surface regression check for /resumes/new?step=setup&resume[intake_details][experience_level]=three_to_five_years at 390x844.`
 - Specs:
-  - `not run for this page in the first audit batch`
+  - `bundle exec rspec spec/requests/resumes_spec.rb`
 - Notes:
-  - `This page stayed stable enough that the first bounded fix slice was better spent on admin-settings runtime noise instead.`
+  - `At 390x844 during the cross-check, total page height was 2201px with no horizontal overflow.`
+  - `The fast-start compact picker copy remained present, and the finalize-only current-layout copy did not leak onto the setup form.`

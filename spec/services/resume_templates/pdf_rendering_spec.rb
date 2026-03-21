@@ -100,6 +100,21 @@ RSpec.describe 'Resume template PDF rendering' do
     end
   end
 
+  it 'applies font scale and density overrides through the shared rendered HTML path' do
+    resume = build_resume_for(family: 'modern', accent_color: '#0F172A')
+    resume.update!(settings: resume.settings.merge('font_scale' => 'lg', 'density' => 'relaxed'))
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    expect(html).to include('text-5xl')
+    expect(html).to include('p-10 sm:p-12')
+    expect(html).to include('mt-10 space-y-10')
+  end
+
   it 'renders an attached headshot for the editorial split family through the shared PDF template' do
     resume = build_resume_for(family: 'editorial-split', accent_color: '#D7F038', attach_headshot: true)
 
@@ -135,5 +150,40 @@ RSpec.describe 'Resume template PDF rendering' do
 
     expect(html).to include('Jordan Rivera headshot')
     expect(html).to include('data:image/png;base64')
+  end
+
+  it 'respects hidden_sections setting and excludes hidden section content from rendered HTML' do
+    resume = build_resume_for(family: 'modern', accent_color: '#0F172A')
+    projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
+    create(:entry, section: projects_section, content: { 'name' => 'Hidden Project', 'role' => 'Lead' })
+
+    resume.update!(settings: resume.settings.merge('hidden_sections' => ['projects']))
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    expect(html).to include('Jordan Rivera')
+    expect(html).to include('Ruby on Rails')
+    expect(html).not_to include('Hidden Project')
+  end
+
+  it 'renders all sections when hidden_sections is empty' do
+    resume = build_resume_for(family: 'classic', accent_color: '#1D4ED8')
+    projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
+    create(:entry, section: projects_section, content: { 'name' => 'Visible Project', 'role' => 'Lead' })
+
+    resume.update!(settings: resume.settings.merge('hidden_sections' => []))
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    expect(html).to include('Visible Project')
+    expect(html).to include('Ruby on Rails')
   end
 end

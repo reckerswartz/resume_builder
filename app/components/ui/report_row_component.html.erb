@@ -1,15 +1,15 @@
 <% row_content = capture do %>
   <div class="min-w-0 flex-1">
-    <p class="text-sm font-medium text-slate-900"><%= title %></p>
+    <p class="text-sm font-medium text-ink-950"><%= title %></p>
     <% if subtitle.present? %>
-      <p class="mt-1 text-sm text-slate-500"><%= subtitle %></p>
+      <p class="mt-1 text-sm text-ink-700/65"><%= subtitle %></p>
     <% end %>
   </div>
 
   <% if badges.any? %>
     <div class="flex shrink-0 flex-wrap justify-end gap-2">
       <% badges.each do |badge| %>
-        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-medium <%= badge.fetch(:classes, 'border border-slate-200 bg-slate-50 text-slate-600') %>"><%= badge.fetch(:label) %></span>
+        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-medium <%= badge.fetch(:classes, 'border border-canvas-200/80 bg-canvas-100/88 text-ink-700/75') %>"><%= badge.fetch(:label) %></span>
       <% end %>
     </div>
   <% end %>

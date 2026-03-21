@@ -53,7 +53,7 @@
 
               <div class="mt-4 grid gap-3 lg:grid-cols-2">
                 <% recommended_cards.each do |card_state| %>
-                  <div class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                  <div class="<%= ui_inset_panel_classes %>">
                     <div class="flex items-start justify-between gap-3">
                       <div>
                         <p class="text-sm font-semibold tracking-tight text-ink-950"><%= card_state.fetch(:template).name %></p>
@@ -115,7 +115,7 @@
         </div>
 
         <details
-          class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)]"
+          class="<%= ui_inset_panel_classes %>"
           data-controller="disclosure"
           data-disclosure-storage-key-value="template-gallery-filters"
           data-disclosure-default-open-value="<%= marketplace_state.filters_active? %>"
@@ -158,7 +158,7 @@
         </details>
       </div>
 
-      <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+      <aside class="hidden xl:block space-y-4 xl:sticky xl:top-6 xl:self-start">
         <%= render Ui::DashboardPanelComponent.new(
           eyebrow: t("templates.index.quick_choices_eyebrow"),
           title: t("templates.index.quick_choices_title"),
@@ -197,7 +197,7 @@
               </div>
             <% end %>
 
-            <div class="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
+            <div class="atelier-dark-inset backdrop-blur-sm">
               <div class="flex items-start gap-3">
                 <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :hero) %>
                 <div>

@@ -13,7 +13,7 @@ This file tracks the first real Behance template candidate processed through the
 - Implemented family: `editorial-split`
 - Pixel status: `close`
 - Last captured: `2026-03-20`
-- Last reviewed: `2026-03-20`
+- Last reviewed: `2026-03-21`
 
 ## Reference summary
 
@@ -86,6 +86,8 @@ This file tracks the first real Behance template candidate processed through the
 - Updated the Behance rollout workflows to hand eligible captures directly into the implementation workflow and reopen tracked improvement keys through the existing registry/doc model.
 - Polished the outer utility rail spacing and badge treatment to better match the stored Behance reference while still using truthful page-size and contact data.
 - Verified the delivered slices through focused model, renderer, request, and admin specs.
+- Ran a verify-only regression pass after local template-surface changes and confirmed the shared `editorial-split` preview, PDF, marketplace, admin, and resume-flow surfaces remain green.
+- Ran a follow-up verify-only regression pass after newer builder/start-flow changes, fixed stale request coverage for the setup-step compact picker, and reconfirmed the shared `editorial-split` path remains green.
 
 ## Pending
 
@@ -112,3 +114,5 @@ This file tracks the first real Behance template candidate processed through the
 - Notes:
   - focused suite passed with `86 examples, 0 failures`
   - the shipped Rails renderer now supports a truthful headshot path for `editorial-split` through either a direct upload or the selected photo-library asset while keeping the no-photo fallback honest for resumes without an image
+  - verify-only regression suite passed on `2026-03-21` with `44 examples, 0 failures`, plus `ruby -c db/seeds.rb` and locale YAML parse checks
+  - follow-up verify-only regression suite passed on `2026-03-21` with `48 examples, 0 failures` after aligning the setup-step request coverage with the current start-flow gating and ensuring a default template record exists in the request example

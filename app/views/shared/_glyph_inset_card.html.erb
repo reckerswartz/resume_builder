@@ -1,0 +1,23 @@
+<%# Shared glyph-inset-card: an inset panel with a glyph icon, title, and description.
+  Required locals:
+    glyph:       Symbol — the glyph name passed to Ui::GlyphComponent (e.g. :spark, :layers, :preview)
+    title:       String — bold title text
+    description: String — supporting description text
+  Optional locals:
+    tone:        Symbol — inset panel tone (default: :subtle)
+    glyph_size:  Symbol — glyph size (default: :sm)
+    glyph_tone:  Symbol — glyph tone (default: :soft)
+%>
+<% tone       = local_assigns.fetch(:tone, :subtle) %>
+<% glyph_size = local_assigns.fetch(:glyph_size, :sm) %>
+<% glyph_tone = local_assigns.fetch(:glyph_tone, :soft) %>
+
+<div class="<%= ui_inset_panel_classes(tone: tone) %>">
+  <div class="flex items-start gap-3">
+    <%= render Ui::GlyphComponent.new(name: glyph, size: glyph_size, tone: glyph_tone) %>
+    <div>
+      <p class="text-sm font-semibold text-ink-950"><%= title %></p>
+      <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= description %></p>
+    </div>
+  </div>
+</div>

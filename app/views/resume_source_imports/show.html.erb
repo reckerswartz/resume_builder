@@ -4,7 +4,7 @@
 <% status_tone = configured ? :neutral : :warning %>
 <% return_label = @resume.present? ? t("resumes.resume_source_imports.show.actions.back_to_source_step") : t("resumes.resume_source_imports.show.actions.back_to_resume_setup") %>
 
-<section class="space-y-6">
+<section class="space-y-6 overflow-hidden">
   <%= render Ui::PageHeaderComponent.new(
     eyebrow: t("resumes.resume_source_imports.show.page_header.eyebrow"),
     title: t("resumes.resume_source_imports.show.page_header.title", provider: provider_label),
@@ -19,9 +19,9 @@
     density: :compact
   ) %>
 
-  <%= render Ui::SurfaceCardComponent.new(padding: :lg) do %>
-    <div class="space-y-6">
-      <div class="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)]">
+  <%= render Ui::SurfaceCardComponent.new(padding: :md, extra_classes: "min-w-0 w-full max-w-full") do %>
+    <div class="space-y-6 min-w-0">
+      <div class="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
         <div class="space-y-4">
           <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t("resumes.resume_source_imports.show.rollout_status.eyebrow") %></p>

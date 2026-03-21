@@ -24,18 +24,18 @@
   </header>
 
   <div class="<%= section_stack_classes %>">
-    <% resume.ordered_sections.each do |section| %>
+    <% visible_sections.each do |section| %>
       <% entries = section_entries(section) %>
       <section>
         <div class="<%= [section_heading_spacing_class, "flex items-center gap-4"].join(" ") %>">
           <h2 class="<%= [section_title_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>"><%= section.title %></h2>
-          <span class="h-px flex-1" style="background-color: <%= accent_color_with_alpha("33") %>;"></span>
+          <span class="h-px flex-1" style="background-color: <%= accent_color_with_alpha("20") %>;"></span>
         </div>
 
         <% if section.section_type == "skills" %>
           <div class="flex flex-wrap gap-2.5">
             <% entries.each do |entry| %>
-              <span class="<%= [chip_text_class, "rounded-full border px-4 py-2 text-slate-700"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("08") %>;;">
+              <span class="<%= [chip_text_class, "rounded-full border px-3 py-1.5 text-slate-700"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("08") %>;;">
                 <span class="font-medium text-slate-900"><%= value_for(entry, "name") %></span>
                 <% if value_for(entry, "level").present? %>
                   <span class="text-slate-500">· <%= value_for(entry, "level") %></span>
@@ -51,7 +51,7 @@
               <% location = entry_location(entry) %>
               <% highlights = entry_highlights(entry) %>
               <% url = entry_url(entry) %>
-              <article class="rounded-[1.75rem] border border-slate-200 bg-white px-5 py-5 shadow-sm shadow-slate-200/60">
+              <article class="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm shadow-slate-200/60">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>

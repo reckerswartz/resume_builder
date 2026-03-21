@@ -35,7 +35,7 @@ class Admin::TemplatesController < Admin::BaseController
     authorize @template
 
     if @template.save
-      redirect_to admin_template_path(@template), notice: "Template created."
+      redirect_to admin_template_path(@template), notice: I18n.t("admin.templates_controller.template_created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -45,7 +45,7 @@ class Admin::TemplatesController < Admin::BaseController
     authorize @template
 
     if @template.update(template_params)
-      redirect_to admin_template_path(@template), notice: "Template updated."
+      redirect_to admin_template_path(@template), notice: I18n.t("admin.templates_controller.template_updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -55,7 +55,7 @@ class Admin::TemplatesController < Admin::BaseController
     authorize @template
 
     @template.destroy!
-    redirect_to admin_templates_path, notice: "Template deleted.", status: :see_other
+    redirect_to admin_templates_path, notice: I18n.t("admin.templates_controller.template_deleted"), status: :see_other
   end
 
   private

@@ -65,8 +65,10 @@
 - Flag risks + rollback
 
 ## Windsurf
-- Use vikinger-ui-agent when needed
-- Themes = inspiration only
+- Behance AI Voice is the persistent UI baseline for product-facing work
+- For UI-affecting work, read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md`
+- Preserve shared `Ui::*` components, `ui_*` helper APIs, and `atelier-*` tokens unless replacing them with a better shared pattern
+- Themes = inspiration only; never copy third-party assets, branding, or marketing copy directly
 
 ## Output
 - Match project style

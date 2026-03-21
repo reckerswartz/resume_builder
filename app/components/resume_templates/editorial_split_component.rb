@@ -12,11 +12,11 @@ module ResumeTemplates
     }.freeze
 
     def sidebar_sections
-      resume.ordered_sections.select { |section| sidebar_section_types.include?(section.section_type) }
+      visible_sections.select { |section| sidebar_section_types.include?(section.section_type) }
     end
 
     def main_sections
-      resume.ordered_sections.reject { |section| sidebar_section_types.include?(section.section_type) }
+      visible_sections.reject { |section| sidebar_section_types.include?(section.section_type) }
     end
 
     def sidebar_section_types

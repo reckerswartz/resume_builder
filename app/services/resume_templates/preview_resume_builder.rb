@@ -16,11 +16,14 @@ module ResumeTemplates
     SAMPLE_HEADLINE = "Lead Product Engineer".freeze
     SAMPLE_SUMMARY = "Builds polished, ATS-friendly resume experiences with structured content, shared rendering, and fast iteration loops across product, design, and engineering.".freeze
 
-    def initialize(template:)
+    def initialize(template:, accent_color: nil)
       @template = template
+      @accent_color = accent_color
     end
 
     def call
+      layout_config = template.render_layout_config
+
       Resume.new(
         user: preview_user,
         template: template,
@@ -31,17 +34,24 @@ module ResumeTemplates
         source_mode: "scratch",
         source_text: "",
         contact_details: SAMPLE_CONTACT_DETAILS.dup,
-        settings: SAMPLE_SETTINGS.merge("accent_color" => template.normalized_layout_config.fetch("accent_color"))
+        settings: SAMPLE_SETTINGS.merge("accent_color" => selected_accent_color(layout_config))
       ).tap do |resume|
         build_sections(resume)
       end
     end
 
     private
-      attr_reader :template
+      attr_reader :accent_color, :template
 
       def preview_user
         @preview_user ||= User.new(email_address: "jordan.lee@example.com", role: :user)
+      end
+
+      def selected_accent_color(layout_config)
+        ResumeTemplates::Catalog.normalized_accent_color(
+          accent_color,
+          fallback: layout_config.fetch("accent_color")
+        )
       end
 
       def build_sections(resume)

@@ -46,11 +46,11 @@ module Ui
 
       case state(item)
       when :current
-        "#{base} border-slate-900 bg-slate-900 text-white shadow-slate-900/15"
+        "#{base} border-ink-950 bg-ink-950 text-white shadow-[0_20px_36px_rgba(2,6,23,0.18)]"
       when :completed
-        "#{base} border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-200/60"
+        "#{base} border-emerald-200 bg-emerald-50 text-emerald-900 shadow-[0_14px_32px_rgba(16,185,129,0.1)]"
       else
-        "#{base} border-slate-200 bg-white text-slate-600 shadow-slate-200/80 hover:border-slate-300 hover:text-slate-900"
+        "#{base} border-canvas-200/80 bg-canvas-50/92 text-ink-700 shadow-[0_14px_32px_rgba(15,23,42,0.08)] hover:border-aqua-200/80 hover:bg-canvas-50 hover:text-ink-950"
       end
     end
 
@@ -61,7 +61,7 @@ module Ui
       when :completed
         "builder-step-tab-badge flex items-center justify-center rounded-2xl bg-white text-sm font-semibold text-emerald-700"
       else
-        "builder-step-tab-badge flex items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-500"
+        "builder-step-tab-badge flex items-center justify-center rounded-2xl bg-canvas-100/88 text-sm font-semibold text-ink-700/55"
       end
     end
 
@@ -72,7 +72,7 @@ module Ui
       when :completed
         "text-emerald-600"
       else
-        "text-slate-400"
+        "text-ink-700/55"
       end
     end
 

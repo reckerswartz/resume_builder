@@ -9,7 +9,7 @@
 <% save_message = template.persisted? ? "Saving changes updates the shared preview and PDF export renderer for future resume sessions that use this template." : "Creating the template registers it for admin review and, if active, user selection in the template gallery." %>
 <% preview_guidance = "Changes to family, font scale, density, columns, theme tone, and accent color update the shared preview after save." %>
 
-<%= form_with model: [:admin, template], class: "grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]" do |form| %>
+<%= form_with model: [:admin, template], class: "grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)] min-w-0 w-full max-w-full overflow-hidden" do |form| %>
   <% layout_config = template.normalized_layout_config %>
   <% if template.errors.any? %>
     <div class="xl:col-span-2 <%= ui_inset_panel_classes(tone: :danger) %>">

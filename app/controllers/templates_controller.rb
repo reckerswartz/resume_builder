@@ -15,7 +15,7 @@ class TemplatesController < ApplicationController
     @theme_tone_filter = params[:theme_tone].to_s.presence_in(THEME_TONE_FILTER_VALUES)
     @shell_style_filter = params[:shell_style].to_s.presence_in(SHELL_STYLE_FILTER_VALUES)
     @sort = params[:sort].to_s.presence
-    @recommendation_resume = Resume.new(intake_details: requested_resume_intake_details)
+    @recommendation_resume = Resume.new(intake_details: requested_resume_intake_details, settings: requested_resume_settings)
 
     @filter_templates = user_visible_templates.matching_query(@query)
     @templates = @filter_templates
@@ -28,8 +28,11 @@ class TemplatesController < ApplicationController
 
   def show
     authorize @template
-    @recommendation_resume = Resume.new(intake_details: requested_resume_intake_details)
-    @preview_resume = ResumeTemplates::PreviewResumeBuilder.new(template: @template).call
+    @recommendation_resume = Resume.new(intake_details: requested_resume_intake_details, settings: requested_resume_settings)
+    @preview_resume = ResumeTemplates::PreviewResumeBuilder.new(
+      template: @template,
+      accent_color: requested_resume_accent_color
+    ).call
   end
 
   private
@@ -48,6 +51,20 @@ class TemplatesController < ApplicationController
         .to_h
         .deep_stringify_keys
         .slice("experience_level", "student_status")
+    end
+
+    def requested_resume_settings
+      raw_settings = params.fetch(:resume, {}).fetch(:settings, {})
+      raw_settings = raw_settings.to_unsafe_h if raw_settings.respond_to?(:to_unsafe_h)
+
+      raw_settings
+        .to_h
+        .deep_stringify_keys
+        .slice("accent_color")
+    end
+
+    def requested_resume_accent_color
+      requested_resume_settings["accent_color"]
     end
 
     def user_visible_templates

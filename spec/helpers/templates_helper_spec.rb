@@ -1,6 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe TemplatesHelper, type: :helper do
+  describe '#marketplace_template_card' do
+    it 'builds a selected accent-aware template card for template detail carry-through' do
+      template = create(
+        :template,
+        name: 'Classic Ivory',
+        slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+
+      template_card = helper.marketplace_template_card(template, selected_accent_color: '#334155')
+
+      expect(template_card.fetch(:selected_accent_color)).to eq('#334155')
+      expect(template_card.fetch(:preview_resume).settings).to include('accent_color' => '#334155')
+      expect(template_card.fetch(:accent_variants)).to include(include(label: 'Slate', accent_color: '#334155'))
+    end
+  end
+
   describe '#template_marketplace_filter_groups' do
     it 'builds filter groups with active option state and counts from the provided templates' do
       modern_template = create(:template, name: 'Modern Slate')

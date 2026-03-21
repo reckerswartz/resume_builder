@@ -5,6 +5,8 @@ module Resumes
     end
 
     def call(attributes = {})
+      selected_template = attributes[:template] || Template.default!
+
       Resume.transaction do
         resume = user.resumes.create!(
           title: attributes[:title].presence || "Untitled Resume",
@@ -17,8 +19,8 @@ module Resumes
           contact_details: default_contact_details.merge(attributes[:contact_details] || {}),
           intake_details: attributes[:intake_details] || {},
           personal_details: attributes[:personal_details] || {},
-          settings: default_settings.merge(attributes[:settings] || {}),
-          template: attributes[:template] || Template.default!
+          settings: default_settings(template: selected_template).merge(attributes[:settings] || {}),
+          template: selected_template
         )
 
         build_default_sections(resume)
@@ -56,11 +58,11 @@ module Resumes
         }
       end
 
-      def default_settings
+      def default_settings(template:)
         {
-          "accent_color" => "#0F172A",
+          "accent_color" => template.render_layout_config.fetch("accent_color"),
           "show_contact_icons" => true,
-          "page_size" => "A4"
+          "page_size" => Resume::DEFAULT_PAGE_SIZE
         }
       end
   end

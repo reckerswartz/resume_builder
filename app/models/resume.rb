@@ -6,6 +6,9 @@ class Resume < ApplicationRecord
   PERSONAL_DETAIL_FIELDS = %w[date_of_birth nationality marital_status visa_status].freeze
   HEADSHOT_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
   MAX_HEADSHOT_SIZE = 3.megabytes
+  CONTACT_STRIP_FIELDS = %w[first_name surname phone city country pin_code website linkedin driving_licence].freeze
+  PAGE_SIZES = %w[A4 Letter].freeze
+  DEFAULT_PAGE_SIZE = "A4".freeze
 
   belongs_to :template
   belongs_to :user
@@ -60,6 +63,30 @@ class Resume < ApplicationRecord
     return "ready" if pdf_export.attached?
 
     "draft"
+  end
+
+  def accent_color
+    ResumeTemplates::Catalog.normalized_accent_color((settings || {})["accent_color"], fallback: render_layout_config.fetch("accent_color"))
+  end
+
+  def font_scale
+    ResumeTemplates::Catalog.normalized_font_scale((settings || {})["font_scale"], fallback: render_layout_config.fetch("font_scale"))
+  end
+
+  def density
+    ResumeTemplates::Catalog.normalized_density((settings || {})["density"], fallback: render_layout_config.fetch("density"))
+  end
+
+  def page_size
+    (settings || {})["page_size"].to_s.presence_in(PAGE_SIZES) || DEFAULT_PAGE_SIZE
+  end
+
+  def show_contact_icons?
+    BOOLEAN_TYPE.cast((settings || {}).fetch("show_contact_icons", true))
+  end
+
+  def hidden_section_types
+    normalize_hidden_sections((settings || {})["hidden_sections"])
   end
 
   def source_step_completed?
@@ -127,6 +154,10 @@ class Resume < ApplicationRecord
     self.personal_details = normalized_personal_details
     self.settings = (settings || {}).deep_stringify_keys
     settings["show_contact_icons"] = BOOLEAN_TYPE.cast(settings["show_contact_icons"]) if settings.key?("show_contact_icons")
+    settings["page_size"] = page_size if settings.key?("page_size")
+    normalized_font_scale_setting if settings.key?("font_scale")
+    normalized_density_setting if settings.key?("density")
+    settings["hidden_sections"] = normalize_hidden_sections(settings["hidden_sections"]) if settings.key?("hidden_sections")
     self.intake_details = normalized_intake_details
   end
 
@@ -164,15 +195,9 @@ class Resume < ApplicationRecord
   def normalize_contact_details
     normalized_contact_details = contact_details.deep_stringify_keys
 
-    normalized_contact_details["first_name"] = stored_contact_field("first_name").to_s.strip
-    normalized_contact_details["surname"] = stored_contact_field("surname").to_s.strip
-    normalized_contact_details["phone"] = stored_contact_field("phone").to_s.strip
-    normalized_contact_details["city"] = stored_contact_field("city").to_s.strip
-    normalized_contact_details["country"] = stored_contact_field("country").to_s.strip
-    normalized_contact_details["pin_code"] = stored_contact_field("pin_code").to_s.strip
-    normalized_contact_details["website"] = stored_contact_field("website").to_s.strip
-    normalized_contact_details["linkedin"] = stored_contact_field("linkedin").to_s.strip
-    normalized_contact_details["driving_licence"] = stored_contact_field("driving_licence").to_s.strip
+    CONTACT_STRIP_FIELDS.each do |field|
+      normalized_contact_details[field] = stored_contact_field(field).to_s.strip
+    end
 
     normalized_contact_details["full_name"] = (derived_full_name.presence || stored_contact_field("full_name")).to_s.strip
     normalized_contact_details["location"] = (derived_location.presence || stored_contact_field("location")).to_s.strip
@@ -236,6 +261,28 @@ class Resume < ApplicationRecord
     PERSONAL_DETAIL_FIELDS.index_with do |field|
       raw_details[field].to_s.strip
     end
+  end
+
+  def normalize_hidden_sections(value)
+    Array(value).map(&:to_s).select { |section_type| ResumeBuilder::SectionRegistry.types.include?(section_type) }.uniq
+  end
+
+  def normalized_font_scale_setting
+    candidate = settings["font_scale"].to_s
+    return settings.delete("font_scale") if candidate.blank?
+
+    settings["font_scale"] = ResumeTemplates::Catalog.normalized_font_scale(candidate, fallback: render_layout_config.fetch("font_scale"))
+  end
+
+  def normalized_density_setting
+    candidate = settings["density"].to_s
+    return settings.delete("density") if candidate.blank?
+
+    settings["density"] = ResumeTemplates::Catalog.normalized_density(candidate, fallback: render_layout_config.fetch("density"))
+  end
+
+  def render_layout_config
+    template&.render_layout_config || ResumeTemplates::Catalog.default_layout_config
   end
 
   def fallback_photo_asset_for(slot_name)

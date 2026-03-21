@@ -211,6 +211,8 @@ RSpec.describe Templates::MarketplaceState do
         sort_name: 'modern slate',
         sort_family: 'modern',
         sort_density_rank: 1,
+        selected_accent_color: '#1D4ED8',
+        selected_accent_variant_label: 'Slate',
         badge_labels: ['Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Stacked', 'Entries: Timeline'],
         layout_focus_label: 'Balanced single-column flow'
       )
@@ -227,6 +229,8 @@ RSpec.describe Templates::MarketplaceState do
         sort_name: 'sidebar indigo',
         sort_family: 'sidebar accent',
         sort_density_rank: 1,
+        selected_accent_color: '#0F172A',
+        selected_accent_variant_label: 'Indigo',
         badge_labels: ['Density: Comfortable', 'Columns: 2 columns', 'Theme: Indigo', 'Header: Split', 'Entries: Cards', 'Sidebar: Skills and Education'],
         layout_focus_label: 'Sidebar: Skills and Education'
       )

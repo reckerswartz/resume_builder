@@ -1,5 +1,6 @@
 <% field_label = local_assigns.fetch(:field_label, t("resumes.form.template_field_label")) %>
 <% picker_description = local_assigns.fetch(:description, t("resumes.form.template_picker_description")) %>
+<% render_accent_field = local_assigns.fetch(:render_accent_field, !resume.persisted?) %>
 <% template_picker_state = local_assigns.fetch(:template_picker_state) do
      resume_template_picker_state(
        resume: resume,
@@ -9,8 +10,13 @@
      )
    end %>
 <% compact_picker = template_picker_state.compact? %>
+<% compact_text_scope = local_assigns.fetch(:compact_text_scope, "resumes.template_picker_compact") %>
 
-<div class="<%= ["space-y-4", ("template-picker-compact" if compact_picker)].compact.join(" ") %>" data-controller="template-picker">
+<div class="<%= ["space-y-4", ("template-picker-compact" if compact_picker)].compact.join(" ") %>" data-controller="template-picker" data-template-picker-accent-field-id-value="<%= template_picker_state.accent_field_id %>">
+  <% if render_accent_field %>
+    <%= hidden_field_tag "#{form.object_name}[settings][accent_color]", template_picker_state.selected_accent_color, id: template_picker_state.accent_field_id %>
+  <% end %>
+
   <div>
     <%= form.label :template_id, template_picker_state.field_label, class: ui_label_classes %>
     <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_picker_state.description %></p>
@@ -18,5 +24,6 @@
 
   <%= render compact_picker ? "resumes/template_picker_compact" : "resumes/template_picker_default",
     template_picker_state: template_picker_state,
-    form: form %>
+    form: form,
+    compact_text_scope: compact_text_scope %>
 </div>

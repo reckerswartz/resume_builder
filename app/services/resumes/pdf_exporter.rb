@@ -7,7 +7,6 @@ module Resumes
         left: 12,
         right: 12
       },
-      page_size: "A4",
       print_media_type: true,
       disable_smart_shrinking: false,
       encoding: "UTF-8"
@@ -18,11 +17,15 @@ module Resumes
     end
 
     def call
-      WickedPdf.new.pdf_from_string(rendered_html, DEFAULT_OPTIONS)
+      WickedPdf.new.pdf_from_string(rendered_html, export_options)
     end
 
     private
       attr_reader :resume
+
+      def export_options
+        DEFAULT_OPTIONS.merge(page_size: resume.page_size)
+      end
 
       def rendered_html
         ApplicationController.render(

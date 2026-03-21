@@ -77,6 +77,54 @@ RSpec.describe 'Resumes', type: :request do
     sign_in_as(user) if authenticated
   end
 
+  describe 'GET /resumes/new' do
+    it 'keeps the fast-start template picker copy on the setup form' do
+      template
+
+      get new_resume_path, params: {
+        step: 'setup',
+        resume: {
+          intake_details: {
+            experience_level: 'three_to_five_years'
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('template-picker-compact')
+      expect(response.body).to include(I18n.t('resumes.template_picker_compact.fast_start_pill'))
+      expect(response.body).to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
+      expect(response.body).not_to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
+    end
+
+    it 'preserves a requested accent selection in the setup picker state' do
+      classic_template = create(
+        :template,
+        name: 'Classic Ivory',
+        slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+
+      get new_resume_path, params: {
+        step: 'setup',
+        template_id: classic_template.id,
+        resume: {
+          intake_details: {
+            experience_level: 'three_to_five_years'
+          },
+          settings: {
+            accent_color: '#334155'
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('name="resume[settings][accent_color]"')
+      expect(response.body).to include('value="#334155"')
+      expect(response.body).to include('Slate accent')
+    end
+  end
+
   describe 'GET /resumes/:id/edit' do
     it 'preserves locale query params in builder navigation and preview handoff links' do
       resume = create(:resume, user:, template:)
@@ -100,6 +148,53 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include(I18n.t('resumes.edit.mobile_preview_panel.title'))
       expect(response.body).to include(I18n.t('resume_builder.editor_state.navigation.preview'))
       expect(response.body).to include(I18n.t('resume_builder.editor_state.navigation.next', step: 'Education'))
+    end
+
+    it 'uses compact finalize picker copy without reusing fast-start wording' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'finalize' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('template-picker-compact')
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_pill'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.browse_all_templates'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
+      expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
+    end
+
+    it 'collapses the shared add-section form on populated section steps' do
+      resume = create(:resume, user:, template:)
+      create(:section, resume:, title: 'Experience', section_type: 'experience')
+
+      get edit_resume_path(resume), params: { step: 'experience' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      disclosure = document.at_css("details##{ActionView::RecordIdentifier.dom_id(resume, :add_section_form)}")
+
+      expect(disclosure).to be_present
+      expect(disclosure.attribute('open')).to be_nil
+      expect(disclosure.text).to include(I18n.t('resumes.section_form.summary_action'))
+    end
+
+    it 'opens the shared add-section form when the current step has no sections yet' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'finalize' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      disclosure = document.at_css("details##{ActionView::RecordIdentifier.dom_id(resume, :add_section_form)}")
+
+      expect(disclosure).to be_present
+      expect(disclosure.attribute('open')).to be_present
+      expect(disclosure.text).to include(I18n.t('resumes.section_form.summary_action'))
     end
 
     it 'renders the shared photo library on the personal details step when photo processing is enabled' do
@@ -214,6 +309,39 @@ RSpec.describe 'Resumes', type: :request do
       expect(resume.reload.template).to eq(sidebar_template)
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :preview)}"))
       expect(response.body).to match(/target="#{ActionView::RecordIdentifier.dom_id(resume, :preview)}".*Sidebar Indigo/m)
+    end
+
+    it 'saves finalize formatting and section visibility settings through the turbo update flow' do
+      resume = create(:resume, user:, template: template)
+      projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
+      create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
+
+      patch resume_path(resume), params: {
+        step: 'finalize',
+        resume: {
+          settings: {
+            page_size: 'Letter',
+            font_scale: 'lg',
+            density: 'relaxed',
+            accent_color: '#123456',
+            show_contact_icons: false,
+            hidden_sections: ['projects', 'unexpected']
+          }
+        }
+      }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(resume.reload.settings).to include(
+        'page_size' => 'Letter',
+        'font_scale' => 'lg',
+        'density' => 'relaxed',
+        'accent_color' => '#123456',
+        'show_contact_icons' => false,
+        'hidden_sections' => ['projects']
+      )
+      expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :preview)}"))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.badges.hidden'))
     end
 
     it 'saves source details and applies pasted-text autofill when requested' do

@@ -16,7 +16,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       expect(classes).to include('cursor-not-allowed')
       expect(classes).to include('bg-canvas-100/70')
-      expect(classes).to include('text-slate-400')
+      expect(classes).to include('text-ink-700/40')
     end
   end
 
@@ -45,7 +45,13 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'returns neutral indicator classes when unselected' do
-      expect(helper.ui_selectable_indicator_classes(selected: false)).to include('text-slate-400')
+      expect(helper.ui_selectable_indicator_classes(selected: false)).to include('text-ink-700/55')
+    end
+  end
+
+  describe '#ui_input_classes' do
+    it 'uses the shared muted ink placeholder palette' do
+      expect(helper.ui_input_classes).to include('placeholder:text-ink-700/40')
     end
   end
 

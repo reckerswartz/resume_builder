@@ -15,7 +15,7 @@
   </header>
 
   <div class="<%= section_stack_classes %>">
-    <% resume.ordered_sections.each do |section| %>
+    <% visible_sections.each do |section| %>
       <% entries = section_entries(section) %>
       <section>
         <div class="<%= [section_heading_spacing_class, "flex items-center gap-3"].join(" ") %>">

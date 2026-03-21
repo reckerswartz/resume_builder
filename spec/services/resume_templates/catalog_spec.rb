@@ -52,6 +52,7 @@ RSpec.describe ResumeTemplates::Catalog do
     it 'returns locale-backed labels for shared template metadata and readable fallbacks for unknown values' do
       expect(described_class.family_label('sidebar-accent')).to eq('Sidebar Accent')
       expect(described_class.family_label('legacy')).to eq('Legacy')
+      expect(described_class.font_scale_label('base')).to eq('Base')
       expect(described_class.density_label('comfortable')).to eq('Comfortable')
       expect(described_class.column_count_label('two_column')).to eq('2 columns')
       expect(described_class.theme_tone_label('lime')).to eq('Lime')
@@ -63,6 +64,26 @@ RSpec.describe ResumeTemplates::Catalog do
       expect(described_class.sidebar_position_label('left')).to eq('Left')
       expect(described_class.density_options).to include(['Compact', 'compact'], ['Comfortable', 'comfortable'], ['Relaxed', 'relaxed'])
       expect(described_class.shell_style_options).to include(['Flat', 'flat'], ['Card', 'card'])
+    end
+  end
+
+  describe '.accent_variants' do
+    it 'returns the template default accent plus curated related swatches and appends a custom fallback when needed' do
+      classic_layout = described_class.default_layout_config(family: 'classic')
+
+      expect(described_class.accent_variants(classic_layout)).to eq([
+        { key: 'blue', label: 'Blue', accent_color: '#1D4ED8', default: true, custom: false },
+        { key: 'slate', label: 'Slate', accent_color: '#334155', default: false, custom: false },
+        { key: 'indigo', label: 'Indigo', accent_color: '#4338CA', default: false, custom: false }
+      ])
+
+      expect(described_class.accent_variants(classic_layout, selected_accent_color: '#123456').last).to eq(
+        key: 'custom',
+        label: 'Custom',
+        accent_color: '#123456',
+        default: false,
+        custom: true
+      )
     end
   end
 end

@@ -9,7 +9,7 @@
     <div class="<%= "hidden" if card_state.fetch(:summary_hidden) %>" data-template-picker-target="summary" data-template-id="<%= template.id %>" aria-hidden="<%= card_state.fetch(:summary_aria_hidden) %>">
       <%= render Ui::WidgetCardComponent.new(**card_state.fetch(:summary_card_attributes)) do %>
         <div class="space-y-3">
-          <%= render "resumes/template_picker_preview", template_card: template_card, size: preview_size %>
+          <%= render "resumes/template_picker_preview", template_card: template_card, card_state: card_state, size: preview_size %>
 
           <div class="flex flex-wrap gap-2">
             <% card_state.fetch(:summary_badges).each do |badge_label| %>
@@ -22,8 +22,8 @@
               <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
               <div>
                 <div class="flex items-center gap-3">
-                  <span class="h-3 w-3 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
-                  <p class="text-sm font-semibold text-ink-950"><%= template_card.fetch(:family_label) %></p>
+                  <span class="h-3 w-3 rounded-full border border-black/10" data-template-variant-swatch="true" data-template-id="<%= template.id %>" style="background-color: <%= card_state.fetch(:selected_accent_color) %>;"></span>
+                  <p class="text-sm font-semibold text-ink-950" data-template-variant-label="true" data-template-id="<%= template.id %>"><%= t("resumes.template_picker_browser.accent_value", variant: card_state.fetch(:selected_accent_variant_label)) %></p>
                 </div>
                 <p class="text-xs text-ink-700/70"><%= card_state.fetch(:summary_detail_text) %></p>
               </div>
@@ -40,7 +40,7 @@
           <% end %>
 
           <div>
-            <%= link_to t(".open_full_preview"), template_path(id: template), class: ui_button_classes(:secondary, size: :sm) %>
+            <%= link_to t(".open_full_preview"), card_state.fetch(:preview_template_path), class: ui_button_classes(:secondary, size: :sm), data: { template_variant_preview_link: true, template_id: template.id } %>
           </div>
         </div>
       <% end %>

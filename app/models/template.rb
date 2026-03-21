@@ -1,5 +1,8 @@
 class Template < ApplicationRecord
   has_many :resumes, dependent: :restrict_with_exception
+  has_many :template_artifacts, dependent: :destroy
+  has_many :template_implementations, dependent: :destroy
+  has_many :template_validation_runs, dependent: :destroy
 
   ADMIN_SORTS = {
     "name" => ->(direction) { { name: direction, slug: :asc } },
@@ -75,6 +78,14 @@ class Template < ApplicationRecord
 
   def normalized_layout_config
     ResumeTemplates::Catalog.normalize_layout_config(layout_config, fallback_family: layout_family_fallback)
+  end
+
+  def current_implementation
+    template_implementations.render_ready.most_recent_first.first
+  end
+
+  def render_layout_config
+    ResumeTemplates::RenderProfileResolver.new(template: self).call
   end
 
   def layout_family

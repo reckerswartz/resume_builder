@@ -10,6 +10,23 @@ Use this document with:
 - `docs/references/behance/ai_voice_generator_reference.md`
 - `docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md`
 
+## Source-of-truth role
+
+This document is the translation layer between the raw Behance reference and the shipped Resume Builder UI system.
+
+Use the UI baseline docs with this precedence:
+
+- `docs/references/behance/ai_voice_generator_reference.md` is the immutable external reference capture
+- `docs/behance_product_ui_system.md` explains how the Behance system becomes Resume Builder's shared visual language
+- `docs/ui_guidelines.md` remains the authoritative implementation contract for shipped UI decisions
+
+If guidance overlaps, preserve the visual rationale from this document but defer to `docs/ui_guidelines.md` for implementation choices.
+
+## Baseline review status
+
+- Last reviewed against the Behance reference set on `2026-03-21`
+- UI-affecting work should read this document together with `docs/ui_guidelines.md` and `docs/references/behance/ai_voice_generator_reference.md` before introducing new visual patterns
+
 ## Design goals
 
 The UI should feel like a polished product surface rather than a plain CRUD interface.

@@ -42,18 +42,18 @@
           </div>
 
           <div class="relative mt-6 space-y-3 text-sm text-white/72">
-            <div class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4">
+            <div class="atelier-dark-inset">
               <p class="font-medium text-white"><%= t("home.index.preview_panel.summary_label") %></p>
               <p class="mt-2"><%= t("home.index.preview_panel.summary_text") %></p>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-2">
-              <div class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4">
+              <div class="atelier-dark-inset">
                 <p class="font-medium text-white"><%= t("home.index.preview_panel.experience_label") %></p>
                 <p class="mt-2"><%= t("home.index.preview_panel.experience_text") %></p>
               </div>
 
-              <div class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4">
+              <div class="atelier-dark-inset">
                 <p class="font-medium text-white"><%= t("home.index.preview_panel.skills_label") %></p>
                 <p class="mt-2"><%= t("home.index.preview_panel.skills_text") %></p>
               </div>
@@ -72,92 +72,31 @@
         density: :compact
       ) do %>
         <div class="space-y-3">
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <div class="flex items-start gap-3">
-              <%= render Ui::GlyphComponent.new(name: :spark, size: :sm, tone: :soft) %>
-              <div>
-                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.start_here.cards.scratch.title") %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.start_here.cards.scratch.description") %></p>
-              </div>
-            </div>
-          </div>
+          <%= render "shared/glyph_inset_card", glyph: :spark, title: t("home.index.start_here.cards.scratch.title"), description: t("home.index.start_here.cards.scratch.description") %>
 
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <div class="flex items-start gap-3">
-              <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
-              <div>
-                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.start_here.cards.existing_resume.title") %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.start_here.cards.existing_resume.description") %></p>
-              </div>
-            </div>
-          </div>
+          <%= render "shared/glyph_inset_card", glyph: :layers, title: t("home.index.start_here.cards.existing_resume.title"), description: t("home.index.start_here.cards.existing_resume.description") %>
 
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <div class="flex items-start gap-3">
-              <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
-              <div>
-                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.start_here.cards.keep_preview.title") %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.start_here.cards.keep_preview.description") %></p>
-              </div>
-            </div>
-          </div>
+          <%= render "shared/glyph_inset_card", glyph: :preview, title: t("home.index.start_here.cards.keep_preview.title"), description: t("home.index.start_here.cards.keep_preview.description") %>
         </div>
       <% end %>
     </aside>
   </div>
 
   <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :md) do %>
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
-      <div>
-        <span class="atelier-pill">
-          <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
-          <%= t("home.index.common_questions.pill") %>
-        </span>
-        <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t("home.index.common_questions.title") %></h2>
-        <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.description") %></p>
+    <div>
+      <span class="atelier-pill">
+        <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+        <%= t("home.index.common_questions.pill") %>
+      </span>
+      <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t("home.index.common_questions.title") %></h2>
+      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.description") %></p>
 
-        <div class="mt-4 space-y-3">
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <div class="flex items-start gap-3">
-              <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :soft) %>
-              <div>
-                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.common_questions.questions.design_experience.title") %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.design_experience.description") %></p>
-              </div>
-            </div>
-          </div>
+      <div class="mt-4 space-y-3">
+        <%= render "shared/glyph_inset_card", glyph: :preview, title: t("home.index.common_questions.questions.design_experience.title"), description: t("home.index.common_questions.questions.design_experience.description") %>
 
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <div class="flex items-start gap-3">
-              <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
-              <div>
-                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.common_questions.questions.switch_templates.title") %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.switch_templates.description") %></p>
-              </div>
-            </div>
-          </div>
+        <%= render "shared/glyph_inset_card", glyph: :layers, title: t("home.index.common_questions.questions.switch_templates.title"), description: t("home.index.common_questions.questions.switch_templates.description") %>
 
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <div class="flex items-start gap-3">
-              <%= render Ui::GlyphComponent.new(name: :spark, size: :sm, tone: :soft) %>
-              <div>
-                <p class="text-sm font-semibold text-ink-950"><%= t("home.index.common_questions.questions.existing_resume.title") %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.existing_resume.description") %></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="<%= [ui_inset_panel_classes(tone: :default), 'space-y-3'].join(' ') %>">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("home.index.reassurance.eyebrow") %></p>
-        <p class="text-sm font-semibold text-ink-950"><%= t("home.index.reassurance.title") %></p>
-        <p class="text-sm leading-6 text-ink-700/80"><%= t("home.index.reassurance.description") %></p>
-        <div class="flex flex-wrap gap-2">
-          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("home.index.reassurance.badges.no_design_tools") %></span>
-          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("home.index.reassurance.badges.switch_templates_later") %></span>
-          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("home.index.reassurance.badges.export_when_ready") %></span>
-        </div>
+        <%= render "shared/glyph_inset_card", glyph: :spark, title: t("home.index.common_questions.questions.existing_resume.title"), description: t("home.index.common_questions.questions.existing_resume.description") %>
       </div>
     </div>
   <% end %>

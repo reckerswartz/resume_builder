@@ -3,9 +3,9 @@
   extra_classes: "overflow-hidden",
   html_options: { id: dom_id(resume, :editor_chrome) }
 ) do %>
-  <div class="relative overflow-hidden bg-ink-950 px-6 py-6 text-white">
+  <div class="relative overflow-hidden border-b border-white/10 bg-ink-950/84 px-6 py-6 text-white backdrop-blur-xl">
     <div class="absolute -right-10 top-6 h-24 w-24 rounded-full atelier-glow opacity-40"></div>
-    <div class="absolute inset-x-6 top-0 h-px bg-white/10"></div>
+    <div class="absolute inset-x-6 top-0 h-px atelier-rule opacity-60"></div>
 
     <div class="relative flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
       <div class="space-y-4">
@@ -29,17 +29,19 @@
         </div>
       </div>
 
-      <div class="grid gap-3 sm:grid-cols-2 xl:min-w-[22rem]">
-        <%= render Ui::WidgetCardComponent.new(**builder_state.progress_card_attributes) do %>
-          <div class="flex items-center gap-3">
-            <div class="h-2 flex-1 overflow-hidden rounded-full bg-canvas-200/80">
-              <div class="h-full rounded-full bg-aqua-300 transition-all" style="<%= builder_state.progress_meter_style %>"></div>
+      <div class="hidden xl:block">
+        <div class="grid gap-3 sm:grid-cols-2 xl:min-w-[22rem]">
+          <%= render Ui::WidgetCardComponent.new(**builder_state.progress_card_attributes) do %>
+            <div class="flex items-center gap-3">
+              <div class="h-2 flex-1 overflow-hidden rounded-full bg-canvas-200/80">
+                <div class="h-full rounded-full bg-aqua-300 transition-all" style="<%= builder_state.progress_meter_style %>"></div>
+              </div>
+              <span class="text-sm font-semibold text-ink-950"><%= builder_state.progress_meter_label %></span>
             </div>
-            <span class="text-sm font-semibold text-ink-950"><%= builder_state.progress_meter_label %></span>
-          </div>
-        <% end %>
+          <% end %>
 
-        <%= render Ui::WidgetCardComponent.new(**builder_state.next_step_card_attributes) %>
+          <%= render Ui::WidgetCardComponent.new(**builder_state.next_step_card_attributes) %>
+        </div>
       </div>
     </div>
   </div>

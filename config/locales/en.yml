@@ -76,6 +76,10 @@ en:
           modern-clean: "Modern Clean"
           sidebar-accent: "Sidebar Accent"
           editorial-split: "Editorial Split"
+        font_scale:
+          sm: "Small"
+          base: "Base"
+          lg: "Large"
         density:
           compact: "Compact"
           comfortable: "Comfortable"
@@ -89,6 +93,8 @@ en:
           teal: "Teal"
           indigo: "Indigo"
           lime: "Lime"
+        accent_variant:
+          custom: "Custom"
         shell_style:
           flat: "Flat"
           card: "Card"

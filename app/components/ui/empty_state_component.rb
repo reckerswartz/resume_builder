@@ -28,11 +28,11 @@ module Ui
     end
 
     def title_classes
-      [ title_size_classes, "font-serif font-semibold tracking-[-0.03em] text-slate-900" ].join(" ")
+      [ title_size_classes, "font-serif font-semibold tracking-[-0.03em] text-ink-950" ].join(" ")
     end
 
     def description_classes
-      [ title.present? ? "mt-2" : nil, "text-sm leading-6 text-slate-600" ].compact.join(" ")
+      [ title.present? ? "mt-2" : nil, "text-sm leading-6 text-ink-700/80" ].compact.join(" ")
     end
 
     def action_wrapper_classes
@@ -70,9 +70,9 @@ module Ui
       def tone_classes
         case tone.to_sym
         when :subtle
-          "border-white/60 bg-slate-50/88"
+          "border-mist-200/80 bg-canvas-100/88"
         else
-          "border-white/70 bg-white/92"
+          "border-canvas-200/80 bg-canvas-50/92"
         end
       end
 

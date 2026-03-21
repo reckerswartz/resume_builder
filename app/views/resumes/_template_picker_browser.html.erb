@@ -83,6 +83,7 @@
           class="<%= card_state.fetch(:card_classes) %>"
           data-template-picker-target="card"
           data-template-id="<%= template.id %>"
+          data-selected-accent-color="<%= card_state.fetch(:selected_accent_color) %>"
           data-family="<%= card_state.fetch(:filter_family) %>"
           data-density="<%= card_state.fetch(:filter_density) %>"
           data-column-count="<%= card_state.fetch(:filter_column_count) %>"
@@ -139,7 +140,7 @@
               <span class="<%= ui_badge_classes(:neutral) %>"><%= template_card.fetch(:short_label) %></span>
             </div>
 
-            <%= render "resumes/template_picker_preview", template_card: template_card %>
+            <%= render "resumes/template_picker_preview", template_card: template_card, card_state: card_state %>
           </div>
 
           <p
@@ -171,15 +172,39 @@
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
               <div class="flex items-start gap-3">
                 <%= render Ui::GlyphComponent.new(name: :swatches, size: :sm, tone: :soft) %>
-                <div>
-                  <div class="flex items-center gap-3">
-                    <span class="h-3 w-3 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
-                    <span
-                      class="text-sm <%= card_state.fetch(:supporting_classes) %>"
-                      data-template-picker-target="supporting"
-                      data-template-id="<%= template.id %>"
-                      data-selected-classes="<%= card_state.fetch(:supporting_selected_classes) %>"
-                      data-unselected-classes="<%= card_state.fetch(:supporting_unselected_classes) %>"><%= card_state.fetch(:accent_label) %></span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t(".accent_variants_label") %></p>
+                      <span
+                        class="mt-2 inline-flex text-sm <%= card_state.fetch(:supporting_classes) %>"
+                        data-template-variant-label="true"
+                        data-template-id="<%= template.id %>"
+                        data-template-picker-target="supporting"
+                        data-selected-classes="<%= card_state.fetch(:supporting_selected_classes) %>"
+                        data-unselected-classes="<%= card_state.fetch(:supporting_unselected_classes) %>"><%= t(".accent_value", variant: card_state.fetch(:selected_accent_variant_label)) %></span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                      <% card_state.fetch(:accent_variants).each do |accent_variant| %>
+                        <button
+                          type="button"
+                          class="<%= ["inline-flex h-8 w-8 items-center justify-center rounded-full border-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent", (accent_variant.fetch(:selected) ? "border-aqua-200 bg-canvas-50 shadow-[0_12px_28px_rgba(125,211,252,0.2)]" : "border-canvas-200/80 bg-canvas-50/92 hover:border-aqua-200/80 hover:bg-canvas-50")].join(" ") %>"
+                          data-action="click->template-picker#selectAccentVariant"
+                          data-template-variant-button="true"
+                          data-template-id="<%= template.id %>"
+                          data-accent-color="<%= accent_variant.fetch(:accent_color) %>"
+                          data-variant-label="<%= accent_variant.fetch(:label) %>"
+                          data-accent-label="<%= t(".accent_value", variant: accent_variant.fetch(:label)) %>"
+                          data-preview-template-path="<%= accent_variant.fetch(:preview_template_path) %>"
+                          data-selected-classes="border-aqua-200 bg-canvas-50 shadow-[0_12px_28px_rgba(125,211,252,0.2)]"
+                          data-unselected-classes="border-canvas-200/80 bg-canvas-50/92 hover:border-aqua-200/80 hover:bg-canvas-50"
+                          aria-pressed="<%= accent_variant.fetch(:selected) %>"
+                          aria-label="<%= t(".accent_swatch_label", variant: accent_variant.fetch(:label)) %>">
+                          <span class="h-4 w-4 rounded-full border border-black/10" style="background-color: <%= accent_variant.fetch(:accent_color) %>;"></span>
+                        </button>
+                      <% end %>
+                    </div>
                   </div>
                   <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".accent_description") %></p>
                 </div>

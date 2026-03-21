@@ -137,6 +137,10 @@ en:
                 fields:
                   primary_model: "Primary text model"
                   verification_models: "Verification models"
+                  verification_disclosure_summary:
+                    zero: "Show available text models (none selected)"
+                    one: "Show available text models (%{count} selected)"
+                    other: "Show available text models (%{count} selected)"
               vision_workflow:
                 eyebrow: "Vision workflow"
                 title_fallback: "Choose a primary vision model"
@@ -155,6 +159,10 @@ en:
                 fields:
                   primary_model: "Primary vision model"
                   verification_models: "Verification models"
+                  verification_disclosure_summary:
+                    zero: "Show available vision models (none selected)"
+                    one: "Show available vision models (%{count} selected)"
+                    other: "Show available vision models (%{count} selected)"
               option_status:
                 selected: "Selected"
                 optional: "Optional"
@@ -320,3 +328,167 @@ en:
               settings_hub: "Settings hub"
             empty_state:
               description: "This model is not assigned to any orchestration role yet."
+    llm_models_controller:
+      model_created: "LLM model created."
+      model_updated: "LLM model updated."
+      model_deleted: "LLM model deleted."
+    templates:
+      show:
+        navigation:
+          sections:
+            shared_preview:
+              label: "Shared preview"
+              caption: "Live sample from the shared renderer"
+            layout_profile:
+              label: "Layout profile"
+              caption: "Family, density, shell, and structure"
+            artifact_review:
+              label: "Artifact review"
+              caption: "Stored source captures, notes, and reference lineage"
+            implementation_validation:
+              label: "Implementation & validation"
+              caption: "Current render profile and the latest review trail"
+            configuration:
+              label: "Configuration"
+              caption: "Visibility and raw layout config"
+        artifact_review:
+          summary:
+            states:
+              source_capture_needed: "Source capture needed"
+              implementation_follow_up: "Implementation record needed"
+              draft_candidate_in_progress:
+                one: "%{count} draft candidate in progress"
+                other: "%{count} draft candidates in progress"
+              review_ready: "Ready for lifecycle review"
+              validation_follow_up: "Validation follow-up needed"
+          title: "Artifact review"
+          eyebrow: "Captured references"
+          description: "Inspect stored source captures, documentation notes, and validation artifacts before promoting new implementation work."
+          badges:
+            sources:
+              one: "%{count} source"
+              other: "%{count} sources"
+            documentation_notes:
+              one: "%{count} note"
+              other: "%{count} notes"
+            validation_runs:
+              one: "%{count} validation run"
+              other: "%{count} validation runs"
+            validation_artifacts:
+              one: "%{count} validation artifact"
+              other: "%{count} validation artifacts"
+            draft_candidates:
+              one: "%{count} draft candidate"
+              other: "%{count} draft candidates"
+            implementation_pending: "Implementation pending"
+            implementation_ready: "Implementation %{status}"
+          actions:
+            create_candidate: "Create draft candidate"
+          groups:
+            source_artifacts:
+              title: "Source artifacts"
+              description: "Immutable reference captures stored from Behance or other trusted source collection work."
+              empty_title: "No source artifacts yet"
+              empty_description: "Ingest a capture bundle first so future implementation work stays grounded in immutable reference material."
+            documentation_artifacts:
+              title: "Documentation artifacts"
+              description: "Reference notes and interpretation records that help explain why a capture matters."
+              empty_title: "No documentation artifacts yet"
+              empty_description: "Capture notes and decision context will appear here once the source material has been reviewed."
+            validation_artifacts:
+              title: "Validation artifacts"
+              description: "Stored discrepancy reports or validation snapshots that explain why follow-up work is still needed."
+              empty_title: "No validation artifacts yet"
+              empty_description: "Validation artifacts will appear here once review and comparison runs start recording outputs."
+            derived_artifacts:
+              title: "Derived artifacts"
+              description: "Snapshots and promoted records produced after the original source capture."
+              empty_title: "No derived artifacts yet"
+              empty_description: "Derived artifacts will appear once implementation or seed-promotion work begins."
+        implementation_validation:
+          title: "Implementation & validation"
+          eyebrow: "Lifecycle status"
+          description: "Review the current render-ready implementation profile and the latest validation runs before creating another revision."
+          badges:
+            no_implementation: "No implementation"
+            draft_candidates:
+              one: "%{count} draft candidate"
+              other: "%{count} draft candidates"
+            validation_runs:
+              one: "%{count} validation run"
+              other: "%{count} validation runs"
+          implementation_card:
+            title: "Current implementation"
+            description: "The shared renderer adopts this implementation profile whenever a render-ready record is available."
+            actions:
+              create_candidate: "Create draft from latest source"
+            empty_title: "No render-ready implementation yet"
+            empty_description: "Source artifacts can exist before a validated implementation profile is recorded."
+            reference_badge: "Reference only"
+            render_profile_title: "Stored render profile"
+            render_profile_description: "This normalized profile is what the shared renderer can adopt without mutating the stored source artifacts."
+          draft_candidates:
+            title: "Draft candidates"
+            description: "These implementation snapshots are isolated from live rendering until validation promotes one to a render-ready state."
+            empty_title: "No draft candidates yet"
+            empty_description: "Create a draft from a reviewed source artifact to start implementation work without changing the live renderer."
+            validation:
+              title: "Latest validation"
+              empty_state: "No validation recorded yet"
+            guidance:
+              promotion_ready: "A passed review is recorded. You can now promote this draft to a render-ready implementation."
+              validation_required: "Record a passed review before promoting this draft to a render-ready implementation."
+              follow_up_required: "The latest review still needs follow-up before this draft can be promoted."
+              failed_review: "The latest validation failed. Resolve the draft before promoting it."
+            actions:
+              record_pass: "Record review pass"
+              record_follow_up: "Needs follow-up"
+              promote: "Promote to validated"
+            render_profile_title: "Candidate render profile"
+            render_profile_description: "Draft candidates begin from the currently resolved render profile and stay isolated from live rendering until validation."
+          validation_runs:
+            title: "Recent validation runs"
+            description: "Keep the latest review trail visible even when implementation work is still in progress."
+            empty_title: "No validation runs yet"
+            empty_description: "Record manual review, PDF export, or pixel-compare runs once validation work begins."
+            metadata_title: "Validation metadata"
+            metadata_description: "Stored metrics and metadata for this validation run."
+        summary:
+          review_items:
+            artifact_coverage:
+              label: "Artifact coverage"
+        fields:
+          source_url: "Source URL"
+          parent_artifact: "Parent artifact"
+          source_signature: "Source signature"
+          attachment: "Attachment"
+          metadata: "Stored metadata"
+          reference_only: "Reference only"
+          not_recorded: "Not recorded"
+          source_artifact: "Source artifact"
+          renderer_family: "Renderer family"
+          validator: "Validator"
+          validated_at: "Validated at"
+          validation_type: "Validation type"
+          implementation: "Implementation"
+          identifier: "Identifier"
+          notes: "Notes"
+        metric_labels:
+          open_discrepancies:
+            one: "%{count} open discrepancy"
+            other: "%{count} open discrepancies"
+          resolved_discrepancies:
+            one: "%{count} resolved discrepancy"
+            other: "%{count} resolved discrepancies"
+    templates_controller:
+      template_created: "Template created."
+      template_updated: "Template updated."
+      template_deleted: "Template deleted."
+    template_implementation_candidates_controller:
+      candidate_created: "%{candidate_name} created from %{artifact_name}."
+      candidate_reused: "%{candidate_name} already matches %{artifact_name}; reusing the existing draft candidate."
+    template_implementation_validation_runs_controller:
+      validation_recorded: "%{validation_type} recorded for %{implementation_name} as %{status}."
+    template_implementation_promotions_controller:
+      implementation_promoted: "%{implementation_name} promoted to a render-ready validated implementation."
+      implementation_already_promoted: "%{implementation_name} is already render-ready."

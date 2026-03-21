@@ -1,3 +1,5 @@
+<% finalize_workspace_state = resume_finalize_workspace_state(resume, step_sections: step_sections) %>
+
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <%= render Ui::StepHeaderComponent.new(
     title: current_step.fetch(:title),
@@ -32,61 +34,11 @@
     </div>
 
     <div class="space-y-5">
-      <div>
-        <%= render "resumes/template_picker",
-          form: form,
-          resume: resume,
-          template_picker_state: resume_template_picker_state(
-            resume: resume,
-            form_object_name: form.object_name,
-            field_label: t("resumes.editor_finalize_step.template_field_label"),
-            description: t("resumes.editor_finalize_step.template_picker_description")
-          ) %>
-      </div>
+      <%= render "resumes/finalize_workspace_template_panel", resume: resume, form: form, finalize_workspace_state: finalize_workspace_state %>
 
-      <details
-        class="rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)]"
-        data-controller="disclosure"
-        data-disclosure-storage-key-value="resume-finalize-output-settings"
-        data-action="toggle->disclosure#remember">
-        <summary class="cursor-pointer list-none">
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= t("resumes.editor_finalize_step.output_settings.eyebrow") %></p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.description") %></p>
-            </div>
-            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.output_settings.optional_badge") %></span>
-          </div>
-        </summary>
+      <%= render "resumes/finalize_workspace_design_panel", form: form, finalize_workspace_state: finalize_workspace_state %>
 
-        <div class="mt-4 grid gap-5 sm:grid-cols-2">
-          <div>
-            <%= form.label :slug, t("resumes.editor_finalize_step.output_settings.resume_link"), class: ui_label_classes %>
-            <%= form.text_field :slug, class: ui_input_classes %>
-          </div>
-
-          <div>
-            <%= label_tag "resume_settings_page_size", t("resumes.editor_finalize_step.output_settings.page_size"), class: ui_label_classes %>
-            <%= select_tag "resume[settings][page_size]", options_for_select([["A4", "A4"], ["Letter", "Letter"]], resume.settings.fetch("page_size", "A4")), class: ui_input_classes %>
-          </div>
-
-          <div>
-            <%= label_tag "resume_settings_accent_color", t("resumes.editor_finalize_step.output_settings.accent_color"), class: ui_label_classes %>
-            <%= color_field_tag "resume[settings][accent_color]", resume.settings.fetch("accent_color", "#0F172A"), class: "#{ui_input_classes} h-12 px-2 py-2" %>
-          </div>
-
-          <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <%= hidden_field_tag "resume[settings][show_contact_icons]", false %>
-            <label class="flex items-center justify-between gap-4">
-              <span>
-                <span class="block <%= ui_label_classes %>"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons") %></span>
-                <span class="mt-1 block text-sm text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons_description") %></span>
-              </span>
-              <%= check_box_tag "resume[settings][show_contact_icons]", true, resume.settings.fetch("show_contact_icons", true), class: ui_checkbox_classes %>
-            </label>
-          </div>
-        </div>
-      </details>
+      <%= render "resumes/finalize_workspace_sections_panel", finalize_workspace_state: finalize_workspace_state %>
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -134,6 +86,6 @@
   <% end %>
 
   <% if add_section_types.any? %>
-    <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types %>
+    <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types, open: step_sections.empty? %>
   <% end %>
 </section>

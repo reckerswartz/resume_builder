@@ -3,23 +3,12 @@
     title: current_step[:title],
     description: current_step[:description]
   ) do %>
-    <%= render Ui::WidgetCardComponent.new(
-      eyebrow: t("resumes.editor_section_step.current_step.eyebrow"),
-      title: t("resumes.editor_section_step.current_step.title"),
-      description: t("resumes.editor_section_step.current_step.description"),
-      padding: :sm
-    ) do %>
-      <div class="mt-4 flex flex-wrap gap-2">
-        <span class="<%= ui_badge_classes(:neutral) %>"><%= current_step[:label] %></span>
-        <span class="<%= ui_badge_classes(:info) %>"><%= t("resumes.editor_section_step.current_step.preview_sync_badge") %></span>
-        <% if current_step[:key] == "experience" %>
-          <%= link_to t("resumes.editor_section_step.current_step.open_examples"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
-        <% end %>
-        <% if next_step_path.present? %>
-          <%= link_to t("resumes.editor_section_step.current_step.next_step"), next_step_path, class: ui_button_classes(:secondary, size: :sm) %>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= current_step[:label] %></span>
+      <% if current_step[:key] == "experience" %>
+        <%= link_to t("resumes.editor_section_step.current_step.open_examples"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
+      <% end %>
+    </div>
   <% end %>
 <% end %>
 
@@ -30,19 +19,9 @@
     extra_classes: "overflow-hidden",
     html_options: { id: "experience-step-tips" }
   ) do %>
-    <summary class="cursor-pointer border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-5">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <span class="atelier-pill">
-            <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-            <%= t("resumes.editor_section_step.experience_guidance.pill") %>
-          </span>
-          <h3 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_section_step.experience_guidance.title") %></h3>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_section_step.experience_guidance.description") %></p>
-        </div>
-
-        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_section_step.experience_guidance.badge") %></span>
-      </div>
+    <summary class="flex cursor-pointer list-none items-center justify-between gap-3 border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-3 [&::-webkit-details-marker]:hidden">
+      <span class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_section_step.experience_guidance.title") %></span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_section_step.experience_guidance.badge") %></span>
     </summary>
 
     <div class="px-6 py-6">
@@ -76,6 +55,6 @@
   <% end %>
 
   <% if add_section_types.any? %>
-    <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types %>
+    <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types, open: step_sections.empty? %>
   <% end %>
 </section>

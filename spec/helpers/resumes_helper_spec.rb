@@ -72,6 +72,80 @@ RSpec.describe ResumesHelper, type: :helper do
       expect(preview_resume).to be_a(Resume)
       expect(preview_resume.template).to eq(template)
       expect(preview_resume.sections.size).to eq(ResumeBuilder::SectionRegistry.starter_sections.size)
+      expect(template_card.fetch(:selected_accent_color)).to eq('#0F172A')
+      expect(template_card.fetch(:accent_variants)).to include(
+        include(key: 'slate', label: 'Slate', accent_color: '#0F172A', default: true, custom: false),
+        include(key: 'blue', label: 'Blue', accent_color: '#1D4ED8', default: false, custom: false),
+        include(key: 'teal', label: 'Teal', accent_color: '#0F766E', default: false, custom: false)
+      )
+      expect(template_card.fetch(:preview_resumes_by_accent_color).keys).to match_array(['#0F172A', '#1D4ED8', '#0F766E'])
+    end
+
+    it 'uses the render-ready implementation profile for shared builder card metadata' do
+      template = create(
+        :template,
+        name: 'Modern Slate',
+        slug: 'modern-slate',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      create(
+        :template_implementation,
+        template: template,
+        status: 'validated',
+        renderer_family: 'classic',
+        render_profile: {
+          'family' => 'classic',
+          'accent_color' => '#1D4ED8',
+          'density' => 'compact'
+        }
+      )
+
+      template_card = helper.template_cards_for_builder(selected_template: template).find { |card| card.fetch(:template) == template }
+
+      expect(template_card).to include(
+        family: 'classic',
+        family_label: 'Classic',
+        density: 'compact',
+        density_label: 'Compact',
+        accent_color: '#1D4ED8'
+      )
+    end
+
+    it 'uses selected accent overrides when building shared template card previews' do
+      classic_template = create(
+        :template,
+        name: 'Classic Ivory',
+        slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+
+      template_card = helper.template_cards_for_builder(
+        selected_template: classic_template,
+        selected_accent_colors: { classic_template.id => '#334155' }
+      ).find { |card| card.fetch(:template) == classic_template }
+
+      expect(template_card.fetch(:selected_accent_color)).to eq('#334155')
+      expect(template_card.fetch(:preview_resume).settings).to include('accent_color' => '#334155')
+      expect(template_card.fetch(:preview_resumes_by_accent_color).keys).to include('#334155')
+    end
+  end
+
+  describe '#resume_finalize_workspace_state' do
+    it 'builds finalize workspace state with section visibility metadata' do
+      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => ['projects'] })
+      projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
+      create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
+
+      finalize_workspace_state = helper.resume_finalize_workspace_state(resume, step_sections: [projects_section])
+
+      expect(finalize_workspace_state.design_badges).to include(
+        include(label: 'Page: A4'),
+        include(label: 'Type: Base'),
+        include(label: 'Density: Comfortable')
+      )
+      expect(finalize_workspace_state.section_visibility_states).to include(
+        include(section_type: 'projects', hidden: true, badge_label: 'Hidden from output')
+      )
     end
   end
 

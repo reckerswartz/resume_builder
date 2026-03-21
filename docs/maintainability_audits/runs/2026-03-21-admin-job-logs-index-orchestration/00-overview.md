@@ -7,8 +7,8 @@ This run continues the maintainability audit by targeting the controller-owned i
 - Run timestamp: `2026-03-21T00:27:00Z`
 - Mode: `implement-next`
 - Trigger: `@[/maintainability-audit]`
-- Result: `in_progress`
-- Registry updated: `pending`
+- Result: `closed`
+- Registry updated: `yes`
 - Area keys touched:
   - `admin-job-logs-index-orchestration`
 
@@ -34,12 +34,16 @@ This run continues the maintainability audit by targeting the controller-owned i
 - Reloaded the maintainability tracker and repo guidance before selecting the next slice.
 - Selected `Admin::JobLogsController#index` as the next maintainability hotspot.
 - Opened a dedicated area track for the job logs index workflow problem.
+- Created `app/services/admin/job_logs_index_service.rb` with filtered scope loading, monitoring stats, exact-match lookup, pagination, and related-error preloading.
+- Refactored `Admin::JobLogsController#index` to delegate to the new service while keeping param normalization and response selection in the controller.
+- Removed the now-unused `preload_related_error_logs` private method from the controller.
+- Added focused service coverage in `spec/services/admin/job_logs_index_service_spec.rb` (8 examples).
+- Re-verified the existing request coverage in `spec/requests/admin/job_logs_spec.rb` (9 examples).
+- Updated the area doc, run log, and registry to close the area.
 
 ## Pending
 
-- Extract the job logs index workflow into an admin service.
-- Add focused service coverage for the extracted index workflow.
-- Re-verify the affected admin job logs request scope after the controller cleanup.
+- None. The targeted extraction is complete.
 
 ## Area summary
 
@@ -53,12 +57,12 @@ This run continues the maintainability audit by targeting the controller-owned i
 ## Verification
 
 - Specs:
-  - `pending`
+  - `bundle exec rspec spec/services/admin/job_logs_index_service_spec.rb spec/requests/admin/job_logs_spec.rb` (17 examples, 0 failures)
 - Lint or syntax:
-  - `pending`
+  - `ruby -c app/controllers/admin/job_logs_controller.rb app/services/admin/job_logs_index_service.rb spec/services/admin/job_logs_index_service_spec.rb` (Syntax OK)
 - Notes:
-  - Verification will stay focused on the extracted admin index workflow and the existing request coverage for job logs.
+  - All existing request behavior remains unchanged. The controller is now thinner and focused on param normalization and response selection.
 
 ## Next slice
 
-- Reassess whether any material maintainability work remains in `Admin::JobLogsController` after the index workflow extraction lands.
+- Review `ResumesHelper` (523 lines) as the next likely maintainability hotspot, focusing on mixed responsibilities across template picker state, source upload review, export actions, photo library state, and builder metadata shaping.

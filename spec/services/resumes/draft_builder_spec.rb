@@ -44,6 +44,29 @@ RSpec.describe Resumes::DraftBuilder do
       )
     end
 
+    it "uses the selected template render profile accent color in default settings" do
+      classic_template = create(
+        :template,
+        name: "Classic Ivory",
+        slug: "classic-ivory",
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: "classic")
+      )
+
+      draft = described_class.new(
+        user: user,
+        template: classic_template,
+        attributes: {}
+      ).call
+
+      draft.valid?
+
+      expect(draft.settings).to include(
+        "accent_color" => classic_template.render_layout_config.fetch("accent_color"),
+        "show_contact_icons" => true,
+        "page_size" => "A4"
+      )
+    end
+
     it "preserves provided draft attributes while keeping default fallbacks" do
       draft = described_class.new(
         user: user,
@@ -79,6 +102,26 @@ RSpec.describe Resumes::DraftBuilder do
         "nationality" => "Indian",
         "marital_status" => "",
         "visa_status" => ""
+      )
+    end
+
+    it "merges requested accent settings into the draft defaults" do
+      draft = described_class.new(
+        user: user,
+        template: template,
+        attributes: {
+          settings: {
+            accent_color: "#334155"
+          }
+        }
+      ).call
+
+      draft.valid?
+
+      expect(draft.settings).to eq(
+        "accent_color" => "#334155",
+        "show_contact_icons" => true,
+        "page_size" => "A4"
       )
     end
   end

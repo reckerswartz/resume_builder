@@ -5,7 +5,10 @@ module TemplatesHelper
     @template_marketplace_states ||= {}
     resolved_templates = Array(templates)
     resolved_filter_templates = Array(filter_templates)
-    resume_key = resume&.intake_details&.slice('experience_level', 'student_status') || {}
+    resume_key = [
+      resume&.intake_details&.slice('experience_level', 'student_status')&.compact_blank || {},
+      resume&.settings&.to_h&.fetch('accent_color', nil)
+    ]
     state_key = [ resolved_templates.map(&:id), resolved_filter_templates.map(&:id), query, family_filter, density_filter, column_count_filter, theme_tone_filter, shell_style_filter, sort, resume_key ]
 
     @template_marketplace_states[state_key] ||= Templates::MarketplaceState.new(
@@ -23,8 +26,11 @@ module TemplatesHelper
     )
   end
 
-  def marketplace_template_card(template)
-    template_cards_for_builder(selected_template: template).find { |template_card| template_card.fetch(:template).id == template.id }
+  def marketplace_template_card(template, selected_accent_color: nil)
+    template_cards_for_builder(
+      selected_template: template,
+      selected_accent_colors: { template.id => selected_accent_color }
+    ).find { |template_card| template_card.fetch(:template).id == template.id }
   end
 
   def template_marketplace_filter_groups(templates:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:)

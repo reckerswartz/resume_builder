@@ -18,8 +18,8 @@ module Ui
     end
 
     def wrapper_classes
-      base = "flex items-center justify-between gap-4 rounded-2xl border border-slate-200 px-4 py-4"
-      state_classes = linked? ? "transition hover:border-slate-300 hover:bg-slate-50" : "bg-white"
+      base = "flex items-center justify-between gap-4 rounded-2xl border border-canvas-200/80 px-4 py-4"
+      state_classes = linked? ? "bg-canvas-50/92 transition hover:border-aqua-200/80 hover:bg-canvas-50" : "bg-canvas-50/92"
 
       [ base, state_classes ].join(" ")
     end

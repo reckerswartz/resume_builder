@@ -1,11 +1,5 @@
 module Resumes
   class DraftBuilder
-    DEFAULT_SETTINGS = {
-      "accent_color" => "#0F172A",
-      "show_contact_icons" => true,
-      "page_size" => "A4"
-    }.freeze
-
     def initialize(user:, template:, attributes: {})
       @user = user
       @template = template
@@ -28,11 +22,19 @@ module Resumes
         },
         intake_details: attributes[:intake_details] || {},
         personal_details: attributes[:personal_details] || {},
-        settings: DEFAULT_SETTINGS.dup
+        settings: default_settings.merge(attributes.fetch(:settings, {}).to_h.deep_stringify_keys)
       )
     end
 
     private
       attr_reader :attributes, :template, :user
+
+      def default_settings
+        {
+          "accent_color" => template.render_layout_config.fetch("accent_color"),
+          "show_contact_icons" => true,
+          "page_size" => Resume::DEFAULT_PAGE_SIZE
+        }
+      end
   end
 end

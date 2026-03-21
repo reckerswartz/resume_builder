@@ -10,7 +10,7 @@ RSpec.describe Resume, type: :model do
 
   describe 'callbacks' do
     it 'assigns the default template and normalizes stored JSON values' do
-      template = create(:template)
+      template = create(:template, layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
 
       resume = described_class.create!(
         user: create(:user),
@@ -20,7 +20,7 @@ RSpec.describe Resume, type: :model do
         source_mode: 'unknown',
         source_text: nil,
         contact_details: { full_name: 'Casey Example' },
-        settings: { show_contact_icons: 'false' },
+        settings: { show_contact_icons: 'false', page_size: 'Legal', font_scale: 'giant', density: 'airy', hidden_sections: %w[projects unexpected projects] },
         summary: 'Summary'
       )
 
@@ -44,6 +44,29 @@ RSpec.describe Resume, type: :model do
       expect(resume.source_mode).to eq('scratch')
       expect(resume.source_text).to eq('')
       expect(resume.settings['show_contact_icons']).to eq(false)
+      expect(resume.page_size).to eq('A4')
+      expect(resume.font_scale).to eq('sm')
+      expect(resume.density).to eq('compact')
+      expect(resume.hidden_section_types).to eq(['projects'])
+    end
+
+    it 'removes blank font scale and density overrides so template defaults still apply' do
+      template = create(:template, layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
+
+      resume = described_class.create!(
+        user: create(:user),
+        title: 'Classic Resume',
+        template: template,
+        slug: nil,
+        contact_details: {},
+        settings: { accent_color: '#1D4ED8', page_size: 'A4', show_contact_icons: true, font_scale: '', density: '' },
+        summary: 'Summary'
+      )
+
+      expect(resume.settings).not_to have_key('font_scale')
+      expect(resume.settings).not_to have_key('density')
+      expect(resume.font_scale).to eq('sm')
+      expect(resume.density).to eq('compact')
     end
 
     it 'derives full_name and location from split contact fields' do

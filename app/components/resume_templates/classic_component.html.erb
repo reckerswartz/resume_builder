@@ -1,5 +1,5 @@
 <div class="<%= shell_classes %>">
-  <header class="border-b-2 <%= header_padding_class %>" style="border-color: <%= accent_color %>;">
+  <header class="border-b-[3px] <%= header_padding_class %>" style="border-color: <%= accent_color %>;">
     <% if split_header? %>
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -24,7 +24,7 @@
       <% end %>
 
       <% if contact_items.any? %>
-        <p class="<%= ["mt-4", meta_text_class, "leading-6 text-slate-600"].join(" ") %>"><%= contact_items.map { |_label, value| value }.join(" · ") %></p>
+        <p class="<%= ["mt-4", meta_text_class, "leading-6 text-slate-600"].join(" ") %>"><%= contact_items.map { |_label, value| value }.join(" | ") %></p>
       <% end %>
     <% end %>
 
@@ -34,15 +34,15 @@
   </header>
 
   <div class="<%= section_stack_classes %>">
-    <% resume.ordered_sections.each do |section| %>
+    <% visible_sections.each do |section| %>
       <section>
         <% if marker_section_heading? %>
           <div class="<%= [section_heading_spacing_class, "flex items-center gap-3"].join(" ") %>">
             <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= accent_color %>;"></span>
-            <h2 class="<%= [section_title_text_class, "font-semibold uppercase tracking-[0.18em] text-slate-900"].join(" ") %>"><%= section.title %></h2>
+            <h2 class="<%= [section_title_text_class, "font-semibold uppercase tracking-[0.12em] text-slate-900"].join(" ") %>"><%= section.title %></h2>
           </div>
         <% else %>
-          <h2 class="<%= [section_heading_spacing_class, section_title_text_class, "border-b pb-2 font-semibold uppercase tracking-[0.18em]"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("44") %>; color: <%= accent_color %>;"><%= section.title %></h2>
+          <h2 class="<%= [section_heading_spacing_class, section_title_text_class, "border-b pb-2 font-semibold uppercase tracking-[0.12em]"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("44") %>; color: <%= accent_color %>;"><%= section.title %></h2>
         <% end %>
 
         <% if section.section_type == "skills" %>
@@ -72,7 +72,7 @@
               <article class="<%= article_classes %>">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
+                    <h3 class="<%= [entry_title_text_class, "font-bold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
                     <% if subtitle.present? %>
                       <p class="<%= ["mt-1", meta_text_class, "text-slate-600"].join(" ") %>"><%= subtitle %></p>
                     <% end %>
@@ -94,7 +94,7 @@
                 <% end %>
 
                 <% if highlights.any? %>
-                  <ul class="<%= [entry_body_spacing_class, body_text_class, "list-disc space-y-1 pl-5 leading-6 text-slate-700"].join(" ") %>">
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, "list-[square] space-y-1 pl-5 leading-6 text-slate-700"].join(" ") %>">
                     <% highlights.each do |highlight| %>
                       <li><%= highlight %></li>
                     <% end %>

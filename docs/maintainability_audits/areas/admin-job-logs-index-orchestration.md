@@ -9,10 +9,10 @@ This file tracks the `Admin::JobLogsController` maintainability hotspot around t
 - Path: `app/controllers/admin/job_logs_controller.rb`
 - Category: `controller`
 - Priority: `high`
-- Status: `in_progress`
+- Status: `closed`
 - Recommended refactor shape: `extract_service`
-- Last reviewed: `2026-03-21T00:27:00Z`
-- Last changed: `2026-03-21T00:27:00Z`
+- Last reviewed: `2026-03-21T01:40:00Z`
+- Last changed: `2026-03-21T01:40:00Z`
 
 ## Hotspot summary
 
@@ -53,26 +53,29 @@ This file tracks the `Admin::JobLogsController` maintainability hotspot around t
 
 - Selected `Admin::JobLogsController#index` as the next maintainability hotspot after closing the provider sync area.
 - Confirmed the smallest safe slice is to extract the index data-loading workflow into an admin service rather than introducing a new query-object layer.
+- Created `app/services/admin/job_logs_index_service.rb` with filtered scope loading, monitoring stats, exact-match lookup, pagination, and related-error preloading.
+- Refactored `Admin::JobLogsController#index` to delegate to the new service while keeping param normalization and response selection in the controller.
+- Removed the now-unused `preload_related_error_logs` private method from the controller.
+- Added focused service coverage in `spec/services/admin/job_logs_index_service_spec.rb` (8 examples).
+- Re-verified the existing request coverage in `spec/requests/admin/job_logs_spec.rb` (9 examples).
 
 ## Pending
 
-- Extract the job logs index workflow into an admin service.
-- Add focused service coverage for filtered results, exact-match lookup, and related-error preload behavior.
-- Re-verify the admin job logs request surface after the controller cleanup.
+- None. The targeted extraction is complete.
 
 ## Open follow-up keys
 
-- `extract-job-logs-index-service`
+- none
 
 ## Closed follow-up keys
 
-- none
+- `extract-job-logs-index-service`
 
 ## Verification
 
 - Specs:
-  - `pending`
+  - `bundle exec rspec spec/services/admin/job_logs_index_service_spec.rb spec/requests/admin/job_logs_spec.rb` (17 examples, 0 failures)
 - Lint or syntax:
-  - `pending`
+  - `ruby -c app/controllers/admin/job_logs_controller.rb app/services/admin/job_logs_index_service.rb spec/services/admin/job_logs_index_service_spec.rb` (Syntax OK)
 - Notes:
   - This slice is intentionally limited to the index action workflow and does not change the show page or job control actions.

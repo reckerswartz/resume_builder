@@ -18,7 +18,13 @@ Rails.application.routes.draw do
       end
     end
     resource :settings, only: %i[ show update ]
-    resources :templates
+    resources :templates do
+      resources :implementation_candidates, only: :create, controller: "template_implementation_candidates"
+      resources :implementations, only: [], param: :id do
+        resources :validation_runs, only: :create, controller: "template_implementation_validation_runs"
+        resource :promotion, only: :create, controller: "template_implementation_promotions"
+      end
+    end
   end
 
   resource :registration, only: %i[ new create ]

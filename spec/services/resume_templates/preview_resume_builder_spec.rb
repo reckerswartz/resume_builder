@@ -19,5 +19,39 @@ RSpec.describe ResumeTemplates::PreviewResumeBuilder do
       expect(preview_resume.ordered_sections.map(&:section_type)).to eq(ResumeBuilder::SectionRegistry.types)
       expect(preview_resume.ordered_sections.flat_map(&:ordered_entries)).not_to be_empty
     end
+
+    it 'uses the render-ready implementation accent color when building the preview resume' do
+      template = create(
+        :template,
+        slug: 'modern',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      create(
+        :template_implementation,
+        template: template,
+        status: 'validated',
+        renderer_family: 'classic',
+        render_profile: {
+          'family' => 'classic',
+          'accent_color' => '#1D4ED8'
+        }
+      )
+
+      preview_resume = described_class.new(template: template).call
+
+      expect(preview_resume.settings).to include('accent_color' => '#1D4ED8')
+    end
+
+    it 'uses the requested accent color when rendering a variant preview' do
+      template = create(
+        :template,
+        slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+
+      preview_resume = described_class.new(template: template, accent_color: '#334155').call
+
+      expect(preview_resume.settings).to include('accent_color' => '#334155')
+    end
   end
 end

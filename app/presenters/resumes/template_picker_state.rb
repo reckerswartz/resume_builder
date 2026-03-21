@@ -23,6 +23,14 @@ module Resumes
       mode == :compact
     end
 
+    def accent_field_id
+      "#{form_object_name}_settings_accent_color"
+    end
+
+    def selected_accent_color
+      selected_card_state&.fetch(:selected_accent_color) || resume.accent_color
+    end
+
     def selected_card_state
       @selected_card_state ||= card_states.find { |card_state| card_state.fetch(:selected) } || card_states.first
     end
@@ -111,6 +119,8 @@ module Resumes
         template = template_card.fetch(:template)
         selected = selected_template_card.present? && selected_template_card.fetch(:template).id == template.id
         recommendation = recommendation_for(template)
+        selected_accent_color = template_card.fetch(:selected_accent_color, template_card.fetch(:accent_color))
+        selected_accent_variant = selected_accent_variant_for(template_card, selected_accent_color)
 
         {
           template: template,
@@ -155,7 +165,12 @@ module Resumes
           selection_badges: selection_badges(template_card, recommendation: recommendation),
           show_current_only_badge: !template.active?,
           current_only_badge_label: picker_text("current_only_badge"),
-          accent_label: picker_text("accent_label", color: template_card.fetch(:accent_color)),
+          selected_accent_color: selected_accent_color,
+          selected_accent_variant_label: selected_accent_variant.fetch(:label),
+          accent_variants: accent_variant_states_for(template, template_card, selected_accent_color),
+          preview_template_path: preview_template_path_for(template, accent_color: selected_accent_color),
+          preview_template_paths_by_accent_color: preview_template_paths_by_accent_color(template, template_card),
+          accent_label: picker_text("accent_label", variant: selected_accent_variant.fetch(:label)),
           summary_hidden: !selected,
           summary_aria_hidden: (!selected).to_s,
           summary_card_attributes: summary_card_attributes_for(template, template_card),
@@ -174,7 +189,11 @@ module Resumes
       attr_reader :form_object_name, :resume, :view_context
 
       def raw_template_cards
-        @raw_template_cards ||= view_context.template_cards_for_builder(selected_template: selected_template)
+        @raw_template_cards ||= begin
+          args = { selected_template: selected_template }
+          args[:selected_accent_colors] = selected_accent_colors if selected_accent_colors.present?
+          view_context.template_cards_for_builder(**args)
+        end
       end
 
       def selected_template
@@ -285,6 +304,66 @@ module Resumes
 
       def picker_text(key, **options)
         I18n.t("resumes.template_picker_state.#{key}", **options)
+      end
+
+      def accent_variant_states_for(template, template_card, selected_accent_color)
+        template_card_accent_variants(template_card).map do |accent_variant|
+          accent_color = accent_variant.fetch(:accent_color)
+
+          accent_variant.merge(
+            selected: accent_color == selected_accent_color,
+            preview_template_path: preview_template_path_for(template, accent_color: accent_color)
+          )
+        end
+      end
+
+      def preview_template_paths_by_accent_color(template, template_card)
+        template_card_accent_variants(template_card).each_with_object({}) do |accent_variant, paths|
+          accent_color = accent_variant.fetch(:accent_color)
+          paths[accent_color] = preview_template_path_for(template, accent_color: accent_color)
+        end
+      end
+
+      def selected_accent_variant_for(template_card, selected_accent_color)
+        template_card_accent_variants(template_card).find do |accent_variant|
+          accent_variant.fetch(:accent_color) == selected_accent_color
+        end || template_card_accent_variants(template_card).first
+      end
+
+      def preview_template_path_for(template, accent_color:)
+        path_params = { id: template }
+        path_params[:resume] = resume_context_params(template: template, accent_color: accent_color) if resume_context_params(template: template, accent_color: accent_color).present?
+        view_context.template_path(**path_params)
+      end
+
+      def resume_context_params(template:, accent_color:)
+        context = {}
+        intake_details = resume.intake_details.slice("experience_level", "student_status").compact_blank
+        context[:intake_details] = intake_details if intake_details.present?
+        if accent_color.present? && accent_color != template.render_layout_config.fetch("accent_color")
+          context[:settings] = { accent_color: accent_color }
+        end
+        context
+      end
+
+      def selected_accent_colors
+        return {} if selected_template_id.blank?
+        return {} if selected_template.blank?
+        return {} if resume.accent_color == selected_template.render_layout_config.fetch("accent_color")
+
+        { selected_template_id => resume.accent_color }
+      end
+
+      def template_card_accent_variants(template_card)
+        template_card.fetch(:accent_variants) do
+          ResumeTemplates::Catalog.accent_variants(
+            {
+              "theme_tone" => template_card.fetch(:theme_tone),
+              "accent_color" => template_card.fetch(:accent_color)
+            },
+            selected_accent_color: template_card.fetch(:selected_accent_color, template_card.fetch(:accent_color))
+          )
+        end
       end
 
       def searchable_text_for(template_card)

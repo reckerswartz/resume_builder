@@ -1,12 +1,19 @@
-<% template_card = marketplace_template_card(@template) %>
+<% template_card = marketplace_template_card(@template, selected_accent_color: @preview_resume.accent_color) %>
+<% resume_context_params = {} %>
 <% resume_intake_params = @recommendation_resume&.intake_details&.slice("experience_level", "student_status") || {} %>
-<% use_template_path = if resume_intake_params.present?
-  new_resume_path(template_id: @template.id, resume: { intake_details: resume_intake_params })
+<% selected_accent_color = template_card.fetch(:selected_accent_color) %>
+<% selected_accent_variant_label = template_card.fetch(:accent_variants).find { |accent_variant| accent_variant.fetch(:accent_color) == selected_accent_color }&.fetch(:label) || template_card.fetch(:accent_variants).first.fetch(:label) %>
+<% resume_context_params[:intake_details] = resume_intake_params if resume_intake_params.present? %>
+<% if selected_accent_color.present? && selected_accent_color != @template.render_layout_config.fetch("accent_color") %>
+  <% resume_context_params[:settings] = { accent_color: selected_accent_color } %>
+<% end %>
+<% use_template_path = if resume_context_params.present?
+  new_resume_path(template_id: @template.id, resume: resume_context_params)
 else
   new_resume_path(template_id: @template.id)
 end %>
-<% templates_path_with_context = if resume_intake_params.present?
-  templates_path(resume: { intake_details: resume_intake_params })
+<% templates_path_with_context = if resume_context_params.present?
+  templates_path(resume: resume_context_params)
 else
   templates_path
 end %>
@@ -84,7 +91,7 @@ end %>
         density: :compact
       ) do %>
         <div class="space-y-3">
-          <div class="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
+          <div class="atelier-dark-inset backdrop-blur-sm">
             <div class="flex items-start gap-3">
               <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :hero) %>
               <div>
@@ -101,7 +108,7 @@ end %>
             </div>
           </div>
 
-          <div class="rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
+          <div class="atelier-dark-inset backdrop-blur-sm">
             <div class="flex items-start gap-3">
               <%= render Ui::GlyphComponent.new(name: :preview, size: :sm, tone: :hero) %>
               <div>
@@ -136,8 +143,8 @@ end %>
                 <div>
                   <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t(".carry_through.accent_label") %></p>
                   <div class="mt-2 flex items-center gap-3">
-                    <span class="h-4 w-4 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
-                    <p class="text-sm font-semibold text-ink-950"><%= t(".carry_through.preview_accent") %></p>
+                    <span class="h-4 w-4 rounded-full border border-black/10" style="background-color: <%= selected_accent_color %>;"></span>
+                    <p class="text-sm font-semibold text-ink-950"><%= t("templates.template_card.accent_value", variant: selected_accent_variant_label) %></p>
                   </div>
                   <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t(".carry_through.accent_description") %></p>
                 </div>

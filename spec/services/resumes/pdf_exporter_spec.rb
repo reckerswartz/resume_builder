@@ -9,7 +9,7 @@ RSpec.describe Resumes::PdfExporter do
         settings: {
           'accent_color' => '#111827',
           'show_contact_icons' => true,
-          'page_size' => 'A4'
+          'page_size' => 'Letter'
         },
         contact_details: {
           'full_name' => 'Export User',
@@ -23,7 +23,7 @@ RSpec.describe Resumes::PdfExporter do
         expect(html).to include('Export User')
         expect(html).to include('export@example.com')
         expect(html).to include('#111827')
-        expect(options).to include(page_size: 'A4')
+        expect(options).to include(page_size: 'Letter')
         'pdf-binary'
       end
 

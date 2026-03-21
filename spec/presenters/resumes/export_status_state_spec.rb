@@ -1,77 +1,129 @@
 require 'rails_helper'
 
 RSpec.describe Resumes::ExportStatusState do
-  let(:resume) { create(:resume) }
-  let(:view_context) { instance_double('view_context') }
-
-  subject(:export_status_state) { described_class.new(resume:, context:, view_context:) }
-
-  before do
-    allow(view_context).to receive(:resume_export_status_label).with(resume).and_return('Draft only')
-    allow(view_context).to receive(:resume_export_status_message).with(resume).and_return('No PDF export has been generated yet.')
-    allow(view_context).to receive(:resume_export_status_badge_classes).with(resume, context: context).and_return('border border-slate-200 bg-white text-slate-600')
-    allow(view_context).to receive(:download_resume_path).with(resume).and_return("/resumes/#{resume.id}/download")
+  let(:view_context) do
+    controller = ApplicationController.new
+    controller.request = ActionDispatch::TestRequest.create
+    controller.view_context
   end
 
-  context 'when rendered in the preview context' do
-    let(:context) { :preview }
+  def build_state(resume:, context:)
+    described_class.new(resume: resume, context: context, view_context: view_context)
+  end
 
+  describe '#status_label' do
+    it 'returns the draft-only label for a resume without exports' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :editor).status_label).to eq(I18n.t('resumes.helper.export_status.labels.draft_only'))
+    end
+
+    it 'returns the ready label when a PDF export is attached' do
+      resume = create(:resume)
+      resume.pdf_export.attach(io: StringIO.new('pdf'), filename: 'resume.pdf', content_type: 'application/pdf')
+
+      expect(build_state(resume: resume, context: :editor).status_label).to eq(I18n.t('resumes.helper.export_status.labels.ready'))
+    end
+  end
+
+  describe '#status_message' do
+    it 'returns the draft-only message for a fresh resume' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :preview).status_message).to eq(I18n.t('resumes.helper.export_status.messages.draft_only'))
+    end
+
+    it 'returns the queued message with download variant when a previous PDF exists' do
+      resume = create(:resume)
+      resume.pdf_export.attach(io: StringIO.new('pdf'), filename: 'resume.pdf', content_type: 'application/pdf')
+      create(:job_log, :queued, job_type: 'ResumeExportJob', input: { 'arguments' => [resume.id] })
+
+      expect(build_state(resume: resume, context: :editor).status_message).to eq(I18n.t('resumes.helper.export_status.messages.queued.with_download'))
+    end
+
+    it 'returns the queued message without download variant when no previous PDF exists' do
+      resume = create(:resume)
+      create(:job_log, :queued, job_type: 'ResumeExportJob', input: { 'arguments' => [resume.id] })
+
+      expect(build_state(resume: resume, context: :editor).status_message).to eq(I18n.t('resumes.helper.export_status.messages.queued.without_download'))
+    end
+  end
+
+  describe '#status_badge_classes' do
+    it 'returns dark emerald classes for ready state in editor context' do
+      resume = create(:resume)
+      resume.pdf_export.attach(io: StringIO.new('pdf'), filename: 'resume.pdf', content_type: 'application/pdf')
+
+      expect(build_state(resume: resume, context: :editor).status_badge_classes).to include('emerald')
+    end
+
+    it 'returns light slate classes for draft state in preview context' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :preview).status_badge_classes).to include('border border-canvas-200/80 bg-canvas-50/88 text-ink-700')
+    end
+  end
+
+  describe '#widget_attributes' do
     it 'builds widget attributes for the shared export summary card' do
-      expect(export_status_state.widget_attributes).to eq(
-        eyebrow: 'Export status',
-        title: 'Draft only',
-        description: 'No PDF export has been generated yet.',
-        tone: :subtle,
-        padding: :sm,
-        badge: 'Draft',
-        badge_classes: 'rounded-full px-3 py-1 text-xs font-medium border border-slate-200 bg-white text-slate-600',
-        title_size: :xl
-      )
+      resume = create(:resume)
+      state = build_state(resume: resume, context: :preview)
+
+      attrs = state.widget_attributes
+
+      expect(attrs[:eyebrow]).to eq('Export status')
+      expect(attrs[:title]).to eq(state.status_label)
+      expect(attrs[:description]).to eq(state.status_message)
+      expect(attrs[:tone]).to eq(:subtle)
+      expect(attrs[:badge_classes]).to include(state.status_badge_classes)
     end
 
-    it 'uses the secondary download button style and reports when no file is attached' do
-      expect(export_status_state.download_button_style).to eq(:secondary)
-      expect(export_status_state.download_available?).to be(false)
-    end
-  end
+    it 'uses the dark tone in editor context' do
+      resume = create(:resume)
 
-  context 'when rendered on the show page with a generated PDF' do
-    let(:context) { :show }
-
-    before do
-      resume.pdf_export.attach(io: StringIO.new('pdf data'), filename: 'resume.pdf', content_type: 'application/pdf')
-      allow(view_context).to receive(:resume_export_status_label).with(resume).and_return('PDF ready')
-      allow(view_context).to receive(:resume_export_status_message).with(resume).and_return('The latest PDF export is attached and ready to download.')
+      expect(build_state(resume: resume, context: :editor).widget_attributes[:tone]).to eq(:dark)
     end
 
-    it 'uses the white-canvas show card tone and keeps downloads in the action rail' do
-      expect(export_status_state.widget_attributes).to eq(
-        eyebrow: 'Export status',
-        title: 'PDF ready',
-        description: 'The latest PDF export is attached and ready to download.',
-        tone: :default,
-        padding: :sm,
-        badge: 'Ready',
-        badge_classes: 'rounded-full px-3 py-1 text-xs font-medium border border-slate-200 bg-white text-slate-600',
-        title_size: :xl
-      )
-      expect(export_status_state.download_button_style).to eq(:secondary)
-      expect(export_status_state.download_available?).to be(false)
-      expect(export_status_state.download_path).to eq("/resumes/#{resume.id}/download")
+    it 'uses the default tone in show context' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :show).widget_attributes[:tone]).to eq(:default)
     end
   end
 
-  context 'when rendered in the editor context with a generated PDF' do
-    let(:context) { :editor }
+  describe '#download_available?' do
+    it 'is true when a PDF is attached in editor context' do
+      resume = create(:resume)
+      resume.pdf_export.attach(io: StringIO.new('pdf'), filename: 'resume.pdf', content_type: 'application/pdf')
 
-    before do
-      resume.pdf_export.attach(io: StringIO.new('pdf data'), filename: 'resume.pdf', content_type: 'application/pdf')
+      expect(build_state(resume: resume, context: :editor).download_available?).to be(true)
     end
 
-    it 'uses the editor button style and exposes the download path' do
-      expect(export_status_state.download_button_style).to eq(:hero_secondary)
-      expect(export_status_state.download_available?).to be(true)
-      expect(export_status_state.download_path).to eq("/resumes/#{resume.id}/download")
+    it 'is false on the show page even when a PDF is attached' do
+      resume = create(:resume)
+      resume.pdf_export.attach(io: StringIO.new('pdf'), filename: 'resume.pdf', content_type: 'application/pdf')
+
+      expect(build_state(resume: resume, context: :show).download_available?).to be(false)
+    end
+
+    it 'is false when no PDF is attached' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :editor).download_available?).to be(false)
+    end
+  end
+
+  describe '#download_button_style' do
+    it 'returns hero_secondary in editor context' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :editor).download_button_style).to eq(:hero_secondary)
+    end
+
+    it 'returns secondary in other contexts' do
+      resume = create(:resume)
+
+      expect(build_state(resume: resume, context: :show).download_button_style).to eq(:secondary)
     end
   end
 end

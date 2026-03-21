@@ -4,6 +4,13 @@
 <% description_text = card_state.present? ? card_state.fetch(:description_text) : template.description.presence || template_card.fetch(:summary) %>
 <% preview_template_path = card_state.present? ? card_state.fetch(:preview_template_path) : template_path(id: template) %>
 <% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : new_resume_path(template_id: template.id) %>
+<% selected_accent_color = card_state.present? ? card_state.fetch(:selected_accent_color) : template_card.fetch(:selected_accent_color) %>
+<% accent_variants = card_state.present? ? card_state.fetch(:accent_variants) : template_card.fetch(:accent_variants) %>
+<% selected_accent_variant_label = if card_state.present?
+  card_state.fetch(:selected_accent_variant_label)
+else
+  accent_variants.find { |accent_variant| accent_variant.fetch(:accent_color) == selected_accent_color }&.fetch(:label) || accent_variants.first.fetch(:label)
+end %>
 <% badge_labels = if card_state.present?
   card_state.fetch(:badge_labels)
 else
@@ -29,6 +36,7 @@ end %>
     data: {
       template_gallery_target: "card",
       template_id: template.id,
+      selected_accent_color: selected_accent_color,
       family: card_state.fetch(:filter_family),
       density: card_state.fetch(:filter_density),
       column_count: card_state.fetch(:filter_column_count),
@@ -68,10 +76,32 @@ end %>
 
       <div class="rounded-[1.2rem] border border-canvas-200/80 bg-canvas-100/88 px-3 py-3 text-right shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
         <div class="flex items-center justify-end gap-2">
-          <span class="h-3.5 w-3.5 rounded-full border border-black/10" style="background-color: <%= template_card.fetch(:accent_color) %>;"></span>
+          <span class="h-3.5 w-3.5 rounded-full border border-black/10" data-template-variant-swatch="true" data-template-id="<%= template.id %>" style="background-color: <%= selected_accent_color %>;"></span>
           <span class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".accent_label") %></span>
         </div>
-        <p class="mt-2 text-sm font-semibold text-ink-950"><%= template_card.fetch(:accent_color) %></p>
+        <p class="mt-2 text-sm font-semibold text-ink-950" data-template-variant-label="true" data-template-id="<%= template.id %>"><%= t(".accent_value", variant: selected_accent_variant_label) %></p>
+        <div class="mt-3 flex flex-wrap justify-end gap-2">
+          <% accent_variants.each do |accent_variant| %>
+            <% accent_variant_selected = accent_variant.fetch(:accent_color) == selected_accent_color %>
+            <button
+              type="button"
+              class="<%= ["inline-flex h-8 w-8 items-center justify-center rounded-full border-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent", (accent_variant_selected ? "border-aqua-200 bg-canvas-50 shadow-[0_12px_28px_rgba(125,211,252,0.2)]" : "border-canvas-200/80 bg-canvas-50/92 hover:border-aqua-200/80 hover:bg-canvas-50")].join(" ") %>"
+              data-action="click->template-gallery#selectAccentVariant"
+              data-template-variant-button="true"
+              data-template-id="<%= template.id %>"
+              data-accent-color="<%= accent_variant.fetch(:accent_color) %>"
+              data-variant-label="<%= accent_variant.fetch(:label) %>"
+              data-accent-label="<%= t(".accent_value", variant: accent_variant.fetch(:label)) %>"
+              data-preview-template-path="<%= card_state.present? ? accent_variant.fetch(:preview_template_path) : preview_template_path %>"
+              data-use-template-path="<%= card_state.present? ? accent_variant.fetch(:use_template_path) : use_template_path %>"
+              data-selected-classes="border-aqua-200 bg-canvas-50 shadow-[0_12px_28px_rgba(125,211,252,0.2)]"
+              data-unselected-classes="border-canvas-200/80 bg-canvas-50/92 hover:border-aqua-200/80 hover:bg-canvas-50"
+              aria-pressed="<%= accent_variant_selected %>"
+              aria-label="<%= t(".accent_swatch_label", variant: accent_variant.fetch(:label)) %>">
+              <span class="h-4 w-4 rounded-full border border-black/10" style="background-color: <%= accent_variant.fetch(:accent_color) %>;"></span>
+            </button>
+          <% end %>
+        </div>
       </div>
     </div>
 
@@ -82,7 +112,7 @@ end %>
       </div>
 
       <div class="<%= [ui_inset_panel_classes(tone: :default), 'overflow-hidden'].join(' ') %>">
-        <%= render "resumes/template_picker_preview", template_card: template_card %>
+        <%= render "resumes/template_picker_preview", template_card: template_card, card_state: card_state, selected_accent_color: selected_accent_color %>
       </div>
     </div>
 
@@ -116,8 +146,8 @@ end %>
     </div>
 
     <div class="mt-6 flex flex-wrap gap-3">
-      <%= link_to t(".preview_template"), preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
-      <%= link_to t(".use_template"), use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center" %>
+      <%= link_to t(".preview_template"), preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center", data: { template_variant_preview_link: true, template_id: template.id } %>
+      <%= link_to t(".use_template"), use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center", data: { template_variant_use_link: true, template_id: template.id } %>
     </div>
   </div>
 <% end %>

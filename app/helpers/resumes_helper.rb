@@ -13,21 +13,39 @@ module ResumesHelper
     builder_templates(selected_template:, templates:).map { |template| [ template.name, template.id ] }
   end
 
-  def template_cards_for_builder(selected_template: nil, templates: nil)
+  def template_cards_for_builder(selected_template: nil, templates: nil, selected_accent_colors: nil)
+    accent_color_overrides = (selected_accent_colors || {}).to_h.stringify_keys
+
     builder_templates(selected_template:, templates:).map do |template|
-      layout_config = template.normalized_layout_config
+      layout_config = template.render_layout_config
       family = layout_config.fetch("family")
       family_label = ResumeTemplates::Catalog.family_label(layout_config.fetch("family"))
+      selected_accent_color = template_card_selected_accent_color(
+        template: template,
+        layout_config: layout_config,
+        selected_accent_colors: accent_color_overrides
+      )
+      accent_variants = ResumeTemplates::Catalog.accent_variants(
+        layout_config,
+        selected_accent_color: selected_accent_color
+      )
+      preview_resumes_by_accent_color = accent_variants.each_with_object({}) do |accent_variant, previews|
+        accent_color = accent_variant.fetch(:accent_color)
+        previews[accent_color] = template_preview_resume(template, accent_color: accent_color)
+      end
       sidebar_section_labels = Array(layout_config["sidebar_section_types"]).map do |section_type|
         ResumeBuilder::SectionRegistry.title_for(section_type)
       end
 
       {
         template: template,
-        preview_resume: template_preview_resume(template),
+        preview_resume: preview_resumes_by_accent_color.fetch(selected_accent_color),
+        preview_resumes_by_accent_color: preview_resumes_by_accent_color,
         family: family,
         family_label: family_label,
         accent_color: layout_config.fetch("accent_color"),
+        selected_accent_color: selected_accent_color,
+        accent_variants: accent_variants,
         column_count: layout_config.fetch("column_count"),
         column_count_label: ResumeTemplates::Catalog.column_count_label(layout_config.fetch("column_count")),
         density: layout_config.fetch("density"),
@@ -68,14 +86,23 @@ module ResumesHelper
     end
   end
 
-  def template_preview_resume(template)
+  def template_preview_resume(template, accent_color: nil)
     @template_preview_resumes ||= {}
-    @template_preview_resumes[template.id || template.slug] ||= ResumeTemplates::PreviewResumeBuilder.new(template: template).call
+    normalized_accent_color = ResumeTemplates::Catalog.normalized_accent_color(
+      accent_color,
+      fallback: template.render_layout_config.fetch("accent_color")
+    )
+    cache_key = [ template.id || template.slug, normalized_accent_color ]
+
+    @template_preview_resumes[cache_key] ||= ResumeTemplates::PreviewResumeBuilder.new(
+      template: template,
+      accent_color: normalized_accent_color
+    ).call
   end
 
   def resume_template_picker_state(resume:, form_object_name:, field_label:, description:, mode: :default)
     @resume_template_picker_states ||= Hash.new { |hash, key| hash[key] = {} }
-    state_key = [ resume.template_id, resume.template&.id, form_object_name, field_label, description, mode ]
+    state_key = [ resume.template_id, resume.template&.id, resume.accent_color, form_object_name, field_label, description, mode ]
 
     @resume_template_picker_states[resume.object_id][state_key] ||= Resumes::TemplatePickerState.new(
       resume: resume,
@@ -84,6 +111,15 @@ module ResumesHelper
       description: description,
       mode: mode,
       view_context: self
+    )
+  end
+
+  def template_card_selected_accent_color(template:, layout_config:, selected_accent_colors: {})
+    selected_accent_color = selected_accent_colors[template.id.to_s] || selected_accent_colors[template.id]
+
+    ResumeTemplates::Catalog.normalized_accent_color(
+      selected_accent_color,
+      fallback: layout_config.fetch("accent_color")
     )
   end
 
@@ -182,6 +218,14 @@ module ResumesHelper
     )
   end
 
+  def resume_finalize_workspace_state(resume, step_sections:)
+    Resumes::FinalizeWorkspaceState.new(
+      resume: resume,
+      step_sections: step_sections,
+      view_context: self
+    )
+  end
+
   def resume_export_status_state(resume, context:)
     @resume_export_status_states ||= Hash.new { |hash, key| hash[key] = {} }
     @resume_export_status_states[resume.object_id][context.to_sym] ||= Resumes::ExportStatusState.new(
@@ -231,25 +275,12 @@ module ResumesHelper
     resume_builder_catalog.entry_fields_for(section.section_type)
   end
 
+  def entry_field_state(entry, section)
+    Resumes::EntryFieldState.new(entry: entry, section: section)
+  end
+
   def entry_field_value(entry, key)
-    case key
-    when "highlights_text"
-      Array(entry.content["highlights"]).join("\n")
-    when "start_month"
-      entry_date_part(entry.content["start_date"], :month)
-    when "start_year"
-      entry_date_part(entry.content["start_date"], :year)
-    when "end_month"
-      entry_current_role?(entry) ? "" : entry_date_part(entry.content["end_date"], :month)
-    when "end_year"
-      entry_current_role?(entry) ? "" : entry_date_part(entry.content["end_date"], :year)
-    when "remote"
-      ActiveModel::Type::Boolean.new.cast(entry.content["remote"])
-    when "current_role"
-      entry_current_role?(entry)
-    else
-      entry.content.fetch(key, "")
-    end
+    entry_field_state(entry, entry.section).field_value(key)
   end
 
   def entry_field_text_area?(field)
@@ -261,216 +292,64 @@ module ResumesHelper
   end
 
   def entry_field_checked?(entry, key)
-    ActiveModel::Type::Boolean.new.cast(entry_field_value(entry, key))
+    entry_field_state(entry, entry.section).field_checked?(key)
   end
 
   def entry_editor_title(entry, section)
-    fallback = I18n.t("resumes.entry_form.titles.entry_fallback", section: ResumeBuilder::SectionRegistry.title_for(section.section_type))
-
-    case section.section_type
-    when "experience"
-      entry.content["title"].presence || entry.content["organization"].presence || fallback
-    when "education"
-      entry.content["degree"].presence || entry.content["institution"].presence || fallback
-    when "skills"
-      entry.content["name"].presence || fallback
-    when "projects"
-      entry.content["name"].presence || entry.content["role"].presence || fallback
-    else
-      entry_first_present_value(entry) || fallback
-    end
+    entry_field_state(entry, section).editor_title
   end
 
   def entry_editor_metadata(entry, section)
-    case section.section_type
-    when "experience"
-      [ entry.content["organization"], entry_date_range_label(entry) ].compact_blank.join(" · ").presence
-    when "education"
-      [ entry.content["institution"], entry_date_range_label(entry) ].compact_blank.join(" · ").presence
-    when "skills"
-      entry.content["level"].presence
-    when "projects"
-      [ entry.content["role"], entry.content["url"] ].compact_blank.join(" · ").presence
-    end
+    entry_field_state(entry, section).editor_metadata
   end
 
   def entry_editor_supporting_text(entry, section)
-    case section.section_type
-    when "experience", "projects"
-      entry.content["summary"].presence || Array(entry.content["highlights"]).first.presence
-    when "education"
-      entry.content["details"].presence
-    end
+    entry_field_state(entry, section).editor_supporting_text
   end
 
   def resume_export_status_label(resume)
-    case resume.export_state
-    when "queued"
-      I18n.t("resumes.helper.export_status.labels.queued")
-    when "running"
-      I18n.t("resumes.helper.export_status.labels.running")
-    when "failed"
-      I18n.t("resumes.helper.export_status.labels.failed")
-    when "ready"
-      I18n.t("resumes.helper.export_status.labels.ready")
-    else
-      I18n.t("resumes.helper.export_status.labels.draft_only")
-    end
+    resume_export_status_state(resume, context: :editor).status_label
   end
 
   def resume_export_status_message(resume)
-    case resume.export_state
-    when "queued"
-      resume.pdf_export.attached? ? I18n.t("resumes.helper.export_status.messages.queued.with_download") : I18n.t("resumes.helper.export_status.messages.queued.without_download")
-    when "running"
-      resume.pdf_export.attached? ? I18n.t("resumes.helper.export_status.messages.running.with_download") : I18n.t("resumes.helper.export_status.messages.running.without_download")
-    when "failed"
-      resume.pdf_export.attached? ? I18n.t("resumes.helper.export_status.messages.failed.with_download") : I18n.t("resumes.helper.export_status.messages.failed.without_download")
-    when "ready"
-      I18n.t("resumes.helper.export_status.messages.ready")
-    else
-      I18n.t("resumes.helper.export_status.messages.draft_only")
-    end
+    resume_export_status_state(resume, context: :editor).status_message
   end
 
   def resume_export_status_badge_classes(resume, context: :editor)
-    dark_context = context.to_sym == :editor
+    resume_export_status_state(resume, context: context).status_badge_classes
+  end
 
-    case resume.export_state
-    when "ready"
-      dark_context ? "border border-emerald-300/30 bg-emerald-300/15 text-emerald-100" : "border border-emerald-200 bg-emerald-50 text-emerald-700"
-    when "failed"
-      dark_context ? "border border-rose-300/30 bg-rose-300/15 text-rose-100" : "border border-rose-200 bg-rose-50 text-rose-700"
-    when "running"
-      dark_context ? "border border-amber-300/30 bg-amber-300/15 text-amber-100" : "border border-amber-200 bg-amber-50 text-amber-700"
-    when "queued"
-      dark_context ? "border border-sky-300/30 bg-sky-300/15 text-sky-100" : "border border-sky-200 bg-sky-50 text-sky-700"
-    else
-      dark_context ? "border border-white/15 bg-white/10 text-white/80" : "border border-slate-200 bg-white text-slate-600"
-    end
+  def resume_source_step_state(resume, autofill_enabled:)
+    @resume_source_step_states ||= Hash.new { |hash, key| hash[key] = {} }
+    @resume_source_step_states[resume.object_id][autofill_enabled] ||= Resumes::SourceStepState.new(
+      resume: resume,
+      autofill_enabled: autofill_enabled,
+      view_context: self
+    )
   end
 
   def resume_source_document_autofill_supported?(resume)
-    Resumes::SourceTextResolver.supported_upload?(resume.source_document)
+    resume_source_step_state(resume, autofill_enabled: false).document_autofill_supported?
   end
 
   def resume_source_cloud_import_provider_states(resume)
-    return_to = request&.fullpath.to_s
-    resume_id = resume&.persisted? ? resume.id : nil
-
-    Resumes::CloudImportProviderCatalog.all.map do |provider|
-      configured = provider.fetch(:configured)
-      provider_label = provider.fetch(:label)
-
-      {
-        key: provider.fetch(:key),
-        label: provider_label,
-        description: provider.fetch(:description),
-        status_label: configured ? I18n.t("resumes.helper.source_cloud_import.status.configured") : I18n.t("resumes.helper.source_cloud_import.status.setup_required"),
-        status_tone: configured ? :neutral : :warning,
-        action_label: configured ? I18n.t("resumes.helper.source_cloud_import.actions.connect_soon") : I18n.t("resumes.helper.source_cloud_import.actions.see_setup"),
-        action_path: resume_source_import_path(provider.fetch(:key), return_to: return_to.presence, resume_id: resume_id),
-        message: if configured
-          I18n.t("resumes.cloud_import_provider_catalog.feedback.configured", provider: provider_label)
-        else
-          I18n.t("resumes.cloud_import_provider_catalog.feedback.setup_required", provider: provider_label, env_vars: provider.fetch(:required_env_vars).to_sentence)
-        end
-      }
-    end
+    resume_source_step_state(resume, autofill_enabled: false).cloud_import_provider_states
   end
 
   def resume_source_upload_review_state(resume, autofill_enabled:)
-    return unless resume.source_document.attached?
-
-    attachment = resume.source_document
-    supported_upload = resume_source_document_autofill_supported?(resume)
-    content_type = attachment.blob.content_type.presence || I18n.t("resumes.helper.source_upload_review.unknown_type")
-
-    if supported_upload && autofill_enabled
-      {
-        title: I18n.t("resumes.helper.source_upload_review.ready_for_ai_import.title"),
-        badge_label: I18n.t("resumes.helper.source_upload_review.ready_for_ai_import.badge_label"),
-        badge_tone: :success,
-        panel_tone: :success,
-        filename: attachment.filename.to_s,
-        content_type: content_type,
-        file_size: number_to_human_size(attachment.byte_size),
-        message: I18n.t("resumes.helper.source_upload_review.ready_for_ai_import.message")
-      }
-    elsif supported_upload
-      {
-        title: I18n.t("resumes.helper.source_upload_review.supported_upload_attached.title"),
-        badge_label: I18n.t("resumes.helper.source_upload_review.supported_upload_attached.badge_label"),
-        badge_tone: :neutral,
-        panel_tone: :default,
-        filename: attachment.filename.to_s,
-        content_type: content_type,
-        file_size: number_to_human_size(attachment.byte_size),
-        message: I18n.t("resumes.helper.source_upload_review.supported_upload_attached.message")
-      }
-    else
-      {
-        title: I18n.t("resumes.helper.source_upload_review.reference_file_only.title"),
-        badge_label: I18n.t("resumes.helper.source_upload_review.reference_file_only.badge_label"),
-        badge_tone: :neutral,
-        panel_tone: :default,
-        filename: attachment.filename.to_s,
-        content_type: content_type,
-        file_size: number_to_human_size(attachment.byte_size),
-        message: I18n.t("resumes.helper.source_upload_review.reference_file_only.message")
-      }
-    end
+    resume_source_step_state(resume, autofill_enabled: autofill_enabled).upload_review_state
   end
 
   def resume_source_autofill_status_label(resume, autofill_enabled:)
-    return I18n.t("resumes.helper.source_autofill.labels.unavailable") unless autofill_enabled
-
-    case resume.source_mode
-    when "paste"
-      resume.source_text.to_s.squish.present? ? I18n.t("resumes.helper.source_autofill.labels.paste_ready") : I18n.t("resumes.helper.source_autofill.labels.paste_required")
-    when "upload"
-      return I18n.t("resumes.helper.source_autofill.labels.attach_file") unless resume.source_document.attached?
-
-      resume_source_document_autofill_supported?(resume) ? I18n.t("resumes.helper.source_autofill.labels.upload_ready") : I18n.t("resumes.helper.source_autofill.labels.reference_file_only")
-    else
-      I18n.t("resumes.helper.source_autofill.labels.choose_import_path")
-    end
+    resume_source_step_state(resume, autofill_enabled: autofill_enabled).autofill_status_label
   end
 
   def resume_source_autofill_status_message(resume, autofill_enabled:)
-    return I18n.t("resumes.helper.source_autofill.messages.unavailable") unless autofill_enabled
-
-    case resume.source_mode
-    when "paste"
-      if resume.source_text.to_s.squish.present?
-        I18n.t("resumes.helper.source_autofill.messages.paste_ready")
-      else
-        I18n.t("resumes.helper.source_autofill.messages.paste_required")
-      end
-    when "upload"
-      return I18n.t("resumes.helper.source_autofill.messages.attach_document") unless resume.source_document.attached?
-
-      if resume_source_document_autofill_supported?(resume)
-        I18n.t("resumes.helper.source_autofill.messages.upload_ready")
-      else
-        I18n.t("resumes.helper.source_autofill.messages.upload_reference_only", formats: Resumes::SourceTextResolver.supported_upload_formats_label)
-      end
-    else
-      I18n.t("resumes.helper.source_autofill.messages.scratch_mode")
-    end
+    resume_source_step_state(resume, autofill_enabled: autofill_enabled).autofill_status_message
   end
 
   def resume_source_autofill_action_ready?(resume, autofill_enabled:)
-    return false unless autofill_enabled
-
-    case resume.source_mode
-    when "paste"
-      resume.source_text.to_s.squish.present?
-    when "upload"
-      resume.source_document.attached? && resume_source_document_autofill_supported?(resume)
-    else
-      false
-    end
+    resume_source_step_state(resume, autofill_enabled: autofill_enabled).autofill_action_ready?
   end
 
   private
@@ -489,35 +368,6 @@ module ResumesHelper
         requested_step: params[:step],
         view_context: self
       )
-    end
-
-    def entry_current_role?(entry)
-      ActiveModel::Type::Boolean.new.cast(entry.content["current_role"]) || %w[Current Present].include?(entry.content["end_date"])
-    end
-
-    def entry_date_range_label(entry)
-      start_date = entry.content["start_date"].presence
-      end_date = entry_current_role?(entry) ? "Present" : entry.content["end_date"].presence
-
-      return if start_date.blank? && end_date.blank?
-
-      [ start_date, end_date ].compact.join(" - ")
-    end
-
-    def entry_date_part(value, part)
-      normalized_value = value.to_s.squish
-      return "" if normalized_value.blank?
-
-      components = normalized_value.split(" ", 2)
-      return components.first if part == :year && components.one?
-      return components.first if part == :month && components.many?
-      return components.last.to_s if part == :year && components.many?
-
-      ""
-    end
-
-    def entry_first_present_value(entry)
-      entry.content.values.flatten.map { |value| value.to_s.squish }.find(&:present?)
     end
 
 end

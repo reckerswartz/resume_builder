@@ -34,7 +34,7 @@ module ApplicationHelper
     when :warning
       "border border-amber-200/80 bg-canvas-50/95 text-amber-700 shadow-[0_14px_32px_rgba(245,158,11,0.1)] hover:-translate-y-0.5 hover:bg-amber-50"
     when :disabled
-      "cursor-not-allowed border border-canvas-200/80 bg-canvas-100/70 text-slate-400 shadow-none"
+      "cursor-not-allowed border border-canvas-200/80 bg-canvas-100/70 text-ink-700/40 shadow-none"
     when :ghost
       "text-ink-700 underline decoration-canvas-300 underline-offset-4 hover:text-ink-950"
     when :danger
@@ -170,7 +170,25 @@ module ApplicationHelper
   end
 
   def ui_input_classes
-    "mt-2 block w-full rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-3 text-sm text-ink-950 shadow-[0_14px_32px_rgba(15,23,42,0.08)] transition placeholder:text-slate-400 focus:border-aqua-200 focus:outline-none focus:ring-2 focus:ring-aqua-100/80"
+    "mt-2 block w-full rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 px-4 py-3 text-sm text-ink-950 shadow-[0_14px_32px_rgba(15,23,42,0.08)] transition placeholder:text-ink-700/40 focus:border-aqua-200 focus:outline-none focus:ring-2 focus:ring-aqua-100/80"
+  end
+
+  def ui_step_circle_classes
+    "mt-0.5 inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-ink-950 text-[0.65rem] font-semibold text-white"
+  end
+
+  def ui_avatar_classes(size: :md)
+    base = "flex items-center justify-center rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50/92 font-semibold tracking-[0.18em] text-ink-950 shadow-[0_12px_28px_rgba(15,23,42,0.08)]"
+    size_classes = case size.to_sym
+    when :sm
+      "h-10 w-10 text-xs"
+    when :lg
+      "h-14 w-14 text-base"
+    else
+      "h-12 w-12 text-sm"
+    end
+
+    "#{base} #{size_classes}"
   end
 
   def ui_checkbox_classes

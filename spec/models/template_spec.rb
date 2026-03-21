@@ -57,4 +57,54 @@ RSpec.describe Template, type: :model do
       expect(described_class.default!).not_to eq(inactive)
     end
   end
+
+  describe '#current_implementation' do
+    it 'returns the most recent render-ready implementation' do
+      template = create(:template, slug: 'modern')
+      create(:template_implementation, template: template, status: 'draft', created_at: 3.days.ago)
+      older = create(:template_implementation, template: template, status: 'validated', created_at: 2.days.ago)
+      newer = create(:template_implementation, template: template, status: 'stable', created_at: 1.day.ago)
+
+      expect(template.current_implementation).to eq(newer)
+      expect(template.current_implementation).not_to eq(older)
+    end
+  end
+
+  describe '#render_layout_config' do
+    it 'prefers the current implementation render profile over the raw template layout config' do
+      template = create(
+        :template,
+        slug: 'modern',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      create(
+        :template_implementation,
+        template: template,
+        status: 'validated',
+        renderer_family: 'classic',
+        render_profile: {
+          'family' => 'classic',
+          'accent_color' => '#1d4ed8',
+          'density' => 'compact'
+        }
+      )
+
+      expect(template.render_layout_config).to include(
+        'family' => 'classic',
+        'accent_color' => '#1d4ed8',
+        'density' => 'compact'
+      )
+    end
+
+    it 'falls back to the normalized template layout config when no render-ready implementation exists' do
+      template = create(
+        :template,
+        slug: 'modern',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      create(:template_implementation, template: template, status: 'draft', renderer_family: 'classic', render_profile: { 'family' => 'classic' })
+
+      expect(template.render_layout_config).to include('family' => 'modern')
+    end
+  end
 end

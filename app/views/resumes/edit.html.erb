@@ -7,7 +7,9 @@
  <% show_mobile_preview_panel = builder_state.step_partial != "editor_section_step" %>
 
  <section class="space-y-6">
-   <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
+   <div class="hidden xl:block">
+     <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
+   </div>
 
   <% if show_mobile_preview_panel %>
     <div class="xl:hidden">

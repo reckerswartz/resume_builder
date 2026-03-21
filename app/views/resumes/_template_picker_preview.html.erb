@@ -1,4 +1,8 @@
-<% preview_resume = template_card.fetch(:preview_resume) %>
+<% card_state = local_assigns[:card_state] %>
+<% template = template_card.fetch(:template) %>
+<% accent_variants = template_card.fetch(:accent_variants) %>
+<% preview_resumes_by_accent_color = template_card.fetch(:preview_resumes_by_accent_color) %>
+<% selected_accent_color = local_assigns[:selected_accent_color].presence || card_state&.fetch(:selected_accent_color) || template_card.fetch(:selected_accent_color) %>
 <% preview_size = local_assigns.fetch(:size, :default).to_sym %>
 <% shell_is_card = template_card.fetch(:shell_style) == "card" %>
 <% preview_shell_classes = ["relative overflow-hidden rounded-[1.25rem] border border-canvas-200/80 bg-canvas-100/84", ("shadow-[0_14px_30px_rgba(15,23,42,0.08)]" if shell_is_card)].compact.join(" ") %>
@@ -12,9 +16,15 @@
   <div class="absolute -right-8 top-4 h-16 w-16 rounded-full atelier-glow opacity-25"></div>
 
   <div class="<%= [preview_height_classes, "overflow-hidden bg-canvas-50/92"].join(" ") %>">
-    <div class="pointer-events-none origin-top-left select-none" style="transform: scale(<%= preview_scale %>); width: <%= preview_width %>;">
-      <%= render ResumeTemplates::ComponentResolver.component_for(preview_resume) %>
-    </div>
+    <% accent_variants.each do |accent_variant| %>
+      <% accent_color = accent_variant.fetch(:accent_color) %>
+      <div class="<%= "hidden" unless accent_color == selected_accent_color %>"
+        data-template-variant-preview="true"
+        data-template-id="<%= template.id %>"
+        data-accent-color="<%= accent_color %>">
+        <div class="pointer-events-none origin-top-left select-none" style="transform: scale(<%= preview_scale %>); width: <%= preview_width %>;"><%= render ResumeTemplates::ComponentResolver.component_for(preview_resumes_by_accent_color.fetch(accent_color)) %></div>
+      </div>
+    <% end %>
   </div>
 
   <div class="pointer-events-none absolute inset-x-0 bottom-0 <%= gradient_height_classes %> bg-gradient-to-t from-canvas-50 via-canvas-50/90 to-transparent"></div>

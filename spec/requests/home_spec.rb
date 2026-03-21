@@ -11,7 +11,6 @@ RSpec.describe 'Home', type: :request do
       expect(response.body).to include('Three simple ways to begin')
       expect(response.body).to include('Common questions')
       expect(response.body).to include('Before you start')
-      expect(response.body).to include('One workspace, preview, and export path.')
       expect(response.body).to include('atelier-pill')
     end
 

@@ -188,6 +188,51 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include(ERB::Util.html_escape(templates_path(resume: { intake_details: { experience_level: 'less_than_3_years', student_status: 'student' } })))
     end
 
+    it 'preserves non-default accent context through template detail actions' do
+      template = create(
+        :template,
+        name: 'Classic Ivory',
+        slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+
+      get template_path(id: template), params: {
+        resume: {
+          intake_details: {
+            experience_level: 'less_than_3_years',
+            student_status: 'student'
+          },
+          settings: {
+            accent_color: '#334155'
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Slate accent')
+      expect(response.body).to include(
+        ERB::Util.html_escape(
+          new_resume_path(
+            template_id: template.id,
+            resume: {
+              intake_details: { experience_level: 'less_than_3_years', student_status: 'student' },
+              settings: { accent_color: '#334155' }
+            }
+          )
+        )
+      )
+      expect(response.body).to include(
+        ERB::Util.html_escape(
+          templates_path(
+            resume: {
+              intake_details: { experience_level: 'less_than_3_years', student_status: 'student' },
+              settings: { accent_color: '#334155' }
+            }
+          )
+        )
+      )
+    end
+
     it 'redirects back to the marketplace when the template is not available' do
       create(:template, name: 'Modern Slate')
       hidden_template = create(:template, name: 'Legacy Hidden', active: false)

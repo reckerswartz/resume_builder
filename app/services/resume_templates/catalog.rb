@@ -3,6 +3,11 @@ module ResumeTemplates
     ACCENT_COLOR_PATTERN = /\A#(?:\h{3}|\h{6})\z/
     BOOLEAN_TYPE = ActiveModel::Type::Boolean.new
     PHOTO_SLOT_NAMES = %w[headshot].freeze
+    FONT_SCALE_OPTIONS = {
+      "sm" => "Small",
+      "base" => "Base",
+      "lg" => "Large"
+    }.freeze
 
     FONT_SCALES = {
       "sm" => {
@@ -79,6 +84,20 @@ module ResumeTemplates
       "teal" => "Teal",
       "indigo" => "Indigo",
       "lime" => "Lime"
+    }.freeze
+    ACCENT_TONE_COLORS = {
+      "slate" => "#334155",
+      "blue" => "#1D4ED8",
+      "teal" => "#0F766E",
+      "indigo" => "#4338CA",
+      "lime" => "#D7F038"
+    }.freeze
+    ACCENT_VARIANT_TONES = {
+      "slate" => %w[blue teal],
+      "blue" => %w[slate indigo],
+      "teal" => %w[blue slate],
+      "indigo" => %w[blue slate],
+      "lime" => %w[slate indigo]
     }.freeze
 
     FAMILY_DEFINITIONS = {
@@ -249,7 +268,13 @@ module ResumeTemplates
       end
 
       def font_scale_options
-        [ [ "Small", "sm" ], [ "Base", "base" ], [ "Large", "lg" ] ]
+        FONT_SCALE_OPTIONS.map { |value, label| [ label, value ] }
+      end
+
+      def font_scale_label(font_scale)
+        font_scale_key = font_scale.to_s
+
+        I18n.t("resume_templates.catalog.labels.font_scale.#{font_scale_key}", default: FONT_SCALE_OPTIONS.fetch(font_scale_key, font_scale_key.humanize))
       end
 
       def density_options
@@ -344,12 +369,48 @@ module ResumeTemplates
         normalize_accent_color(value, fallback)
       end
 
+      def normalized_font_scale(value, fallback: default_layout_config.fetch("font_scale"))
+        normalize_option(value, FONT_SCALES.keys, fallback)
+      end
+
+      def normalized_density(value, fallback: default_layout_config.fetch("density"))
+        normalize_option(value, DENSITY_SCALES.keys, fallback)
+      end
+
       def typography_scale(font_scale)
-        FONT_SCALES.fetch(normalize_option(font_scale, FONT_SCALES.keys, "base"))
+        FONT_SCALES.fetch(normalized_font_scale(font_scale, fallback: "base"))
       end
 
       def density_scale(density)
-        DENSITY_SCALES.fetch(normalize_option(density, DENSITY_SCALES.keys, "comfortable"))
+        DENSITY_SCALES.fetch(normalized_density(density, fallback: "comfortable"))
+      end
+
+      def accent_variants(layout_config_or_family, selected_accent_color: nil)
+        layout_config = normalize_layout_config(extract_layout_config(layout_config_or_family))
+        theme_tone = layout_config.fetch("theme_tone")
+        default_accent_color = layout_config.fetch("accent_color")
+        variants = [
+          accent_variant_definition(theme_tone, accent_color: default_accent_color, default: true)
+        ]
+
+        ACCENT_VARIANT_TONES.fetch(theme_tone, []).each do |variant_tone|
+          variants << accent_variant_definition(variant_tone, accent_color: ACCENT_TONE_COLORS.fetch(variant_tone))
+        end
+
+        return variants if selected_accent_color.blank?
+
+        normalized_selected_color = normalize_accent_color(selected_accent_color, default_accent_color)
+        return variants if variants.any? { |variant| variant.fetch(:accent_color) == normalized_selected_color }
+
+        variants + [
+          {
+            key: "custom",
+            label: I18n.t("resume_templates.catalog.labels.accent_variant.custom"),
+            accent_color: normalized_selected_color,
+            default: false,
+            custom: true
+          }
+        ]
       end
 
       private
@@ -410,6 +471,16 @@ module ResumeTemplates
           return value_key if value_key.blank?
 
           I18n.t("resume_templates.catalog.labels.#{group}.#{value_key}", default: value_key.humanize)
+        end
+
+        def accent_variant_definition(theme_tone, accent_color:, default: false)
+          {
+            key: theme_tone.to_s,
+            label: theme_tone_label(theme_tone),
+            accent_color: accent_color,
+            default: default,
+            custom: false
+          }
         end
     end
   end

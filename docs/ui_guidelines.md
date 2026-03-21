@@ -21,6 +21,21 @@ The goal is to keep UI work:
 - consistent across public, authenticated, and admin surfaces
 - inspired by the Behance AI Voice Generator product case study without copying proprietary assets, branding, or markup directly
 
+## Canonical source hierarchy
+
+Use the UI baseline docs with a fixed precedence:
+
+- `docs/references/behance/ai_voice_generator_reference.md` is the immutable external reference capture
+- `docs/behance_product_ui_system.md` translates that reference into Resume Builder's shared visual system and rationale
+- `docs/ui_guidelines.md` is the authoritative implementation contract for shipped UI decisions
+
+If guidance overlaps, follow this document for implementation choices, use `docs/behance_product_ui_system.md` for visual rationale, and never treat the Behance reference as a source of shippable assets or copy.
+
+## Baseline review status
+
+- Last reviewed against the Behance baseline set on `2026-03-21`
+- Any task that touches views, components, helpers, presenters, CSS, Stimulus, or user-facing copy should read all three UI baseline docs before making visual decisions
+
 ## Current UI Direction
 
 The product UI should feel denser and more structured than a simple CRUD app, while still staying readable and accessible.

@@ -114,6 +114,7 @@ RSpec.describe Resumes::TemplatePickerState do
 
   before do
     allow(view_context).to receive(:template_cards_for_builder).with(selected_template: selected_template).and_return(template_cards)
+    allow(view_context).to receive(:template_path).and_return('/templates/preview')
     allow(view_context).to receive(:ui_selectable_card_classes).with(selected: true, size: :lg).and_return('card-selected')
     allow(view_context).to receive(:ui_selectable_card_classes).with(selected: false, size: :lg).and_return('card-unselected')
     allow(view_context).to receive(:ui_selectable_indicator_classes).with(selected: true).and_return('indicator-selected')
@@ -158,13 +159,16 @@ RSpec.describe Resumes::TemplatePickerState do
         selection_badges: ['Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Split', 'Entries: Cards'],
         show_current_only_badge: true,
         current_only_badge_label: 'Current only',
-        accent_label: 'Accent #0F172A',
+        selected_accent_color: '#0F172A',
+        selected_accent_variant_label: 'Slate',
+        preview_template_path: '/templates/preview',
+        accent_label: 'Accent: Slate',
         summary_hidden: false,
         summary_aria_hidden: 'false',
         summary_card_attributes: { eyebrow: 'Selection summary', title: 'Legacy Blue', description: 'Legacy summary', tone: :default, padding: :sm },
         summary_badges: ['Legacy', 'Columns: 1 column', 'Theme: Slate', 'Skills: Chips'],
         summary_detail_text: 'Card shell · Marker headings',
-        summary_note: 'You can switch templates later from the finalize step without losing the current resume content.'
+        summary_note: 'You can change this template later without losing content.'
       )
 
       expect(active_card_state).to include(
@@ -182,12 +186,15 @@ RSpec.describe Resumes::TemplatePickerState do
         current_badge_classes: 'badge-warning',
         selection_badges: ['Density: Comfortable', 'Columns: 2 columns', 'Theme: Indigo', 'Header: Split', 'Entries: List', 'Sidebar: Skills and Education'],
         show_current_only_badge: false,
-        accent_label: 'Accent #4338CA',
+        selected_accent_color: '#4338CA',
+        selected_accent_variant_label: 'Indigo',
+        preview_template_path: '/templates/preview',
+        accent_label: 'Accent: Indigo',
         summary_hidden: true,
         summary_aria_hidden: 'true',
         summary_badges: ['Sidebar Accent', 'Columns: 2 columns', 'Theme: Indigo', 'Skills: Chips', 'Sidebar: Skills and Education'],
         summary_detail_text: 'Card shell · Rule headings',
-        summary_note: 'You can switch templates later from the finalize step without losing the current resume content.'
+        summary_note: 'You can change this template later without losing content.'
       )
     end
   end
@@ -274,8 +281,15 @@ RSpec.describe Resumes::TemplatePickerState do
         title: 'Legacy Blue'
       )
       expect(compact_template_picker_state.selected_card_state.fetch(:summary_note)).to eq(
-        'Start with this look now and switch templates later from finalize without changing the draft content.'
+        'You can change this template later without losing content.'
       )
+    end
+  end
+
+  describe 'accent field metadata' do
+    it 'exposes the shared accent field id and selected accent value' do
+      expect(template_picker_state.accent_field_id).to eq('resume_settings_accent_color')
+      expect(template_picker_state.selected_accent_color).to eq('#0F172A')
     end
   end
 

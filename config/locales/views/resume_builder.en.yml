@@ -72,6 +72,18 @@ en:
             url: "URL"
             summary: "Summary"
             highlights_text: "Highlights"
+        certifications:
+          title: "Certifications"
+          fields:
+            name: "Certification"
+            organization: "Issuing organization"
+            start_date: "Year earned"
+            details: "Details"
+        languages:
+          title: "Languages"
+          fields:
+            name: "Language"
+            level: "Proficiency"
     workspace_state:
       page_header:
         eyebrow: "Guided builder"
@@ -476,8 +488,57 @@ en:
         title: "Keep the last decisions lightweight"
         badge: "Export stays ready"
         description: "Choose a template first, then open extra output settings only if you need them. Export and download actions stay close while you make the last adjustments."
+      template_workspace:
+        eyebrow: "Templates"
+        title: "Keep layout choice reversible"
+        description: "Switch the structural template here without rebuilding the resume. The live preview and exported PDF keep using the same shared renderer path."
+        badges:
+          switch_anytime: "Switch anytime"
+      design_workspace:
+        eyebrow: "Design & formatting"
+        title: "Adjust the output without changing the template"
+        description: "Use renderer-backed controls only: page size, accent color, font scale, density, and contact display. Leave a field on template default when you want the selected layout to decide."
+        badges:
+          page_size: "Page: %{page_size}"
+          font_scale: "Type: %{font_scale}"
+          density: "Density: %{density}"
+        template_default_font_scale: "Template default (%{font_scale})"
+        template_default_density: "Template default (%{density})"
+        font_scale: "Font scale"
+        font_scale_description: "Choose a shared text scale that the preview and PDF can both reflect truthfully."
+        density: "Density"
+        density_description: "Control spacing through the shared density presets instead of freeform layout tweaks."
+      sections_workspace:
+        eyebrow: "Sections"
+        title: "Decide what stays visible in output"
+        description: "Keep editing all sections in the builder, then hide the ones that should stay out of the live preview and exported PDF for this draft."
+        badge: "Preview-aware"
+        hide_label: "Hide"
+        badges:
+          visible: "Visible"
+          hidden: "Hidden from output"
+        summary: "%{section_label} · %{entry_label}"
+        section_count:
+          one: "1 section"
+          other: "%{count} sections"
+        entry_count:
+          one: "1 entry"
+          other: "%{count} entries"
+        empty_state:
+          title: "No sections to manage yet"
+          description: "Add sections first, then return here to decide what stays visible in the preview and PDF."
       template_field_label: "Template"
       template_picker_description: "Switch the look without changing the saved resume content. Active templates stay available here, and a legacy template remains selectable if this resume already uses it."
+      template_picker:
+        fast_start_pill: "Current layout"
+        fast_start_description: "Keep the selected layout visible here, then open the full browser only when you want to compare more options."
+        open_marketplace: "Open marketplace"
+        recommended_pill: "Recommended for this draft"
+        recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
+        preview_selected_badge: "Selected"
+        expand_preview_hint: "Preview"
+        browse_all_templates: "Browse all templates"
+        browse_all_templates_description: "Filter by family, density, columns, theme, or layout"
       output_settings:
         eyebrow: "Output settings"
         description: "Open link, page-size, color, and contact-display controls only when you need them."
@@ -493,7 +554,7 @@ en:
         pill: "Additional sections"
         title: "Additional sections"
         description: "Projects and custom sections remain available here while the main builder flow stays focused on heading, experience, education, skills, and summary."
-        badge: "White-canvas editor"
+        badge: "Inline editor"
       empty_state:
         title: "No additional sections yet"
         description: "Add projects or other custom sections here once the core guided steps feel complete."
@@ -521,44 +582,45 @@ en:
     section_form:
       title: "Add section"
       description: "Create a new section and then add entries to it without leaving the guided workspace."
-      pill: "Section setup"
-      add_flow_badge: "White-canvas add flow"
+      pill: "New section"
+      add_flow_badge: "Quick add"
+      summary_action: "Open form"
       title_label: "Title"
       title_placeholder: "Awards"
       type_label: "Type"
       submit: "Add section"
     section_editor:
-      pill: "Section canvas"
-      description: "Keep the section label and type tidy here, then use the entry cards below to shape what appears in the shared preview."
+      pill: "Section"
+      description: "Edit entries below. Changes appear in the preview automatically."
       entry_count:
         one: "1 entry"
         other: "%{count} entries"
       badges:
-        live_preview_enabled: "Live preview enabled"
-        drag_to_reorder: "Drag to reorder"
+        live_preview_enabled: "Preview updates live"
+        drag_to_reorder: "Reorder"
       actions:
         up: "Up"
         down: "Down"
         remove: "Remove"
       settings:
         title: "Section settings"
-        description: "Update the section title or swap the type without leaving the current step."
+        description: "Rename or change the section type."
         autosave_active: "Autosave active"
         title_label: "Title"
         type_label: "Type"
       empty_state:
         description: "No entries yet. Add your first item below."
     entry_form:
-      pill: "Entry canvas"
+      pill: "Entry"
       badges:
         live_entry: "Live entry"
         new_entry: "New entry"
-        drag_to_reorder: "Drag to reorder"
+        drag_to_reorder: "Reorder"
       titles:
         entry_fallback: "%{section} entry"
         add_entry: "Add %{section}"
       supporting_text:
-        persisted_fallback: "%{section} details appear in the preview as soon as they save."
+        persisted_fallback: "Updates appear in the preview when saved."
         new_with_existing: "Open the form when you’re ready to add another item."
         new_without_existing: "Add the first item for this section to start filling the preview."
       disclosure_labels:
@@ -569,16 +631,16 @@ en:
         down: "Down"
         improve: "Improve"
         remove: "Remove"
-      checkbox_hint: "Use this toggle to keep the experience entry aligned with the guided builder flow."
+      checkbox_hint: "Include this entry in the resume."
       footer_note:
-        persisted: "Edits save in place and refresh the shared preview rail without leaving this step."
-        new_entry: "Start with the essential details first. You can expand the card again after the new entry is created."
+        persisted: "Edits save automatically and update the preview."
+        new_entry: "Fill in the basics first. You can expand the card again after saving."
       submit:
         save: "Save entry"
         add: "Add entry"
     preview:
-      live_sample: "Live sample"
-      description: "Use this rail to compare edits, spot layout issues, and open the preview page when you need more room."
+      live_sample: "Live preview"
+      description: "Compare your edits here, or open the full preview for a closer look."
     show:
       preview_pill: "Live preview"
       preview_title: "Review before you export"
