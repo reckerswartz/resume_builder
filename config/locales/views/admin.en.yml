@@ -43,3 +43,280 @@ en:
         resume_image_generation:
           label: "Resume image generation"
           description: "Allow background removal, template-specific portrait generation, and verification actions when compatible vision roles are assigned."
+      cloud_import_provider_states:
+        status:
+          configured: "Configured"
+          setup_required: "Setup required"
+    settings:
+      show:
+        navigation:
+          eyebrow: "Settings sections"
+          title: "Jump to the grouped controls"
+          description: "Use the list for orientation, then keep edits focused in the main settings sections."
+          badges:
+            enabled: "%{enabled}/%{total} enabled"
+            workflows_assigned: "%{count}/2 workflows assigned"
+            connectors_configured: "%{configured}/%{total} connectors configured"
+        summary:
+          eyebrow: "Settings summary"
+          title: "One save surface for grouped controls"
+          description: "Edit rollout flags, defaults, connector readiness, and workflow assignments below, then save once from the action bar."
+          readiness_badge: "Workflow readiness"
+          save_posture:
+            ready: "Ready to save"
+            follow_up: "Follow-up before save"
+          guidance_registry_changes: "Use provider and model management pages for registry changes, then return here to wire the active platform workflows and rollout defaults."
+          guidance_save_posture: "Keep save posture light and explicit: review readiness badges here, then use the sticky action bar to apply changes once the grouped controls look right."
+        sections:
+          feature_access:
+            title: "Feature access"
+            eyebrow: "Platform controls"
+            description: "Enable or disable major product capabilities from one shared admin surface."
+            badges:
+              enabled: "%{enabled}/%{total} enabled"
+            toggle_status:
+              "on": "On"
+              "off": "Off"
+          platform_defaults:
+            title: "Platform defaults"
+            eyebrow: "Shared preferences"
+            description: "Fallback values used throughout the application for newly created resumes and support touchpoints."
+            badges:
+              support_email_set: "Support email set"
+              support_email_needed: "Support email needed"
+            fields:
+              default_template_slug: "Default template slug"
+              support_email: "Support email"
+          cloud_import_connectors:
+            title: "Cloud import connectors"
+            eyebrow: "Provider readiness"
+            description: "Review provider environment setup before any OAuth handoff or remote file import work begins."
+            badges:
+              configured: "%{configured}/%{total} configured"
+              safe_scaffold: "Safe scaffold"
+            required_env_vars: "Required environment variables"
+          llm_orchestration:
+            title: "LLM orchestration"
+            eyebrow: "Model roles"
+            description: "Choose the primary generation models and the verification models that run in parallel for text and vision workflows."
+            badges:
+              providers: "%{count} providers"
+              models: "%{count} models"
+            widgets:
+              text_registry:
+                eyebrow: "Text registry"
+                title_fallback: "Primary text model needed"
+                description: "%{count} text-capable models are available for suggestion and autofill workflows."
+                badge:
+                  one: "%{count} verifier"
+                  other: "%{count} verifiers"
+              vision_registry:
+                eyebrow: "Vision registry"
+                title_fallback: "Primary vision model needed"
+                description: "%{count} vision-capable models are available for future multimodal review flows."
+                badge:
+                  one: "%{count} verifier"
+                  other: "%{count} verifiers"
+            panels:
+              manage_models: "Manage models"
+              text_workflow:
+                eyebrow: "Text workflow"
+                title_fallback: "Choose a primary text model"
+                description: "Use one primary text model for generation and optional verification models to support suggestion and autofill workflows."
+                current_primary_model:
+                  title: "Current primary model"
+                  subtitle_fallback: "No primary text model selected yet."
+                  badge_fallback: "Unassigned"
+                verification_coverage:
+                  title: "Verification coverage"
+                  subtitle:
+                    one: "%{count} model selected for text verification."
+                    other: "%{count} models selected for text verification."
+                  subtitle_none: "No verification models selected yet."
+                  no_verifiers: "No verifiers"
+                fields:
+                  primary_model: "Primary text model"
+                  verification_models: "Verification models"
+              vision_workflow:
+                eyebrow: "Vision workflow"
+                title_fallback: "Choose a primary vision model"
+                description: "Prepare one primary vision model and optional verification models for future visual or multimodal review flows."
+                current_primary_model:
+                  title: "Current primary model"
+                  subtitle_fallback: "No primary vision model selected yet."
+                  badge_fallback: "Unassigned"
+                verification_coverage:
+                  title: "Verification coverage"
+                  subtitle:
+                    one: "%{count} model selected for vision verification."
+                    other: "%{count} models selected for vision verification."
+                  subtitle_none: "No verification models selected yet."
+                  no_verifiers: "No verifiers"
+                fields:
+                  primary_model: "Primary vision model"
+                  verification_models: "Verification models"
+              option_status:
+                selected: "Selected"
+                optional: "Optional"
+              no_model_selected: "No model selected"
+              more_badge: "+%{count} more"
+              empty_state:
+                eyebrow: "Registry needed"
+                title: "Add providers and models first"
+                description: "Register at least one provider and one model before assigning text or vision workflows."
+                badge: "Setup needed"
+                actions:
+                  manage_providers: "Manage providers"
+                  manage_models: "Manage models"
+        sticky_action_bar:
+          title: "Review save posture"
+          description: "Save changes when the grouped controls look right. Feature flags and role assignments update immediately for admin-controlled workflows."
+          badges:
+            save_posture:
+              ready: "Ready to save"
+              follow_up: "Follow-up before save"
+            workflows_assigned: "%{count}/2 workflows assigned"
+            connectors_configured: "%{configured}/%{total} connectors configured"
+          actions:
+            manage_providers: "Manage providers"
+            manage_models: "Manage models"
+            save_settings: "Save settings"
+
+    llm_models_helper:
+      capabilities:
+        text: "Text"
+        vision: "Vision"
+        none_selected: "No capabilities selected"
+      catalog_labels:
+        synced: "Synced catalog"
+        manual: "Manual catalog"
+      runtime_summary:
+        temperature: "Temp %{value}"
+        max_output_tokens: "%{count} max tokens"
+        provider_defaults: "Provider defaults"
+      assignments:
+        assigned: "Assigned"
+        unassigned: "Unassigned"
+        role_labels:
+          text_generation: "Text generation"
+          text_verification: "Text verification"
+          vision_generation: "Vision generation"
+          vision_verification: "Vision verification"
+      provider_status:
+        choose_provider: "Choose a provider"
+        ready: "Provider ready"
+        setup: "Provider setup"
+        select_provider_first: "Select a provider before saving this model."
+        configured_for_live_requests: "%{provider} is configured for live requests."
+        needs_provider_setup: "%{provider} still needs provider setup before this model can serve live requests."
+      orchestration_status:
+        inactive_badge: "Inactive"
+        ready_badge: "Ready"
+        inactive_detail: "Inactive models remain in the catalog but are ignored by ready-model selection."
+        assigned_detail: "Assigned to %{roles}."
+        ready_detail: "Ready to be assigned from the settings hub."
+
+    llm_models:
+      show:
+        status_labels:
+          active: "Active"
+          inactive: "Inactive"
+        page_header:
+          eyebrow: "LLM model"
+          description: "Check provider state, assignment readiness, and runtime defaults for this model."
+          actions:
+            back_to_models: "Back to models"
+            feature_settings: "Feature settings"
+            edit_model: "Edit model"
+        triage:
+          eyebrow: "Assignment readiness"
+          title: "Review this model"
+          description: "Decide whether this model is good to assign now, usable with caution, or still blocked before you inspect deeper catalog metadata."
+          titles:
+            blocked: "Blocked for assignment"
+            follow_up: "Usable with follow-up"
+            ready: "Good to assign"
+          badges:
+            ready: "Ready"
+            attention: "Attention"
+            follow_up: "Follow-up"
+          readiness_items:
+            activate_model:
+              label: "Activate this model"
+              detail: "Inactive models remain in the registry, but ready-model selection ignores them until they are activated again."
+            choose_capability:
+              label: "Choose at least one capability"
+              detail: "Select text, vision, or both so this model can participate in orchestration roles from the settings hub."
+            finish_provider_setup:
+              label: "Finish provider setup"
+            assign_workflow:
+              label: "Assign this model to a workflow"
+              detail: "Use Platform settings to connect this model to text generation, verification, or future vision flows."
+            ready_for_orchestration:
+              label: "Ready for orchestration"
+              detail: "This model is active, its provider is request-ready, and it has the coverage needed for assignment-driven workflows."
+        navigation:
+          eyebrow: "Model sections"
+          title: "Jump to details"
+          description: "Move between catalog details, readiness follow-up, and assigned roles."
+          view_provider: "View provider"
+          sections:
+            catalog_runtime:
+              label: "Catalog & runtime"
+              caption: "Provider, identifier, capabilities, and defaults"
+            orchestration_readiness:
+              label: "Orchestration readiness"
+              caption: "Provider setup and role assignment follow-up"
+            assigned_roles:
+              label: "Assigned roles"
+              caption: "Current workflow coverage from the settings hub"
+        sections:
+          catalog_runtime:
+            title: "Catalog & runtime"
+            eyebrow: "Model profile"
+            description: "Review the provider, identifier, capabilities, and runtime defaults stored for this model."
+            fields:
+              provider: "Provider"
+              identifier: "Identifier"
+              provider_readiness: "Provider readiness"
+              catalog_source: "Catalog source"
+              catalog_source_synced_detail: "Managed by provider sync."
+              catalog_source_manual_detail: "Maintained manually in the registry."
+              capabilities: "Capabilities"
+              temperature: "Temperature"
+              max_output_tokens: "Max output tokens"
+              provider_default: "Provider default"
+            technical_metadata:
+              title: "Technical metadata"
+              description: "Lower-priority catalog details such as family, parameter size, ownership, quantization, and modality metadata."
+              badge: "Reference only"
+              fields:
+                family: "Family"
+                parameter_size: "Parameter size"
+                owned_by: "Owned by"
+                quantization: "Quantization"
+                modalities: "Modalities"
+          orchestration_readiness:
+            title: "Orchestration readiness"
+            eyebrow: "Operational status"
+            description: "Surface the follow-ups required before this model can reliably participate in assignment-driven workflows."
+            actions:
+              edit_model: "Edit model"
+              feature_settings: "Feature settings"
+              view_provider: "View provider"
+          assigned_roles:
+            title: "Assigned roles"
+            eyebrow: "Workflow coverage"
+            description: "Inspect the orchestration roles currently using this model and jump to the settings hub when assignments need to change."
+            badges:
+              role_count:
+                one: "%{count} role"
+                other: "%{count} roles"
+            header_description: "Assignment order and workflow coverage for %{model_name}."
+            actions:
+              feature_settings: "Feature settings"
+            row:
+              execution_order: "Execution order %{position} · %{capabilities}"
+              settings_hub: "Settings hub"
+            empty_state:
+              description: "This model is not assigned to any orchestration role yet."

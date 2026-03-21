@@ -6,11 +6,11 @@ RSpec.describe 'Admin::LlmProviders', type: :request do
     sign_in_as(create(:user, :admin))
   end
 
-  def sync_result(success:, skipped: false, models: [], created_count: 0, updated_count: 0, deactivated_count: 0, error_message: nil)
+  def sync_result(success:, skipped: false, provider: nil, models: [], created_count: 0, updated_count: 0, deactivated_count: 0, error_message: nil)
     Llm::ProviderModelSyncService::Result.new(
       success:,
       skipped:,
-      provider: nil,
+      provider: provider,
       models:,
       created_count:,
       updated_count:,
@@ -141,6 +141,41 @@ RSpec.describe 'Admin::LlmProviders', type: :request do
       expect(response).to redirect_to(admin_llm_provider_path(LlmProvider.last))
       expect(flash[:notice]).to include('LLM provider created.')
       expect(flash[:notice]).to include('Synced 1 model.')
+    end
+  end
+
+  describe 'PATCH /admin/llm_providers/:id' do
+    it 'updates a provider and preserves the sync feedback flow' do
+      provider = create(:llm_provider, :nvidia_build, name: 'Old Provider', slug: 'old-provider', api_key_env_var: 'NVIDIA_API_KEY')
+      result = sync_result(
+        success: true,
+        provider: provider,
+        models: [ build_stubbed(:llm_model) ],
+        created_count: 0,
+        updated_count: 1,
+        deactivated_count: 0
+      )
+      sync_service = instance_double(Llm::ProviderModelSyncService, call: result)
+      allow(Llm::ProviderModelSyncService).to receive(:new).with(provider: provider).and_return(sync_service)
+
+      patch admin_llm_provider_path(provider), params: {
+        llm_provider: {
+          name: 'Updated Provider',
+          slug: 'updated-provider',
+          adapter: 'nvidia_build',
+          base_url: 'https://integrate.api.nvidia.com',
+          api_key_env_var: 'NVIDIA_API_KEY',
+          active: 'true',
+          request_timeout_seconds: '60'
+        }
+      }
+
+      expect(response).to redirect_to(admin_llm_provider_path(provider))
+      expect(flash[:notice]).to include('LLM provider updated.')
+      expect(flash[:notice]).to include('Synced 1 model.')
+      expect(provider.reload.name).to eq('Updated Provider')
+      expect(provider.slug).to eq('updated-provider')
+      expect(provider.request_timeout_seconds).to eq(60)
     end
   end
 

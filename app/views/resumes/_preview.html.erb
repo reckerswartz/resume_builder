@@ -1,7 +1,7 @@
 <% preview_state = local_assigns.fetch(:preview_state) { resume_builder_preview_state(resume) } %>
 <% preview_page_action = preview_state.preview_page_action %>
 
-<%= turbo_frame_tag dom_id(resume, :preview) do %>
+<%= turbo_frame_tag dom_id(resume, :preview), class: "block min-w-0 w-full max-w-full" do %>
   <div class="space-y-4 xl:sticky xl:top-6">
     <%= render Ui::DashboardPanelComponent.new(**preview_state.panel_attributes) do %>
       <div class="flex flex-wrap gap-2">

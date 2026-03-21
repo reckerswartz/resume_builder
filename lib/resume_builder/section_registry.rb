@@ -116,6 +116,10 @@ module ResumeBuilder
         fetch(section_type).fetch(:title)
       end
 
+      def singular_title_for(section_type)
+        fetch(section_type).fetch(:singular_title)
+      end
+
       def fields_for(section_type)
         fetch(section_type).fetch(:fields).deep_dup
       end
@@ -134,10 +138,12 @@ module ResumeBuilder
 
       def starter_sections
         SECTION_DEFINITIONS.filter_map do |section_type, definition|
+          localized_section = localized_definition(section_type, definition)
+
           {
             section_type: section_type,
-            title: title_for(section_type),
-            entries: definition.fetch(:starter_entries).deep_dup
+            title: localized_section.fetch(:title),
+            entries: localized_section.fetch(:starter_entries).deep_dup
           }
         end
       end
@@ -145,11 +151,40 @@ module ResumeBuilder
       private
         def localized_definition(section_type, definition)
           definition.merge(
-            title: I18n.t("resume_builder.section_registry.sections.#{section_type}.title"),
+            title: localized_title(section_type),
+            singular_title: localized_singular_title(section_type),
             fields: definition.fetch(:fields).map do |field|
               field.merge(label: I18n.t("resume_builder.section_registry.sections.#{section_type}.fields.#{field.fetch(:key)}"))
-            end
+            end,
+            starter_entries: localized_starter_entries(section_type, definition)
           )
+        end
+
+        def localized_title(section_type)
+          I18n.t("resume_builder.section_registry.sections.#{section_type}.title")
+        end
+
+        def localized_singular_title(section_type)
+          I18n.t(
+            "resume_builder.section_registry.sections.#{section_type}.singular_title",
+            default: localized_title(section_type).to_s.singularize
+          )
+        end
+
+        def localized_starter_entries(section_type, definition)
+          entries = if I18n.exists?(starter_entries_key(section_type))
+            I18n.t(starter_entries_key(section_type))
+          else
+            definition.fetch(:starter_entries)
+          end
+
+          Array(entries).map do |entry|
+            entry.is_a?(Hash) ? entry.deep_stringify_keys : entry
+          end
+        end
+
+        def starter_entries_key(section_type)
+          "resume_builder.section_registry.sections.#{section_type}.starter_entries"
         end
     end
   end

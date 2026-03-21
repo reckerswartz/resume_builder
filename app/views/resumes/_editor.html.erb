@@ -1,5 +1,5 @@
-<%= turbo_frame_tag dom_id(resume, :editor) do %>
-  <% builder_state = resume_builder_editor_state(resume) %>
+<%= turbo_frame_tag dom_id(resume, :editor), class: "block min-w-0 w-full max-w-full" do %>
+  <% builder_state = local_assigns.fetch(:builder_state) { resume_builder_editor_state(resume) } %>
   <div class="space-y-6">
     <%= render "editor_chrome", resume: resume, builder_state: builder_state %>
     <%= render "editor_step_content", resume: resume, builder_state: builder_state %>

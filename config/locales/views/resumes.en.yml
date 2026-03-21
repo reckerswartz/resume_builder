@@ -61,6 +61,18 @@ en:
         provider_unavailable: "Cloud import provider is not available."
         configured: "%{provider} import is not connected yet. Provider auth handoff is the next rollout step."
         setup_required: "%{provider} import is not configured. Add %{env_vars} to enable this connector."
+    source_text_resolver:
+      supported_upload_formats_label: "PDF, DOCX, TXT, Markdown, HTML, and RTF"
+      paste_required: "Paste resume text before running autofill."
+      upload_required: "Attach a source document before running autofill."
+      unreadable_upload: "The attached source document did not contain readable text."
+      choose_source: "Choose pasted text or upload a supported source document before running autofill."
+      unsupported_upload: "Autofill currently supports %{formats} uploads. Keep DOC or other unsupported files attached for reference or paste their text."
+    resume_autofill_service:
+      disabled: "AI import is unavailable right now."
+      no_models: "No text autofill model is enabled."
+      unavailable: "Resume autofill is unavailable right now."
+      invalid_payload: "The autofill model did not return structured resume data."
     entries_controller:
       created: "Entry added."
       updated: "Entry updated."

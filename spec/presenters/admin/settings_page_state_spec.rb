@@ -69,21 +69,48 @@ RSpec.describe Admin::SettingsPageState do
   describe '#page_header_attributes' do
     it 'builds the shared admin settings header payload from the extracted state' do
       expect(page_state.page_header_attributes).to eq(
-        eyebrow: 'Admin settings',
-        title: 'Platform settings',
-        description: 'Control feature access, platform defaults, cloud-import readiness, and model assignments from one shared admin surface.',
+        eyebrow: I18n.t('admin.settings_page_state.page_header.eyebrow'),
+        title: I18n.t('admin.settings_page_state.page_header.title'),
+        description: I18n.t('admin.settings_page_state.page_header.description'),
         badges: [
-          { label: '2/3 enabled', tone: :neutral },
-          { label: '2 providers', tone: :neutral },
-          { label: '4 models', tone: :neutral }
+          { label: I18n.t('admin.settings_page_state.page_header.badges.enabled', enabled: 2, total: 3), tone: :neutral },
+          { label: I18n.t('admin.settings_page_state.page_header.badges.providers', count: 2), tone: :neutral },
+          { label: I18n.t('admin.settings_page_state.page_header.badges.models', count: 4), tone: :neutral }
         ],
         actions: [
-          { label: 'Manage templates', path: '/admin/templates', style: :secondary },
-          { label: 'Manage providers', path: '/admin/llm_providers', style: :secondary },
-          { label: 'Manage models', path: '/admin/llm_models', style: :primary }
+          { label: I18n.t('admin.settings_page_state.page_header.actions.manage_templates'), path: '/admin/templates', style: :secondary },
+          { label: I18n.t('admin.settings_page_state.page_header.actions.manage_providers'), path: '/admin/llm_providers', style: :secondary },
+          { label: I18n.t('admin.settings_page_state.page_header.actions.manage_models'), path: '/admin/llm_models', style: :primary }
         ],
         density: :compact
       )
+    end
+  end
+
+  describe '#hub_sections' do
+    it 'builds localized labels and captions for the settings navigation rail' do
+      expect(page_state.hub_sections).to eq([
+        {
+          id: 'feature-access',
+          label: I18n.t('admin.settings_page_state.hub_sections.feature_access.label'),
+          caption: I18n.t('admin.settings_page_state.hub_sections.feature_access.caption')
+        },
+        {
+          id: 'platform-defaults',
+          label: I18n.t('admin.settings_page_state.hub_sections.platform_defaults.label'),
+          caption: I18n.t('admin.settings_page_state.hub_sections.platform_defaults.caption')
+        },
+        {
+          id: 'cloud-import-connectors',
+          label: I18n.t('admin.settings_page_state.hub_sections.cloud_import_connectors.label'),
+          caption: I18n.t('admin.settings_page_state.hub_sections.cloud_import_connectors.caption')
+        },
+        {
+          id: 'llm-orchestration',
+          label: I18n.t('admin.settings_page_state.hub_sections.llm_orchestration.label'),
+          caption: I18n.t('admin.settings_page_state.hub_sections.llm_orchestration.caption')
+        }
+      ])
     end
   end
 

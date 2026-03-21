@@ -228,12 +228,19 @@ RSpec.describe ResumesHelper, type: :helper do
       end
 
       expect(google_drive_state).to include(
-        label: 'Google Drive',
-        status_label: 'Setup required',
+        label: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
+        description: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.description'),
+        status_label: I18n.t('resumes.helper.source_cloud_import.status.setup_required'),
         status_tone: :warning,
-        action_label: 'See setup'
+        action_label: I18n.t('resumes.helper.source_cloud_import.actions.see_setup')
       )
-      expect(google_drive_state.fetch(:message)).to include('GOOGLE_DRIVE_CLIENT_ID')
+      expect(google_drive_state.fetch(:message)).to eq(
+        I18n.t(
+          'resumes.cloud_import_provider_catalog.feedback.setup_required',
+          provider: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
+          env_vars: 'GOOGLE_DRIVE_CLIENT_ID and GOOGLE_DRIVE_CLIENT_SECRET'
+        )
+      )
       expect(google_drive_state.fetch(:action_path)).to include('/resume_source_imports/google_drive')
       expect(google_drive_state.fetch(:action_path)).to include('resume_id=')
     end
@@ -248,12 +255,18 @@ RSpec.describe ResumesHelper, type: :helper do
       end
 
       expect(google_drive_state).to include(
-        label: 'Google Drive',
-        status_label: 'Configured',
+        label: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
+        description: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.description'),
+        status_label: I18n.t('resumes.helper.source_cloud_import.status.configured'),
         status_tone: :neutral,
-        action_label: 'Connect soon'
+        action_label: I18n.t('resumes.helper.source_cloud_import.actions.connect_soon')
       )
-      expect(google_drive_state.fetch(:message)).to include('OAuth handoff and remote file chooser are not wired')
+      expect(google_drive_state.fetch(:message)).to eq(
+        I18n.t(
+          'resumes.cloud_import_provider_catalog.feedback.configured',
+          provider: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label')
+        )
+      )
     end
   end
 

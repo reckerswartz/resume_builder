@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-20T23:39:00Z"
+updated_at: "2026-03-21T00:27:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-20-admin-settings-page-state/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-21-admin-job-logs-index-orchestration/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -63,16 +63,50 @@ areas:
     path: "app/controllers/admin/settings_controller.rb"
     category: "controller"
     priority: "high"
-    status: "in_progress"
+    status: "closed"
     reasons:
       - "The update action owns a cross-model transaction and workflow orchestration inline."
       - "Success and failure handling currently depend on mutable controller-local state and merged errors."
     recommended_refactor_shape: "extract_service"
     area_doc_path: "docs/maintainability_audits/areas/admin-settings-update-orchestration.md"
-    open_follow_up_keys:
-      - "extract-settings-page-state"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "extract-settings-update-service"
-    last_reviewed_at: "2026-03-20T23:39:00Z"
-    last_changed_at: "2026-03-20T23:39:00Z"
-    next_step: "Extract the heavy inline page-state setup in app/views/admin/settings/show.html.erb into a presenter/helper-backed object and then reassess the remaining admin settings maintainability hotspot."
+      - "extract-settings-page-state"
+    last_reviewed_at: "2026-03-20T23:55:00Z"
+    last_changed_at: "2026-03-20T23:55:00Z"
+    next_step: "Review Admin::LlmProvidersController#create/update for provider persistence plus post-save model-sync orchestration and controller-owned sync message composition."
+  - area_key: "admin-llm-provider-sync-orchestration"
+    title: "Admin LLM provider sync orchestration"
+    path: "app/controllers/admin/llm_providers_controller.rb"
+    category: "controller"
+    priority: "high"
+    status: "closed"
+    reasons:
+      - "The provider controller owns post-save catalog sync orchestration inline."
+      - "Sync success and error feedback composition currently lives in controller-private helpers shared by create, update, and explicit sync actions."
+    recommended_refactor_shape: "extract_service"
+    area_doc_path: "docs/maintainability_audits/areas/admin-llm-provider-sync-orchestration.md"
+    open_follow_up_keys: []
+    closed_follow_up_keys:
+      - "extract-provider-catalog-sync-service"
+    last_reviewed_at: "2026-03-21T00:18:00Z"
+    last_changed_at: "2026-03-21T00:18:00Z"
+    next_step: "Review Admin::JobLogsController#index for mixed filtering, monitoring summary assembly, exact-match lookup, pagination, and related-error preload responsibilities."
+  - area_key: "admin-job-logs-index-orchestration"
+    title: "Admin job logs index orchestration"
+    path: "app/controllers/admin/job_logs_controller.rb"
+    category: "controller"
+    priority: "high"
+    status: "in_progress"
+    reasons:
+      - "The job logs index action owns filtered listing workflow, monitoring summaries, exact-match lookup, pagination, and related-error preload behavior inline."
+      - "The controller coordinates both Admin::JobMonitoringService output and error-log correlation for the same page load."
+    recommended_refactor_shape: "extract_service"
+    area_doc_path: "docs/maintainability_audits/areas/admin-job-logs-index-orchestration.md"
+    open_follow_up_keys:
+      - "extract-job-logs-index-service"
+    closed_follow_up_keys: []
+    last_reviewed_at: "2026-03-21T00:27:00Z"
+    last_changed_at: "2026-03-21T00:27:00Z"
+    next_step: "Extract the admin job logs index data-loading workflow into a service, then reassess the remaining Admin::JobLogsController hotspot."

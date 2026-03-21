@@ -43,6 +43,13 @@ RSpec.describe 'Photo library', type: :request do
     end
   end
 
+  def enable_vision_role(role)
+    provider = create(:llm_provider)
+    model = create(:llm_model, :vision_capable, llm_provider: provider)
+    create(:llm_model_assignment, llm_model: model, role: role)
+    model
+  end
+
   before do
     clear_enqueued_jobs
     sign_in_as(user)
@@ -129,11 +136,8 @@ RSpec.describe 'Photo library', type: :request do
   end
 
   describe 'POST /photo_profiles/:photo_profile_id/photo_assets/:id/generate_for_template' do
-    let(:llm_provider) { create(:llm_provider) }
-    let(:llm_model) { create(:llm_model, :vision_capable, llm_provider:) }
-
     before do
-      create(:llm_model_assignment, llm_model:, role: 'vision_generation')
+      enable_vision_role('vision_generation')
     end
 
     it 'queues template generation and uses the localized notice' do
@@ -156,6 +160,59 @@ RSpec.describe 'Photo library', type: :request do
       expect(processing_run.resume).to eq(resume)
       expect(processing_run.template).to eq(resume.template)
       expect(enqueued_jobs.map { |job| job[:job] }).to include(ResumeTemplateImageGenerationJob)
+    end
+
+    it 'uses the localized resume-required alert when a resume context is missing' do
+      photo_asset = create_ready_photo_asset(photo_profile:, filename: 'selected-headshot.png')
+      clear_enqueued_jobs
+
+      with_feature_flags(photo_processing: true, llm_access: true, resume_image_generation: true) do
+        expect do
+          post generate_for_template_photo_profile_photo_asset_path(photo_profile, photo_asset), params: {
+            return_to: resumes_path
+          }
+        end.not_to change(PhotoProcessingRun, :count)
+      end
+
+      expect(response).to redirect_to(resumes_path)
+      expect(flash[:alert]).to eq(I18n.t('resumes.photo_library.controller.resume_required'))
+      expect(enqueued_jobs).to be_empty
+    end
+  end
+
+  describe 'POST /photo_profiles/:photo_profile_id/photo_assets/:id/verify' do
+    it 'uses the localized unavailable alert when verification is disabled' do
+      photo_asset = create_ready_photo_asset(photo_profile:, filename: 'selected-headshot.png')
+      clear_enqueued_jobs
+
+      expect do
+        post verify_photo_profile_photo_asset_path(photo_profile, photo_asset), params: {
+          resume_id: resume.id,
+          return_to: return_to_path
+        }
+      end.not_to change(PhotoProcessingRun, :count)
+
+      expect(response).to redirect_to(return_to_path)
+      expect(flash[:alert]).to eq(I18n.t('resumes.photo_library.controller.verification_unavailable'))
+      expect(enqueued_jobs).to be_empty
+    end
+
+    it 'uses the localized resume-required alert when verification is available but a resume context is missing' do
+      photo_asset = create_ready_photo_asset(photo_profile:, filename: 'selected-headshot.png')
+      enable_vision_role('vision_verification')
+      clear_enqueued_jobs
+
+      with_feature_flags(photo_processing: true, llm_access: true, resume_image_generation: true) do
+        expect do
+          post verify_photo_profile_photo_asset_path(photo_profile, photo_asset), params: {
+            return_to: resumes_path
+          }
+        end.not_to change(PhotoProcessingRun, :count)
+      end
+
+      expect(response).to redirect_to(resumes_path)
+      expect(flash[:alert]).to eq(I18n.t('resumes.photo_library.controller.resume_required'))
+      expect(enqueued_jobs).to be_empty
     end
   end
 end

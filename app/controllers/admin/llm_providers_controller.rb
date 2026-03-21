@@ -35,7 +35,8 @@ class Admin::LlmProvidersController < Admin::BaseController
     authorize @llm_provider
 
     if @llm_provider.save
-      redirect_with_sync_result(@llm_provider, default_notice: "LLM provider created.")
+      sync_result = provider_catalog_sync_result(default_notice: "LLM provider created.")
+      redirect_to admin_llm_provider_path(sync_result.provider), notice: sync_result.notice, alert: sync_result.alert
     else
       render :new, status: :unprocessable_entity
     end
@@ -45,7 +46,8 @@ class Admin::LlmProvidersController < Admin::BaseController
     authorize @llm_provider
 
     if @llm_provider.update(llm_provider_params)
-      redirect_with_sync_result(@llm_provider, default_notice: "LLM provider updated.")
+      sync_result = provider_catalog_sync_result(default_notice: "LLM provider updated.")
+      redirect_to admin_llm_provider_path(sync_result.provider), notice: sync_result.notice, alert: sync_result.alert
     else
       render :edit, status: :unprocessable_entity
     end
@@ -54,8 +56,8 @@ class Admin::LlmProvidersController < Admin::BaseController
   def sync_models
     authorize @llm_provider, :sync_models?
 
-    result = sync_provider_models(@llm_provider)
-    redirect_to admin_llm_provider_path(@llm_provider), notice: sync_success_message(result), alert: sync_error_message(result)
+    sync_result = provider_catalog_sync_result
+    redirect_to admin_llm_provider_path(sync_result.provider), notice: sync_result.notice, alert: sync_result.alert
   end
 
   def destroy
@@ -91,34 +93,10 @@ class Admin::LlmProvidersController < Admin::BaseController
       }
     end
 
-    def redirect_with_sync_result(provider, default_notice:)
-      result = sync_provider_models(provider)
-      redirect_to admin_llm_provider_path(provider), notice: combined_notice(default_notice, result), alert: sync_error_message(result)
-    end
-
-    def sync_provider_models(provider)
-      Llm::ProviderModelSyncService.new(provider:).call
-    end
-
-    def combined_notice(default_notice, result)
-      [ default_notice, sync_success_message(result) ].compact.join(" ")
-    end
-
-    def sync_success_message(result)
-      return unless result.success?
-
-      summary = []
-      summary << "Synced #{helpers.pluralize(result.models.size, 'model')}."
-      summary << "#{result.created_count} added"
-      summary << "#{result.updated_count} refreshed"
-      summary << "#{result.deactivated_count} deactivated" if result.deactivated_count.positive?
-      summary.join(" ")
-    end
-
-    def sync_error_message(result)
-      return if result.success?
-      return "Model sync skipped: #{result.error_message}" if result.skipped?
-
-      "Model sync failed: #{result.error_message}"
+    def provider_catalog_sync_result(default_notice: nil)
+      Admin::LlmProviderCatalogSyncService.new(
+        provider: @llm_provider,
+        default_notice: default_notice
+      ).call
     end
 end

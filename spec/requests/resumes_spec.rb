@@ -91,6 +91,17 @@ RSpec.describe 'Resumes', type: :request do
       expect(hrefs).to include(edit_resume_path(resume, step: 'education', locale: :en))
     end
 
+    it 'hides the extra mobile preview panel on section-based builder steps while keeping preview navigation in the builder chrome' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'experience' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include(I18n.t('resumes.edit.mobile_preview_panel.title'))
+      expect(response.body).to include(I18n.t('resume_builder.editor_state.navigation.preview'))
+      expect(response.body).to include(I18n.t('resume_builder.editor_state.navigation.next', step: 'Education'))
+    end
+
     it 'renders the shared photo library on the personal details step when photo processing is enabled' do
       editorial_template = create(
         :template,
@@ -105,6 +116,14 @@ RSpec.describe 'Resumes', type: :request do
       photo_profile.update!(selected_source_photo_asset: source_asset)
       resume.update!(photo_profile: photo_profile)
       resume.resume_photo_selections.create!(template: resume.template, photo_asset: selected_asset, slot_name: 'headshot', status: :active)
+      PhotoProcessingRun.create!(
+        photo_profile: photo_profile,
+        resume: resume,
+        template: resume.template,
+        workflow_type: :background_remove,
+        status: :succeeded,
+        next_step_guidance: 'Legacy background removal guidance'
+      )
 
       with_feature_flags(photo_processing: true) do
         get edit_resume_path(resume), params: { step: 'personal_details' }
@@ -114,7 +133,9 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.photo_library.title'))
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.photo_library.selection_title'))
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.photo_library.current_selection_title'))
+      expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.photo_library.recent_runs.guidance.background_remove'))
       expect(response.body).to include(selected_asset.display_name)
+      expect(response.body).not_to include('Legacy background removal guidance')
 
       document = Nokogiri::HTML.parse(response.body)
       selected_radio = document.at_css("input[name='resume[selected_headshot_photo_asset_id]'][value='#{selected_asset.id}']")
@@ -142,7 +163,7 @@ RSpec.describe 'Resumes', type: :request do
         }, as: :turbo_stream
       end
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
       expect(response.body).to include(I18n.t('resumes.controller.selected_photo_unavailable'))
       expect(resume.reload.resume_photo_selections).to be_empty
@@ -307,6 +328,43 @@ RSpec.describe 'Resumes', type: :request do
       expect(resume.llm_interactions.last.metadata).to include(
         'source_kind' => 'uploaded_document',
         'source_content_type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      )
+    end
+
+    it 'returns the localized source-resolver alert when autofill is requested with an unsupported upload' do
+      resume = create(:resume, user:, template:, source_mode: 'scratch', source_text: '')
+      PlatformSetting.current.update!(
+        feature_flags: {
+          'llm_access' => true,
+          'resume_suggestions' => true,
+          'autofill_content' => true
+        },
+        preferences: PlatformSetting.current.preferences
+      )
+
+      Tempfile.create([ 'resume-source-upload', '.doc' ]) do |file|
+        file.binmode
+        file.write('legacy doc sample')
+        file.rewind
+
+        patch resume_path(resume), params: {
+          step: 'source',
+          run_autofill: 'true',
+          resume: {
+            source_mode: 'upload',
+            source_text: '',
+            source_document: Rack::Test::UploadedFile.new(file.path, 'application/msword')
+          }
+        }
+      end
+
+      expect(response).to redirect_to(edit_resume_path(resume, step: 'source'))
+      expect(flash[:alert]).to eq(
+        I18n.t('resumes.source_text_resolver.unsupported_upload', formats: Resumes::SourceTextResolver.supported_upload_formats_label)
+      )
+      expect(resume.reload.source_document).to be_attached
+      expect(resume.llm_interactions.last.error_message).to eq(
+        I18n.t('resumes.source_text_resolver.unsupported_upload', formats: Resumes::SourceTextResolver.supported_upload_formats_label)
       )
     end
   end

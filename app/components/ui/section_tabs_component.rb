@@ -14,21 +14,23 @@ module Ui
     end
 
     def grid_classes
+      mobile_base = "builder-step-tabs"
+
       case [ items.size, 7 ].min
       when 1
-        "grid gap-3"
+        "#{mobile_base} sm:grid-cols-1"
       when 2
-        "grid gap-3 sm:grid-cols-2"
+        "#{mobile_base} sm:grid-cols-2"
       when 3
-        "grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+        "#{mobile_base} sm:grid-cols-2 xl:grid-cols-3"
       when 4
-        "grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+        "#{mobile_base} sm:grid-cols-2 xl:grid-cols-4"
       when 5
-        "grid gap-3 sm:grid-cols-2 xl:grid-cols-5"
+        "#{mobile_base} sm:grid-cols-2 xl:grid-cols-5"
       when 6
-        "grid gap-3 sm:grid-cols-2 xl:grid-cols-6"
+        "#{mobile_base} sm:grid-cols-2 xl:grid-cols-6"
       else
-        "grid gap-3 sm:grid-cols-2 xl:grid-cols-7"
+        "#{mobile_base} sm:grid-cols-2 xl:grid-cols-7"
       end
     end
 
@@ -40,7 +42,7 @@ module Ui
     end
 
     def link_classes(item)
-      base = "group rounded-[1.5rem] border px-4 py-4 shadow-sm transition"
+      base = "builder-step-tab group rounded-[1.5rem] border shadow-sm transition"
 
       case state(item)
       when :current
@@ -55,11 +57,11 @@ module Ui
     def badge_classes(item)
       case state(item)
       when :current
-        "flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold text-white"
+        "builder-step-tab-badge flex items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold text-white"
       when :completed
-        "flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-emerald-700"
+        "builder-step-tab-badge flex items-center justify-center rounded-2xl bg-white text-sm font-semibold text-emerald-700"
       else
-        "flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-500"
+        "builder-step-tab-badge flex items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-500"
       end
     end
 

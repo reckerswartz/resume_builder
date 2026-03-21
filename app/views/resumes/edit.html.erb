@@ -1,36 +1,40 @@
  <%= turbo_stream_from [@resume, :export] %>
 
-<% workspace_state = resume_builder_workspace_state(@resume) %>
-<% preview_state = resume_builder_preview_state(@resume) %>
-<% preview_page_action = preview_state.preview_page_action %>
+ <% workspace_state = resume_builder_workspace_state(@resume) %>
+ <% builder_state = resume_builder_editor_state(@resume) %>
+ <% preview_state = resume_builder_preview_state(@resume) %>
+ <% preview_page_action = preview_state.preview_page_action %>
+ <% show_mobile_preview_panel = builder_state.step_partial != "editor_section_step" %>
 
-<section class="space-y-6">
-  <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
+ <section class="space-y-6">
+   <%= render "workspace_overview", resume: @resume, workspace_state: workspace_state %>
 
-  <div class="xl:hidden">
-    <%= render Ui::DashboardPanelComponent.new(
-      eyebrow: t("resumes.edit.mobile_preview_panel.eyebrow"),
-      title: t("resumes.edit.mobile_preview_panel.title"),
-      description: t("resumes.edit.mobile_preview_panel.description"),
-      padding: :sm,
-      density: :compact
-    ) do %>
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex flex-wrap gap-2">
-          <% preview_state.badges.each do |badge| %>
-            <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
-          <% end %>
+  <% if show_mobile_preview_panel %>
+    <div class="xl:hidden">
+      <%= render Ui::DashboardPanelComponent.new(
+        eyebrow: t("resumes.edit.mobile_preview_panel.eyebrow"),
+        title: t("resumes.edit.mobile_preview_panel.title"),
+        description: t("resumes.edit.mobile_preview_panel.description"),
+        padding: :sm,
+        density: :compact
+      ) do %>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex flex-wrap gap-2">
+            <% preview_state.badges.each do |badge| %>
+              <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+            <% end %>
+          </div>
+
+          <div>
+            <%= link_to preview_page_action.fetch(:label), preview_page_action.fetch(:path), **preview_page_action.fetch(:options, {}).merge(class: ui_button_classes(:secondary, size: :sm)) %>
+          </div>
         </div>
+      <% end %>
+    </div>
+  <% end %>
 
-        <div>
-          <%= link_to preview_page_action.fetch(:label), preview_page_action.fetch(:path), **preview_page_action.fetch(:options, {}).merge(class: ui_button_classes(:secondary, size: :sm)) %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_24rem] xl:items-start">
-    <%= render "editor", resume: @resume %>
-    <%= render "preview", resume: @resume, preview_state: preview_state %>
-  </div>
-</section>
+   <div class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_24rem] xl:items-start">
+    <%= render "editor", resume: @resume, builder_state: builder_state %>
+     <%= render "preview", resume: @resume, preview_state: preview_state %>
+   </div>
+ </section>

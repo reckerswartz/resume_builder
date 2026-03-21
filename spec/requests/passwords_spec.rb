@@ -64,7 +64,7 @@ RSpec.describe 'Passwords', type: :request do
         password_confirmation: 'different-password'
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include('Password confirmation')
       expect(response.body).to include('Request a new link')
     end

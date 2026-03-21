@@ -18,13 +18,13 @@ module Admin::LlmModelsHelper
   def llm_model_capability_labels(llm_model)
     labels = []
     labels << llm_model.model_type_label if llm_model.model_type_label.present?
-    labels << "Text" if llm_model.supports_text?
-    labels << "Vision" if llm_model.supports_vision?
+    labels << llm_models_helper_copy("capabilities.text") if llm_model.supports_text?
+    labels << llm_models_helper_copy("capabilities.vision") if llm_model.supports_vision?
     labels.uniq
   end
 
   def llm_model_catalog_label(llm_model)
-    llm_model.provider_synced? ? "Synced catalog" : "Manual catalog"
+    llm_model.provider_synced? ? llm_models_helper_copy("catalog_labels.synced") : llm_models_helper_copy("catalog_labels.manual")
   end
 
   def llm_model_metadata_summary(llm_model)
@@ -33,13 +33,13 @@ module Admin::LlmModelsHelper
 
   def llm_model_runtime_summary(llm_model)
     parts = []
-    parts << "Temp #{llm_model.temperature}" if llm_model.temperature.present?
-    parts << "#{llm_model.max_output_tokens} max tokens" if llm_model.max_output_tokens.present?
-    parts.presence&.join(" · ") || "Provider defaults"
+    parts << llm_models_helper_copy("runtime_summary.temperature", value: llm_model.temperature) if llm_model.temperature.present?
+    parts << llm_models_helper_copy("runtime_summary.max_output_tokens", count: llm_model.max_output_tokens) if llm_model.max_output_tokens.present?
+    parts.presence&.join(" · ") || llm_models_helper_copy("runtime_summary.provider_defaults")
   end
 
   def llm_model_capability_summary(llm_model)
-    llm_model_capability_labels(llm_model).to_sentence.presence || "No capabilities selected"
+    llm_model_capability_labels(llm_model).to_sentence.presence || llm_models_helper_copy("capabilities.none_selected")
   end
 
   def llm_model_ordered_assignments(llm_model)
@@ -47,11 +47,11 @@ module Admin::LlmModelsHelper
   end
 
   def llm_model_assignment_summary(llm_model)
-    llm_model_ordered_assignments(llm_model).map { |assignment| assignment.role.humanize }.to_sentence.presence || "Unassigned"
+    llm_model_ordered_assignments(llm_model).map { |assignment| llm_model_role_label(assignment.role) }.to_sentence.presence || llm_models_helper_copy("assignments.unassigned")
   end
 
   def llm_model_assignment_badge_label(llm_model)
-    llm_model.llm_model_assignments.any? ? "Assigned" : "Unassigned"
+    llm_model.llm_model_assignments.any? ? llm_models_helper_copy("assignments.assigned") : llm_models_helper_copy("assignments.unassigned")
   end
 
   def llm_model_assignment_tone(llm_model)
@@ -59,17 +59,17 @@ module Admin::LlmModelsHelper
   end
 
   def llm_model_provider_status_label(llm_model)
-    return "Choose a provider" if llm_model.llm_provider.blank?
-    return "Provider ready" if llm_model.llm_provider.configured_for_requests?
+    return llm_models_helper_copy("provider_status.choose_provider") if llm_model.llm_provider.blank?
+    return llm_models_helper_copy("provider_status.ready") if llm_model.llm_provider.configured_for_requests?
 
-    "Provider setup"
+    llm_models_helper_copy("provider_status.setup")
   end
 
   def llm_model_provider_status_description(llm_model)
-    return "Select a provider before saving this model." if llm_model.llm_provider.blank?
-    return "#{llm_model.llm_provider.name} is configured for live requests." if llm_model.llm_provider.configured_for_requests?
+    return llm_models_helper_copy("provider_status.select_provider_first") if llm_model.llm_provider.blank?
+    return llm_models_helper_copy("provider_status.configured_for_live_requests", provider: llm_model.llm_provider.name) if llm_model.llm_provider.configured_for_requests?
 
-    "#{llm_model.llm_provider.name} still needs provider setup before this model can serve live requests."
+    llm_models_helper_copy("provider_status.needs_provider_setup", provider: llm_model.llm_provider.name)
   end
 
   def llm_model_provider_status_tone(llm_model)
@@ -79,19 +79,19 @@ module Admin::LlmModelsHelper
   end
 
   def llm_model_orchestration_status_badge_label(llm_model)
-    return "Inactive" unless llm_model.active?
-    return "Provider setup" unless llm_model.llm_provider.configured_for_requests?
-    return "Assigned" if llm_model.llm_model_assignments.any?
+    return llm_models_helper_copy("orchestration_status.inactive_badge") unless llm_model.active?
+    return llm_models_helper_copy("provider_status.setup") unless llm_model.llm_provider.configured_for_requests?
+    return llm_models_helper_copy("assignments.assigned") if llm_model.llm_model_assignments.any?
 
-    "Ready"
+    llm_models_helper_copy("orchestration_status.ready_badge")
   end
 
   def llm_model_orchestration_status_label(llm_model)
-    return "Inactive models remain in the catalog but are ignored by ready-model selection." unless llm_model.active?
-    return "#{llm_model.llm_provider.name} still needs provider setup before this model can serve live requests." unless llm_model.llm_provider.configured_for_requests?
-    return "Assigned to #{llm_model_assignment_summary(llm_model)}." if llm_model.llm_model_assignments.any?
+    return llm_models_helper_copy("orchestration_status.inactive_detail") unless llm_model.active?
+    return llm_models_helper_copy("provider_status.needs_provider_setup", provider: llm_model.llm_provider.name) unless llm_model.llm_provider.configured_for_requests?
+    return llm_models_helper_copy("orchestration_status.assigned_detail", roles: llm_model_assignment_summary(llm_model)) if llm_model.llm_model_assignments.any?
 
-    "Ready to be assigned from the settings hub."
+    llm_models_helper_copy("orchestration_status.ready_detail")
   end
 
   def llm_model_orchestration_status_tone(llm_model)
@@ -100,4 +100,13 @@ module Admin::LlmModelsHelper
 
     :success
   end
+
+  def llm_model_role_label(role)
+    llm_models_helper_copy("assignments.role_labels.#{role}", default: role.to_s.humanize)
+  end
+
+  private
+    def llm_models_helper_copy(key, **options)
+      I18n.t("admin.llm_models_helper.#{key}", **options)
+    end
 end

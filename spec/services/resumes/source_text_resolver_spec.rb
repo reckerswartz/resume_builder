@@ -76,6 +76,24 @@ RSpec.describe Resumes::SourceTextResolver do
       expect(result.content_type).to eq('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     end
 
+    it 'returns the localized paste-required failure when pasted source text is blank' do
+      resume.update!(source_mode: 'paste', source_text: '')
+
+      result = described_class.new(resume: resume).call
+
+      expect(result).not_to be_success
+      expect(result.error_message).to eq(I18n.t('resumes.source_text_resolver.paste_required'))
+    end
+
+    it 'returns the localized upload-required failure when no source document is attached' do
+      resume.update!(source_mode: 'upload', source_text: '')
+
+      result = described_class.new(resume: resume).call
+
+      expect(result).not_to be_success
+      expect(result.error_message).to eq(I18n.t('resumes.source_text_resolver.upload_required'))
+    end
+
     it 'returns a readable-text failure when a supported PDF upload cannot be parsed' do
       resume.update!(source_mode: 'upload', source_text: '')
       resume.source_document.attach(
@@ -88,7 +106,7 @@ RSpec.describe Resumes::SourceTextResolver do
       result = described_class.new(resume: resume).call
 
       expect(result).not_to be_success
-      expect(result.error_message).to eq('The attached source document did not contain readable text.')
+      expect(result.error_message).to eq(I18n.t('resumes.source_text_resolver.unreadable_upload'))
     end
 
     it 'returns a helpful failure for unsupported uploaded documents' do
@@ -102,7 +120,18 @@ RSpec.describe Resumes::SourceTextResolver do
       result = described_class.new(resume: resume).call
 
       expect(result).not_to be_success
-      expect(result.error_message).to include('Autofill currently supports PDF, DOCX, TXT, Markdown, HTML, and RTF uploads')
+      expect(result.error_message).to eq(
+        I18n.t('resumes.source_text_resolver.unsupported_upload', formats: described_class.supported_upload_formats_label)
+      )
+    end
+
+    it 'returns the localized choose-source failure for unsupported source modes' do
+      resume.update!(source_mode: 'scratch', source_text: '')
+
+      result = described_class.new(resume: resume).call
+
+      expect(result).not_to be_success
+      expect(result.error_message).to eq(I18n.t('resumes.source_text_resolver.choose_source'))
     end
   end
 end

@@ -21,11 +21,11 @@ module Llm
     end
 
     def call
-      return skipped_result("LLM autofill is disabled.") unless feature_enabled?
+      return skipped_result(I18n.t("resumes.resume_autofill_service.disabled")) unless feature_enabled?
       return skipped_result(source_content_result.error_message) unless source_content_result.success?
 
       generation_models = assigned_models_for(TEXT_GENERATION_ROLE)
-      return skipped_result("No text autofill model is enabled.") if generation_models.blank?
+      return skipped_result(I18n.t("resumes.resume_autofill_service.no_models")) if generation_models.blank?
 
       generation_executions = ParallelTextRunner.new(
         user: user,
@@ -38,10 +38,10 @@ module Llm
       ).call
 
       primary_execution = generation_executions.find(&:success?)
-      return failure_result(generation_executions, "Resume autofill is unavailable right now.") unless primary_execution
+      return failure_result(generation_executions, I18n.t("resumes.resume_autofill_service.unavailable")) unless primary_execution
 
       generated_payload = normalized_payload(primary_execution.response_text)
-      return failure_result(generation_executions, "The autofill model did not return structured resume data.") if payload_blank?(generated_payload)
+      return failure_result(generation_executions, I18n.t("resumes.resume_autofill_service.invalid_payload")) if payload_blank?(generated_payload)
 
       verification_executions = verification_models.any? ? run_verification_models(generated_payload) : []
       merged_payload = merge_payloads(

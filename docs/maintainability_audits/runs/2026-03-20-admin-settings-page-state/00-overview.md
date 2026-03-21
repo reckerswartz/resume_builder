@@ -7,8 +7,8 @@ This run continues the admin settings maintainability follow-up by targeting the
 - Run timestamp: `2026-03-20T23:39:00Z`
 - Mode: `implement-next`
 - Trigger: `@[/maintainability-audit]`
-- Result: `in_progress`
-- Registry updated: `pending`
+- Result: `complete`
+- Registry updated: `yes`
 - Area keys touched:
   - `admin-settings-update-orchestration`
 
@@ -28,16 +28,18 @@ This run continues the admin settings maintainability follow-up by targeting the
 
 - Confirmed the next smallest safe slice is a presenter-backed extraction for the admin settings view state.
 - Reopened the admin settings maintainability area for the page-state follow-up.
+- Extracted the heavy inline admin settings page-state setup into `Admin::SettingsPageState` and wired it through `Admin::SettingsHelper`.
+- Updated `app/views/admin/settings/show.html.erb` to render from the helper-backed state object rather than assembling workflow, connector, and LLM locals inline.
+- Added focused presenter coverage for the extracted page-state object.
+- Verified the focused admin settings presenter/request scope after the view cleanup.
 
 ## Pending
 
-- Extract the heavy inline settings page-state setup into an admin presenter/state object and wire it through the helper layer.
-- Add focused presenter coverage for the extracted page-state object.
-- Re-verify the admin settings request surface after the view cleanup.
+- No remaining pending tasks for the tracked admin settings hotspot.
 
 ## Area summary
 
-- `admin-settings-update-orchestration`: active admin settings hotspot with a completed update-service slice and an in-progress follow-up focused on view-layer page-state extraction.
+- `admin-settings-update-orchestration`: closed admin settings hotspot after completing both the update-service extraction and the follow-up page-state extraction.
 
 ## Implementation decisions
 
@@ -47,12 +49,15 @@ This run continues the admin settings maintainability follow-up by targeting the
 ## Verification
 
 - Specs:
-  - `pending`
+  - `bundle exec rspec spec/presenters/admin/settings_page_state_spec.rb spec/requests/admin/settings_spec.rb`
 - Lint or syntax:
-  - `pending`
+  - `ruby -c app/presenters/admin/settings_page_state.rb`
+  - `ruby -c app/helpers/admin/settings_helper.rb`
+  - `ruby -c spec/presenters/admin/settings_page_state_spec.rb`
+  - `ruby -c spec/requests/admin/settings_spec.rb`
 - Notes:
-  - Verification will stay focused on the affected presenter, helper-backed view path, and admin settings request coverage.
+  - The focused presenter/request verification passed with 7 examples and 0 failures.
 
 ## Next slice
 
-- Reassess the remaining admin settings hotspot after the page-state extraction lands and identify the next smallest maintainability follow-up.
+- Review `Admin::LlmProvidersController#create/update` for provider persistence plus post-save model-sync orchestration and controller-owned sync message composition.

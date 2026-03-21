@@ -23,10 +23,10 @@
           <div>
             <span class="atelier-pill">
               <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-              Settings sections
+              <%= t("admin.settings.show.navigation.eyebrow") %>
             </span>
-            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to the grouped controls</h2>
-            <p class="mt-2 text-sm leading-6 text-ink-700/80">Use the list for orientation, then keep edits focused in the main settings sections.</p>
+            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t("admin.settings.show.navigation.title") %></h2>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("admin.settings.show.navigation.description") %></p>
           </div>
 
           <div class="space-y-3">
@@ -40,9 +40,9 @@
           </div>
 
           <div class="flex flex-wrap gap-2">
-            <span class="<%= ui_badge_classes(:neutral) %>"><%= page_state.enabled_feature_count %>/<%= page_state.feature_flags.size %> enabled</span>
-            <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= page_state.workflow_ready_count %>/2 workflows assigned</span>
-            <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= page_state.configured_cloud_import_provider_count %>/<%= page_state.cloud_import_provider_states.size %> connectors configured</span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("admin.settings.show.navigation.badges.enabled", enabled: page_state.enabled_feature_count, total: page_state.feature_flags.size) %></span>
+            <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= t("admin.settings.show.navigation.badges.workflows_assigned", count: page_state.workflow_ready_count) %></span>
+            <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= t("admin.settings.show.navigation.badges.connectors_configured", configured: page_state.configured_cloud_import_provider_count, total: page_state.cloud_import_provider_states.size) %></span>
           </div>
         </div>
       <% end %>
@@ -50,9 +50,9 @@
 
     <div class="space-y-6">
       <%= render Ui::DashboardPanelComponent.new(
-        eyebrow: "Settings summary",
-        title: "One save surface for grouped controls",
-        description: "Edit rollout flags, defaults, connector readiness, and workflow assignments below, then save once from the action bar.",
+        eyebrow: t("admin.settings.show.summary.eyebrow"),
+        title: t("admin.settings.show.summary.title"),
+        description: t("admin.settings.show.summary.description"),
         padding: :sm,
         density: :compact
       ) do %>
@@ -60,25 +60,25 @@
           <div class="flex flex-wrap gap-2">
             <span class="atelier-pill">
               <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-              Workflow readiness
+              <%= t("admin.settings.show.summary.readiness_badge") %>
             </span>
-            <span class="<%= ui_badge_classes(page_state.save_posture_ready? ? :success : :warning) %>"><%= page_state.save_posture_ready? ? "Ready to save" : "Follow-up before save" %></span>
-            <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= page_state.workflow_ready_count %>/2 workflows assigned</span>
-            <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= page_state.configured_cloud_import_provider_count %>/<%= page_state.cloud_import_provider_states.size %> connectors configured</span>
+            <span class="<%= ui_badge_classes(page_state.save_posture_ready? ? :success : :warning) %>"><%= page_state.save_posture_ready? ? t("admin.settings.show.summary.save_posture.ready") : t("admin.settings.show.summary.save_posture.follow_up") %></span>
+            <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= t("admin.settings.show.navigation.badges.workflows_assigned", count: page_state.workflow_ready_count) %></span>
+            <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= t("admin.settings.show.navigation.badges.connectors_configured", configured: page_state.configured_cloud_import_provider_count, total: page_state.cloud_import_provider_states.size) %></span>
           </div>
 
-          <p class="text-sm leading-6 text-ink-700/80">Use provider and model management pages for registry changes, then return here to wire the active platform workflows and rollout defaults.</p>
-          <p class="text-sm leading-6 text-ink-700/80">Keep save posture light and explicit: review readiness badges here, then use the sticky action bar to apply changes once the grouped controls look right.</p>
+          <p class="text-sm leading-6 text-ink-700/80"><%= t("admin.settings.show.summary.guidance_registry_changes") %></p>
+          <p class="text-sm leading-6 text-ink-700/80"><%= t("admin.settings.show.summary.guidance_save_posture") %></p>
         </div>
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Feature access",
+        title: t("admin.settings.show.sections.feature_access.title"),
         anchor: "feature-access",
-        eyebrow: "Platform controls",
-        description: "Enable or disable major product capabilities from one shared admin surface.",
+        eyebrow: t("admin.settings.show.sections.feature_access.eyebrow"),
+        description: t("admin.settings.show.sections.feature_access.description"),
         badges: [
-          { label: "#{page_state.enabled_feature_count}/#{page_state.feature_flags.size} enabled", tone: page_state.enabled_feature_count.positive? ? :success : :neutral }
+          { label: t("admin.settings.show.sections.feature_access.badges.enabled", enabled: page_state.enabled_feature_count, total: page_state.feature_flags.size), tone: page_state.enabled_feature_count.positive? ? :success : :neutral }
         ]
       ) do %>
         <div class="space-y-4">
@@ -92,7 +92,7 @@
                 </span>
 
                 <span class="flex items-center gap-3">
-                  <span class="<%= ui_badge_classes(flag.fetch(:enabled) ? :success : :neutral) %>"><%= flag.fetch(:enabled) ? "On" : "Off" %></span>
+                  <span class="<%= ui_badge_classes(flag.fetch(:enabled) ? :success : :neutral) %>"><%= flag.fetch(:enabled) ? t("admin.settings.show.sections.feature_access.toggle_status.on") : t("admin.settings.show.sections.feature_access.toggle_status.off") %></span>
                   <%= check_box_tag "platform_setting[feature_flags][#{flag.fetch(:key)}]", true, flag.fetch(:enabled), class: ui_checkbox_classes %>
                 </span>
               </label>
@@ -102,36 +102,36 @@
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Platform defaults",
+        title: t("admin.settings.show.sections.platform_defaults.title"),
         anchor: "platform-defaults",
-        eyebrow: "Shared preferences",
-        description: "Fallback values used throughout the application for newly created resumes and support touchpoints.",
+        eyebrow: t("admin.settings.show.sections.platform_defaults.eyebrow"),
+        description: t("admin.settings.show.sections.platform_defaults.description"),
         badges: [
           { label: page_state.default_template_slug, tone: :neutral },
-          { label: page_state.support_email.present? ? "Support email set" : "Support email needed", tone: page_state.support_email.present? ? :success : :warning }
+          { label: page_state.support_email.present? ? t("admin.settings.show.sections.platform_defaults.badges.support_email_set") : t("admin.settings.show.sections.platform_defaults.badges.support_email_needed"), tone: page_state.support_email.present? ? :success : :warning }
         ]
       ) do %>
         <div class="grid gap-5 sm:grid-cols-2">
           <div>
-            <%= label_tag "platform_setting_preferences_default_template_slug", "Default template slug", class: ui_label_classes %>
+            <%= label_tag "platform_setting_preferences_default_template_slug", t("admin.settings.show.sections.platform_defaults.fields.default_template_slug"), class: ui_label_classes %>
             <%= text_field_tag "platform_setting[preferences][default_template_slug]", page_state.default_template_slug, class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "platform_setting_preferences_support_email", "Support email", class: ui_label_classes %>
+            <%= label_tag "platform_setting_preferences_support_email", t("admin.settings.show.sections.platform_defaults.fields.support_email"), class: ui_label_classes %>
             <%= email_field_tag "platform_setting[preferences][support_email]", page_state.support_email, class: ui_input_classes %>
           </div>
         </div>
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Cloud import connectors",
+        title: t("admin.settings.show.sections.cloud_import_connectors.title"),
         anchor: "cloud-import-connectors",
-        eyebrow: "Provider readiness",
-        description: "Review provider environment setup before any OAuth handoff or remote file import work begins.",
+        eyebrow: t("admin.settings.show.sections.cloud_import_connectors.eyebrow"),
+        description: t("admin.settings.show.sections.cloud_import_connectors.description"),
         badges: [
-          { label: "#{page_state.configured_cloud_import_provider_count}/#{page_state.cloud_import_provider_states.size} configured", tone: page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning },
-          { label: "Safe scaffold", tone: :neutral }
+          { label: t("admin.settings.show.sections.cloud_import_connectors.badges.configured", configured: page_state.configured_cloud_import_provider_count, total: page_state.cloud_import_provider_states.size), tone: page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning },
+          { label: t("admin.settings.show.sections.cloud_import_connectors.badges.safe_scaffold"), tone: :neutral }
         ]
       ) do %>
         <div class="grid gap-4 xl:grid-cols-2">
@@ -149,7 +149,7 @@
               <p class="text-sm leading-6 text-ink-700/80"><%= provider.fetch(:message) %></p>
 
               <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70">Required environment variables</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("admin.settings.show.sections.cloud_import_connectors.required_env_vars") %></p>
                 <div class="mt-3 flex flex-wrap gap-2">
                   <% provider.fetch(:required_env_vars).each do |env_var| %>
                     <span class="<%= ui_badge_classes(:neutral) %>"><%= env_var %></span>
@@ -162,31 +162,31 @@
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "LLM orchestration",
+        title: t("admin.settings.show.sections.llm_orchestration.title"),
         anchor: "llm-orchestration",
-        eyebrow: "Model roles",
-        description: "Choose the primary generation models and the verification models that run in parallel for text and vision workflows.",
+        eyebrow: t("admin.settings.show.sections.llm_orchestration.eyebrow"),
+        description: t("admin.settings.show.sections.llm_orchestration.description"),
         badges: [
-          { label: "#{page_state.llm_providers_count} providers", tone: :neutral },
-          { label: "#{page_state.llm_models.count} models", tone: :neutral }
+          { label: t("admin.settings.show.sections.llm_orchestration.badges.providers", count: page_state.llm_providers_count), tone: :neutral },
+          { label: t("admin.settings.show.sections.llm_orchestration.badges.models", count: page_state.llm_models.count), tone: :neutral }
         ]
       ) do %>
         <% if page_state.llm_models.any? %>
           <div class="grid gap-4 lg:grid-cols-2">
             <%= render Ui::WidgetCardComponent.new(
-              eyebrow: "Text registry",
-              title: page_state.text_primary_model&.name || "Primary text model needed",
-              description: "#{page_state.text_llm_models.count} text-capable models are available for suggestion and autofill workflows.",
-              badge: "#{page_state.text_verification_model_ids.size} verifiers",
+              eyebrow: t("admin.settings.show.sections.llm_orchestration.widgets.text_registry.eyebrow"),
+              title: page_state.text_primary_model&.name || t("admin.settings.show.sections.llm_orchestration.widgets.text_registry.title_fallback"),
+              description: t("admin.settings.show.sections.llm_orchestration.widgets.text_registry.description", count: page_state.text_llm_models.count),
+              badge: t("admin.settings.show.sections.llm_orchestration.widgets.text_registry.badge", count: page_state.text_verification_model_ids.size),
               badge_classes: ui_badge_classes(page_state.text_verification_model_ids.any? ? :success : :neutral),
               title_size: :base
             ) %>
 
             <%= render Ui::WidgetCardComponent.new(
-              eyebrow: "Vision registry",
-              title: page_state.vision_primary_model&.name || "Primary vision model needed",
-              description: "#{page_state.vision_llm_models.count} vision-capable models are available for future multimodal review flows.",
-              badge: "#{page_state.vision_verification_model_ids.size} verifiers",
+              eyebrow: t("admin.settings.show.sections.llm_orchestration.widgets.vision_registry.eyebrow"),
+              title: page_state.vision_primary_model&.name || t("admin.settings.show.sections.llm_orchestration.widgets.vision_registry.title_fallback"),
+              description: t("admin.settings.show.sections.llm_orchestration.widgets.vision_registry.description", count: page_state.vision_llm_models.count),
+              badge: t("admin.settings.show.sections.llm_orchestration.widgets.vision_registry.badge", count: page_state.vision_verification_model_ids.size),
               badge_classes: ui_badge_classes(page_state.vision_verification_model_ids.any? ? :success : :neutral),
               title_size: :base
             ) %>
@@ -194,10 +194,10 @@
 
           <div class="mt-5 grid gap-5 xl:grid-cols-2">
             <%= render Ui::DashboardPanelComponent.new(
-              eyebrow: "Text workflow",
-              title: page_state.text_primary_model&.name || "Choose a primary text model",
-              description: "Use one primary text model for generation and optional verification models to support suggestion and autofill workflows.",
-              action_label: "Manage models",
+              eyebrow: t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.eyebrow"),
+              title: page_state.text_primary_model&.name || t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.title_fallback"),
+              description: t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.description"),
+              action_label: t("admin.settings.show.sections.llm_orchestration.panels.manage_models"),
               action_path: admin_llm_models_path,
               action_style: :secondary,
               padding: :sm,
@@ -205,26 +205,26 @@
             ) do %>
               <div class="space-y-4">
                 <%= render Ui::ReportRowComponent.new(
-                  title: "Current primary model",
-                  subtitle: page_state.text_primary_model.present? ? settings_llm_model_option_summary(page_state.text_primary_model) : "No primary text model selected yet.",
-                  badge: page_state.text_primary_model.present? ? page_state.text_primary_model.name : "Unassigned",
+                  title: t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.current_primary_model.title"),
+                  subtitle: page_state.text_primary_model.present? ? settings_llm_model_option_summary(page_state.text_primary_model) : t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.current_primary_model.subtitle_fallback"),
+                  badge: page_state.text_primary_model.present? ? page_state.text_primary_model.name : t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.current_primary_model.badge_fallback"),
                   badge_classes: ui_badge_classes(page_state.text_primary_model.present? ? :success : :neutral)
                 ) %>
 
                 <%= render Ui::ReportRowComponent.new(
-                  title: "Verification coverage",
-                  subtitle: page_state.text_verification_models.any? ? "#{pluralize(page_state.text_verification_models.size, "model")} selected for text verification." : "No verification models selected yet.",
-                  badges: page_state.text_verification_models.any? ? page_state.text_verification_models.first(3).map { |llm_model| { label: llm_model.name, classes: ui_badge_classes(:neutral) } } + (page_state.text_verification_models.size > 3 ? [ { label: "+#{page_state.text_verification_models.size - 3} more", classes: ui_badge_classes(:neutral) } ] : []) : [ { label: "No verifiers", classes: ui_badge_classes(:neutral) } ]
+                  title: t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.verification_coverage.title"),
+                  subtitle: page_state.text_verification_models.any? ? t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.verification_coverage.subtitle", count: page_state.text_verification_models.size) : t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.verification_coverage.subtitle_none"),
+                  badges: page_state.text_verification_models.any? ? page_state.text_verification_models.first(3).map { |llm_model| { label: llm_model.name, classes: ui_badge_classes(:neutral) } } + (page_state.text_verification_models.size > 3 ? [ { label: t("admin.settings.show.sections.llm_orchestration.panels.more_badge", count: page_state.text_verification_models.size - 3), classes: ui_badge_classes(:neutral) } ] : []) : [ { label: t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.verification_coverage.no_verifiers"), classes: ui_badge_classes(:neutral) } ]
                 ) %>
 
                 <div>
-                  <%= label_tag "llm_role_assignments_text_generation", "Primary text model", class: ui_label_classes %>
-                  <%= select_tag "llm_role_assignments[text_generation][]", options_for_select([["No model selected", ""]] + llm_model_options_for_select(page_state.text_llm_models), page_state.text_generation_model_id), class: ui_input_classes %>
+                  <%= label_tag "llm_role_assignments_text_generation", t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.fields.primary_model"), class: ui_label_classes %>
+                  <%= select_tag "llm_role_assignments[text_generation][]", options_for_select([[t("admin.settings.show.sections.llm_orchestration.panels.no_model_selected"), ""]] + llm_model_options_for_select(page_state.text_llm_models), page_state.text_generation_model_id), class: ui_input_classes %>
                 </div>
 
                 <div>
                   <%= hidden_field_tag "llm_role_assignments[text_verification][]", "" %>
-                  <p class="text-sm font-medium text-ink-700/80">Verification models</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t("admin.settings.show.sections.llm_orchestration.panels.text_workflow.fields.verification_models") %></p>
                   <div class="mt-3 space-y-3">
                     <% page_state.text_llm_models.each do |llm_model| %>
                       <% selected = page_state.text_verification_model_ids.include?(llm_model.id) %>
@@ -238,7 +238,7 @@
                             <% end %>
                           </span>
                           <span class="flex items-center gap-3">
-                            <span class="<%= ui_badge_classes(selected ? :success : :neutral) %>"><%= selected ? "Selected" : "Optional" %></span>
+                            <span class="<%= ui_badge_classes(selected ? :success : :neutral) %>"><%= selected ? t("admin.settings.show.sections.llm_orchestration.panels.option_status.selected") : t("admin.settings.show.sections.llm_orchestration.panels.option_status.optional") %></span>
                             <%= check_box_tag "llm_role_assignments[text_verification][]", llm_model.id, selected, class: "mt-1 #{ui_checkbox_classes}" %>
                           </span>
                         </label>
@@ -250,10 +250,10 @@
             <% end %>
 
             <%= render Ui::DashboardPanelComponent.new(
-              eyebrow: "Vision workflow",
-              title: page_state.vision_primary_model&.name || "Choose a primary vision model",
-              description: "Prepare one primary vision model and optional verification models for future visual or multimodal review flows.",
-              action_label: "Manage models",
+              eyebrow: t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.eyebrow"),
+              title: page_state.vision_primary_model&.name || t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.title_fallback"),
+              description: t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.description"),
+              action_label: t("admin.settings.show.sections.llm_orchestration.panels.manage_models"),
               action_path: admin_llm_models_path,
               action_style: :secondary,
               padding: :sm,
@@ -261,26 +261,26 @@
             ) do %>
               <div class="space-y-4">
                 <%= render Ui::ReportRowComponent.new(
-                  title: "Current primary model",
-                  subtitle: page_state.vision_primary_model.present? ? settings_llm_model_option_summary(page_state.vision_primary_model) : "No primary vision model selected yet.",
-                  badge: page_state.vision_primary_model.present? ? page_state.vision_primary_model.name : "Unassigned",
+                  title: t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.current_primary_model.title"),
+                  subtitle: page_state.vision_primary_model.present? ? settings_llm_model_option_summary(page_state.vision_primary_model) : t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.current_primary_model.subtitle_fallback"),
+                  badge: page_state.vision_primary_model.present? ? page_state.vision_primary_model.name : t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.current_primary_model.badge_fallback"),
                   badge_classes: ui_badge_classes(page_state.vision_primary_model.present? ? :success : :neutral)
                 ) %>
 
                 <%= render Ui::ReportRowComponent.new(
-                  title: "Verification coverage",
-                  subtitle: page_state.vision_verification_models.any? ? "#{pluralize(page_state.vision_verification_models.size, "model")} selected for vision verification." : "No verification models selected yet.",
-                  badges: page_state.vision_verification_models.any? ? page_state.vision_verification_models.first(3).map { |llm_model| { label: llm_model.name, classes: ui_badge_classes(:neutral) } } + (page_state.vision_verification_models.size > 3 ? [ { label: "+#{page_state.vision_verification_models.size - 3} more", classes: ui_badge_classes(:neutral) } ] : []) : [ { label: "No verifiers", classes: ui_badge_classes(:neutral) } ]
+                  title: t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.verification_coverage.title"),
+                  subtitle: page_state.vision_verification_models.any? ? t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.verification_coverage.subtitle", count: page_state.vision_verification_models.size) : t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.verification_coverage.subtitle_none"),
+                  badges: page_state.vision_verification_models.any? ? page_state.vision_verification_models.first(3).map { |llm_model| { label: llm_model.name, classes: ui_badge_classes(:neutral) } } + (page_state.vision_verification_models.size > 3 ? [ { label: t("admin.settings.show.sections.llm_orchestration.panels.more_badge", count: page_state.vision_verification_models.size - 3), classes: ui_badge_classes(:neutral) } ] : []) : [ { label: t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.verification_coverage.no_verifiers"), classes: ui_badge_classes(:neutral) } ]
                 ) %>
 
                 <div>
-                  <%= label_tag "llm_role_assignments_vision_generation", "Primary vision model", class: ui_label_classes %>
-                  <%= select_tag "llm_role_assignments[vision_generation][]", options_for_select([["No model selected", ""]] + llm_model_options_for_select(page_state.vision_llm_models), page_state.vision_generation_model_id), class: ui_input_classes %>
+                  <%= label_tag "llm_role_assignments_vision_generation", t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.fields.primary_model"), class: ui_label_classes %>
+                  <%= select_tag "llm_role_assignments[vision_generation][]", options_for_select([[t("admin.settings.show.sections.llm_orchestration.panels.no_model_selected"), ""]] + llm_model_options_for_select(page_state.vision_llm_models), page_state.vision_generation_model_id), class: ui_input_classes %>
                 </div>
 
                 <div>
                   <%= hidden_field_tag "llm_role_assignments[vision_verification][]", "" %>
-                  <p class="text-sm font-medium text-ink-700/80">Verification models</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t("admin.settings.show.sections.llm_orchestration.panels.vision_workflow.fields.verification_models") %></p>
                   <div class="mt-3 space-y-3">
                     <% page_state.vision_llm_models.each do |llm_model| %>
                       <% selected = page_state.vision_verification_model_ids.include?(llm_model.id) %>
@@ -294,7 +294,7 @@
                             <% end %>
                           </span>
                           <span class="flex items-center gap-3">
-                            <span class="<%= ui_badge_classes(selected ? :success : :neutral) %>"><%= selected ? "Selected" : "Optional" %></span>
+                            <span class="<%= ui_badge_classes(selected ? :success : :neutral) %>"><%= selected ? t("admin.settings.show.sections.llm_orchestration.panels.option_status.selected") : t("admin.settings.show.sections.llm_orchestration.panels.option_status.optional") %></span>
                             <%= check_box_tag "llm_role_assignments[vision_verification][]", llm_model.id, selected, class: "mt-1 #{ui_checkbox_classes}" %>
                           </span>
                         </label>
@@ -307,32 +307,32 @@
           </div>
         <% else %>
           <%= render Ui::WidgetCardComponent.new(
-            eyebrow: "Registry needed",
-            title: "Add providers and models first",
-            description: "Register at least one provider and one model before assigning text or vision workflows.",
-            badge: "Setup needed",
+            eyebrow: t("admin.settings.show.sections.llm_orchestration.panels.empty_state.eyebrow"),
+            title: t("admin.settings.show.sections.llm_orchestration.panels.empty_state.title"),
+            description: t("admin.settings.show.sections.llm_orchestration.panels.empty_state.description"),
+            badge: t("admin.settings.show.sections.llm_orchestration.panels.empty_state.badge"),
             badge_classes: ui_badge_classes(:warning),
             title_size: :base
           ) do %>
             <div class="flex flex-wrap gap-2">
-              <%= link_to "Manage providers", admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
-              <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:primary, size: :sm) %>
+              <%= link_to t("admin.settings.show.sections.llm_orchestration.panels.empty_state.actions.manage_providers"), admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
+              <%= link_to t("admin.settings.show.sections.llm_orchestration.panels.empty_state.actions.manage_models"), admin_llm_models_path, class: ui_button_classes(:primary, size: :sm) %>
             </div>
           <% end %>
         <% end %>
       <% end %>
 
       <%= render Ui::StickyActionBarComponent.new(
-        title: "Review save posture",
-        description: "Save changes when the grouped controls look right. Feature flags and role assignments update immediately for admin-controlled workflows.",
+        title: t("admin.settings.show.sticky_action_bar.title"),
+        description: t("admin.settings.show.sticky_action_bar.description"),
         density: :compact
       ) do %>
-        <span class="<%= ui_badge_classes(page_state.save_posture_ready? ? :success : :warning) %>"><%= page_state.save_posture_ready? ? "Ready to save" : "Follow-up before save" %></span>
-        <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= page_state.workflow_ready_count %>/2 workflows assigned</span>
-        <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= page_state.configured_cloud_import_provider_count %>/<%= page_state.cloud_import_provider_states.size %> connectors configured</span>
-        <%= link_to "Manage providers", admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
-        <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
-        <%= form.submit "Save settings", class: ui_button_classes(:primary) %>
+        <span class="<%= ui_badge_classes(page_state.save_posture_ready? ? :success : :warning) %>"><%= page_state.save_posture_ready? ? t("admin.settings.show.sticky_action_bar.badges.save_posture.ready") : t("admin.settings.show.sticky_action_bar.badges.save_posture.follow_up") %></span>
+        <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= t("admin.settings.show.sticky_action_bar.badges.workflows_assigned", count: page_state.workflow_ready_count) %></span>
+        <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= t("admin.settings.show.sticky_action_bar.badges.connectors_configured", configured: page_state.configured_cloud_import_provider_count, total: page_state.cloud_import_provider_states.size) %></span>
+        <%= link_to t("admin.settings.show.sticky_action_bar.actions.manage_providers"), admin_llm_providers_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= link_to t("admin.settings.show.sticky_action_bar.actions.manage_models"), admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= form.submit t("admin.settings.show.sticky_action_bar.actions.save_settings"), class: ui_button_classes(:primary) %>
       <% end %>
     </div>
   <% end %>

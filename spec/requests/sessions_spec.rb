@@ -43,7 +43,7 @@ RSpec.describe 'Sessions', type: :request do
         password: 'wrong-password'
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('sessions.controller.invalid_credentials'))
       expect(response.body).to include('Caps lock is on.')
     end

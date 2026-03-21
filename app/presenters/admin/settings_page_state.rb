@@ -1,11 +1,11 @@
 module Admin
   class SettingsPageState
-    HUB_SECTIONS = [
-      { id: "feature-access", label: "Feature access", caption: "Rollout and feature gating" }.freeze,
-      { id: "platform-defaults", label: "Platform defaults", caption: "Default template and support contact" }.freeze,
-      { id: "cloud-import-connectors", label: "Cloud import connectors", caption: "Provider readiness and environment checks" }.freeze,
-      { id: "llm-orchestration", label: "LLM orchestration", caption: "Generation and verification workflows" }.freeze
-    ].freeze
+    HUB_SECTION_KEYS = {
+      "feature-access" => "feature_access",
+      "platform-defaults" => "platform_defaults",
+      "cloud-import-connectors" => "cloud_import_connectors",
+      "llm-orchestration" => "llm_orchestration"
+    }.freeze
 
     attr_reader :llm_models, :llm_providers_count, :text_llm_models, :vision_llm_models
 
@@ -21,18 +21,18 @@ module Admin
 
     def page_header_attributes
       {
-        eyebrow: "Admin settings",
-        title: "Platform settings",
-        description: "Control feature access, platform defaults, cloud-import readiness, and model assignments from one shared admin surface.",
+        eyebrow: copy("page_header.eyebrow"),
+        title: copy("page_header.title"),
+        description: copy("page_header.description"),
         badges: [
-          { label: "#{enabled_feature_count}/#{feature_flags.size} enabled", tone: :neutral },
-          { label: "#{llm_providers_count} providers", tone: :neutral },
-          { label: "#{llm_models.count} models", tone: :neutral }
+          { label: copy("page_header.badges.enabled", enabled: enabled_feature_count, total: feature_flags.size), tone: :neutral },
+          { label: copy("page_header.badges.providers", count: llm_providers_count), tone: :neutral },
+          { label: copy("page_header.badges.models", count: llm_models.count), tone: :neutral }
         ],
         actions: [
-          { label: "Manage templates", path: view_context.admin_templates_path, style: :secondary },
-          { label: "Manage providers", path: view_context.admin_llm_providers_path, style: :secondary },
-          { label: "Manage models", path: view_context.admin_llm_models_path, style: :primary }
+          { label: copy("page_header.actions.manage_templates"), path: view_context.admin_templates_path, style: :secondary },
+          { label: copy("page_header.actions.manage_providers"), path: view_context.admin_llm_providers_path, style: :secondary },
+          { label: copy("page_header.actions.manage_models"), path: view_context.admin_llm_models_path, style: :primary }
         ],
         density: :compact
       }
@@ -95,7 +95,13 @@ module Admin
     end
 
     def hub_sections
-      HUB_SECTIONS
+      HUB_SECTION_KEYS.map do |id, key|
+        {
+          id: id,
+          label: copy("hub_sections.#{key}.label"),
+          caption: copy("hub_sections.#{key}.caption")
+        }
+      end
     end
 
     def workflow_ready_count
@@ -108,6 +114,10 @@ module Admin
 
     private
       attr_reader :llm_assignment_model_ids, :platform_setting, :view_context
+
+      def copy(key, **options)
+        I18n.t("admin.settings_page_state.#{key}", **options)
+      end
 
       def primary_llm_model_for(role, llm_models)
         selected_id = selected_llm_model_id_for(role)

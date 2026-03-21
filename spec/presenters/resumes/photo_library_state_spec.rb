@@ -64,5 +64,48 @@ RSpec.describe Resumes::PhotoLibraryState do
         I18n.t('resumes.editor_personal_details_step.photo_library.recent_runs.statuses.queued')
       )
     end
+
+    it 'localizes recent-run guidance labels for successful workflows' do
+      run = PhotoProcessingRun.create!(
+        photo_profile:,
+        resume:,
+        template:,
+        workflow_type: :background_remove,
+        status: :succeeded
+      )
+
+      expect(photo_library_state.run_guidance_label(run)).to eq(
+        I18n.t('resumes.editor_personal_details_step.photo_library.recent_runs.guidance.background_remove')
+      )
+    end
+
+    it 'does not expose guidance when a run already has an error summary' do
+      run = PhotoProcessingRun.create!(
+        photo_profile:,
+        resume:,
+        template:,
+        workflow_type: :verify_candidate,
+        status: :failed,
+        error_summary: 'Provider response was invalid.',
+        next_step_guidance: 'Ignore this fallback guidance.'
+      )
+
+      expect(photo_library_state.run_guidance_label(run)).to be_nil
+    end
+
+    it 'localizes recent-run guidance labels by workflow type' do
+      run = PhotoProcessingRun.create!(
+        photo_profile:,
+        resume:,
+        template:,
+        workflow_type: :background_remove,
+        status: :succeeded,
+        next_step_guidance: 'Legacy background removal guidance'
+      )
+
+      expect(photo_library_state.run_guidance_label(run)).to eq(
+        I18n.t('resumes.editor_personal_details_step.photo_library.recent_runs.guidance.background_remove')
+      )
+    end
   end
 end

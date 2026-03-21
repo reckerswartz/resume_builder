@@ -39,7 +39,7 @@ module Resumes
       end
 
       def supported_upload_formats_label
-        "PDF, DOCX, TXT, Markdown, HTML, and RTF"
+        I18n.t("resumes.source_text_resolver.supported_upload_formats_label")
       end
     end
 
@@ -50,7 +50,7 @@ module Resumes
     def call
       case resume.source_mode
       when "paste"
-        return failure("Paste resume text before running autofill.") if normalized_text(resume.source_text).blank?
+        return failure(I18n.t("resumes.source_text_resolver.paste_required")) if normalized_text(resume.source_text).blank?
 
         Result.new(
           success: true,
@@ -60,11 +60,11 @@ module Resumes
           content_type: "text/plain"
         )
       when "upload"
-        return failure("Attach a source document before running autofill.") unless resume.source_document.attached?
+        return failure(I18n.t("resumes.source_text_resolver.upload_required")) unless resume.source_document.attached?
         return failure(upload_not_supported_message) unless self.class.supported_upload?(resume.source_document)
 
         extracted_text = extract_uploaded_text
-        return failure("The attached source document did not contain readable text.") if extracted_text.blank?
+        return failure(I18n.t("resumes.source_text_resolver.unreadable_upload")) if extracted_text.blank?
 
         Result.new(
           success: true,
@@ -74,7 +74,7 @@ module Resumes
           content_type: detected_content_type.presence || "text/plain"
         )
       else
-        failure("Choose pasted text or upload a supported source document before running autofill.")
+        failure(I18n.t("resumes.source_text_resolver.choose_source"))
       end
     end
 
@@ -170,7 +170,7 @@ module Resumes
       end
 
       def upload_not_supported_message
-        "Autofill currently supports #{self.class.supported_upload_formats_label} uploads. Keep DOC or other unsupported files attached for reference or paste their text."
+        I18n.t("resumes.source_text_resolver.unsupported_upload", formats: self.class.supported_upload_formats_label)
       end
   end
 end

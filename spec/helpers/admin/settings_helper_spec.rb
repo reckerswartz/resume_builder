@@ -1,6 +1,29 @@
 require 'rails_helper'
 
 RSpec.describe Admin::SettingsHelper, type: :helper do
+  describe '#feature_flags_for_settings' do
+    it 'builds localized labels and descriptions for the settings toggles' do
+      platform_setting = create(:platform_setting, feature_flags: { 'llm_access' => true, 'resume_suggestions' => false, 'autofill_content' => false, 'photo_processing' => true, 'resume_image_generation' => false })
+
+      feature_flags = helper.feature_flags_for_settings(platform_setting)
+
+      expect(feature_flags).to include(
+        hash_including(
+          key: 'llm_access',
+          label: I18n.t('admin.settings_helper.feature_flags.llm_access.label'),
+          description: I18n.t('admin.settings_helper.feature_flags.llm_access.description'),
+          enabled: true
+        ),
+        hash_including(
+          key: 'photo_processing',
+          label: I18n.t('admin.settings_helper.feature_flags.photo_processing.label'),
+          description: I18n.t('admin.settings_helper.feature_flags.photo_processing.description'),
+          enabled: true
+        )
+      )
+    end
+  end
+
   describe '#cloud_import_provider_states_for_settings' do
     before do
       allow(ENV).to receive(:[]).and_call_original
@@ -16,12 +39,15 @@ RSpec.describe Admin::SettingsHelper, type: :helper do
       end
 
       expect(google_drive_state).to include(
-        label: 'Google Drive',
+        label: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
         configured: false,
-        status_label: 'Setup required',
+        status_label: I18n.t('admin.settings_helper.cloud_import_provider_states.status.setup_required'),
         status_tone: :warning
       )
-      expect(google_drive_state.fetch(:message)).to include('GOOGLE_DRIVE_CLIENT_ID')
+      expect(google_drive_state.fetch(:description)).to eq(I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.description'))
+      expect(google_drive_state.fetch(:message)).to eq(
+        I18n.t('resumes.cloud_import_provider_catalog.feedback.setup_required', provider: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'), env_vars: 'GOOGLE_DRIVE_CLIENT_ID and GOOGLE_DRIVE_CLIENT_SECRET')
+      )
     end
 
     it 'marks connectors as configured when credentials are present' do
@@ -33,12 +59,15 @@ RSpec.describe Admin::SettingsHelper, type: :helper do
       end
 
       expect(dropbox_state).to include(
-        label: 'Dropbox',
+        label: I18n.t('resumes.cloud_import_provider_catalog.providers.dropbox.label'),
         configured: true,
-        status_label: 'Configured',
+        status_label: I18n.t('admin.settings_helper.cloud_import_provider_states.status.configured'),
         status_tone: :success
       )
-      expect(dropbox_state.fetch(:message)).to include('Environment credentials are present')
+      expect(dropbox_state.fetch(:description)).to eq(I18n.t('resumes.cloud_import_provider_catalog.providers.dropbox.description'))
+      expect(dropbox_state.fetch(:message)).to eq(
+        I18n.t('resumes.cloud_import_provider_catalog.feedback.configured', provider: I18n.t('resumes.cloud_import_provider_catalog.providers.dropbox.label'))
+      )
     end
   end
 

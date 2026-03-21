@@ -246,5 +246,57 @@ RSpec.describe Llm::ResumeAutofillService do
       expect(result.interactions.map { |interaction| interaction.metadata['source_kind'] }.uniq).to eq(['uploaded_document'])
       expect(result.interactions.map { |interaction| interaction.metadata['source_content_type'] }.uniq).to eq(['application/pdf'])
     end
+
+    it 'returns the localized disabled error when autofill is unavailable' do
+      PlatformSetting.current.update!(
+        feature_flags: {
+          'llm_access' => true,
+          'resume_suggestions' => true,
+          'autofill_content' => false
+        },
+        preferences: PlatformSetting.current.preferences
+      )
+
+      result = described_class.new(user:, resume:).call
+
+      expect(result).not_to be_success
+      expect(result.error_message).to eq(I18n.t('resumes.resume_autofill_service.disabled'))
+      expect(result.interactions.size).to eq(1)
+      expect(result.interactions.first.error_message).to eq(I18n.t('resumes.resume_autofill_service.disabled'))
+    end
+
+    it 'returns the localized no-models error when no text generation model is assigned' do
+      allow(LlmModelAssignment).to receive(:ready_models_for).and_call_original
+      allow(LlmModelAssignment).to receive(:ready_models_for).with('text_generation').and_return([])
+
+      result = described_class.new(user:, resume:).call
+
+      expect(result).not_to be_success
+      expect(result.error_message).to eq(I18n.t('resumes.resume_autofill_service.no_models'))
+      expect(result.interactions.size).to eq(1)
+      expect(result.interactions.first.error_message).to eq(I18n.t('resumes.resume_autofill_service.no_models'))
+    end
+
+    it 'returns the localized invalid-payload error when the generation model returns no structured resume data' do
+      invalid_payload_client = provider_client_class.new(
+        generation_model.identifier => {
+          content: '{}',
+          token_usage: { 'input_tokens' => 12, 'output_tokens' => 3 },
+          metadata: { 'source' => 'invalid-payload-spec' }
+        },
+        verification_model.identifier => {
+          content: '{}',
+          token_usage: { 'input_tokens' => 8, 'output_tokens' => 2 },
+          metadata: { 'source' => 'invalid-payload-spec' }
+        }
+      )
+      allow(Llm::ClientFactory).to receive(:build).and_return(invalid_payload_client)
+
+      result = described_class.new(user:, resume:).call
+
+      expect(result).not_to be_success
+      expect(result.error_message).to eq(I18n.t('resumes.resume_autofill_service.invalid_payload'))
+      expect(result.interactions.size).to eq(1)
+    end
   end
 end
