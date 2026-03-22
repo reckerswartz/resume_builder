@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
+    - "sign-in"
+    - "create-account"
     - "resume-builder-personal-details"
-    - "resume-builder-summary"
-    - "template-show"
-  reason: "resume-show improved to 87 after trimming the repeated export-state badge from the preview surface and now has no open issues. resume-builder-personal-details still has the highest-value remaining builder follow-ups, resume-builder-summary is the next content step if the builder flow continues forward, and template-show is the next marketplace/detail surface if the audit shifts back to template discovery."
+  reason: "resume-builder-finalize improved to 83 after replacing design workspace jargon. Only UX-BLDFIN-005 (task_overload) remains open. sign-in and create-account are still unaudited public pages. resume-builder-personal-details (81) has UX-BLDPD-003 open."
 pages:
   - page_key: "home"
     title: "Home"
@@ -412,24 +412,24 @@ pages:
     page_family: "builder"
     priority: "high"
     status: "improved"
-    usability_score: 79
+    usability_score: 83
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-finalize.md"
     open_issue_keys:
-      - "UX-BLDFIN-004"
       - "UX-BLDFIN-005"
     closed_issue_keys:
       - "UX-BLDFIN-001"
       - "UX-BLDFIN-002"
       - "UX-BLDFIN-003"
-    last_audited_at: "2026-03-22T04:50:00Z"
-    last_changed_at: "2026-03-22T04:50:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-remove-duplicate-step-header/00-overview.md"
-    next_step: "Fix UX-BLDFIN-004 (content_brevity) by shortening developer-facing jargon in design workspace descriptions. UX-BLDFIN-005 (task_overload) is structural and lower priority."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T04:50:00Z"
+      - "UX-BLDFIN-004"
+    last_audited_at: "2026-03-22T05:34:00Z"
+    last_changed_at: "2026-03-22T05:34:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-plain-language-design-copy/00-overview.md"
+    next_step: "UX-BLDFIN-005 (task_overload) is the only remaining open issue. Consider addressing it if finalize task overload becomes a user complaint."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T05:34:00Z"
     issues_found: 5
-    issues_resolved: 3
-    issues_remaining: 2
+    issues_resolved: 4
+    issues_remaining: 1
     regression_detected: false
   - { page_key: "admin-dashboard", title: "Admin dashboard", path: "/admin", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-templates-index", title: "Admin templates index", path: "/admin/templates", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
