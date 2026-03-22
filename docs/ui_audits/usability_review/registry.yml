@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:45:22Z"
+updated_at: "2026-03-22T23:51:48Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-task-overload-closeout/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsrc-shorten-import-guidance/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "password-reset-edit"
+    - "template-show"
     - "resume-builder-heading"
     - "resumes-index"
-  reason: "resume-builder-personal-details is now closed with no open usability issues. password-reset-edit is the next unaudited public/auth recovery page, resume-builder-heading retains the lowest-priority remaining audited builder follow-up, and resumes-index should be re-reviewed after the current workspace bulk-actions regression is fixed."
+  reason: "resume-builder-source is now closed with no open usability issues. template-show retains the low-priority carry-through copy cleanup UX-TSHOW-003, resume-builder-heading retains the low-priority copy follow-up UX-BLDHDG-003, and resumes-index is the next useful re-review if workspace hierarchy or quick-action guidance changes again."
 pages:
   - page_key: "home"
     title: "Home"
@@ -323,23 +323,23 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "improved"
-    usability_score: 85
+    usability_score: 86
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-source.md"
-    open_issue_keys:
-      - "UX-BLDSRC-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDSRC-001"
       - "UX-BLDSRC-002"
       - "UX-BLDSRC-004"
-    last_audited_at: "2026-03-22T06:18:00Z"
-    last_changed_at: "2026-03-22T06:18:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsrc-demote-import-status/00-overview.md"
-    next_step: "No medium or high source-step issues remain open. If this page is revisited, UX-BLDSRC-003 is the only remaining low-priority follow-up."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T06:18:00Z"
+      - "UX-BLDSRC-003"
+    last_audited_at: "2026-03-22T23:51:48Z"
+    last_changed_at: "2026-03-22T23:51:48Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsrc-shorten-import-guidance/00-overview.md"
+    next_step: "No open issues remain on the source step. Revisit only if the source-step helper copy grows again or the import decision flow changes materially."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T23:51:48Z"
     issues_found: 4
-    issues_resolved: 3
-    issues_remaining: 1
+    issues_resolved: 4
+    issues_remaining: 0
     regression_detected: false
     github_issue_numbers:
       UX-BLDSRC-003: 71
@@ -351,25 +351,23 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "improved"
-    usability_score: 87
+    usability_score: 88
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-heading.md"
-    open_issue_keys:
-      - "UX-BLDHDG-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDHDG-001"
       - "UX-BLDHDG-002"
-    last_audited_at: "2026-03-22T06:08:00Z"
-    last_changed_at: "2026-03-22T06:08:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-trim-duplicate-personal-details-cta/00-overview.md"
-    next_step: "No medium or high heading-step issues remain open. If this page is revisited, UX-BLDHDG-003 is the only remaining low-priority follow-up."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T06:08:00Z"
+      - "UX-BLDHDG-003"
+    last_audited_at: "2026-03-22T23:50:35Z"
+    last_changed_at: "2026-03-22T23:50:35Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-footer-note-closeout/00-overview.md"
+    next_step: "No open issues remain on resume-builder-heading. Revisit only if the footer guidance or heading-step action balance changes materially."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T23:50:35Z"
     issues_found: 3
-    issues_resolved: 2
-    issues_remaining: 1
+    issues_resolved: 3
+    issues_remaining: 0
     regression_detected: false
-    github_issue_numbers:
-      UX-BLDHDG-003: 72
   - page_key: "resume-builder-personal-details"
     title: "Resume builder personal details step"
     path: "/resumes/:id/edit?step=personal_details"

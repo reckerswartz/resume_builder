@@ -11,16 +11,16 @@
 ## Current status
 
 - **Status**: improved
-- **Usability score**: 87 (post-fix)
+- **Usability score**: 88 (post-fix)
 - **Pre-fix score**: 82
-- **Cycle count**: 2
-- **Last audited**: 2026-03-22T06:08:00Z
+- **Cycle count**: 3
+- **Last audited**: 2026-03-22T23:50:35Z
 
 ## Scores by dimension
 
 | Dimension | Pre-fix | Post-fix |
 |---|---|---|
-| Content brevity | 82 | 87 |
+| Content brevity | 82 | 90 |
 | Information density | 80 | 88 |
 | Progressive disclosure | 85 | 85 |
 | Repeated content | 65 | 90 |
@@ -52,13 +52,19 @@
 - **Files changed**: `app/views/resumes/_editor_heading_step.html.erb`, `spec/requests/resumes_spec.rb`
 - **Verification**: `bundle exec rspec spec/requests/resumes_spec.rb` (32 examples, 0 failures). Playwright re-audit confirmed the top card is gone, the footer keeps one personal-details link, and console errors remain zero.
 
-### UX-BLDHDG-003 — Verbose WidgetCard description
+### UX-BLDHDG-003 — Verbose footer note
 
 - **Severity**: low
 - **Category**: content_brevity
-- **Status**: open
-- **Evidence**: The heading step no longer shows the optional-next-step card, so the remaining copy follow-up is the footer note: "Changes save in place and keep the preview in sync while you move between guided steps." It is helpful, but still longer than the compact heading step likely needs.
+- **Status**: resolved
+- **Evidence**: The shipped heading step now renders the shorter footer note `Changes save automatically and sync with the preview.` The older longer footer sentence no longer renders in the request response.
+- **Fix**: Kept the shorter locale-backed footer note in `config/locales/views/resume_builder.en.yml` and added a focused request assertion in `spec/requests/resumes_spec.rb` so the short copy stays present while the older verbose sentence stays absent.
+
+## Verification
+
+- `bundle exec rspec spec/requests/resumes_spec.rb:731` — 1 example, 0 failures
+- Run log: `docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-footer-note-closeout/00-overview.md`
 
 ## Next step
 
-No medium or high heading-step issues remain open. If this page is revisited, UX-BLDHDG-003 is the only remaining low-priority follow-up.
+No open issues remain on `resume-builder-heading`. Revisit only if the footer guidance or heading-step action balance changes materially.

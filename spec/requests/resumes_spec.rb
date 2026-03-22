@@ -726,6 +726,8 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body.scan(I18n.t('resume_builder.step_registry.steps.source.title')).size).to eq(1)
       expect(response.body).to include(I18n.t('resumes.editor_source_step.import_status.eyebrow'))
       expect(response.body).not_to include(I18n.t('resumes.editor_source_step.supported_formats.eyebrow'))
+      expect(response.body).to include(I18n.t('resumes.editor_source_step.guidance.description'))
+      expect(response.body).not_to include('Once the source feels right, continue into heading and the rest of the guided builder.')
     end
 
     it 'renders the heading step without a duplicate step title while keeping the personal details widget' do
@@ -746,6 +748,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(optional_next_step_heading).to be_nil
       expect(personal_details_links.size).to eq(1)
       expect(response.body).to include(I18n.t('resumes.editor_heading_step.footer_note'))
+      expect(response.body).not_to include('Changes save in place and keep the preview in sync while you move between guided steps.')
     end
 
     it 'renders the personal details step without a duplicate step title and starts with the profile links panel' do
@@ -922,7 +925,7 @@ RSpec.describe 'Resumes', type: :request do
       hidden_design_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="design"][hidden]')
       additional_sections_disclosure = document.at_css('details[data-finalize-additional-sections-disclosure]')
       expect(output_settings).to be_present
-      expect(sections_panels.size).to eq(2)
+      expect(sections_panels.size).to eq(1)
       expect(hidden_template_panel).to be_present
       expect(hidden_design_panel).to be_present
       expect(additional_sections_disclosure).to be_present

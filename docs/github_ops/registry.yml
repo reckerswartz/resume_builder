@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:47:18Z"
+updated_at: "2026-03-22T23:52:28Z"
 
 github:
   remote: "origin"
@@ -71,9 +71,9 @@ workflow_registries:
     issue_prefix: "ux-usability-audit"
     domain: "builder"
     type: "usability-issue"
-    issue_count: { open: 2, closed: 15 }
+    issue_count: { open: 1, closed: 16 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T23:47:18Z"
+    last_synced_at: "2026-03-22T23:52:28Z"
     github_issues: [7, 8, 40, 41, 42, 43, 61, 62, 66, 68, 69, 70, 71, 72, 73, 74, 79]
 
   - workflow: "maintainability-audit"
@@ -253,5 +253,5 @@ file_locks:
   active: []
 
 roadmap:
-  generated_at: "2026-03-22T23:47:18Z"
+  generated_at: "2026-03-22T23:52:28Z"
   path: "docs/github_ops/roadmap.md"
