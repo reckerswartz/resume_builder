@@ -9,7 +9,7 @@ RSpec.describe ResumeBuilder::StepRegistry do
 
   describe '.section_types_for' do
     it 'returns the registered section types for the finalize step' do
-      expect(described_class.section_types_for('finalize')).to eq(['projects'])
+      expect(described_class.section_types_for('finalize')).to eq(%w[projects certifications languages])
     end
   end
 
