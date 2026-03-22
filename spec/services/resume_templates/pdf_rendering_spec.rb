@@ -80,7 +80,7 @@ RSpec.describe 'Resume template PDF rendering' do
   {
     'ats-minimal' => '#334155',
     'professional' => '#0F4C81',
-    'modern-clean' => '#0F766E',
+    'modern-clean' => '#0D6B63',
     'sidebar-accent' => '#4338CA',
     'editorial-split' => '#D7F038'
   }.each do |family, accent_color|
@@ -152,7 +152,7 @@ RSpec.describe 'Resume template PDF rendering' do
   end
 
   it 'renders Modern Clean at compact density with tight spacing and card padding' do
-    resume = build_resume_for(family: 'modern-clean', accent_color: '#0F766E')
+    resume = build_resume_for(family: 'modern-clean', accent_color: '#0D6B63')
 
     html = ApplicationController.render(
       template: 'resumes/pdf',

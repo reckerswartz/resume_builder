@@ -160,7 +160,7 @@ module ResumeTemplates
     ACCENT_TONE_COLORS = {
       "slate" => "#334155",
       "blue" => "#1D4ED8",
-      "teal" => "#0F766E",
+      "teal" => "#0D6B63",
       "indigo" => "#4338CA",
       "lime" => "#D7F038"
     }.freeze
@@ -182,7 +182,7 @@ module ResumeTemplates
       { key: "orange",   hex: "#EA580C", label: "Orange" },
       { key: "amber",    hex: "#D97706", label: "Amber" },
       { key: "emerald",  hex: "#059669", label: "Emerald" },
-      { key: "teal",     hex: "#0F766E", label: "Teal" },
+      { key: "teal",     hex: "#0D6B63", label: "Teal" },
       { key: "cyan",     hex: "#0891B2", label: "Cyan" },
       { key: "sky",      hex: "#0284C7", label: "Sky" },
       { key: "blue",     hex: "#1D4ED8", label: "Blue" },

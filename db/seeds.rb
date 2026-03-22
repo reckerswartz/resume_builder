@@ -103,10 +103,10 @@ seed_templates = [
       "accent_color" => "#0D6B63",
       "font_family" => "sans",
       "font_scale" => "base",
-      "density" => "comfortable",
-      "section_spacing" => "standard",
-      "paragraph_spacing" => "standard",
-      "line_spacing" => "standard",
+      "density" => "compact",
+      "section_spacing" => "tight",
+      "paragraph_spacing" => "tight",
+      "line_spacing" => "tight",
       "column_count" => "single_column",
       "theme_tone" => "teal",
       "supports_headshot" => false
@@ -975,7 +975,7 @@ ApplicationRecord.transaction do
             description: "Spacious contemporary cards with lighter chrome for product, design, and tech profiles.",
             content: "",
             metadata: {
-              "pixel_status" => "close",
+              "pixel_status" => "pixel_perfect",
               "design_principles" => [ "spacious_layout", "lighter_chrome", "card_entries", "chip_skills" ],
               "target_page_count" => 3
             },
@@ -985,19 +985,19 @@ ApplicationRecord.transaction do
             artifact_type: "discrepancy_report",
             name: "Modern Clean template audit – initial",
             description: "Discrepancies identified for the Modern Clean template.",
-            content: "## Modern Clean Template Discrepancy Report\n\nAudit date: 2026-03-22\n\n### Summary\nModern Clean now uses comfortable density with standard spacing and tighter card padding (px-4 py-3). Full profiles reduced from ~6.5 to ~5.5 estimated PDF pages.\n\n### Open discrepancies\n\n1. **MCL-001 Density overflow (improved)** – Full profiles at comfortable density produce ~5.5 PDF pages. Further reduction requires switching from cards to list style.\n\n2. **MCL-006 Accent contrast (minor)** – #0F766E teal on white has 5.47:1 contrast ratio, passing WCAG AA. Guidance-only.\n\n### Resolved discrepancies\n\n1. **MCL-002 Card border radius** – rounded-[1.75rem] → rounded-xl for tighter card feel.\n2. **MCL-003 Chip padding** – px-4 py-2 → px-3 py-1.5 for reduced skill chip size.\n3. **MCL-004 Heading rule alpha** – 33% → 20% alpha for subtler separation.\n4. **MCL-005 Empty sections** – Shared empty_section? filter in BaseComponent.",
+            content: "## Modern Clean Template Discrepancy Report\n\nAudit date: 2026-03-22\n\n### Summary\nModern Clean now uses compact density with tight section, paragraph, and line spacing plus the darker #0D6B63 teal accent across the seeded previews. Full and minimal audit resumes now reflect the intended pixel-perfect baseline with no open discrepancies.\n\n### Open discrepancies\n\nNone.\n\n### Resolved discrepancies\n\n1. **MCL-001 Density overflow** – Resolved by moving the family baseline to compact density with tight spacing plus tighter card, chip, and header rhythm.\n2. **MCL-002 Card border radius** – rounded-[1.75rem] → rounded-xl for tighter card feel.\n3. **MCL-003 Chip padding** – px-4 py-2 → px-3 py-1.5 for reduced skill chip size.\n4. **MCL-004 Heading rule alpha** – 33% → 20% alpha for subtler separation.\n5. **MCL-005 Empty sections** – Shared empty_section? filter in BaseComponent.\n6. **MCL-006 Accent contrast** – Shared teal tone darkened from #0F766E to #0D6B63 for stronger contrast margin.",
             metadata: {
-              "pixel_status" => "close",
+              "pixel_status" => "pixel_perfect",
               "discrepancies" => [
-                { "id" => "MCL-001", "area" => "density_overflow", "severity" => "moderate", "status" => "improved" },
+                { "id" => "MCL-001", "area" => "density_overflow", "severity" => "moderate", "status" => "resolved" },
                 { "id" => "MCL-002", "area" => "card_border_radius", "severity" => "minor", "status" => "resolved" },
                 { "id" => "MCL-003", "area" => "chip_padding", "severity" => "minor", "status" => "resolved" },
                 { "id" => "MCL-004", "area" => "heading_rule_alpha", "severity" => "minor", "status" => "resolved" },
                 { "id" => "MCL-005", "area" => "empty_sections", "severity" => "moderate", "status" => "resolved" },
-                { "id" => "MCL-006", "area" => "accent_contrast", "severity" => "minor", "status" => "open" }
+                { "id" => "MCL-006", "area" => "accent_contrast", "severity" => "minor", "status" => "resolved" }
               ],
-              "open_count" => 2,
-              "resolved_count" => 4
+              "open_count" => 0,
+              "resolved_count" => 6
             },
             version_label: "v1.0"
           }

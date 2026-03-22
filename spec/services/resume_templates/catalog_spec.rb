@@ -124,7 +124,7 @@ RSpec.describe ResumeTemplates::Catalog do
       end
 
       hex_values = palette.map { |s| s.fetch(:hex) }
-      expect(hex_values).to include('#334155', '#1D4ED8', '#0F766E', '#4338CA', '#DC2626')
+      expect(hex_values).to include('#334155', '#1D4ED8', '#0D6B63', '#4338CA', '#DC2626')
     end
   end
 
