@@ -19,12 +19,12 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next structural slice is complete: `LlmProvider` credential management extracted to `LlmProvider::CredentialManagement` concern with 15 focused examples.
 - The next verification slice is complete: `Resumes::PdfTextExtractor` and `Resumes::DocxTextExtractor` now have dedicated spec coverage (16 examples).
 - The next structural slice is complete: `Admin::JobLogsHelper` runtime-state and control-state extracted to `Admin::JobLogs::RuntimeState` and `Admin::JobLogs::ControlState` presenters. Helper reduced from 181 to 85 lines (53% reduction). Area closed with all 3 follow-ups resolved.
+- The next verification slice is complete: `Resumes::ExportStatusBroadcaster` and `Errors::Tracker` now have dedicated spec coverage (11 examples). All inventoried service coverage gaps are closed.
 
 ### Pending
 
-- The next `implement-next` maintainability slice should come from the verification lane, because the last completed lane was structural.
-- The structural candidate queue is now empty.
-- The remaining verification backlog includes `app/services/resumes/export_status_broadcaster.rb` and `app/services/errors/tracker.rb`.
+- Both candidate queues are now empty. The next `implement-next` run requires a fresh whole-codebase hotspot scan.
+- Remaining coverage gaps are concentrated in low-priority UI components (25 missing) and skip-tier models.
 
 ## Installed workflow
 
@@ -95,8 +95,8 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ## Current round-robin state
 
-- Last completed lane: `structural`
-- Next preferred lane: `verification`
+- Last completed lane: `verification`
+- Next preferred lane: `structural`
 - Audit scope: `whole_codebase`
 - Max consecutive runs per lane: `1`
 
@@ -106,8 +106,7 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ### Current verification candidates
 
-- `app/services/resumes/export_status_broadcaster.rb`
-- `app/services/errors/tracker.rb`
+(empty — all inventoried service coverage gaps are closed)
 
 ## Audited and completed structural hotspots
 
