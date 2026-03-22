@@ -46,6 +46,22 @@ module Templates
       use_template_path_for(nil)
     end
 
+    def apply_to_resume_available?
+      latest_user_resume.present?
+    end
+
+    def apply_to_resume_path_for(template)
+      return unless latest_user_resume.present?
+
+      view_context.edit_resume_path(latest_user_resume, step: :finalize)
+    end
+
+    def apply_to_resume_label
+      return unless latest_user_resume.present?
+
+      I18n.t("templates.marketplace_state.apply_to_resume", title: latest_user_resume.title.truncate(30))
+    end
+
     def clear_filters_path
       path_params = resume_intake_params.present? ? { resume: { intake_details: resume_intake_params } } : {}
       view_context.templates_path(**path_params)
@@ -439,6 +455,13 @@ module Templates
           context[:settings] = { accent_color: accent_color }
         end
         context
+      end
+
+      def latest_user_resume
+        @latest_user_resume ||= begin
+          user = view_context.respond_to?(:current_user) ? view_context.current_user : nil
+          user&.resumes&.order(updated_at: :desc)&.first
+        end
       end
 
       def resume_intake_params

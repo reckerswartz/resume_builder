@@ -17,11 +17,13 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next post-correction structural slice is complete: `ApplicationHelper` now delegates table/query behavior to `TableHelper`.
 - The next post-correction verification slice is complete: `Resumes::CloudImportProviderCatalog` now has dedicated shared-service coverage.
 - The next structural slice is complete: `LlmProvider` credential management extracted to `LlmProvider::CredentialManagement` concern with 15 focused examples.
+- The next verification slice is complete: `Resumes::PdfTextExtractor` and `Resumes::DocxTextExtractor` now have dedicated spec coverage (16 examples).
+- The next structural slice is complete: `Admin::JobLogsHelper` runtime-state and control-state extracted to `Admin::JobLogs::RuntimeState` and `Admin::JobLogs::ControlState` presenters. Helper reduced from 181 to 85 lines (53% reduction). Area closed with all 3 follow-ups resolved.
 
 ### Pending
 
-- The next `implement-next` maintainability slice should come from the structural lane, because the last completed lane was verification.
-- The next structural candidate is `app/helpers/admin/job_logs_helper.rb` (runtime-state / control-state follow-ups).
+- The next `implement-next` maintainability slice should come from the verification lane, because the last completed lane was structural.
+- The structural candidate queue is now empty.
 - The remaining verification backlog includes `app/services/resumes/export_status_broadcaster.rb` and `app/services/errors/tracker.rb`.
 
 ## Installed workflow
@@ -93,14 +95,14 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ## Current round-robin state
 
-- Last completed lane: `verification`
-- Next preferred lane: `structural`
+- Last completed lane: `structural`
+- Next preferred lane: `verification`
 - Audit scope: `whole_codebase`
 - Max consecutive runs per lane: `1`
 
 ### Current structural candidates
 
-- `app/helpers/admin/job_logs_helper.rb` (runtime-state / control-state follow-ups)
+(empty — scan for new hotspots when the structural lane rotates back)
 
 ### Current verification candidates
 
@@ -123,7 +125,7 @@ If this overview is stale, the workflow is considered incomplete even if code an
   - status: `closed`
 - `app/helpers/admin/job_logs_helper.rb`
   - area: `admin-job-logs-helper-mixed-responsibilities`
-  - status: `improved`
+  - status: `closed`
 - `app/helpers/application_helper.rb`
   - area: `application-helper-mixed-responsibilities`
   - status: `closed`

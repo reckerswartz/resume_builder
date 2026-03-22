@@ -10,10 +10,10 @@ This file tracks the `Admin::JobLogsHelper` maintainability hotspot around mixed
 - Path: `app/helpers/admin/job_logs_helper.rb`
 - Category: `helper`
 - Priority: `medium`
-- Status: `improved`
+- Status: `closed`
 - Recommended refactor shape: `extract_presenter`
-- Last reviewed: `2026-03-21T22:18:00Z`
-- Last changed: `2026-03-21T22:18:00Z`
+- Last reviewed: `2026-03-22T06:00:00Z`
+- Last changed: `2026-03-22T06:00:00Z`
 
 ## Hotspot summary
 
@@ -84,27 +84,33 @@ This file tracks the `Admin::JobLogsHelper` maintainability hotspot around mixed
 - Refactored `Admin::JobLogsHelper` to a thin `job_log_related_error_state` factory that preserves the controller/service preload path.
 - Updated the admin job-log index and show views to consume the extracted related-error state instead of helper-owned lookup/description methods.
 - Added focused presenter coverage and helper integration coverage, then re-verified the adjacent request and index-service specs.
+- Extracted `Admin::JobLogs::RuntimeState` (79 lines) to own label, tone, description, and worker_label from queue_snapshot state.
+- Extracted `Admin::JobLogs::ControlState` (64 lines) to own retry/discard/requeue availability, labels, summaries, confirmations.
+- Refactored `Admin::JobLogsHelper` from 181 to 85 lines (53% reduction) with three thin factory methods: `job_log_related_error_state`, `job_log_runtime_state`, `job_log_control_state`.
+- Updated `app/views/admin/job_logs/show.html.erb` to consume RuntimeState and ControlState presenters instead of individual helper methods.
+- Added `spec/presenters/admin/job_logs/runtime_state_spec.rb` (18 examples) and `spec/presenters/admin/job_logs/control_state_spec.rb` (17 examples).
+- Updated `spec/helpers/admin/job_logs_helper_spec.rb` with factory method coverage for both new presenters.
 
 ## Pending
 
-- Extract the runtime-label/runtime-description cluster into a focused state object or presenter when the admin job-log surfaces rotate back into the structural lane.
-- Extract the job-control decision/summary cluster so `Admin::JobLogsHelper` stops owning both safe-action policy and related page copy.
+- No open follow-ups remain. All three presenter extractions are complete.
 
 ## Open follow-up keys
 
-- `extract-job-log-runtime-state`
-- `extract-job-log-control-state`
+(none)
 
 ## Closed follow-up keys
 
 - `extract-job-log-related-error-state`
+- `extract-job-log-runtime-state`
+- `extract-job-log-control-state`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/presenters/admin/job_logs/related_error_state_spec.rb spec/helpers/admin/job_logs_helper_spec.rb spec/services/admin/job_logs_index_service_spec.rb spec/requests/admin/job_logs_spec.rb` (31 examples, 0 failures)
+  - `bundle exec rspec spec/presenters/admin/job_logs/runtime_state_spec.rb spec/presenters/admin/job_logs/control_state_spec.rb spec/helpers/admin/job_logs_helper_spec.rb spec/requests/admin/job_logs_spec.rb spec/services/admin/job_logs_index_service_spec.rb spec/presenters/admin/job_logs/related_error_state_spec.rb` (70 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/helpers/admin/job_logs_helper.rb app/presenters/admin/job_logs/related_error_state.rb spec/helpers/admin/job_logs_helper_spec.rb spec/presenters/admin/job_logs/related_error_state_spec.rb spec/services/admin/job_logs_index_service_spec.rb spec/requests/admin/job_logs_spec.rb` (Syntax OK)
+  - `ruby -c app/helpers/admin/job_logs_helper.rb app/presenters/admin/job_logs/runtime_state.rb app/presenters/admin/job_logs/control_state.rb` (Syntax OK)
 - Notes:
-  - The extraction intentionally leaves runtime copy and job-control decision logic in place for a later structural slice.
+  - All three presenter extractions are complete. The helper is now a thin factory layer.
   - The index-service preload contract remains intact through the helper factory so the refactor does not trade maintainability for extra queries.

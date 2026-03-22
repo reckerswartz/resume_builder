@@ -109,7 +109,9 @@ RSpec.describe 'Resume template PDF rendering' do
       assigns: { resume: resume }
     )
 
-    expect(html).to include('font-serif')
+    doc = Nokogiri::HTML.parse(html)
+    shell = doc.at_css('div[class*="max-w-3xl"]')
+    expect(shell['class']).to include('font-serif')
 
     resume.update!(settings: resume.settings.merge('font_family' => 'mono'))
 
@@ -119,8 +121,10 @@ RSpec.describe 'Resume template PDF rendering' do
       assigns: { resume: resume.reload }
     )
 
-    expect(overridden_html).to include('font-mono')
-    expect(overridden_html).not_to include('font-serif')
+    overridden_doc = Nokogiri::HTML.parse(overridden_html)
+    overridden_shell = overridden_doc.at_css('div[class*="max-w-3xl"]')
+    expect(overridden_shell['class']).to include('font-mono')
+    expect(overridden_shell['class']).not_to include('font-serif')
   end
 
   it 'applies font scale, density, and spacing overrides through the shared rendered HTML path' do

@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:50:00Z"
+updated_at: "2026-03-22T06:00:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-22-text-extractor-coverage/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-22-job-logs-helper-runtime-control-state/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -42,11 +42,10 @@ categories:
 round_robin:
   overview_doc: "docs/maintainability_audits/README.md"
   audit_scope: "whole_codebase"
-  last_completed_lane: "verification"
-  next_preferred_lane: "structural"
+  last_completed_lane: "structural"
+  next_preferred_lane: "verification"
   max_consecutive_lane_runs: 1
-  structural_candidate_paths:
-    - "app/helpers/admin/job_logs_helper.rb (runtime-state / control-state follow-ups)"
+  structural_candidate_paths: []
   verification_candidate_paths:
     - "app/services/resumes/export_status_broadcaster.rb"
     - "app/services/errors/tracker.rb"
@@ -143,9 +142,9 @@ areas:
       - "extract-job-log-related-error-state"
       - "extract-job-log-runtime-state"
       - "extract-job-log-control-state"
-    last_reviewed_at: "2026-03-21T22:18:00Z"
-    last_changed_at: "2026-03-21T22:18:00Z"
-    next_step: "All 3 follow-ups resolved. Helper reduced from 181 to 86 lines with 3 extracted presenters (RelatedErrorState, RuntimeState, ControlState)."
+    last_reviewed_at: "2026-03-22T06:00:00Z"
+    last_changed_at: "2026-03-22T06:00:00Z"
+    next_step: "All follow-ups closed. Helper reduced from 181 to 85 lines across 3 extracted presenters."
   - area_key: "application-helper-mixed-responsibilities"
     title: "Application helper mixed responsibilities"
     lane: "structural"

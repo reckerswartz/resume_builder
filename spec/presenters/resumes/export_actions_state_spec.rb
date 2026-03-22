@@ -31,7 +31,7 @@ RSpec.describe Resumes::ExportActionsState do
           label: 'Download TXT',
           path: "/resumes/#{resume.id}/download_text",
           style: :secondary,
-          options: { data: { turbo_frame: '_top' } }
+          options: { data: { turbo: false } }
         }
       ])
     end
@@ -50,13 +50,13 @@ RSpec.describe Resumes::ExportActionsState do
           label: 'Download PDF',
           path: "/resumes/#{resume.id}/download",
           style: :secondary,
-          options: { data: { turbo_frame: '_top' } }
+          options: { data: { turbo: false } }
         },
         {
           label: 'Download TXT',
           path: "/resumes/#{resume.id}/download_text",
           style: :secondary,
-          options: { data: { turbo_frame: '_top' } }
+          options: { data: { turbo: false } }
         }
       ])
     end
@@ -81,13 +81,13 @@ RSpec.describe Resumes::ExportActionsState do
           label: 'Download PDF',
           path: "/resumes/#{resume.id}/download",
           style: :primary,
-          options: { data: { turbo_frame: '_top' } }
+          options: { data: { turbo: false } }
         },
         {
           label: 'Download TXT',
           path: "/resumes/#{resume.id}/download_text",
           style: :secondary,
-          options: { data: { turbo_frame: '_top' } }
+          options: { data: { turbo: false } }
         }
       ])
     end

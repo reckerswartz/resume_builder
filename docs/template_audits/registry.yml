@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:50:00Z"
+updated_at: "2026-03-22T05:51:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/template-audit.md"
@@ -10,7 +10,7 @@ tracking:
   template_doc_template: "docs/template_audits/templates/TEMPLATE.md"
   run_doc_template: "docs/template_audits/runs/TEMPLATE.md"
   artifact_root: "docs/template_audits/artifacts"
-  latest_run: "docs/template_audits/runs/2026-03-22-finalize-workspace-regression-reaudit/00-overview.md"
+  latest_run: "docs/template_audits/runs/2026-03-22-modern-mod001-contact-pill-gap-fix/00-overview.md"
 seed_profiles:
   catalog_path: "app/services/resumes/seed_profile_catalog.rb"
   profile_count: 8
@@ -29,9 +29,9 @@ templates:
     open_discrepancy_count: 0
     resolved_discrepancy_count: 7
     last_audit_at: "2026-03-22"
-    notes: "Resolved MOD-001 (contact_pills wrapping gap) via gap-x-2 gap-y-1.5 + items-start. All 7 discrepancies resolved. Zero console errors."
+    notes: "MOD-001 resolved: contact pill gap-x-2 gap-y-1.5 → uniform gap-2 for consistent 8px wrapping. Zero open discrepancies."
     cycle_count: 9
-    last_cycle_date: "2026-03-22T05:50:00Z"
+    last_cycle_date: "2026-03-22T05:51:00Z"
     discrepancies_found: 7
     discrepancies_resolved: 7
     discrepancies_remaining: 0

@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title><%= @resume.title %></title>
-    <%= stylesheet_link_tag :app, media: "all" %>
     <style>
+      <%= File.read(Rails.root.join("app/assets/builds/app.css")).html_safe %>
+
       section { page-break-inside: avoid; }
       article { page-break-inside: avoid; }
       h2 { page-break-after: avoid; }
