@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:10:00Z"
+updated_at: "2026-03-22T23:19:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-22-broadcaster-tracker-coverage/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-22-page-header-verification/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -45,8 +45,13 @@ round_robin:
   last_completed_lane: "verification"
   next_preferred_lane: "structural"
   max_consecutive_lane_runs: 1
-  structural_candidate_paths: []
-  verification_candidate_paths: []
+  structural_candidate_paths:
+    - "app/helpers/admin/templates_helper.rb"
+    - "app/presenters/resumes/template_picker_state.rb"
+    - "app/presenters/templates/marketplace_state.rb"
+    - "app/services/resume_templates/catalog.rb"
+  verification_candidate_paths:
+    - "app/components/ui/hero_header_component.rb"
 areas:
   - area_key: "resumes-controller-draft-building"
     title: "Resumes controller builder flow cleanup"
@@ -143,6 +148,32 @@ areas:
     last_reviewed_at: "2026-03-22T06:00:00Z"
     last_changed_at: "2026-03-22T06:00:00Z"
     next_step: "All follow-ups closed. Helper reduced from 181 to 85 lines across 3 extracted presenters."
+  - area_key: "admin-templates-helper-mixed-responsibilities"
+    title: "Admin templates helper mixed responsibilities"
+    lane: "structural"
+    path: "app/helpers/admin/templates_helper.rb"
+    category: "helper"
+    priority: "medium"
+    status: "improved"
+    github_issue_number: 80
+    reasons:
+      - "Admin::TemplatesHelper mixed lightweight formatting and artifact/lifecycle review helpers with a separate template-profile state cluster for layout metadata, layout-focus summary, visibility messaging, and headshot messaging."
+      - "The helper served the admin templates index, form, and show pages while assembling a large normalized layout hash inline and layering multiple badge/copy branches on top."
+    recommended_refactor_shape: "extract_presenter"
+    area_doc_path: "docs/maintainability_audits/areas/admin-templates-helper-mixed-responsibilities.md"
+    open_follow_up_keys:
+      - "extract-template-artifact-review-state"
+    closed_follow_up_keys:
+      - "extract-template-profile-state"
+    last_reviewed_at: "2026-03-22T23:15:00Z"
+    last_changed_at: "2026-03-22T23:15:00Z"
+    next_step: "The profile-state regression is restored. Rotate to the verification lane for the remaining UI component coverage gaps, then return to the artifact/lifecycle review cluster in Admin::TemplatesHelper."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T23:15:00Z"
+    issues_found: 2
+    issues_resolved: 1
+    issues_remaining: 1
+    regression_detected: true
   - area_key: "application-helper-mixed-responsibilities"
     title: "Application helper mixed responsibilities"
     lane: "structural"
@@ -269,6 +300,7 @@ areas:
     category: "mixed"
     priority: "medium"
     status: "improved"
+    github_issue_number: 75
     reasons:
       - "Full codebase scan revealed ~60 missing spec files across all layers."
       - "ApplicationJob (91 lines, shared base for all background jobs) had zero dedicated coverage."
@@ -295,14 +327,16 @@ areas:
       - "add-llm-providers-ollama-client-spec"
       - "add-llm-providers-base-client-spec"
       - "add-resumes-cloud-import-provider-catalog-spec"
-    last_reviewed_at: "2026-03-22T06:10:00Z"
-    last_changed_at: "2026-03-22T06:10:00Z"
-    next_step: "All inventoried service coverage gaps are closed. Remaining gaps are in low-priority UI components and skip-tier models."
-    cycle_count: 23
-    last_cycle_date: "2026-03-22T06:10:00Z"
+      - "add-resume-templates-base-component-spec"
+      - "add-ui-page-header-component-spec"
+    last_reviewed_at: "2026-03-22T23:19:00Z"
+    last_changed_at: "2026-03-22T23:19:00Z"
+    next_step: "The next preferred lane is structural. Remaining verification gaps are low-priority UI components and skip-tier models; Ui::HeroHeaderComponent is the only remaining named verification candidate."
+    cycle_count: 25
+    last_cycle_date: "2026-03-22T23:19:00Z"
     issues_found: 61
-    issues_resolved: 35
-    issues_remaining: 26
+    issues_resolved: 37
+    issues_remaining: 24
     regression_detected: false
   - area_key: "llm-provider-credential-management"
     title: "LlmProvider credential management extraction"

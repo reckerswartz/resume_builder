@@ -1,105 +1,55 @@
 # Resume Builder Roadmap
 
-> Auto-generated from GitHub issues on 2026-03-22T05:34:00Z
+> Auto-generated from GitHub issues on 2026-03-22T23:27:38Z
 > Repository: reckerswartz/resume_builder
 
 ## Summary
 
-| Metric | Count |
-|---|---|
-| **Open issues** | 6 |
-| **Closed issues** | 36 |
-| **Closed this sync** | 4 (#40, #41, #46, #62) |
+- **Open issues**: 8
+- **Closed issues**: 49
 
 ## By Severity
 
-| Severity | Open | Closed |
-|---|---|---|
-| critical | 0 | 0 |
-| high | 0 | 0 |
-| medium | 1 | — |
-| low | 4 | — |
-| deferred | 1 | — |
+- **critical**: 0 open
+- **high**: 0 open
+- **medium**: 5 open
+- **low**: 3 open
 
-## Open Issues by Workflow
+## By Workflow
 
-### `/template-audit` (3 open)
+### `/ux-usability-audit` (4 open)
 
-| # | Title | Severity | Status |
-|---|---|---|---|
-| #35 | Modern: 1 remaining discrepancy (MOD-001 contact_pills) | low | pixel_perfect |
-| #36 | Professional: 1 remaining discrepancy (PRO-004 entry_spacing) | low | pixel_perfect |
-| #37 | Modern Clean: 1 remaining discrepancy (MCL-006 accent_contrast) | medium | pixel_perfect |
+- #79 [ux-usability-audit] Four task areas on one page (UX-BLDPD-003)
+- #72 [ux-usability-audit] Verbose WidgetCard description (UX-BLDHDG-003)
+- #71 [ux-usability-audit] Verbose guidance panel (UX-BLDSRC-003)
+- #70 [ux-usability-audit] Verbose carry-through copy (UX-TSHOW-003)
 
-### `/ux-usability-audit` (2 open)
+### `/maintainability-audit` (3 open)
 
-| # | Title | Severity | Page |
-|---|---|---|---|
-| #42 | Hero badges lack icons for scanability (UX-HOME-004) | low | home |
-| #43 | Overlapping readiness cues on workspace cards (UX-RIDX-002) | low | resumes-index |
-
-### `/maintainability-audit` (1 open)
-
-| # | Title | Severity | Status |
-|---|---|---|---|
-| #33 | ResumeTemplates::Catalog 619 lines mixed responsibilities | medium | deferred |
-
-### `/responsive-ui-audit` (0 open)
-
-All responsive issues resolved.
-
-### `/continuous-improvement` (0 open)
-
-All 5 proposals with GitHub issues implemented and validated. 2 additional proposals (CI-EDIT-001, CI-PREVIEW-001) implemented without GitHub tracking. 3 proposals remain discovered: CI-WORKSPACE-002, CI-WORKSPACE-003, CI-TEMPLATE-002.
+- #80 [maintainability-audit] Admin templates helper mixed responsibilities (admin-templates-helper-mixed-responsibilities)
+- #75 [maintainability-audit] Broad codebase coverage scan (broad-codebase-coverage-scan)
+- #33 [maintainability-audit] ResumeTemplates::Catalog is 619 lines with mixed metadata, filtering, and label responsibilities (catalog-619-lines)
 
 ## By Domain
 
-| Domain | Open |
-|---|---|
-| templates | 3 |
-| builder | 0 |
-| workspace | 1 |
-| home | 1 |
-| infrastructure | 1 |
+- **templates**: 2 open
+- **builder**: 3 open
+- **workspace**: 1 open
+- **admin**: 1 open
+- **infrastructure**: 1 open
 
-## Template Status Overview
+## Recently Closed
 
-| Template | Pixel Status | Open | Resolved |
-|---|---|---|---|
-| Modern | pixel_perfect | 1 | 6 |
-| Classic | pixel_perfect | 0 | 5 |
-| ATS Minimal | pixel_perfect | 0 | 5 |
-| Professional | pixel_perfect | 1 | 4 |
-| Modern Clean | pixel_perfect | 1 | 5 |
-| Sidebar Accent | pixel_perfect | 0 | 6 |
-| Editorial Split | pixel_perfect | 0 | 7 |
-
-## Audit Coverage Summary
-
-| Workflow | Pages Tracked | Compliant/Closed | Open Issues |
-|---|---|---|---|
-| ui-guidelines-audit | 37 | 37 compliant | 0 |
-| responsive-ui-audit | 35 | 10 closed, 25 reviewed | 0 |
-| ux-usability-audit | 35 | 0 clean, 15 improved | 9 local (2 on GitHub) |
-| template-audit | 7 | 7 pixel_perfect | 3 (all minor) |
-| continuous-improvement | 10 proposals | 7 implemented, 3 discovered | 0 on GitHub |
-| resumebuilder-reference-rollout | 6 slices | 6 verified | 0 |
-
-## Recommended Next Actions
-
-1. **`/continuous-improvement implement-next`** — CI-WORKSPACE-003 quick export (medium/small)
-2. **`/ux-usability-audit implement-next resume-builder-finalize`** — UX-BLDFIN-004, UX-BLDFIN-005
-3. **`/continuous-improvement implement-next`** — CI-WORKSPACE-002 duplicate resume (high/medium)
-4. **`/continuous-improvement explore admin`** — Discover admin persona improvement opportunities
-
-## Recently Closed (this sync)
-
-| # | Title | Reason |
-|---|---|---|
-| #40 | UX-HOME-002 repeated template-switching messaging | Fixed: home page copy refinements |
-| #41 | UX-HOME-003 FAQ answers inline scroll efficiency | Fixed: FAQ collapsed behind disclosures |
-| #46 | LlmProvider sync-state extraction | Fixed: credential concern extracted, sync-state localized |
-| #62 | UX-TSHOW-002 duplicate CTA cluster | Fixed: consolidated template-show CTAs |
+- #77 [continuous-improvement] workspace always sorts resumes by updated_at descending (CI-WORKSPACE-006) (closed 2026-03-22T23:17:55Z)
+- #76 [continuous-improvement] workspace has no search or filter capability (CI-WORKSPACE-005) (closed 2026-03-22T23:17:53Z)
+- #74 [ux-usability-audit] Four distinct task areas compete for attention on one page: template, design, section visibility, and secti... (UX-BLDFIN-005) (closed 2026-03-22T23:17:58Z)
+- #73 [ux-usability-audit] Curated library pushes textarea below fold (UX-BLDSUM-002) (closed 2026-03-22T23:17:50Z)
+- #69 [ux-usability-audit] Completed cards still show both `Summary ready` and `Ready for review`, which creates two overlapping readi... (UX-RIDX-002) (closed 2026-03-22T23:17:47Z)
+- #68 [ux-usability-audit] Hero badges (Guided steps, Live preview, PDF export) are text-only — small icons would improve scanability (UX-HOME-004) (closed 2026-03-22T23:17:45Z)
+- #67 [template-audit] Modern Clean accent contrast discrepancy (MCL-006) (closed 2026-03-22T23:17:42Z)
+- #66 [ux-usability-audit] Task overload on finalize step (UX-BLDFIN-005) (closed 2026-03-22T23:27:38Z)
+- #65 [continuous-improvement] Allow guest access to template gallery (CI-TEMPLATE-001) (closed 2026-03-22T05:13:25Z)
+- #64 [continuous-improvement] Make homepage Start here cards clickable conversion paths (CI-NAV-001) (closed 2026-03-22T05:20:58Z)
 
 ---
-_Generated by `/github-ops full-sync` at 2026-03-22T05:34:00Z_
+_Generated by `bin/gh-bridge/roadmap-summary` at 2026-03-22T23:27:38Z_

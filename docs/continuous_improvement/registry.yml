@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T04:30:00Z"
+updated_at: "2026-03-22T23:55:00Z"
 workflow:
   status: active
   path: ".windsurf/workflows/continuous-improvement.md"
@@ -12,7 +12,7 @@ tracking:
   overview_path: "docs/continuous_improvement/README.md"
   run_doc_pattern: "docs/continuous_improvement/runs/<date>-<slug>/00-overview.md"
   proposal_doc_pattern: "docs/continuous_improvement/proposals/<proposal_id>.md"
-  latest_run: "docs/continuous_improvement/runs/2026-03-22-new-user-journey-explore/00-overview.md"
+  latest_run: "docs/continuous_improvement/runs/2026-03-22-returning-user-explore-refresh/00-overview.md"
 artifacts:
   cache_root: "tmp/ci_artifacts"
   competitive_subfolder: "competitive"
@@ -122,14 +122,14 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 11
-  last_cycle_date: "2026-03-22T06:10:00Z"
+  cycle_count: 15
+  last_cycle_date: "2026-03-22T23:55:00Z"
   proposals_discovered: 14
-  proposals_implemented: 11
-  proposals_remaining: 3
+  proposals_implemented: 14
+  proposals_remaining: 0
   proposals_routed: 0
   competitive_scans_completed: 0
-  journeys_simulated: 3
+  journeys_simulated: 4
   journey_log:
     - persona: new_user
       date: "2026-03-22T04:30:00Z"
@@ -188,10 +188,27 @@ cycle_metrics:
         - "No search or filter capability on workspace — user cannot find a specific resume"
         - "No sorting options on workspace — always sorted by updated_at desc"
         - "No bulk actions — cannot select multiple resumes for export or delete"
+    - persona: returning_user
+      date: "2026-03-22T23:55:00Z"
+      viewport: "1440x900 + 390x844"
+      steps_completed:
+        - "Open workspace as authenticated demo user"
+        - "Verify search, sort, and bulk controls on /resumes"
+        - "Open an existing resume from the workspace"
+        - "Confirm the builder lands on finalize for a complete draft"
+        - "Open preview from finalize and verify the step context persists"
+        - "Resize to mobile and verify quick preview actions stay above the long preview content"
+      console_errors: 0
+      observations:
+        - "Previously tracked returning-user workspace issues are now resolved in the current tree"
+        - "Edit from the workspace lands on finalize for a complete draft instead of forcing heading"
+        - "Preview preserves step=finalize when returning to editing"
+        - "Mobile preview surfaces export and edit actions before the long document preview"
+        - "No new CI-owned friction or productivity gap was identified in this re-exploration pass"
 next_step:
-  recommended_mode: "implement-next"
-  recommended_persona: "power_user"
-  reason: "CI-WORKSPACE-004 (pagination) implemented in cycle 11. 3 proposals remain: CI-WORKSPACE-005 (search, high/medium), CI-WORKSPACE-006 (sort, medium/small), CI-EXPORT-001 (bulk actions, medium/medium). Next: CI-WORKSPACE-006 (medium impact, small effort)."
+  recommended_mode: "explore"
+  recommended_persona: "new_user"
+  reason: "The returning-user journey re-exploration did not surface a new CI-owned proposal, and the tracked workspace backlog remains validated. The next honest explore pass is the new-user journey, especially the end-to-end public → account creation → first-draft flow after the recent auth and setup refinements."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -561,7 +578,9 @@ proposals:
     category: productivity_boost
     impact: high
     effort: medium
-    status: discovered
+    status: implemented
+    implemented_at: "2026-03-22T06:18:00Z"
+    github_issue: 76
     user_personas:
       - power_user
     journey_step: "View workspace with many resumes — no search or filter"
@@ -592,7 +611,9 @@ proposals:
     category: productivity_boost
     impact: medium
     effort: small
-    status: discovered
+    status: implemented
+    implemented_at: "2026-03-22T06:12:00Z"
+    github_issue: 77
     user_personas:
       - power_user
     journey_step: "View workspace — resumes always sorted by updated_at desc"
@@ -622,6 +643,7 @@ proposals:
     impact: medium
     effort: medium
     status: discovered
+    github_issue: 78
     user_personas:
       - power_user
     journey_step: "View workspace — no bulk export capability"

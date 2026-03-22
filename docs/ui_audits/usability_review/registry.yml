@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:50:00Z"
+updated_at: "2026-03-22T23:23:08Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-rshow-trim-preview-export-badge/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-collapse-additional-sections/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "resume-builder-personal-details"
-    - "resume-builder-summary"
-    - "password-reset-request"
-  reason: "sign-in (85) and create-account (83) now audited and improved. resume-builder-personal-details (81) and resume-builder-summary (81) are the lowest-scoring audited pages with open issues. password-reset-request is the next unaudited public page."
+    - "password-reset-edit"
+    - "template-show"
+    - "resumes-index"
+  reason: "resume-builder-finalize is now closed with no open usability issues. password-reset-edit is the next unaudited public/auth recovery page, template-show retains the low-priority carry-through copy cleanup, and resumes-index should be re-reviewed after the current workspace bulk-actions regression is fixed."
 pages:
   - page_key: "home"
     title: "Home"
@@ -153,7 +153,29 @@ pages:
     issues_resolved: 2
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "password-reset-request", title: "Password reset request", path: "/passwords/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "password-reset-request"
+    title: "Password reset request"
+    path: "/passwords/new"
+    access_level: "public"
+    auth_context: "guest"
+    page_family: "public_auth"
+    priority: "low"
+    status: "improved"
+    usability_score: 88
+    page_doc_path: "docs/ui_audits/usability_review/pages/password-reset-request.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-PWREQ-001"
+    last_audited_at: "2026-03-22T23:13:51Z"
+    last_changed_at: "2026-03-22T23:13:51Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-password-reset-request-action-first/00-overview.md"
+    next_step: "No open issues remain on the password reset request page. Revisit only if the recovery copy, support panel, or public auth shell changes materially."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T23:13:51Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - page_key: "resumes-index"
     title: "Resume workspace"
@@ -254,11 +276,11 @@ pages:
     status: "improved"
     usability_score: 86
     page_doc_path: "docs/ui_audits/usability_review/pages/template-show.md"
-    open_issue_keys: []
+    open_issue_keys:
+      - "UX-TSHOW-003"
     closed_issue_keys:
       - "UX-TSHOW-001"
       - "UX-TSHOW-002"
-      - "UX-TSHOW-003"
       - "UX-TSHOW-004"
     last_audited_at: "2026-03-22T05:24:00Z"
     last_changed_at: "2026-03-22T05:24:00Z"
@@ -270,6 +292,8 @@ pages:
     issues_resolved: 3
     issues_remaining: 1
     regression_detected: false
+    github_issue_numbers:
+      UX-TSHOW-003: 70
   - { page_key: "resume-source-import", title: "Resume source import launcher", path: "/resume_source_imports/:provider", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - page_key: "resume-builder-source"
     title: "Resume builder source step"
@@ -281,11 +305,11 @@ pages:
     status: "improved"
     usability_score: 85
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-source.md"
-    open_issue_keys: []
+    open_issue_keys:
+      - "UX-BLDSRC-003"
     closed_issue_keys:
       - "UX-BLDSRC-001"
       - "UX-BLDSRC-002"
-      - "UX-BLDSRC-003"
       - "UX-BLDSRC-004"
     last_audited_at: "2026-03-22T06:18:00Z"
     last_changed_at: "2026-03-22T06:18:00Z"
@@ -297,6 +321,8 @@ pages:
     issues_resolved: 3
     issues_remaining: 1
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDSRC-003: 71
   - page_key: "resume-builder-heading"
     title: "Resume builder heading step"
     path: "/resumes/:id/edit?step=heading"
@@ -307,11 +333,11 @@ pages:
     status: "improved"
     usability_score: 87
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-heading.md"
-    open_issue_keys: []
+    open_issue_keys:
+      - "UX-BLDHDG-003"
     closed_issue_keys:
       - "UX-BLDHDG-001"
       - "UX-BLDHDG-002"
-      - "UX-BLDHDG-003"
     last_audited_at: "2026-03-22T06:08:00Z"
     last_changed_at: "2026-03-22T06:08:00Z"
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-trim-duplicate-personal-details-cta/00-overview.md"
@@ -322,6 +348,8 @@ pages:
     issues_resolved: 2
     issues_remaining: 1
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDHDG-003: 72
   - page_key: "resume-builder-personal-details"
     title: "Resume builder personal details step"
     path: "/resumes/:id/edit?step=personal_details"
@@ -332,11 +360,11 @@ pages:
     status: "improved"
     usability_score: 81
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-personal-details.md"
-    open_issue_keys: []
+    open_issue_keys:
+      - "UX-BLDPD-003"
     closed_issue_keys:
       - "UX-BLDPD-001"
       - "UX-BLDPD-002"
-      - "UX-BLDPD-003"
     last_audited_at: "2026-03-22T06:31:00Z"
     last_changed_at: "2026-03-22T06:31:00Z"
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-plain-language-headshot-copy/00-overview.md"
@@ -347,6 +375,8 @@ pages:
     issues_resolved: 2
     issues_remaining: 1
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDPD-003: 79
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
     path: "/resumes/:id/edit?step=experience"
@@ -433,22 +463,22 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "improved"
-    usability_score: 81
+    usability_score: 84
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-summary.md"
     open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDSUM-001"
       - "UX-BLDSUM-002"
       - "UX-BLDSUM-003"
-    last_audited_at: "2026-03-22T06:05:00Z"
-    last_changed_at: "2026-03-22T06:05:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsum-remove-duplicate-step-header/00-overview.md"
-    next_step: "UX-BLDSUM-002 (scroll_efficiency) is the only open issue — curated library pushes textarea below fold. Consider collapsing the library behind a disclosure."
-    cycle_count: 1
-    last_cycle_date: "2026-03-22T06:05:00Z"
+    last_audited_at: "2026-03-22T07:15:00Z"
+    last_changed_at: "2026-03-22T07:15:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsum-collapse-summary-library/00-overview.md"
+    next_step: "No open issues remain on resume-builder-summary. Revisit only if the summary suggestions disclosure, builder chrome, or summary-step guidance changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T07:15:00Z"
     issues_found: 3
-    issues_resolved: 2
-    issues_remaining: 1
+    issues_resolved: 3
+    issues_remaining: 0
     regression_detected: false
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"
@@ -458,25 +488,27 @@ pages:
     page_family: "builder"
     priority: "high"
     status: "improved"
-    usability_score: 83
+    usability_score: 86
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-finalize.md"
-    open_issue_keys:
-      - "UX-BLDFIN-005"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDFIN-001"
       - "UX-BLDFIN-002"
       - "UX-BLDFIN-003"
       - "UX-BLDFIN-004"
-    last_audited_at: "2026-03-22T05:34:00Z"
-    last_changed_at: "2026-03-22T05:34:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-plain-language-design-copy/00-overview.md"
-    next_step: "UX-BLDFIN-005 (task_overload) is the only remaining open issue. Consider addressing it if finalize task overload becomes a user complaint."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T05:34:00Z"
+      - "UX-BLDFIN-005"
+    last_audited_at: "2026-03-22T23:23:08Z"
+    last_changed_at: "2026-03-22T23:23:08Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-collapse-additional-sections/00-overview.md"
+    next_step: "No open issues remain on the finalize step. Revisit only if the finalize workspace grows new always-visible control groups or the additional-sections flow changes materially."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T23:23:08Z"
     issues_found: 5
-    issues_resolved: 4
-    issues_remaining: 1
+    issues_resolved: 5
+    issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDFIN-005: 66
   - { page_key: "admin-dashboard", title: "Admin dashboard", path: "/admin", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-templates-index", title: "Admin templates index", path: "/admin/templates", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-template-show", title: "Admin template detail", path: "/admin/templates/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }

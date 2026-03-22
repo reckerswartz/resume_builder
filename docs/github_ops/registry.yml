@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:34:00Z"
+updated_at: "2026-03-22T23:28:05Z"
 
 github:
   remote: "origin"
@@ -7,12 +7,12 @@ github:
   default_branch: "main"
 
 label_taxonomy:
-  synced_at: "2026-03-22T05:34:00Z"
-  workflow_labels: 19
+  synced_at: "2026-03-22T23:20:00Z"
+  workflow_labels: 20
   domain_labels: 13
   severity_labels: 4
   status_labels: 6
-  type_labels: 12
+  type_labels: 14
   coordination_labels: 1
 
 bridge_scripts:
@@ -24,6 +24,7 @@ bridge_scripts:
   close_issue: "bin/gh-bridge/close-issue"
   sync_registry: "bin/gh-bridge/sync-registry"
   roadmap_summary: "bin/gh-bridge/roadmap-summary"
+  aggregate_history: "bin/gh-bridge/aggregate-history"
 
 issue_templates:
   audit: "docs/github_ops/issue_templates/audit.md"
@@ -38,10 +39,10 @@ workflow_registries:
     issue_prefix: "template-audit"
     domain: "templates"
     type: "discrepancy"
-    issue_count: { open: 3, closed: 7 }
+    issue_count: { open: 0, closed: 11 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
-    github_issues: [35, 36, 37]
+    last_synced_at: "2026-03-22T23:21:55Z"
+    github_issues: [2, 3, 4, 5, 6, 35, 36, 37, 38, 39, 67]
 
   - workflow: "responsive-ui-audit"
     registry_path: "docs/ui_audits/responsive_review/registry.yml"
@@ -51,7 +52,7 @@ workflow_registries:
     type: "responsive-issue"
     issue_count: { open: 0, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T06:20:04Z"
     github_issues: [60]
 
   - workflow: "ui-guidelines-audit"
@@ -62,7 +63,7 @@ workflow_registries:
     type: "compliance-gap"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T06:20:04Z"
 
   - workflow: "ux-usability-audit"
     registry_path: "docs/ui_audits/usability_review/registry.yml"
@@ -70,10 +71,10 @@ workflow_registries:
     issue_prefix: "ux-usability-audit"
     domain: "builder"
     type: "usability-issue"
-    issue_count: { open: 2, closed: 4 }
+    issue_count: { open: 4, closed: 13 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
-    github_issues: [42, 43]
+    last_synced_at: "2026-03-22T23:28:05Z"
+    github_issues: [7, 8, 40, 41, 42, 43, 61, 62, 66, 68, 69, 70, 71, 72, 73, 74, 79]
 
   - workflow: "maintainability-audit"
     registry_path: "docs/maintainability_audits/registry.yml"
@@ -81,30 +82,30 @@ workflow_registries:
     issue_prefix: "maintainability-audit"
     domain: "infrastructure"
     type: "maintainability"
-    issue_count: { open: 1, closed: 9 }
+    issue_count: { open: 3, closed: 9 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
-    github_issues: [33]
+    last_synced_at: "2026-03-22T23:21:55Z"
+    github_issues: [9, 10, 33, 44, 45, 46, 48, 51, 54, 56, 75, 80]
 
   - workflow: "security-audit"
-    registry_path: null
+    registry_path: "docs/security_audits/registry.yml"
     tracking_unit: "finding ID"
     issue_prefix: "security-audit"
     domain: "security"
     type: "security-finding"
-    issue_count: { open: 0, closed: 1 }
+    issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T23:20:00Z"
 
   - workflow: "code-review"
-    registry_path: null
+    registry_path: "docs/code_reviews/registry.yml"
     tracking_unit: "finding ID"
     issue_prefix: "code-review"
     domain: "infrastructure"
     type: "refactor"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T23:20:00Z"
 
   - workflow: "behance-template-rollout"
     registry_path: "docs/template_rollouts/registry.yml"
@@ -114,7 +115,7 @@ workflow_registries:
     type: "rollout-slice"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T06:20:04Z"
 
   - workflow: "behance-template-implementation"
     registry_path: "docs/template_rollouts/registry.yml"
@@ -124,7 +125,7 @@ workflow_registries:
     type: "rollout-slice"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T06:20:04Z"
 
   - workflow: "resumebuilder-reference-rollout"
     registry_path: "docs/resumebuilder_rollouts/registry.yml"
@@ -134,7 +135,7 @@ workflow_registries:
     type: "rollout-slice"
     issue_count: { open: 0, closed: 5 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
+    last_synced_at: "2026-03-22T06:20:04Z"
 
   - workflow: "continuous-improvement"
     registry_path: "docs/continuous_improvement/registry.yml"
@@ -142,10 +143,10 @@ workflow_registries:
     issue_prefix: "continuous-improvement"
     domain: "workspace"
     type: "feature"
-    issue_count: { open: 0, closed: 5 }
+    issue_count: { open: 1, closed: 7 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T05:34:00Z"
-    github_issues: [58, 59, 63, 64, 65]
+    last_synced_at: "2026-03-22T23:21:55Z"
+    github_issues: [58, 59, 63, 64, 65, 76, 77, 78]
 
   - workflow: "feature-spec"
     registry_path: null
@@ -237,9 +238,19 @@ workflow_registries:
     pr_count: { open: 0, merged: 0 }
     last_synced_at: null
 
+  - workflow: "meta-learning"
+    registry_path: "docs/meta_learning/registry.yml"
+    tracking_unit: "finding ID"
+    issue_prefix: "meta-learning"
+    domain: "infrastructure"
+    type: "automation"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: "2026-03-22T23:13:43Z"
+
 file_locks:
   active: []
 
 roadmap:
-  generated_at: "2026-03-22T05:34:00Z"
+  generated_at: "2026-03-22T23:28:05Z"
   path: "docs/github_ops/roadmap.md"

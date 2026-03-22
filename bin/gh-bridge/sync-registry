@@ -4,7 +4,7 @@
 #
 # Usage: bin/gh-bridge/sync-registry \
 #   --workflow "template-audit" \
-#   --registry "docs/template_audits/registry.yml" \
+#   [--registry "docs/template_audits/registry.yml"] \
 #   [--dry-run]
 #
 # This script reads the registry, identifies open items without GitHub issue
@@ -28,9 +28,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ -z "$WORKFLOW" ] || [ -z "$REGISTRY" ]; then
-  echo "ERROR: --workflow and --registry are required." >&2
+if [ -z "$WORKFLOW" ]; then
+  echo "ERROR: --workflow is required." >&2
   exit 1
+fi
+
+if [ -z "$REGISTRY" ]; then
+  REGISTRY=$(ruby -ryaml -e '
+    workflow = ARGV[0]
+    registry = YAML.safe_load(File.read("docs/github_ops/registry.yml"), permitted_classes: [Date, Time], aliases: true) || {}
+    entry = Array(registry["workflow_registries"]).find { |candidate| candidate["workflow"] == workflow }
+    print(entry && entry["registry_path"] ? entry["registry_path"] : "")
+  ' "$WORKFLOW" 2>/dev/null || printf "")
+
+  if [ -z "$REGISTRY" ]; then
+    echo "WARNING: Workflow ${WORKFLOW} has no durable registry configured in docs/github_ops/registry.yml." >&2
+    echo "Create a registry first or pass --registry explicitly if one exists outside the central registry." >&2
+    exit 0
+  fi
 fi
 
 if [ ! -f "$REGISTRY" ]; then
@@ -46,61 +61,173 @@ echo "Registry: ${REGISTRY}"
 echo "Repository: ${REPO}"
 echo ""
 
-# Use ruby to parse the YAML and extract open items without github_issue_number
-# This handles the various registry formats across workflows
-ruby -ryaml -rjson -e '
-  registry = YAML.safe_load(File.read(ARGV[0]), permitted_classes: [Date, Time])
-  workflow = ARGV[1]
+ruby -ryaml -rjson -rdate -e '
+  registry = YAML.safe_load(File.read(ARGV[0]), permitted_classes: [Date, Time], aliases: true) || {}
   items = []
 
-  # Template audit format: templates[].discrepancies or top-level open counts
+  def linked_issue?(record)
+    record.is_a?(Hash) && (record["github_issue_number"] || record["github_issue"])
+  end
+
+  def linked_issue_for_key?(record, key)
+    return false unless record.is_a?(Hash) && key
+
+    issue_map = record["github_issue_numbers"]
+    issue_map.is_a?(Hash) && issue_map[key]
+  end
+
+  def read_markdown(path)
+    return nil unless path && File.file?(path)
+
+    File.read(path)
+  rescue Errno::ENOENT
+    nil
+  end
+
+  def extract_open_keys_from_markdown(path)
+    content = read_markdown(path)
+    return [] unless content
+
+    keys = []
+
+    content.scan(/^###\s+([A-Z0-9]+(?:-[A-Z0-9]+)+)\b.*?(?=^###\s|\z)/m) do
+      match = Regexp.last_match
+      keys << match[1] if match[0].match?(/- \*\*Status\*\*:\s*open\b/i)
+    end
+
+    content.each_line do |line|
+      next unless line.start_with?("|")
+
+      columns = line.split("|").map(&:strip)
+      next if columns.length < 3
+
+      key = columns[1]
+      status = columns[-1] || columns[-2]
+      next unless key&.match?(/\A[A-Z0-9]+(?:-[A-Z0-9]+)+\z/)
+
+      keys << key if status.match?(/\bopen\b/i)
+    end
+
+    keys.uniq
+  end
+
+  def append_items(items, candidates)
+    candidates.each do |candidate|
+      next if candidate[:key].nil? || candidate[:key].to_s.empty?
+
+      items << candidate.transform_keys(&:to_s)
+    end
+  end
+
   if registry["templates"]
-    registry["templates"].each do |t|
-      slug = t["slug"]
-      status = t["pixel_status"]
-      open_count = t["open_discrepancy_count"] || 0
-      if open_count > 0 && !t.dig("github_issue_number")
-        items << { key: slug, status: status, open_count: open_count, type: "template" }
+    registry["templates"].each do |template|
+      open_count = template["open_discrepancy_count"] || 0
+      next unless open_count.to_i.positive?
+
+      slug = template["slug"]
+      doc_path = template["template_doc_path"] || "docs/template_audits/templates/#{slug}.md"
+      discrepancy_keys = extract_open_keys_from_markdown(doc_path)
+
+      if discrepancy_keys.any?
+        append_items(items, discrepancy_keys.reject { |key| linked_issue_for_key?(template, key) }.map do |key|
+          { key: key, template: slug, status: template["pixel_status"], type: "template_discrepancy" }
+        end)
+      elsif !linked_issue?(template)
+        items << { "key" => slug, "template" => slug, "status" => template["pixel_status"], "type" => "template" }
       end
     end
   end
 
-  # Responsive/guidelines/usability format: pages[].open_issue_keys
   if registry["pages"]
-    registry["pages"].each do |p|
-      key = p["page_key"]
-      status = p["status"]
-      open_keys = p["open_issue_keys"] || []
-      open_keys.each do |ik|
-        items << { key: ik, page: key, status: status, type: "page_issue" }
+    registry["pages"].each do |page|
+      page_key = page["page_key"]
+      open_keys = Array(page["open_issue_keys"]).compact
+
+      if open_keys.empty?
+        issues_remaining = page["issues_remaining"]
+        open_keys = extract_open_keys_from_markdown(page["page_doc_path"]) if issues_remaining.to_i.positive?
       end
+
+      open_keys = open_keys.reject { |key| linked_issue_for_key?(page, key) }
+
+      append_items(items, open_keys.map do |key|
+        { key: key, page: page_key, status: page["status"], type: "page_issue" }
+      end)
     end
   end
 
-  # Maintainability format: areas[]
   if registry["areas"]
-    registry["areas"].each do |a|
-      key = a["key"]
-      status = a["status"]
-      if status != "closed" && !a.dig("github_issue_number")
-        items << { key: key, status: status, type: "area" }
+    registry["areas"].each do |area|
+      key = area["area_key"] || area["key"]
+      status = area["status"]
+      next if key.nil? || status == "closed" || linked_issue?(area)
+
+      items << { "key" => key, "status" => status, "type" => "area" }
+    end
+  end
+
+  if registry["candidates"]
+    registry["candidates"].each do |candidate|
+      key = candidate["reference_key"] || candidate["key"] || candidate["slug"]
+      status = candidate["candidate_status"] || candidate["status"]
+      next if key.nil? || linked_issue?(candidate)
+      next if %w[implemented superseded rejected duplicate closed verified].include?(status.to_s)
+
+      open_improvement_keys = Array(candidate["open_improvement_keys"]).compact
+      if open_improvement_keys.any?
+        append_items(items, open_improvement_keys.map do |improvement_key|
+          { key: improvement_key, reference: key, status: status, type: "candidate_improvement" }
+        end)
+      else
+        items << { "key" => key, "status" => status, "type" => "candidate" }
       end
     end
   end
 
-  # Rollout format: candidates[] or slices[]
-  ["candidates", "slices"].each do |collection|
-    next unless registry[collection]
-    registry[collection].each do |c|
-      key = c["key"] || c["slug"] || c["reference_key"]
-      status = c["status"]
-      if status != "closed" && status != "implemented" && !c.dig("github_issue_number")
-        items << { key: key, status: status, type: "rollout" }
-      end
+  if registry["slices"]
+    registry["slices"].each do |slice|
+      key = slice["slice_key"] || slice["key"] || slice["slug"] || slice["reference_key"]
+      status = slice["status"]
+      next if key.nil? || linked_issue?(slice)
+      next if %w[verified implemented closed].include?(status.to_s)
+
+      items << { "key" => key, "status" => status, "type" => "rollout_slice" }
     end
   end
 
-  puts JSON.pretty_generate(items)
+  if registry["proposals"]
+    registry["proposals"].each do |proposal|
+      key = proposal["id"]
+      status = proposal["status"]
+      next if key.nil? || linked_issue?(proposal)
+      next if %w[validated implemented closed deferred routed].include?(status.to_s)
+
+      items << { "key" => key, "status" => status, "type" => "proposal" }
+    end
+  end
+
+  if registry["findings"]
+    registry["findings"].each do |finding|
+      key = finding["finding_id"] || finding["id"] || finding["key"]
+      status = finding["status"]
+      next if key.nil? || linked_issue?(finding)
+      next if %w[validated closed deferred remediated].include?(status.to_s)
+
+      items << {
+        "key" => key,
+        "status" => status,
+        "type" => "finding",
+        "severity" => finding["severity"],
+        "category" => finding["category"]
+      }
+    end
+  end
+
+  deduped_items = items.uniq do |item|
+    [item["type"], item["key"], item["page"], item["template"], item["reference"]]
+  end
+
+  puts JSON.pretty_generate(deduped_items)
 ' "$REGISTRY" "$WORKFLOW" 2>/dev/null || echo "[]"
 
 echo ""

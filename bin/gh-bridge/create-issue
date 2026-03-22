@@ -47,8 +47,26 @@ fi
 REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
 FULL_TITLE="[${WORKFLOW}] ${TITLE} (${KEY})"
 
-# Check for existing open issue with the same title
-EXISTING=$(gh issue list --repo "$REPO" --state open --search "\"${FULL_TITLE}\"" --json number,title -q ".[] | select(.title == \"${FULL_TITLE}\") | .number" 2>/dev/null || true)
+# Check for an existing open issue with the same workflow label + tracking key.
+# This stays idempotent even if the descriptive title text changes over time.
+EXISTING=$(gh issue list \
+  --repo "$REPO" \
+  --state open \
+  --label "workflow:${WORKFLOW}" \
+  --search "\"(${KEY})\"" \
+  --json number,title \
+  -q "sort_by(.number) | map(select(.title | endswith(\"(${KEY})\"))) | .[0].number" \
+  2>/dev/null || true)
+
+if [ -z "$EXISTING" ] || [ "$EXISTING" = "null" ]; then
+  EXISTING=$(gh issue list \
+    --repo "$REPO" \
+    --state open \
+    --search "\"${FULL_TITLE}\"" \
+    --json number,title \
+    -q ".[] | select(.title == \"${FULL_TITLE}\") | .number" \
+    2>/dev/null || true)
+fi
 
 if [ -n "$EXISTING" ]; then
   echo "$EXISTING"

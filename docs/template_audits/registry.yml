@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:01:00Z"
+updated_at: "2026-03-22T23:00:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/template-audit.md"
@@ -10,7 +10,7 @@ tracking:
   template_doc_template: "docs/template_audits/templates/TEMPLATE.md"
   run_doc_template: "docs/template_audits/runs/TEMPLATE.md"
   artifact_root: "docs/template_audits/artifacts"
-  latest_run: "docs/template_audits/runs/2026-03-22-professional-entry-spacing/00-overview.md"
+  latest_run: "docs/template_audits/runs/2026-03-22-modern-clean-accent-rereview/00-overview.md"
 seed_profiles:
   catalog_path: "app/services/resumes/seed_profile_catalog.rb"
   profile_count: 8
@@ -74,15 +74,15 @@ templates:
     regression_detected: false
   - slug: "modern-clean"
     pixel_status: "pixel_perfect"
-    open_discrepancy_count: 1
-    resolved_discrepancy_count: 5
+    open_discrepancy_count: 0
+    resolved_discrepancy_count: 6
     last_audit_at: "2026-03-22"
-    notes: "Regression re-audit after finalize-workspace commit (48a3230). Density gap/chip/entry tweaks hold. Zero console errors. MCL-006 (minor accent_contrast guidance) remains."
-    cycle_count: 8
-    last_cycle_date: "2026-03-22T05:30:00Z"
+    notes: "Review-only rereview found the live seeded previews still resolving teal through the old shared tone mapping. Aligned the shared teal tone and curated palette to #0D6B63, reseeded audit data, and reverified /resumes/122 plus /resumes/123 with zero console errors and no overflow. All 6 discrepancies now resolved."
+    cycle_count: 9
+    last_cycle_date: "2026-03-22T23:00:00Z"
     discrepancies_found: 6
-    discrepancies_resolved: 5
-    discrepancies_remaining: 1
+    discrepancies_resolved: 6
+    discrepancies_remaining: 0
     regression_detected: false
   - slug: "sidebar-accent"
     pixel_status: "pixel_perfect"
