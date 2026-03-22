@@ -430,6 +430,29 @@ en:
         early_career: "Early career"
         mid_to_senior: "Mid to senior"
         growth_stage: "Growth stage"
+    skills_step_state:
+      section_guidance:
+        early_career:
+          title: "Start with what you know"
+          description: "List tools, languages, and soft skills you've used in coursework, projects, or part-time roles. Employers want to see honest familiarity, not expertise claims."
+          badge: "Early-career friendly"
+          helper_text: "Order your strongest skills first. Hiring managers scan the first 5–8 items before reading further."
+        experienced:
+          title: "Lead with your strongest skills"
+          description: "Prioritize the skills that have driven results in your most impactful roles. Group technical and leadership skills to show breadth and depth."
+          badge: "Role-aware"
+          helper_text: "Match skills to the target role. Remove outdated or generic entries that don't differentiate you."
+      audience_badges:
+        early_career: "Early career"
+        growth_stage: "Growth stage"
+    skills_suggestion_catalog:
+      category_labels:
+        software_engineering: "Software Engineering"
+        product_management: "Product Management"
+        design: "Design"
+        data_analytics: "Data & Analytics"
+        marketing: "Marketing"
+        general: "General & Operations"
     experience_step_state:
       section_guidance:
         early_career:

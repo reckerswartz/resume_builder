@@ -37,6 +37,41 @@
   <% end %>
 <% end %>
 
+<% if current_step[:key] == "skills" %>
+  <% skills_guidance = resume_skills_step_state(resume).section_guidance %>
+
+  <%= render Ui::SurfaceCardComponent.new(
+    tag: :details,
+    padding: :none,
+    extra_classes: "overflow-hidden",
+    html_options: { id: "skills-step-guidance" }
+  ) do %>
+    <summary class="flex cursor-pointer list-none items-center justify-between gap-3 border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-3 [&::-webkit-details-marker]:hidden">
+      <span class="text-sm font-semibold text-ink-950"><%= skills_guidance[:title] %></span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= skills_guidance[:badge] %></span>
+    </summary>
+
+    <div class="px-6 py-6 space-y-4">
+      <p class="text-sm leading-6 text-ink-700/80"><%= skills_guidance[:description] %></p>
+      <p class="text-sm leading-6 text-ink-700/70"><%= skills_guidance[:helper_text] %></p>
+
+      <% skills_guidance[:suggestions].each do |suggestion| %>
+        <div class="<%= [ui_inset_panel_classes(tone: :default, padding: :sm), 'space-y-3'].join(' ') %>">
+          <div class="flex items-start justify-between gap-3">
+            <p class="text-sm font-semibold text-ink-950"><%= suggestion[:category_label] %></p>
+            <span class="<%= ui_badge_classes(:info) %>"><%= suggestion[:audience_badge_label] %></span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <% suggestion[:skills].each do |skill| %>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= skill %></span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
 <section id="<%= dom_id(resume, :step_sections) %>" class="space-y-4">
   <% if step_sections.any? %>
     <div class="space-y-4" data-controller="sortable">
