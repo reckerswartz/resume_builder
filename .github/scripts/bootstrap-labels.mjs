@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Bootstrap GitHub Labels
+ * Bootstrap GitHub Labels — Preview Tool
  *
- * Creates the labels required by the CI/CD pipeline.
- * Run manually or via: gh api repos/:owner/:repo/labels --method POST ...
+ * Lists the labels required by the CI/CD pipeline.
+ * Actual label creation/updates are handled by the bootstrap-labels.yml
+ * GitHub Actions workflow, which uses the built-in GITHUB_TOKEN automatically.
  *
  * Usage:
- *   GITHUB_TOKEN=ghp_... node .github/scripts/bootstrap-labels.mjs
- *
- * Or use the GitHub CLI:
- *   node .github/scripts/bootstrap-labels.mjs --dry-run
+ *   node .github/scripts/bootstrap-labels.mjs
  */
 
 const LABELS = [
@@ -44,76 +42,10 @@ const LABELS = [
   { name: "scope:admin", color: "f9d0c4", description: "Admin panel" },
 ];
 
-async function main() {
-  const dryRun = process.argv.includes("--dry-run");
-  const token = process.env.GITHUB_TOKEN;
-  const repo = process.env.GITHUB_REPOSITORY;
-
-  if (!dryRun && (!token || !repo)) {
-    console.error("Set GITHUB_TOKEN and GITHUB_REPOSITORY environment variables");
-    console.error("Or run with --dry-run to preview labels");
-    process.exit(1);
-  }
-
-  if (dryRun) {
-    console.log("Labels that would be created:\n");
-    for (const label of LABELS) {
-      console.log(`  #${label.color} ${label.name} — ${label.description}`);
-    }
-    console.log(`\nTotal: ${LABELS.length} labels`);
-    return;
-  }
-
-  const [owner, repoName] = repo.split("/");
-  const baseUrl = `https://api.github.com/repos/${owner}/${repoName}/labels`;
-
-  let created = 0;
-  let updated = 0;
-  let skipped = 0;
-
-  for (const label of LABELS) {
-    // Try to create
-    const createResp = await fetch(baseUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(label),
-    });
-
-    if (createResp.ok) {
-      created++;
-      console.log(`  Created: ${label.name}`);
-    } else if (createResp.status === 422) {
-      // Already exists — update it
-      const updateResp = await fetch(`${baseUrl}/${encodeURIComponent(label.name)}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ color: label.color, description: label.description }),
-      });
-      if (updateResp.ok) {
-        updated++;
-        console.log(`  Updated: ${label.name}`);
-      } else {
-        skipped++;
-        console.log(`  Skipped: ${label.name} (${updateResp.status})`);
-      }
-    } else {
-      skipped++;
-      console.log(`  Failed: ${label.name} (${createResp.status})`);
-    }
-  }
-
-  console.log(`\nDone: ${created} created, ${updated} updated, ${skipped} skipped`);
+console.log("Pipeline labels (managed by .github/workflows/bootstrap-labels.yml):\n");
+for (const label of LABELS) {
+  console.log(`  #${label.color}  ${label.name} — ${label.description}`);
 }
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+console.log(`\nTotal: ${LABELS.length} labels`);
+console.log("\nTo create/update these labels, push this file to main or run the");
+console.log("'Bootstrap Labels' workflow manually from the Actions tab.");

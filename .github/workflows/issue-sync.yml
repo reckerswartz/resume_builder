@@ -36,7 +36,6 @@ jobs:
         with:
           run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id || github.run_id }}
           path: tmp/ci-artifacts/
-          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Process RSpec failures into issues

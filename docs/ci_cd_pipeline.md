@@ -160,11 +160,12 @@ Located in `.github/scripts/`:
 |--------|---------|
 | `playwright-audit.mjs` | Playwright page auditor with login, screenshot, overflow/translation/error detection |
 | `audit-summarize.mjs` | Consolidates per-viewport audit results into a single summary |
-| `bootstrap-labels.mjs` | Creates required GitHub labels for the pipeline |
+| `bootstrap-labels.mjs` | Preview tool listing pipeline labels (actual sync via `bootstrap-labels.yml`) |
 
 ## Required GitHub Labels
 
-Run `node .github/scripts/bootstrap-labels.mjs --dry-run` to preview, or set `GITHUB_TOKEN` + `GITHUB_REPOSITORY` to create them.
+Labels are automatically created/updated by the `Bootstrap Labels` workflow when it runs.
+To preview them locally: `node .github/scripts/bootstrap-labels.mjs`
 
 **Pipeline labels:** `ci-auto`, `ui-audit`, `auto-fix`, `in-progress`, `needs-review`, `full-ci`
 
@@ -174,11 +175,27 @@ Run `node .github/scripts/bootstrap-labels.mjs --dry-run` to preview, or set `GI
 
 **Scope labels:** `scope:ui`, `scope:api`, `scope:ci-cd`, `scope:templates`, `scope:admin`
 
+## Authentication
+
+The entire pipeline uses the **built-in `GITHUB_TOKEN`** that GitHub Actions provides automatically. No personal access tokens are needed.
+
+The built-in token handles:
+- Creating and updating issues
+- Pushing commits and branches
+- Opening and managing pull requests
+- Enabling auto-merge (when repo settings allow)
+- Logging in to GitHub Container Registry (GHCR)
+- Commenting on PRs with audit results
+
+Each workflow declares explicit `permissions` to request only the scopes it needs.
+
+A personal access token is only needed if you require cross-repository access or want to trigger workflows in other repositories.
+
 ## Required Secrets & Variables
 
 | Name | Type | Purpose |
 |------|------|---------|
-| `GITHUB_TOKEN` | Auto | Standard token for API calls (auto-provided) |
+| `GITHUB_TOKEN` | Built-in | Auto-provided by GitHub Actions — no setup required |
 | `STAGING_URL` | Variable | Staging environment URL for health checks |
 | `PRODUCTION_URL` | Variable | Production environment URL for health checks |
 | `RESUME_BUILDER_DATABASE_PASSWORD` | Secret | Production database password |
@@ -221,6 +238,7 @@ The system stabilizes when all audits pass and the issue queue is empty. Any new
 │   └── playwright-audit.mjs
 ├── workflows/
 │   ├── auto-fix.yml
+│   ├── bootstrap-labels.yml
 │   ├── ci.yml
 │   ├── continuous-audit.yml
 │   ├── deploy.yml
@@ -233,8 +251,10 @@ The system stabilizes when all audits pass and the issue queue is empty. Any new
 
 ## Getting Started
 
-1. **Bootstrap labels:** `GITHUB_TOKEN=<token> GITHUB_REPOSITORY=owner/repo node .github/scripts/bootstrap-labels.mjs`
+1. **Push to `main`** — the `Bootstrap Labels` workflow runs automatically and creates all required labels using the built-in `GITHUB_TOKEN`
 2. **Enable auto-merge** on the repository (Settings → General → Allow auto-merge)
 3. **Set branch protection** on `main` requiring the `CI Gate` status check
 4. **Configure environments** for `staging` and `production` in repository settings
-5. **Push to `main`** — the full cycle starts automatically
+5. **Verify the cycle** — the full CI → Audit → Issue → Queue → Fix → PR → Merge → Re-audit loop starts automatically
+
+No manual token setup is required. All API operations use the built-in `GITHUB_TOKEN` provided by GitHub Actions.
