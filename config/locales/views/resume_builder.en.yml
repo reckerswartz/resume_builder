@@ -291,7 +291,7 @@ en:
         city: "City"
         country: "Country"
         pin_code: "Pin code"
-      footer_note: "Changes save in place and keep the preview in sync while you move between guided steps."
+      footer_note: "Changes save automatically and sync with the preview."
       save_heading: "Save heading"
     editor_personal_details_step:
       optional_step:
@@ -757,7 +757,7 @@ en:
         pill: "Import guidance"
         title: "Start with the lightest path"
         badge: "Autofill optional"
-        description: "Start from scratch when you want a clean draft. Use paste or upload only when existing content will save time. Once the source feels right, continue into heading and the rest of the guided builder."
+        description: "Start from scratch for a clean draft, or paste and upload existing content to save time."
       footer_note_ready: "Changes save in place. Autofill becomes available when pasted text or a supported upload is present."
       footer_note_default: "Changes save in place. Use the stepper or the next button when the source setup feels right."
       save_source_setup: "Save source setup"

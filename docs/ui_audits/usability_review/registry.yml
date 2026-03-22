@@ -254,11 +254,11 @@ pages:
     status: "improved"
     usability_score: 86
     page_doc_path: "docs/ui_audits/usability_review/pages/template-show.md"
-    open_issue_keys:
-      - "UX-TSHOW-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-TSHOW-001"
       - "UX-TSHOW-002"
+      - "UX-TSHOW-003"
       - "UX-TSHOW-004"
     last_audited_at: "2026-03-22T05:24:00Z"
     last_changed_at: "2026-03-22T05:24:00Z"
@@ -281,11 +281,11 @@ pages:
     status: "improved"
     usability_score: 85
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-source.md"
-    open_issue_keys:
-      - "UX-BLDSRC-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDSRC-001"
       - "UX-BLDSRC-002"
+      - "UX-BLDSRC-003"
       - "UX-BLDSRC-004"
     last_audited_at: "2026-03-22T06:18:00Z"
     last_changed_at: "2026-03-22T06:18:00Z"
@@ -307,11 +307,11 @@ pages:
     status: "improved"
     usability_score: 87
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-heading.md"
-    open_issue_keys:
-      - "UX-BLDHDG-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDHDG-001"
       - "UX-BLDHDG-002"
+      - "UX-BLDHDG-003"
     last_audited_at: "2026-03-22T06:08:00Z"
     last_changed_at: "2026-03-22T06:08:00Z"
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-trim-duplicate-personal-details-cta/00-overview.md"

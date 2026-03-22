@@ -134,6 +134,6 @@ en:
         title: "Keep supporting choices secondary to the preview"
         description: "Use these notes to confirm the layout fit, then let the live sample stay ahead of secondary styling details."
         accent_label: "Accent color"
-        accent_description: "Treat this as the starting visual cue for the builder, not a locked brand decision."
+        accent_description: "You can change this in the builder anytime."
         layout_focus_label: "Layout focus"
-        layout_description: "Balanced layouts suit broad experience storytelling, while sidebar-heavy layouts keep secondary sections grouped and quieter."
+        layout_description: "Balanced layouts work well for broad experience. Sidebar layouts group secondary sections."
