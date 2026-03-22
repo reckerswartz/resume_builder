@@ -49,6 +49,59 @@ This workflow operates as a repeating cycle: **Review hosted behavior → implem
    - verify the already-implemented slice
    - close it only if code, docs, specs, and user-visible behavior all match the recorded state
 
+## GitHub Integration Gate (mandatory before implementation)
+
+GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. **Create a GitHub issue** for the slice being implemented:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "resumebuilder-reference-rollout" \
+      --key "<slice_key>" \
+      --title "<description of the rollout slice>" \
+      --severity "<severity>" \
+      --domain "builder" \
+      --type "rollout-slice"
+    ```
+    Record the returned issue number in `docs/resumebuilder_rollouts/registry.yml` under the slice entry as `github_issue_number`.
+
+GH-3. **Create a working branch** for the implementation:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "resumebuilder-reference-rollout" \
+      --key "<slice_key>"
+    ```
+    All implementation work happens on this branch.
+
+GH-4. **After validation passes** (Phase 4), commit referencing the issue:
+    ```
+    resumebuilder-reference-rollout: <description>
+
+    Closes #<issue_number>
+    ```
+    Then create a PR:
+    ```bash
+    bin/gh-bridge/create-pr \
+      --workflow "resumebuilder-reference-rollout" \
+      --key "<slice_key>" \
+      --issue <issue_number> \
+      --title "<description>"
+    ```
+    Record the returned PR number in the registry as `github_pr_number`.
+
+GH-5. **After PR merge**, close the issue:
+    ```bash
+    bin/gh-bridge/close-issue \
+      --issue <issue_number> \
+      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
+      --delete-branch "resumebuilder-reference-rollout/<slice_key>"
+    ```
+
 ## Phase 3: Implement & Refine
 
 13. Implement inside existing Rails seams instead of adding page-local one-off patterns:

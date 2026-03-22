@@ -14,6 +14,27 @@ This workflow is one phase of the repeating feature lifecycle: **Spec → Review
 4. **Check for prior reviews**: if this spec has been reviewed before, compare the current version against prior review findings. Track which gaps have been addressed and which remain open.
 5. **Regression baseline**: if the feature has already been planned or partially implemented, compare the spec against implementation feedback and current app behavior so reopened gaps are captured before scoring readiness.
 
+### GitHub Integration Gate (mandatory before reviewing)
+
+GH-1. **Before reviewing**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. If no GitHub issue exists for this feature yet (from `/feature-spec`), **create one**:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "feature-review" \
+      --key "<feature_key>" \
+      --title "<feature name> — review" \
+      --severity "medium" \
+      --domain "<domain>" \
+      --type "feature"
+    ```
+    If an issue already exists, reuse that issue number and update it with review findings via `bin/gh-bridge/update-issue`.
+
 ### Phase 2: Score, Identify & Prioritize Gaps
 
 6. Score the spec, identify gaps, and add missing Gherkin scenarios or edge cases.

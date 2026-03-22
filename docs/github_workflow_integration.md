@@ -594,24 +594,25 @@ roadmap:
 
 ## 12. Implementation Phases
 
-### Phase 1: Foundation (this plan)
-- [x] Architecture document
-- [ ] `bin/gh-bridge/ensure-labels` script
-- [ ] `bin/gh-bridge/create-issue` script
-- [ ] `bin/gh-bridge/create-branch` script
-- [ ] `bin/gh-bridge/create-pr` script
-- [ ] `bin/gh-bridge/update-issue` script
-- [ ] `bin/gh-bridge/close-issue` script
-- [ ] `bin/gh-bridge/sync-registry` script
-- [ ] `bin/gh-bridge/roadmap-summary` script
-- [ ] `docs/github_ops/registry.yml` central registry
-- [ ] `docs/github_ops/issue_templates/` body templates
-- [ ] `.windsurf/workflows/github-ops.md` workflow
+### Phase 1: Foundation
+- [x] Architecture document (`docs/github_workflow_integration.md`)
+- [x] `bin/gh-bridge/ensure-labels` script
+- [x] `bin/gh-bridge/create-issue` script
+- [x] `bin/gh-bridge/create-branch` script
+- [x] `bin/gh-bridge/create-pr` script
+- [x] `bin/gh-bridge/update-issue` script
+- [x] `bin/gh-bridge/close-issue` script
+- [x] `bin/gh-bridge/sync-registry` script
+- [x] `bin/gh-bridge/roadmap-summary` script
+- [x] `docs/github_ops/registry.yml` central registry
+- [x] `docs/github_ops/issue_templates/` body templates (audit, rollout, bug, feature)
+- [x] `.windsurf/workflows/github-ops.md` workflow
 
 ### Phase 2: Workflow Integration
-- [ ] Add GitHub integration hooks to audit workflows (Phase 2 → create-issue, Phase 3 → create-branch, Phase 5 → create-pr)
-- [ ] Add `github_issue_number` / `github_pr_number` fields to all 7 registries
-- [ ] Verify idempotency across all bridge scripts
+- [x] Embed mandatory "GitHub Integration Gate" section into all 18 fix-producing workflows
+- [x] Gate steps include: `gh auth status` check, `create-issue`, `create-branch`, `create-pr`, `close-issue`
+- [ ] Add `github_issue_number` / `github_pr_number` fields to all 7 registries (populated on first use)
+- [ ] Verify idempotency across all bridge scripts end-to-end
 
 ### Phase 3: Roadmap & Projects
 - [ ] Create GitHub Project board with workflow/domain/severity views

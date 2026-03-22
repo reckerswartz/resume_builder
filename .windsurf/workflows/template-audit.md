@@ -61,6 +61,59 @@ This workflow operates as a repeating cycle: **Audit → Capture discrepancies �
 12. **Section toggle verification**: For minimal-mode resumes, confirm that `hidden_sections` in `settings` causes `BaseComponent#visible_sections` to exclude the hidden section types. Templates should use `visible_sections` instead of `resume.ordered_sections` to respect this.
 13. When comparing against reference designs, use the `TemplateArtifact` `reference_design` and `layout_spec` metadata for the template family as the source of truth for design principles, spacing, and style expectations.
 
+### GitHub Integration Gate (mandatory before implementation)
+
+GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. **Create a GitHub issue** for the discrepancy being fixed:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "template-audit" \
+      --key "<discrepancy_id>" \
+      --title "<description of the template discrepancy>" \
+      --severity "<severity>" \
+      --domain "templates" \
+      --type "discrepancy"
+    ```
+    Record the returned issue number in `docs/template_audits/registry.yml` under the template entry as `github_issue_number`.
+
+GH-3. **Create a working branch** for the fix:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "template-audit" \
+      --key "<discrepancy_id>"
+    ```
+    All implementation work happens on this branch.
+
+GH-4. **After validation passes** (Phase 4), commit referencing the issue:
+    ```
+    template-audit: <description>
+
+    Closes #<issue_number>
+    ```
+    Then create a PR:
+    ```bash
+    bin/gh-bridge/create-pr \
+      --workflow "template-audit" \
+      --key "<discrepancy_id>" \
+      --issue <issue_number> \
+      --title "<description>"
+    ```
+    Record the returned PR number in the registry as `github_pr_number`.
+
+GH-5. **After PR merge**, close the issue:
+    ```bash
+    bin/gh-bridge/close-issue \
+      --issue <issue_number> \
+      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
+      --delete-branch "template-audit/<discrepancy_id>"
+    ```
+
 ### Phase 3: Implement & Refine Data
 
 14. In `review-only` mode: stop after capturing findings, updating the registry and template docs, and recording the run log — but still record cycle metrics.

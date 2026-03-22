@@ -24,6 +24,59 @@ This workflow operates as a repeating cycle: **Resolve candidate → Implement s
 11. Do not expose a capability publicly until it is honest across stored data, editor behavior, shared preview rendering, and PDF/export behavior. Keep internal-only planning flags internal until the full path is real.
 12. Implement only one candidate or one open improvement slice by default unless the user explicitly asks for a batch.
 
+### GitHub Integration Gate (mandatory before implementation)
+
+GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. **Create a GitHub issue** for the slice or improvement being implemented:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "behance-template-implementation" \
+      --key "<improvement_key>" \
+      --title "<description of the implementation slice>" \
+      --severity "<severity>" \
+      --domain "templates" \
+      --type "rollout-slice"
+    ```
+    Record the returned issue number in `docs/template_rollouts/registry.yml` under the candidate entry as `github_issue_number`.
+
+GH-3. **Create a working branch** for the implementation:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "behance-template-implementation" \
+      --key "<improvement_key>"
+    ```
+    All implementation work happens on this branch.
+
+GH-4. **After validation passes** (Phase 4), commit referencing the issue:
+    ```
+    behance-template-implementation: <description>
+
+    Closes #<issue_number>
+    ```
+    Then create a PR:
+    ```bash
+    bin/gh-bridge/create-pr \
+      --workflow "behance-template-implementation" \
+      --key "<improvement_key>" \
+      --issue <issue_number> \
+      --title "<description>"
+    ```
+    Record the returned PR number in the registry as `github_pr_number`.
+
+GH-5. **After PR merge**, close the issue:
+    ```bash
+    bin/gh-bridge/close-issue \
+      --issue <issue_number> \
+      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
+      --delete-branch "behance-template-implementation/<improvement_key>"
+    ```
+
 ### Phase 3: Implement & Refine Data
 
 13. When implementing, update the smallest complete set of files required across:

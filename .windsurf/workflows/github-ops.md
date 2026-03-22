@@ -4,7 +4,15 @@ description: Manage GitHub issues, branches, and pull requests for workflow-dete
 
 ## GitHub Operations Workflow
 
-This workflow bridges the 19 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI. It is invoked directly or as a sub-step from other workflows.
+This workflow bridges the 18 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI. Every fix-producing workflow has a mandatory **GitHub Integration Gate** section that enforces issue creation before implementation and PR creation after validation.
+
+### Prerequisites (portable — works on any system)
+
+- **`gh` CLI** must be installed: `brew install gh` (macOS), `sudo apt install gh` (Linux), or [github.com/cli/cli](https://github.com/cli/cli)
+- **`gh` must be authenticated**: run `gh auth login` once per system
+- **Bridge scripts** are in `bin/gh-bridge/` and tracked in git — they come with the repo on clone
+- **Issue templates** are in `docs/github_ops/issue_templates/` — also tracked in git
+- **No secrets or system-specific paths** are required — scripts auto-detect the repo via `gh repo view`
 
 ### Phase 1: Context & Prerequisites
 
@@ -94,14 +102,14 @@ This workflow bridges the 19 Windsurf continuous-improvement workflows to GitHub
 
 ### Integration with Other Workflows
 
-Every audit/rollout/feature workflow can invoke GitHub operations at these points:
+All 18 fix-producing workflows now have a **mandatory `GitHub Integration Gate` section** embedded directly between their discovery/audit phase and their implementation phase. This ensures Cascade creates the GitHub issue and branch before writing any code.
 
-| Workflow Phase | GitHub Operation |
-|---|---|
-| Phase 2: Discover findings | `/github-ops create-issue <workflow> <key>` |
-| Phase 3: Start implementation | `/github-ops create-branch <workflow> <key>` |
-| Phase 4: After verification | `/github-ops update-issue <issue>` |
-| Phase 5: Ready for review | `/github-ops create-pr <workflow> <key> <issue>` |
-| After merge | `/github-ops close-issue <issue>` |
+| Workflow Phase | GitHub Operation | Enforcement |
+|---|---|---|
+| Before implementation | `gh auth status` | **Mandatory** — stops if not authenticated |
+| Before implementation | `bin/gh-bridge/create-issue` | **Mandatory** — creates issue before any fix |
+| Before implementation | `bin/gh-bridge/create-branch` | **Mandatory** — all work on dedicated branch |
+| After validation | `bin/gh-bridge/create-pr` | **Mandatory** — links PR to issue |
+| After merge | `bin/gh-bridge/close-issue` | **Mandatory** — closes issue, deletes branch |
 
-Workflows that produce findings should call `create-issue` during their audit phase. Workflows that implement fixes should call `create-branch` → commit → `create-pr` → `close-issue` during their implement/validate phases.
+The 3 workflows without the gate are intentionally excluded: `/github-ops` (orchestrator), `/c4-architecture` (docs-only), `/repo-cleanup` (utility).

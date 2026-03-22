@@ -14,6 +14,34 @@ This workflow is one phase of the repeating feature lifecycle: **Spec → Review
 4. **Check for existing plans**: if this feature already has an implementation plan (in the spec doc or a separate plan file), treat this invocation as a plan update — incorporate completed PRs, implementation learnings, and newly discovered requirements rather than starting from scratch.
 5. **Regression baseline**: if implementation has already started, compare the current plan against completed work, validated behavior, and any reopened issues so the next PR queue reflects the live state rather than the original draft assumptions.
 
+### GitHub Integration Gate (mandatory before planning)
+
+GH-1. **Before planning**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. If no GitHub issue exists for this feature yet, **create one**:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "feature-plan" \
+      --key "<feature_key>" \
+      --title "<feature name>" \
+      --severity "medium" \
+      --domain "<domain>" \
+      --type "feature"
+    ```
+    If an issue already exists from `/feature-spec`, reuse that issue number.
+
+GH-3. **Create or switch to a working branch**:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "feature-plan" \
+      --key "<feature_key>"
+    ```
+
 ### Phase 2: Plan & Prioritize PRs
 
 6. Produce a Rails-native implementation plan with small PRs, likely files to change, and the right spec coverage. For each PR, consider:

@@ -14,6 +14,34 @@ This workflow is one phase of the repeating TDD cycle: **Red → Green → Refac
 4. Read the source and any existing related specs before writing new tests. Understand the current project test patterns. If the behavior touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before drafting specs.
 5. **Assess current cycle position and regression baseline**: check whether prior red/green/refactor cycles have left any failing specs, open coverage gaps, or stale test patterns. Address those before writing new specs. If a previously-covered behavior has regressed, write or update the failing spec for that regression before expanding to brand-new scope.
 
+### GitHub Integration Gate (mandatory before writing specs)
+
+GH-1. **Before writing specs**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. If not already on a workflow branch, **create a GitHub issue** for the behavior being specified:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "tdd-red-agent" \
+      --key "<behavior_key>" \
+      --title "<description>" \
+      --severity "medium" \
+      --domain "<domain>" \
+      --type "coverage-gap"
+    ```
+
+GH-3. **Create or switch to a working branch**:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "tdd-red-agent" \
+      --key "<behavior_key>"
+    ```
+    All spec work happens on this branch.
+
 ### Phase 2: Write Failing Specs
 
 6. Write focused failing specs before changing implementation code. Match the test layer to the behavior:

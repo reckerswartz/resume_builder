@@ -23,6 +23,59 @@ This workflow operates as a repeating cycle: **Discover → Capture → Compare 
 10. Capture any relevant ResumeBuilder.com marketplace, template, or builder interaction patterns that should influence the implementation, then record those notes in the active run log.
 11. Compare the captured reference against the current template catalog to identify net-new design patterns, improvement opportunities for existing templates, and architectural prerequisites.
 
+### GitHub Integration Gate (mandatory before implementation)
+
+GH-1. **Before implementing any candidate**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. **Create a GitHub issue** for the candidate being implemented:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "behance-template-rollout" \
+      --key "<reference_key>" \
+      --title "<description of the template candidate>" \
+      --severity "<severity>" \
+      --domain "templates" \
+      --type "rollout-slice"
+    ```
+    Record the returned issue number in `docs/template_rollouts/registry.yml` under the candidate entry as `github_issue_number`.
+
+GH-3. **Create a working branch** for the implementation:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "behance-template-rollout" \
+      --key "<reference_key>"
+    ```
+    All implementation work happens on this branch.
+
+GH-4. **After validation passes** (Phase 4), commit referencing the issue:
+    ```
+    behance-template-rollout: <description>
+
+    Closes #<issue_number>
+    ```
+    Then create a PR:
+    ```bash
+    bin/gh-bridge/create-pr \
+      --workflow "behance-template-rollout" \
+      --key "<reference_key>" \
+      --issue <issue_number> \
+      --title "<description>"
+    ```
+    Record the returned PR number in the registry as `github_pr_number`.
+
+GH-5. **After PR merge**, close the issue:
+    ```bash
+    bin/gh-bridge/close-issue \
+      --issue <issue_number> \
+      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
+      --delete-branch "behance-template-rollout/<reference_key>"
+    ```
+
 ### Phase 3: Implement & Refine Data
 
 12. Update the registry row, the per-template tracking doc, and a new run log under `docs/template_rollouts/runs/<timestamp>/` before and after implementation work so completed and pending states stay explicit.

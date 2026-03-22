@@ -29,6 +29,58 @@ This workflow operates as a repeating cycle: **Investigate → Diagnose → Fix 
     - **Rack deprecation**: `:unprocessable_entity` triggers deprecation warnings — use `:unprocessable_content`
 9. Classify the bug by category (data, logic, configuration, dependency, test setup) to inform the fix approach and recurrence prevention.
 
+### GitHub Integration Gate (mandatory before implementation)
+
+GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. **Create a GitHub issue** for the bug:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "smart-fix" \
+      --key "<bug_key>" \
+      --title "<description of the bug>" \
+      --severity "<severity>" \
+      --domain "<domain>" \
+      --type "bug"
+    ```
+    Record the returned issue number.
+
+GH-3. **Create a working branch** for the fix:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "smart-fix" \
+      --key "<bug_key>"
+    ```
+    All implementation work happens on this branch.
+
+GH-4. **After validation passes** (Phase 4), commit referencing the issue:
+    ```
+    smart-fix: <description>
+
+    Closes #<issue_number>
+    ```
+    Then create a PR:
+    ```bash
+    bin/gh-bridge/create-pr \
+      --workflow "smart-fix" \
+      --key "<bug_key>" \
+      --issue <issue_number> \
+      --title "<description>"
+    ```
+
+GH-5. **After PR merge**, close the issue:
+    ```bash
+    bin/gh-bridge/close-issue \
+      --issue <issue_number> \
+      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
+      --delete-branch "smart-fix/<bug_key>"
+    ```
+
 ### Phase 3: Fix & Refine Data
 
 10. If a fix is warranted, implement the smallest Rails-native change that addresses the root cause rather than the symptom. When the bug affects UI, preserve shared `Ui::*` components, `ui_*` helper APIs, page-family rules, and `atelier-*` tokens instead of introducing a page-local workaround.

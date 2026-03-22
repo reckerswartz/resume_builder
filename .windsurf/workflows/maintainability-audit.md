@@ -41,6 +41,59 @@ When both lanes have open work, `implement-next` must alternate lanes in round-r
     - if one lane is empty or blocked, work the other lane but record that fact in the overview and registry
 13. Compare current findings against the registry to distinguish net-new issues from known open items. Update severity, priority, and overview inventory whenever the codebase has evolved.
 
+### GitHub Integration Gate (mandatory before implementation)
+
+GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+    ```bash
+    // turbo
+    gh auth status
+    ```
+    If not authenticated, stop and ask the user to run `gh auth login`.
+
+GH-2. **Create a GitHub issue** for the finding being fixed:
+    ```bash
+    bin/gh-bridge/create-issue \
+      --workflow "maintainability-audit" \
+      --key "<area_key>" \
+      --title "<description of the hotspot>" \
+      --severity "<severity>" \
+      --domain "infrastructure" \
+      --type "maintainability"
+    ```
+    Record the returned issue number in `docs/maintainability_audits/registry.yml` under the area entry as `github_issue_number`.
+
+GH-3. **Create a working branch** for the fix:
+    ```bash
+    bin/gh-bridge/create-branch \
+      --workflow "maintainability-audit" \
+      --key "<area_key>"
+    ```
+    All implementation work happens on this branch.
+
+GH-4. **After validation passes** (Phase 4), commit referencing the issue:
+    ```
+    maintainability-audit: <description>
+
+    Closes #<issue_number>
+    ```
+    Then create a PR:
+    ```bash
+    bin/gh-bridge/create-pr \
+      --workflow "maintainability-audit" \
+      --key "<area_key>" \
+      --issue <issue_number> \
+      --title "<description>"
+    ```
+    Record the returned PR number in the registry as `github_pr_number`.
+
+GH-5. **After PR merge**, close the issue:
+    ```bash
+    bin/gh-bridge/close-issue \
+      --issue <issue_number> \
+      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
+      --delete-branch "maintainability-audit/<area_key>"
+    ```
+
 ### Phase 3: Implement & Refine Data
 
 14. Prefer Rails-native refactors using established project extraction patterns:
