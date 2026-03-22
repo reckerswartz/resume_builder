@@ -4,6 +4,8 @@ class TemplatesController < ApplicationController
   SHELL_STYLE_FILTER_VALUES = ResumeTemplates::Catalog.shell_style_options.map(&:last).freeze
   THEME_TONE_FILTER_VALUES = ResumeTemplates::Catalog.theme_tone_options.map(&:last).freeze
 
+  allow_unauthenticated_access only: %i[index show]
+  before_action :resume_session, only: %i[index show]
   before_action :set_template, only: :show
 
   def index

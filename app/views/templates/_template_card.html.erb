@@ -3,7 +3,7 @@
 <% template = template_card.fetch(:template) %>
 <% description_text = card_state.present? ? card_state.fetch(:description_text) : template.description.presence || template_card.fetch(:summary) %>
 <% preview_template_path = card_state.present? ? card_state.fetch(:preview_template_path) : template_path(id: template) %>
-<% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : new_resume_path(template_id: template.id) %>
+<% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : (current_user.present? ? new_resume_path(template_id: template.id) : new_registration_path) %>
 <% selected_accent_color = card_state.present? ? card_state.fetch(:selected_accent_color) : template_card.fetch(:selected_accent_color) %>
 <% accent_variants = card_state.present? ? card_state.fetch(:accent_variants) : template_card.fetch(:accent_variants) %>
 <% selected_accent_variant_label = if card_state.present?

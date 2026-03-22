@@ -1,10 +1,10 @@
 class TemplatePolicy < ApplicationPolicy
   def index?
-    authenticated?
+    true
   end
 
   def show?
-    authenticated?
+    true
   end
 
   def create?

@@ -126,6 +126,7 @@ RSpec.describe Templates::MarketplaceState do
   before do
     allow(view_context).to receive(:template_cards_for_builder).with(templates: templates).and_return(template_cards)
     allow(view_context).to receive(:template_cards_for_builder).with(templates: filter_templates).and_return(filter_template_cards)
+    allow(view_context).to receive(:current_user).and_return(build(:user))
     allow(view_context).to receive(:new_resume_path).and_return('/resumes/new')
     allow(view_context).to receive(:template_path).and_return('/templates/preview')
     allow(view_context).to receive(:resumes_path).and_return('/resumes')

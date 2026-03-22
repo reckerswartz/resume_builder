@@ -417,6 +417,8 @@ module Templates
       end
 
       def use_template_path_for(template, accent_color: nil)
+        return view_context.new_registration_path unless view_context.current_user.present?
+
         path_params = template.present? ? { template_id: template.id } : {}
         resume_params = resume_context_params(template: template, accent_color: accent_color)
         path_params[:resume] = resume_params if resume_params.present?

@@ -148,7 +148,7 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include('Preview the full layout')
       expect(response.body).to include('Quick take')
       expect(response.body).to include('Live sample')
-      expect(response.body).to include('Try it in the builder')
+      expect(response.body).not_to include('Try it in the builder')
       expect(response.body).to include('Builder carry-through')
       expect(response.body).to include('Keep supporting choices secondary to the preview')
       expect(response.body).to include('Layout focus')
@@ -231,6 +231,40 @@ RSpec.describe 'Templates', type: :request do
           )
         )
       )
+    end
+
+    context 'as an unauthenticated guest' do
+      before { reset!; integration_session.__send__(:default_url_options).clear }
+
+      it 'allows guests to browse the template gallery' do
+        create(:template, name: 'Modern Slate')
+
+        get templates_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Modern Slate')
+        expect(response.body).to include('Browse templates')
+      end
+
+      it 'allows guests to view template detail pages' do
+        template = create(:template, name: 'Classic Ivory', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
+
+        get template_path(id: template)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Classic Ivory')
+        expect(response.body).to include('Live sample')
+      end
+
+      it 'links the Use template CTA to registration for guests' do
+        template = create(:template, name: 'Modern Slate')
+
+        get template_path(id: template)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(new_registration_path)
+        expect(response.body).not_to include(new_resume_path(template_id: template.id))
+      end
     end
 
     it 'redirects back to the marketplace when the template is not available' do
