@@ -39,7 +39,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the finding being fixed:
+GH-2. **Create a GitHub issue** with full structured context for the finding:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "code-review" \
@@ -47,7 +47,14 @@ GH-2. **Create a GitHub issue** for the finding being fixed:
       --title "<description of the code quality finding>" \
       --severity "<severity>" \
       --domain "infrastructure" \
-      --type "refactor"
+      --type "refactor" \
+      --description "<clear description of the code quality issue>" \
+      --expected "<expected code pattern or architecture>" \
+      --actual "<actual code smell or anti-pattern>" \
+      --suggested-fix "<refactoring approach>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --logs "<code metrics, SOLID violations, complexity>"
     ```
     Record the returned issue number.
 
@@ -59,19 +66,19 @@ GH-3. **Create a working branch** for the fix:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    code-review: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
+GH-4. **After validation passes**, commit and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "code-review" \
       --key "<finding_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "infrastructure" \
+      --affected-files "<changed files>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --verification-results "<N examples, 0 failures>"
     ```
 
 GH-5. **After PR merge**, close the issue:
@@ -80,6 +87,12 @@ GH-5. **After PR merge**, close the issue:
       --issue <issue_number> \
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "code-review/<finding_key>"
+    ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow code-review
     ```
 
 ### Phase 3: Remediate & Refine Data

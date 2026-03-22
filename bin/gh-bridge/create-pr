@@ -2,18 +2,31 @@
 # Opens a pull request linked to a GitHub issue.
 # Idempotent: returns existing PR number if the branch already has an open PR.
 #
+# When --body-file is provided, uses that file directly as the PR body.
+# Otherwise, auto-generates a structured PR body from the pull_request template.
+#
 # Usage: bin/gh-bridge/create-pr \
 #   --workflow "template-audit" \
 #   --key "MOD-006-page-count-overflow" \
 #   --issue 42 \
 #   --title "Fix: Resolve page count overflow on Modern template" \
-#   [--body-file "/path/to/pr_body.md"] \
-#   [--base "main"] \
+#   [--body-file "/path/to/pr_body.md"]
+#   [--description "What changed and why"]
+#   [--severity "medium"]
+#   [--domain "templates"]
+#   [--affected-files "file1.rb,file2.erb"]
+#   [--verification "bundle exec rspec ..."]
+#   [--verification-results "31 examples, 0 failures"]
+#   [--regression-check "Cross-checked modern and classic templates"]
+#   [--screenshots "before.png,after.png"]
+#   [--base "main"]
 #   [--draft]
 #
 # Outputs: GitHub PR number
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 WORKFLOW=""
 KEY=""
@@ -22,16 +35,32 @@ TITLE=""
 BODY_FILE=""
 BASE="main"
 DRAFT=""
+DESCRIPTION=""
+SEVERITY=""
+DOMAIN=""
+AFFECTED_FILES=""
+VERIFICATION=""
+VERIFICATION_RESULTS=""
+REGRESSION_CHECK=""
+SCREENSHOTS=""
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --workflow)  WORKFLOW="$2";  shift 2 ;;
-    --key)       KEY="$2";      shift 2 ;;
-    --issue)     ISSUE="$2";    shift 2 ;;
-    --title)     TITLE="$2";    shift 2 ;;
-    --body-file) BODY_FILE="$2"; shift 2 ;;
-    --base)      BASE="$2";     shift 2 ;;
-    --draft)     DRAFT="--draft"; shift ;;
+    --workflow)             WORKFLOW="$2";             shift 2 ;;
+    --key)                  KEY="$2";                  shift 2 ;;
+    --issue)                ISSUE="$2";                shift 2 ;;
+    --title)                TITLE="$2";                shift 2 ;;
+    --body-file)            BODY_FILE="$2";            shift 2 ;;
+    --base)                 BASE="$2";                 shift 2 ;;
+    --draft)                DRAFT="--draft";           shift ;;
+    --description)          DESCRIPTION="$2";          shift 2 ;;
+    --severity)             SEVERITY="$2";             shift 2 ;;
+    --domain)               DOMAIN="$2";               shift 2 ;;
+    --affected-files)       AFFECTED_FILES="$2";       shift 2 ;;
+    --verification)         VERIFICATION="$2";         shift 2 ;;
+    --verification-results) VERIFICATION_RESULTS="$2"; shift 2 ;;
+    --regression-check)     REGRESSION_CHECK="$2";     shift 2 ;;
+    --screenshots)          SCREENSHOTS="$2";          shift 2 ;;
     *) echo "Unknown option: $1" >&2; exit 1 ;;
   esac
 done
@@ -69,13 +98,72 @@ LABELS="workflow:${WORKFLOW},status:needs-review"
 if [ -n "$BODY_FILE" ] && [ -f "$BODY_FILE" ]; then
   BODY_CONTENT=$(cat "$BODY_FILE")
 else
+  # Auto-generate structured PR body
+  [ -z "$DESCRIPTION" ] && DESCRIPTION="$TITLE"
+  [ -z "$SEVERITY" ] && SEVERITY="unclassified"
+  [ -z "$DOMAIN" ] && DOMAIN="unclassified"
+  [ -z "$VERIFICATION" ] && VERIFICATION="# Verification command"
+  [ -z "$VERIFICATION_RESULTS" ] && VERIFICATION_RESULTS="_Pending verification._"
+  [ -z "$REGRESSION_CHECK" ] && REGRESSION_CHECK="_No regressions detected._"
+
+  # Format affected files
+  if [ -n "$AFFECTED_FILES" ]; then
+    FORMATTED_FILES=$(echo "$AFFECTED_FILES" | tr ',' '\n' | while read -r f; do
+      f=$(echo "$f" | xargs)
+      [ -n "$f" ] && echo "- \`${f}\`"
+    done)
+  else
+    FORMATTED_FILES="_See diff for changed files._"
+  fi
+
+  # Format screenshots
+  if [ -n "$SCREENSHOTS" ]; then
+    FORMATTED_SCREENSHOTS=$(echo "$SCREENSHOTS" | tr ',' '\n' | while read -r img; do
+      img=$(echo "$img" | xargs)
+      [ -n "$img" ] && echo "**Evidence**: \`${img}\`"
+    done)
+  else
+    FORMATTED_SCREENSHOTS="_No before/after screenshots._"
+  fi
+
   BODY_CONTENT="## Summary
 
-**Workflow**: \`/${WORKFLOW}\`
-**Tracking key**: \`${KEY}\`"
+| Field | Value |
+|-------|-------|
+| **Workflow** | \`/${WORKFLOW}\` |
+| **Tracking key** | \`${KEY}\` |
+| **Issue** | #${ISSUE:-N/A} |
+| **Domain** | ${DOMAIN} |
+| **Severity** | ${SEVERITY} |
+
+## What Changed
+
+${DESCRIPTION}
+
+## Before / After
+
+${FORMATTED_SCREENSHOTS}
+
+## How It Was Tested
+
+\`\`\`bash
+${VERIFICATION}
+\`\`\`
+
+${VERIFICATION_RESULTS}
+
+## Files Changed
+
+${FORMATTED_FILES}
+
+## Regression Check
+
+${REGRESSION_CHECK}"
 
   if [ -n "$ISSUE" ]; then
     BODY_CONTENT="${BODY_CONTENT}
+
+---
 
 Closes #${ISSUE}"
   fi

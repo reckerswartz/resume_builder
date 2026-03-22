@@ -58,7 +58,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the slice being implemented:
+GH-2. **Create a GitHub issue** with full structured context for the slice:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "resumebuilder-reference-rollout" \
@@ -66,7 +66,16 @@ GH-2. **Create a GitHub issue** for the slice being implemented:
       --title "<description of the rollout slice>" \
       --severity "<severity>" \
       --domain "builder" \
-      --type "rollout-slice"
+      --type "rollout-slice" \
+      --template "rollout" \
+      --description "<clear description of the gap being closed>" \
+      --expected "<target state from ResumeBuilder.com reference>" \
+      --actual "<current app state>" \
+      --suggested-fix "<implementation approach>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --screenshots "<reference and current screenshots>" \
+      --registry-path "docs/resumebuilder_rollouts/registry.yml"
     ```
     Record the returned issue number in `docs/resumebuilder_rollouts/registry.yml` under the slice entry as `github_issue_number`.
 
@@ -78,19 +87,19 @@ GH-3. **Create a working branch** for the implementation:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    resumebuilder-reference-rollout: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
+GH-4. **After validation passes**, commit and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "resumebuilder-reference-rollout" \
       --key "<slice_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "builder" \
+      --affected-files "<changed files>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --verification-results "<N examples, 0 failures>"
     ```
     Record the returned PR number in the registry as `github_pr_number`.
 
@@ -100,6 +109,12 @@ GH-5. **After PR merge**, close the issue:
       --issue <issue_number> \
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "resumebuilder-reference-rollout/<slice_key>"
+    ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow resumebuilder-reference-rollout
     ```
 
 ## Phase 3: Implement & Refine

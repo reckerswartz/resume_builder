@@ -38,7 +38,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the bug:
+GH-2. **Create a GitHub issue** with full structured context for the bug:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "smart-fix" \
@@ -46,7 +46,18 @@ GH-2. **Create a GitHub issue** for the bug:
       --title "<description of the bug>" \
       --severity "<severity>" \
       --domain "<domain>" \
-      --type "bug"
+      --type "bug" \
+      --template "bug" \
+      --page-url "<page URL where bug was found>" \
+      --description "<clear description of the bug>" \
+      --expected "<expected behavior>" \
+      --actual "<actual buggy behavior>" \
+      --suggested-fix "<root cause fix approach>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --screenshots "<Playwright screenshot paths>" \
+      --logs "<error logs, stack traces, console output>" \
+      --reproduction-steps "<steps to reproduce>"
     ```
     Record the returned issue number.
 
@@ -58,19 +69,20 @@ GH-3. **Create a working branch** for the fix:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    smart-fix: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
+GH-4. **After validation passes**, commit and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "smart-fix" \
       --key "<bug_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "<domain>" \
+      --affected-files "<changed files>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --verification-results "<N examples, 0 failures>" \
+      --regression-check "<broader regression results>"
     ```
 
 GH-5. **After PR merge**, close the issue:
@@ -79,6 +91,12 @@ GH-5. **After PR merge**, close the issue:
       --issue <issue_number> \
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "smart-fix/<bug_key>"
+    ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task
     ```
 
 ### Phase 3: Fix & Refine Data

@@ -1,26 +1,42 @@
 ## Context
 
-- **Workflow**: `/${WORKFLOW}`
-- **Registry**: `${REGISTRY_PATH}`
-- **Slice key**: `${SLICE_KEY}`
-- **Priority**: ${PRIORITY}
-- **Source reference**: ${SOURCE_REFERENCE}
+| Field | Value |
+|-------|-------|
+| **Workflow** | `/${WORKFLOW}` |
+| **Slice key** | `${ISSUE_KEY}` |
+| **Priority** | ${SEVERITY} |
+| **Domain** | ${DOMAIN} |
+| **Page URL** | ${PAGE_URL} |
+| **Source reference** | ${SOURCE_REFERENCE} |
+| **Detected at** | ${TIMESTAMP} |
 
-## Current State
+## Description
 
-${CURRENT_STATE}
+${DESCRIPTION}
 
-## Target State
+## Current State (Actual)
 
-${TARGET_STATE}
+${ACTUAL}
+
+## Target State (Expected)
+
+${EXPECTED}
+
+## Screenshots
+
+${SCREENSHOTS}
 
 ## Implementation Plan
 
-${IMPLEMENTATION_PLAN}
+${SUGGESTED_FIX}
 
 ## Affected Surfaces
 
 ${AFFECTED_FILES}
+
+## Logs & Technical Context
+
+${LOGS}
 
 ## Verification
 
@@ -30,6 +46,14 @@ ${VERIFICATION_COMMAND}
 
 ## Related
 
-- Registry entry: `${REGISTRY_PATH}#${SLICE_KEY}`
-- Reference doc: `${REFERENCE_DOC_PATH}`
-- Run log: `${RUN_LOG_PATH}`
+- **Registry**: [`${REGISTRY_PATH}#${ISSUE_KEY}`](${REGISTRY_PATH})
+- **Reference doc**: [`${REFERENCE_DOC_PATH}`](${REFERENCE_DOC_PATH})
+- **Run log**: [`${RUN_LOG_PATH}`](${RUN_LOG_PATH})
+
+## Checklist
+
+- [ ] Reference behavior captured
+- [ ] Implementation plan confirmed
+- [ ] Fix implemented
+- [ ] Verification passing
+- [ ] Registry updated

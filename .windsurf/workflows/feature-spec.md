@@ -23,7 +23,7 @@ GH-1. **Before drafting a spec**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the feature being specified:
+GH-2. **Create a GitHub issue** with structured context for the feature:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "feature-spec" \
@@ -31,7 +31,14 @@ GH-2. **Create a GitHub issue** for the feature being specified:
       --title "<feature name>" \
       --severity "medium" \
       --domain "<domain>" \
-      --type "feature"
+      --type "feature" \
+      --template "feature" \
+      --description "<clear description of the feature>" \
+      --expected "<desired user-facing behavior>" \
+      --actual "<current state or gap>" \
+      --suggested-fix "<high-level implementation approach>" \
+      --affected-files "<likely affected files>" \
+      --spec-path "docs/features/<feature-name>.md"
     ```
     Record the returned issue number. This issue will track the feature through the full Spec → Review → Plan → Implement lifecycle.
 

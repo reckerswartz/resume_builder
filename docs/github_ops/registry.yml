@@ -8,7 +8,7 @@ github:
 
 label_taxonomy:
   synced_at: "2026-03-22T03:42:00Z"
-  workflow_labels: 19
+  workflow_labels: 20
   domain_labels: 13
   severity_labels: 4
   status_labels: 6
@@ -18,18 +18,21 @@ label_taxonomy:
 bridge_scripts:
   ensure_labels: "bin/gh-bridge/ensure-labels"
   create_issue: "bin/gh-bridge/create-issue"
+  build_issue_body: "bin/gh-bridge/build-issue-body"
   create_branch: "bin/gh-bridge/create-branch"
   create_pr: "bin/gh-bridge/create-pr"
   update_issue: "bin/gh-bridge/update-issue"
   close_issue: "bin/gh-bridge/close-issue"
   sync_registry: "bin/gh-bridge/sync-registry"
   roadmap_summary: "bin/gh-bridge/roadmap-summary"
+  next_task: "bin/gh-bridge/next-task"
 
 issue_templates:
   audit: "docs/github_ops/issue_templates/audit.md"
   rollout: "docs/github_ops/issue_templates/rollout.md"
   feature: "docs/github_ops/issue_templates/feature.md"
   bug: "docs/github_ops/issue_templates/bug.md"
+  pull_request: "docs/github_ops/issue_templates/pull_request.md"
 
 workflow_registries:
   - workflow: "template-audit"
@@ -222,6 +225,16 @@ workflow_registries:
     issue_prefix: "smart-fix"
     domain: "infrastructure"
     type: "bug"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "continuous-improvement"
+    registry_path: "docs/continuous_improvement/registry.yml"
+    tracking_unit: "improvement proposal"
+    issue_prefix: "continuous-improvement"
+    domain: "builder"
+    type: "improvement"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
     last_synced_at: null

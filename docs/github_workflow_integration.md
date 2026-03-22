@@ -1,10 +1,10 @@
 # GitHub Workflow Integration Architecture
 
-> Connects the 19 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI, enabling automated issue tracking, change management, and roadmap generation at scale.
+> Connects the 20 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI, enabling automated issue tracking, change management, and roadmap generation at scale.
 
 ## 1. Problem Statement
 
-The Resume Builder project has **19 Windsurf workflows** that continuously audit, fix, and refine the codebase across 7 domain registries. Today, all findings, fixes, and decisions are tracked in local YAML registries and Markdown run logs. This works well for single-session continuity but lacks:
+The Resume Builder project has **20 Windsurf workflows** that continuously audit, fix, and refine the codebase across 7 domain registries. Today, all findings, fixes, and decisions are tracked in local YAML registries and Markdown run logs. This works well for single-session continuity but lacks:
 
 - **External visibility** — stakeholders cannot see open work without reading YAML files
 - **Change traceability** — fixes are committed to working branches without formal PR review gates
@@ -597,33 +597,45 @@ roadmap:
 ### Phase 1: Foundation
 - [x] Architecture document (`docs/github_workflow_integration.md`)
 - [x] `bin/gh-bridge/ensure-labels` script
-- [x] `bin/gh-bridge/create-issue` script
+- [x] `bin/gh-bridge/create-issue` script (enhanced: auto-generates structured body from templates)
+- [x] `bin/gh-bridge/build-issue-body` script (new: populates templates with structured data)
 - [x] `bin/gh-bridge/create-branch` script
-- [x] `bin/gh-bridge/create-pr` script
+- [x] `bin/gh-bridge/create-pr` script (enhanced: auto-generates structured PR body)
 - [x] `bin/gh-bridge/update-issue` script
 - [x] `bin/gh-bridge/close-issue` script
 - [x] `bin/gh-bridge/sync-registry` script
 - [x] `bin/gh-bridge/roadmap-summary` script
+- [x] `bin/gh-bridge/next-task` script (new: severity-ranked next task recommendation)
 - [x] `docs/github_ops/registry.yml` central registry
-- [x] `docs/github_ops/issue_templates/` body templates (audit, rollout, bug, feature)
+- [x] `docs/github_ops/issue_templates/` body templates (audit, rollout, bug, feature, pull_request)
 - [x] `.windsurf/workflows/github-ops.md` workflow
 
 ### Phase 2: Workflow Integration
-- [x] Embed mandatory "GitHub Integration Gate" section into all 18 fix-producing workflows
-- [x] Gate steps include: `gh auth status` check, `create-issue`, `create-branch`, `create-pr`, `close-issue`
+- [x] Embed mandatory "GitHub Integration Gate" section into all 19 fix-producing workflows
+- [x] Gate steps include: `gh auth status`, `create-issue` (structured), `create-branch`, `create-pr` (structured), `close-issue`, `next-task`
+- [x] Enhanced issue creation: page URL, expected/actual, screenshots, logs, suggested fix, affected files, verification
+- [x] Enhanced PR creation: structured summary, verification results, regression check, affected files
+- [x] Post-completion `next-task` recommendation (GH-6) in all audit/rollout/fix workflows
 - [ ] Add `github_issue_number` / `github_pr_number` fields to all 7 registries (populated on first use)
 - [ ] Verify idempotency across all bridge scripts end-to-end
 
 ### Phase 3: Roadmap & Projects
 - [ ] Create GitHub Project board with workflow/domain/severity views
 - [ ] Map open registry items to milestones
-- [ ] Generate first automated roadmap summary
+- [x] Generate first automated roadmap summary
 
 ### Phase 4: Scale & Refine
 - [ ] File lock registry for cross-workflow coordination
 - [ ] Automated conflict detection
 - [ ] Periodic sync cron or pre-push hook
 - [ ] Dashboard view of open work across all workflows
+
+### Phase 5: Autonomous Processing
+- [x] `next-task` mode: severity-ranked issue recommendation with queue visibility
+- [x] `process-next` mode: auto-start appropriate workflow for top-priority issue
+- [x] `continuous` mode: sequential processing loop with guardrails and progress summaries
+- [x] Stopping conditions: no tasks, blocked task, rate limit, user intervention
+- [x] Session logging to `tmp/github_ops_session.md`
 
 ## 13. Workflow Integration Example: `/template-audit`
 
@@ -635,27 +647,52 @@ Complete lifecycle for one discrepancy:
    → bin/gh-bridge/create-issue --workflow template-audit --key MOD-006 \
        --title "Page count overflow on Modern template full profile" \
        --severity moderate --domain templates --type discrepancy \
-       --body-file tmp/gh_issue_body.md --screenshot docs/template_audits/artifacts/modern/...
+       --page-url "/resumes/40" \
+       --description "Modern template renders to 4 pages for minimal profiles" \
+       --expected "Resume fits within 2 pages for minimal data" \
+       --actual "4 pages rendered with excessive section spacing" \
+       --suggested-fix "Reduce section_spacing in modern_component.html.erb" \
+       --affected-files "app/components/resume_templates/modern_component.html.erb" \
+       --verification "bundle exec rspec spec/services/resume_templates/pdf_rendering_spec.rb" \
+       --screenshots "tmp/ui_audit_artifacts/.../modern-overflow.png" \
+       --artifacts-dir "docs/template_audits/artifacts/modern/" \
+       --logs "PDF export: 4 pages. Console: 0 errors." \
+       --registry-path "docs/template_audits/registry.yml" \
+       --doc-path "docs/template_audits/templates/modern.md"
+   → Auto-generates structured issue body with metadata table, expected/actual,
+     screenshots, suggested fix, verification command, and completion checklist
    → Writes github_issue_number: 48 to registry.yml
    → Commits registry update
 
 2. /template-audit implement-next modern
    → Reads registry, picks MOD-006 (github_issue_number: 48)
+   → bin/gh-bridge/update-issue --issue 48 --status in-progress
    → bin/gh-bridge/create-branch --workflow template-audit --key MOD-006-page-count-overflow
    → Implements fix in modern_component.html.erb
    → Commits with message: "template-audit: resolve MOD-006 page count overflow\n\nCloses #48"
    → Runs verification: bundle exec rspec ... (31 examples, 0 failures)
-   → bin/gh-bridge/update-issue --issue 48 --status verified \
-       --comment-file tmp/gh_verification.md
    → bin/gh-bridge/create-pr --workflow template-audit \
        --key MOD-006-page-count-overflow --issue 48 \
-       --title "Fix: Resolve page count overflow on Modern template"
+       --title "Fix: Resolve page count overflow on Modern template" \
+       --description "Reduced section_spacing from 1.5rem to 0.75rem" \
+       --severity moderate --domain templates \
+       --affected-files "app/components/resume_templates/modern_component.html.erb" \
+       --verification "bundle exec rspec spec/services/resume_templates/pdf_rendering_spec.rb" \
+       --verification-results "31 examples, 0 failures" \
+       --regression-check "Cross-checked classic and ats-minimal: no overflow"
+   → Auto-generates structured PR body with summary table, verification results,
+     and Closes #48 directive
    → Updates registry with github_pr_number: 51
 
 3. After PR merge:
    → bin/gh-bridge/close-issue --issue 48 --reason completed
    → Updates registry: MOD-006 status → resolved
    → Deletes branch template-audit/MOD-006-page-count-overflow
+
+4. Determine next task:
+   → bin/gh-bridge/next-task --workflow template-audit
+   → Returns: #49 [high] sidebar-accent SAC-004 section spacing
+   → Suggests: /template-audit implement-next sidebar-accent
 ```
 
 ## 14. Security Considerations

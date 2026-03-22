@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+# Determines the next recommended task by querying open GitHub issues,
+# prioritizing by severity, workflow, and dependencies.
+#
+# Usage: bin/gh-bridge/next-task \
+#   [--workflow "template-audit"]   # Filter to a specific workflow
+#   [--domain "templates"]          # Filter to a specific domain
+#   [--format "json"]               # Output format: text (default) or json
+#
+# Outputs: next recommended issue with context for autonomous processing.
+# Returns exit code 0 if a task is found, 1 if no open tasks remain.
+
+set -euo pipefail
+
+WORKFLOW_FILTER=""
+DOMAIN_FILTER=""
+FORMAT="text"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow) WORKFLOW_FILTER="$2"; shift 2 ;;
+    --domain)   DOMAIN_FILTER="$2";   shift 2 ;;
+    --format)   FORMAT="$2";          shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+if [ -z "$REPO" ]; then
+  echo "ERROR: Could not determine repository. Set GH_REPO or run from a git repo." >&2
+  exit 1
+fi
+
+# Build label filter arguments
+LABEL_ARGS=""
+[ -n "$WORKFLOW_FILTER" ] && LABEL_ARGS="--label workflow:${WORKFLOW_FILTER}"
+[ -n "$DOMAIN_FILTER" ]   && LABEL_ARGS="${LABEL_ARGS} --label domain:${DOMAIN_FILTER}"
+
+# Query open issues, sorted by priority (severity labels)
+# Fetch all open issues with their labels, then rank them
+ISSUES_JSON=$(gh issue list --repo "$REPO" --state open ${LABEL_ARGS} \
+  --json number,title,labels,createdAt,updatedAt \
+  --limit 100 2>/dev/null || echo "[]")
+
+if [ "$ISSUES_JSON" = "[]" ] || [ -z "$ISSUES_JSON" ]; then
+  if [ "$FORMAT" = "json" ]; then
+    echo '{"status":"no_tasks","message":"No open issues found matching filters."}'
+  else
+    echo "No open issues found matching the specified filters."
+    echo ""
+    echo "All tasks may be completed, or try broadening your filter:"
+    echo "  bin/gh-bridge/next-task                    # all open issues"
+    echo "  bin/gh-bridge/next-task --workflow <name>  # specific workflow"
+  fi
+  exit 1
+fi
+
+# Use Ruby to rank issues by severity and select the best next task
+RESULT=$(ruby -rjson -e '
+  issues = JSON.parse(ARGV[0])
+  workflow_filter = ARGV[1]
+  domain_filter = ARGV[2]
+
+  # Severity priority (lower = more urgent)
+  severity_rank = {
+    "severity:critical" => 0,
+    "severity:high"     => 1,
+    "severity:medium"   => 2,
+    "severity:low"      => 3,
+  }
+
+  # Status priority (prefer open over in-progress to avoid conflicts)
+  status_rank = {
+    "status:open"        => 0,
+    "status:in-progress" => 1,
+    "status:blocked"     => 99,
+    "status:deferred"    => 99,
+    "status:needs-review" => 98,
+    "status:verified"    => 97,
+  }
+
+  ranked = issues.map do |issue|
+    labels = issue["labels"].map { |l| l["name"] }
+
+    # Skip blocked, deferred, needs-review, verified issues
+    status_labels = labels.select { |l| l.start_with?("status:") }
+    status_score = status_labels.map { |l| status_rank[l] || 50 }.min || 50
+    next nil if status_score >= 97
+
+    # Extract metadata from labels
+    sev_labels = labels.select { |l| l.start_with?("severity:") }
+    sev_score = sev_labels.map { |l| severity_rank[l] || 3 }.min || 3
+
+    wf_labels = labels.select { |l| l.start_with?("workflow:") }
+    workflow = wf_labels.first&.sub("workflow:", "") || "unknown"
+
+    dom_labels = labels.select { |l| l.start_with?("domain:") }
+    domain = dom_labels.first&.sub("domain:", "") || "unknown"
+
+    type_labels = labels.select { |l| l.start_with?("type:") }
+    type = type_labels.first&.sub("type:", "") || "unknown"
+
+    severity = sev_labels.first&.sub("severity:", "") || "unclassified"
+
+    # Extract tracking key from title: [workflow] Title (KEY)
+    key = issue["title"][/\(([^)]+)\)\s*$/, 1] || "unknown"
+
+    {
+      number: issue["number"],
+      title: issue["title"],
+      key: key,
+      workflow: workflow,
+      domain: domain,
+      type: type,
+      severity: severity,
+      severity_score: sev_score,
+      status_score: status_score,
+      created_at: issue["createdAt"],
+      labels: labels,
+    }
+  end.compact
+
+  # Sort: severity (ascending) → status (ascending) → created_at (ascending)
+  ranked.sort_by! { |r| [r[:severity_score], r[:status_score], r[:created_at]] }
+
+  if ranked.empty?
+    puts JSON.generate({ status: "no_actionable_tasks", message: "All open issues are blocked, deferred, or awaiting review." })
+    exit 1
+  end
+
+  next_task = ranked.first
+  remaining = ranked.size - 1
+
+  # Build context for the next task
+  result = {
+    status: "task_found",
+    next_task: {
+      issue_number: next_task[:number],
+      title: next_task[:title],
+      key: next_task[:key],
+      workflow: next_task[:workflow],
+      domain: next_task[:domain],
+      type: next_task[:type],
+      severity: next_task[:severity],
+      labels: next_task[:labels],
+    },
+    remaining_count: remaining,
+    queue: ranked[1..4]&.map { |r| { number: r[:number], title: r[:title], severity: r[:severity] } } || [],
+    suggested_command: "/#{next_task[:workflow]} implement-next",
+  }
+
+  puts JSON.generate(result)
+' "$ISSUES_JSON" "$WORKFLOW_FILTER" "$DOMAIN_FILTER" 2>/dev/null)
+
+if [ $? -ne 0 ] || [ -z "$RESULT" ]; then
+  echo "ERROR: Failed to rank issues." >&2
+  exit 1
+fi
+
+if [ "$FORMAT" = "json" ]; then
+  echo "$RESULT"
+  exit 0
+fi
+
+# Parse JSON result for text output
+STATUS=$(echo "$RESULT" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"]' 2>/dev/null)
+
+if [ "$STATUS" = "no_actionable_tasks" ]; then
+  echo "All open issues are blocked, deferred, or awaiting review."
+  echo "No actionable tasks available right now."
+  exit 1
+fi
+
+# Format as human-readable text
+ruby -rjson -e '
+  result = JSON.parse(STDIN.read)
+  task = result["next_task"]
+  remaining = result["remaining_count"]
+  queue = result["queue"]
+  cmd = result["suggested_command"]
+
+  puts "=" * 60
+  puts "NEXT RECOMMENDED TASK"
+  puts "=" * 60
+  puts ""
+  puts "Issue:    ##{task["issue_number"]} #{task["title"]}"
+  puts "Key:      #{task["key"]}"
+  puts "Workflow: /#{task["workflow"]}"
+  puts "Domain:   #{task["domain"]}"
+  puts "Severity: #{task["severity"]}"
+  puts "Type:     #{task["type"]}"
+  puts ""
+  puts "Suggested command:"
+  puts "  #{cmd}"
+  puts ""
+
+  if remaining > 0
+    puts "-" * 40
+    puts "QUEUE (#{remaining} more tasks)"
+    puts "-" * 40
+    queue.each_with_index do |q, i|
+      puts "  #{i + 2}. ##{q["number"]} [#{q["severity"]}] #{q["title"]}"
+    end
+    puts "  ..." if remaining > 4
+    puts ""
+  end
+
+  puts "To process this task:"
+  puts "  1. bin/gh-bridge/update-issue --issue #{task["issue_number"]} --status in-progress"
+  puts "  2. bin/gh-bridge/create-branch --workflow #{task["workflow"]} --key #{task["key"]}"
+  puts "  3. #{cmd}"
+  puts "  4. bin/gh-bridge/create-pr --workflow #{task["workflow"]} --key #{task["key"]} --issue #{task["issue_number"]}"
+  puts "  5. bin/gh-bridge/close-issue --issue #{task["issue_number"]}"
+  puts ""
+' <<< "$RESULT"

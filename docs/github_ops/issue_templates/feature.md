@@ -1,13 +1,30 @@
 ## Context
 
-- **Workflow**: `/${WORKFLOW}`
-- **Feature name**: ${FEATURE_NAME}
-- **Priority**: ${PRIORITY}
-- **Spec path**: `${SPEC_PATH}`
+| Field | Value |
+|-------|-------|
+| **Workflow** | `/${WORKFLOW}` |
+| **Tracking key** | `${ISSUE_KEY}` |
+| **Priority** | ${SEVERITY} |
+| **Domain** | ${DOMAIN} |
+| **Page URL** | ${PAGE_URL} |
+| **Spec path** | `${SPEC_PATH}` |
+| **Detected at** | ${TIMESTAMP} |
 
 ## Description
 
 ${DESCRIPTION}
+
+## Expected Behavior
+
+${EXPECTED}
+
+## Current Behavior
+
+${ACTUAL}
+
+## Screenshots
+
+${SCREENSHOTS}
 
 ## Acceptance Criteria
 
@@ -15,11 +32,15 @@ ${ACCEPTANCE_CRITERIA}
 
 ## Implementation Plan
 
-${IMPLEMENTATION_PLAN}
+${SUGGESTED_FIX}
 
 ## Affected Surfaces
 
 ${AFFECTED_FILES}
+
+## Logs & Technical Context
+
+${LOGS}
 
 ## Verification
 
@@ -29,5 +50,15 @@ ${VERIFICATION_COMMAND}
 
 ## Related
 
-- Feature spec: `${SPEC_PATH}`
-- Architecture doc: `docs/architecture_overview.md`
+- **Feature spec**: [`${SPEC_PATH}`](${SPEC_PATH})
+- **Registry**: [`${REGISTRY_PATH}#${ISSUE_KEY}`](${REGISTRY_PATH})
+- **Architecture doc**: [`docs/architecture_overview.md`](docs/architecture_overview.md)
+
+## Checklist
+
+- [ ] Spec reviewed and approved
+- [ ] Implementation plan confirmed
+- [ ] Tests written (TDD red phase)
+- [ ] Implementation complete (TDD green phase)
+- [ ] Verification passing
+- [ ] Documentation updated

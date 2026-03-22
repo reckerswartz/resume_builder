@@ -2,6 +2,10 @@
 # Creates a GitHub issue from workflow findings.
 # Idempotent: searches for existing open issue with same title before creating.
 #
+# When --body-file is provided, uses that file directly as the issue body.
+# Otherwise, auto-generates a structured body using build-issue-body and the
+# appropriate template (audit, bug, feature, rollout) based on --template.
+#
 # Usage: bin/gh-bridge/create-issue \
 #   --workflow "template-audit" \
 #   --key "MOD-006" \
@@ -9,12 +13,27 @@
 #   --severity "medium" \
 #   --domain "templates" \
 #   --type "discrepancy" \
-#   --body-file "/path/to/issue_body.md" \
-#   [--screenshot "/path/to/screenshot.png"]
+#   [--template "audit"]                  # auto-select issue body template
+#   [--body-file "/path/to/issue_body.md"] # OR provide a pre-built body
+#   [--page-url "/resumes/40"]
+#   [--description "Full description of the issue"]
+#   [--expected "Expected behavior"]
+#   [--actual "Actual behavior observed"]
+#   [--suggested-fix "Approach to fix"]
+#   [--affected-files "file1.rb,file2.erb"]
+#   [--verification "bundle exec rspec ..."]
+#   [--screenshots "/path/to/img1.png,/path/to/img2.png"]
+#   [--artifacts-dir "docs/template_audits/artifacts/modern/"]
+#   [--logs "Console output or technical context"]
+#   [--registry-path "docs/template_audits/registry.yml"]
+#   [--run-log-path "docs/.../00-overview.md"]
+#   [--doc-path "docs/.../modern.md"]
 #
 # Outputs: GitHub issue number
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 WORKFLOW=""
 KEY=""
@@ -22,19 +41,53 @@ TITLE=""
 SEVERITY=""
 DOMAIN=""
 TYPE=""
+TEMPLATE=""
 BODY_FILE=""
-SCREENSHOT=""
+PAGE_URL=""
+DESCRIPTION=""
+EXPECTED=""
+ACTUAL=""
+SUGGESTED_FIX=""
+AFFECTED_FILES=""
+VERIFICATION=""
+SCREENSHOTS=""
+ARTIFACTS_DIR=""
+LOGS=""
+REGISTRY_PATH=""
+RUN_LOG_PATH=""
+DOC_PATH=""
+
+# Extra template-specific params (forwarded to build-issue-body)
+EXTRA_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --workflow)   WORKFLOW="$2";    shift 2 ;;
-    --key)        KEY="$2";        shift 2 ;;
-    --title)      TITLE="$2";      shift 2 ;;
-    --severity)   SEVERITY="$2";   shift 2 ;;
-    --domain)     DOMAIN="$2";     shift 2 ;;
-    --type)       TYPE="$2";       shift 2 ;;
-    --body-file)  BODY_FILE="$2";  shift 2 ;;
-    --screenshot) SCREENSHOT="$2"; shift 2 ;;
+    --workflow)       WORKFLOW="$2";       shift 2 ;;
+    --key)            KEY="$2";            shift 2 ;;
+    --title)          TITLE="$2";          shift 2 ;;
+    --severity)       SEVERITY="$2";       shift 2 ;;
+    --domain)         DOMAIN="$2";         shift 2 ;;
+    --type)           TYPE="$2";           shift 2 ;;
+    --template)       TEMPLATE="$2";       shift 2 ;;
+    --body-file)      BODY_FILE="$2";      shift 2 ;;
+    --page-url)       PAGE_URL="$2";       shift 2 ;;
+    --description)    DESCRIPTION="$2";    shift 2 ;;
+    --expected)       EXPECTED="$2";       shift 2 ;;
+    --actual)         ACTUAL="$2";         shift 2 ;;
+    --suggested-fix)  SUGGESTED_FIX="$2";  shift 2 ;;
+    --affected-files) AFFECTED_FILES="$2"; shift 2 ;;
+    --verification)   VERIFICATION="$2";   shift 2 ;;
+    --screenshots)    SCREENSHOTS="$2";    shift 2 ;;
+    --artifacts-dir)  ARTIFACTS_DIR="$2";  shift 2 ;;
+    --logs)           LOGS="$2";           shift 2 ;;
+    --registry-path)  REGISTRY_PATH="$2";  shift 2 ;;
+    --run-log-path)   RUN_LOG_PATH="$2";   shift 2 ;;
+    --doc-path)       DOC_PATH="$2";       shift 2 ;;
+    # Forward any extra template-specific args to build-issue-body
+    --bug-category|--root-cause|--reproduction-steps|--source-reference|\
+    --spec-path|--acceptance-criteria|--error-reference|--related-workflow|\
+    --reference-doc-path)
+      EXTRA_ARGS+=("$1" "$2"); shift 2 ;;
     *) echo "Unknown option: $1" >&2; exit 1 ;;
   esac
 done
@@ -61,18 +114,59 @@ LABELS="workflow:${WORKFLOW},status:open"
 [ -n "$DOMAIN" ]   && LABELS="${LABELS},domain:${DOMAIN}"
 [ -n "$TYPE" ]     && LABELS="${LABELS},type:${TYPE}"
 
-# Build body
+# Build body: prefer explicit --body-file, otherwise auto-generate
 if [ -n "$BODY_FILE" ] && [ -f "$BODY_FILE" ]; then
   BODY_CONTENT=$(cat "$BODY_FILE")
 else
-  BODY_CONTENT="## Finding
+  # Auto-detect template from --type if --template not provided
+  if [ -z "$TEMPLATE" ]; then
+    case "$TYPE" in
+      discrepancy|responsive-issue|compliance-gap|usability-issue|maintainability|security-finding|coverage-gap)
+        TEMPLATE="audit" ;;
+      bug)
+        TEMPLATE="bug" ;;
+      feature)
+        TEMPLATE="feature" ;;
+      rollout-slice)
+        TEMPLATE="rollout" ;;
+      *)
+        TEMPLATE="audit" ;;
+    esac
+  fi
+
+  # Use description or title as fallback
+  [ -z "$DESCRIPTION" ] && DESCRIPTION="$TITLE"
+
+  # Generate structured body via build-issue-body
+  BODY_CONTENT=$("$SCRIPT_DIR/build-issue-body" \
+    --template "$TEMPLATE" \
+    --workflow "$WORKFLOW" \
+    --key "$KEY" \
+    --severity "${SEVERITY:-unclassified}" \
+    --domain "${DOMAIN:-unclassified}" \
+    --type "${TYPE:-$TEMPLATE}" \
+    --description "$DESCRIPTION" \
+    ${PAGE_URL:+--page-url "$PAGE_URL"} \
+    ${EXPECTED:+--expected "$EXPECTED"} \
+    ${ACTUAL:+--actual "$ACTUAL"} \
+    ${SUGGESTED_FIX:+--suggested-fix "$SUGGESTED_FIX"} \
+    ${AFFECTED_FILES:+--affected-files "$AFFECTED_FILES"} \
+    ${VERIFICATION:+--verification "$VERIFICATION"} \
+    ${SCREENSHOTS:+--screenshots "$SCREENSHOTS"} \
+    ${ARTIFACTS_DIR:+--artifacts-dir "$ARTIFACTS_DIR"} \
+    ${LOGS:+--logs "$LOGS"} \
+    ${REGISTRY_PATH:+--registry-path "$REGISTRY_PATH"} \
+    ${RUN_LOG_PATH:+--run-log-path "$RUN_LOG_PATH"} \
+    ${DOC_PATH:+--doc-path "$DOC_PATH"} \
+    "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}" \
+    2>/dev/null || echo "## Finding
 
 **Workflow**: \`/${WORKFLOW}\`
 **Tracking key**: \`${KEY}\`
 **Severity**: ${SEVERITY:-unclassified}
 **Domain**: ${DOMAIN:-unclassified}
 
-_Issue body not provided. Update this issue with full context._"
+_Auto-generated body failed. Update this issue with full context._")
 fi
 
 # Create the issue
@@ -83,15 +177,22 @@ ISSUE_NUMBER=$(gh issue create \
   --label "$LABELS" \
   2>/dev/null | grep -oP '\d+$')
 
-# Upload screenshot as a comment if provided
-if [ -n "$SCREENSHOT" ] && [ -f "$SCREENSHOT" ]; then
-  gh issue comment "$ISSUE_NUMBER" \
-    --repo "$REPO" \
-    --body "## Screenshot
+# Upload screenshots as comments with file references
+if [ -n "$SCREENSHOTS" ]; then
+  IFS=',' read -ra SCREENSHOT_LIST <<< "$SCREENSHOTS"
+  for SHOT in "${SCREENSHOT_LIST[@]}"; do
+    SHOT=$(echo "$SHOT" | xargs)
+    if [ -n "$SHOT" ] && [ -f "$SHOT" ]; then
+      BASENAME=$(basename "$SHOT")
+      gh issue comment "$ISSUE_NUMBER" \
+        --repo "$REPO" \
+        --body "## Screenshot: ${BASENAME}
 
-![Evidence](${SCREENSHOT})
+\`${SHOT}\`
 
-_Uploaded from workflow run._" 2>/dev/null || true
+_Captured by \`/${WORKFLOW}\` workflow._" 2>/dev/null || true
+    fi
+  done
 fi
 
 echo "$ISSUE_NUMBER"

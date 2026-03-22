@@ -1,10 +1,14 @@
 ## Context
 
-- **Workflow**: `/${WORKFLOW}`
-- **Bug category**: ${BUG_CATEGORY}
-- **Severity**: ${SEVERITY}
-- **Domain**: ${DOMAIN}
-- **Detected at**: ${TIMESTAMP}
+| Field | Value |
+|-------|-------|
+| **Workflow** | `/${WORKFLOW}` |
+| **Tracking key** | `${ISSUE_KEY}` |
+| **Severity** | ${SEVERITY} |
+| **Domain** | ${DOMAIN} |
+| **Bug category** | ${BUG_CATEGORY} |
+| **Page URL** | ${PAGE_URL} |
+| **Detected at** | ${TIMESTAMP} |
 
 ## Bug Description
 
@@ -16,23 +20,31 @@ ${REPRODUCTION_STEPS}
 
 ## Expected Behavior
 
-${EXPECTED_BEHAVIOR}
+${EXPECTED}
 
 ## Actual Behavior
 
-${ACTUAL_BEHAVIOR}
+${ACTUAL}
+
+## Screenshots
+
+${SCREENSHOTS}
 
 ## Root Cause Analysis
 
 ${ROOT_CAUSE}
 
+## Suggested Fix
+
+${SUGGESTED_FIX}
+
 ## Affected Files
 
 ${AFFECTED_FILES}
 
-## Suggested Fix
+## Logs & Technical Context
 
-${SUGGESTED_FIX}
+${LOGS}
 
 ## Verification
 
@@ -42,5 +54,14 @@ ${VERIFICATION_COMMAND}
 
 ## Related
 
-- Error log/stack trace: ${ERROR_REFERENCE}
-- Related workflow: `/${RELATED_WORKFLOW}`
+- **Error reference**: ${ERROR_REFERENCE}
+- **Related workflow**: `/${RELATED_WORKFLOW}`
+- **Registry**: [`${REGISTRY_PATH}#${ISSUE_KEY}`](${REGISTRY_PATH})
+
+## Checklist
+
+- [ ] Root cause confirmed
+- [ ] Regression test added
+- [ ] Fix implemented
+- [ ] Verification passing
+- [ ] No regressions introduced

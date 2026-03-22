@@ -39,7 +39,7 @@ GH-1. **Before implementing any remediation**, verify GitHub CLI is authenticate
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the security finding being remediated:
+GH-2. **Create a GitHub issue** with full structured context for the security finding:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "security-audit" \
@@ -47,7 +47,15 @@ GH-2. **Create a GitHub issue** for the security finding being remediated:
       --title "<description of the security finding>" \
       --severity "<severity>" \
       --domain "security" \
-      --type "security-finding"
+      --type "security-finding" \
+      --page-url "<affected endpoint or route>" \
+      --description "<clear description of the vulnerability>" \
+      --expected "<expected secure behavior>" \
+      --actual "<actual insecure behavior>" \
+      --suggested-fix "<remediation approach>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --logs "<Brakeman output, security scan results>"
     ```
     Record the returned issue number.
 
@@ -59,19 +67,20 @@ GH-3. **Create a working branch** for the remediation:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    security-audit: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
+GH-4. **After validation passes**, commit and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "security-audit" \
       --key "<finding_id>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "security" \
+      --affected-files "<changed files>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --verification-results "<N examples, 0 failures>" \
+      --regression-check "<Brakeman re-scan results>"
     ```
 
 GH-5. **After PR merge**, close the issue:
@@ -80,6 +89,12 @@ GH-5. **After PR merge**, close the issue:
       --issue <issue_number> \
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "security-audit/<finding_id>"
+    ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow security-audit
     ```
 
 ### Phase 3: Implement & Refine Data

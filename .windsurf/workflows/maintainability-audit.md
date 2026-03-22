@@ -50,7 +50,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the finding being fixed:
+GH-2. **Create a GitHub issue** with full structured context for the finding being fixed:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "maintainability-audit" \
@@ -58,7 +58,17 @@ GH-2. **Create a GitHub issue** for the finding being fixed:
       --title "<description of the hotspot>" \
       --severity "<severity>" \
       --domain "infrastructure" \
-      --type "maintainability"
+      --type "maintainability" \
+      --description "<clear description of the maintainability issue>" \
+      --expected "<expected code structure or responsibility separation>" \
+      --actual "<actual mixed responsibilities or code smell>" \
+      --suggested-fix "<extraction, refactoring, or coverage approach>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --logs "<code metrics, complexity scores, or test coverage>" \
+      --registry-path "docs/maintainability_audits/registry.yml" \
+      --run-log-path "<path to run log>" \
+      --doc-path "<path to area doc>"
     ```
     Record the returned issue number in `docs/maintainability_audits/registry.yml` under the area entry as `github_issue_number`.
 
@@ -70,19 +80,20 @@ GH-3. **Create a working branch** for the fix:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    maintainability-audit: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
+GH-4. **After validation passes**, commit referencing the issue and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "maintainability-audit" \
       --key "<area_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "infrastructure" \
+      --affected-files "<comma-separated changed files>" \
+      --verification "bundle exec rspec <focused spec paths>" \
+      --verification-results "<N examples, 0 failures>" \
+      --regression-check "<broader regression baseline results>"
     ```
     Record the returned PR number in the registry as `github_pr_number`.
 
@@ -93,6 +104,13 @@ GH-5. **After PR merge**, close the issue:
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "maintainability-audit/<area_key>"
     ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow maintainability-audit
+    ```
+    Output the next recommended task. If in continuous mode, start the next workflow automatically.
 
 ### Phase 3: Implement & Refine Data
 

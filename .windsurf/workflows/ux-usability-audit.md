@@ -43,7 +43,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the finding being fixed:
+GH-2. **Create a GitHub issue** with full structured context for the finding being fixed:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "ux-usability-audit" \
@@ -51,7 +51,20 @@ GH-2. **Create a GitHub issue** for the finding being fixed:
       --title "<description of the usability issue>" \
       --severity "<severity>" \
       --domain "builder" \
-      --type "usability-issue"
+      --type "usability-issue" \
+      --page-url "<page URL where issue was found>" \
+      --description "<clear description with specific evidence>" \
+      --expected "<expected usability behavior>" \
+      --actual "<actual usability behavior observed>" \
+      --suggested-fix "<approach to fix>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec spec/requests/resumes_spec.rb" \
+      --screenshots "<comma-separated Playwright screenshot paths>" \
+      --artifacts-dir "<path to usability audit artifacts>" \
+      --logs "<console errors, usability scores, measurements>" \
+      --registry-path "docs/ui_audits/usability_review/registry.yml" \
+      --run-log-path "<path to run log>" \
+      --doc-path "<path to page doc>"
     ```
     Record the returned issue number in `docs/ui_audits/usability_review/registry.yml` under the page entry as `github_issue_number`.
 
@@ -69,13 +82,20 @@ GH-4. **After validation passes** (Phase 4), commit referencing the issue:
 
     Closes #<issue_number>
     ```
-    Then create a PR:
+    Then create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "ux-usability-audit" \
       --key "<issue_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "builder" \
+      --affected-files "<comma-separated changed files>" \
+      --verification "bundle exec rspec spec/requests/resumes_spec.rb" \
+      --verification-results "<N examples, 0 failures>" \
+      --regression-check "<Playwright re-audit results>"
     ```
     Record the returned PR number in the registry as `github_pr_number`.
 
@@ -86,6 +106,13 @@ GH-5. **After PR merge**, close the issue:
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "ux-usability-audit/<issue_key>"
     ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow ux-usability-audit
+    ```
+    Output the next recommended task. If in continuous mode, start the next workflow automatically.
 
 ### Phase 3: Implement & Refine Data
 

@@ -22,7 +22,7 @@ GH-1. **Before writing specs**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. If not already on a workflow branch, **create a GitHub issue** for the coverage gap:
+GH-2. If not already on a workflow branch, **create a GitHub issue** with structured context:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "rspec-agent" \
@@ -30,7 +30,12 @@ GH-2. If not already on a workflow branch, **create a GitHub issue** for the cov
       --title "<description>" \
       --severity "medium" \
       --domain "testing" \
-      --type "coverage-gap"
+      --type "coverage-gap" \
+      --description "<clear description of the coverage gap>" \
+      --expected "<expected test coverage>" \
+      --actual "<current uncovered behavior>" \
+      --suggested-fix "<spec file paths and test approach>" \
+      --affected-files "<likely affected spec and implementation files>"
     ```
 
 GH-3. **Create or switch to a working branch**:
@@ -41,13 +46,19 @@ GH-3. **Create or switch to a working branch**:
     ```
     All spec work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue and create a PR:
+GH-4. **After validation passes**, commit and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "rspec-agent" \
       --key "<coverage_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what specs were added and why>" \
+      --severity "medium" \
+      --domain "testing" \
+      --affected-files "<new/changed spec files>" \
+      --verification "bundle exec rspec <spec paths>" \
+      --verification-results "<N examples, 0 failures>"
     ```
 
 ### Phase 2: Identify Gaps & Write Specs

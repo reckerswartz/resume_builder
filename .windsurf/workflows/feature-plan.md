@@ -23,7 +23,7 @@ GH-1. **Before planning**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. If no GitHub issue exists for this feature yet, **create one**:
+GH-2. If no GitHub issue exists for this feature yet, **create one** with structured context:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "feature-plan" \
@@ -31,7 +31,14 @@ GH-2. If no GitHub issue exists for this feature yet, **create one**:
       --title "<feature name>" \
       --severity "medium" \
       --domain "<domain>" \
-      --type "feature"
+      --type "feature" \
+      --template "feature" \
+      --description "<clear description of the feature being planned>" \
+      --expected "<desired implementation outcome>" \
+      --actual "<current state or gap>" \
+      --suggested-fix "<PR breakdown and implementation approach>" \
+      --affected-files "<likely affected files>" \
+      --spec-path "docs/features/<feature-name>.md"
     ```
     If an issue already exists from `/feature-spec`, reuse that issue number.
 

@@ -23,7 +23,7 @@ GH-1. **Before reviewing**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. If no GitHub issue exists for this feature yet (from `/feature-spec`), **create one**:
+GH-2. If no GitHub issue exists for this feature yet (from `/feature-spec`), **create one** with structured context:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "feature-review" \
@@ -31,7 +31,13 @@ GH-2. If no GitHub issue exists for this feature yet (from `/feature-spec`), **c
       --title "<feature name> — review" \
       --severity "medium" \
       --domain "<domain>" \
-      --type "feature"
+      --type "feature" \
+      --template "feature" \
+      --description "<clear description of the feature being reviewed>" \
+      --expected "<desired spec completeness and quality>" \
+      --actual "<current spec gaps or issues>" \
+      --suggested-fix "<review recommendations>" \
+      --spec-path "docs/features/<feature-name>.md"
     ```
     If an issue already exists, reuse that issue number and update it with review findings via `bin/gh-bridge/update-issue`.
 

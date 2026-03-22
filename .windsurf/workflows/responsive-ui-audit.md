@@ -39,7 +39,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the finding being fixed:
+GH-2. **Create a GitHub issue** with full structured context for the finding being fixed:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "responsive-ui-audit" \
@@ -47,7 +47,20 @@ GH-2. **Create a GitHub issue** for the finding being fixed:
       --title "<description of the responsive issue>" \
       --severity "<severity>" \
       --domain "builder" \
-      --type "responsive-issue"
+      --type "responsive-issue" \
+      --page-url "<page URL where issue was found>" \
+      --description "<clear description with viewport measurements>" \
+      --expected "<expected responsive behavior at target viewport>" \
+      --actual "<actual behavior: overflow, stacking, truncation>" \
+      --suggested-fix "<approach to fix>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec spec/requests/resumes_spec.rb" \
+      --screenshots "<comma-separated Playwright screenshot paths at 390/768/1280>" \
+      --artifacts-dir "<path to responsive audit artifacts>" \
+      --logs "<viewport measurements, scroll heights, overflow data>" \
+      --registry-path "docs/ui_audits/responsive_review/registry.yml" \
+      --run-log-path "<path to run log>" \
+      --doc-path "<path to page doc>"
     ```
     Record the returned issue number in `docs/ui_audits/responsive_review/registry.yml` under the page entry as `github_issue_number`.
 
@@ -59,19 +72,20 @@ GH-3. **Create a working branch** for the fix:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    responsive-ui-audit: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
+GH-4. **After validation passes**, commit referencing the issue and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "responsive-ui-audit" \
       --key "<issue_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "builder" \
+      --affected-files "<comma-separated changed files>" \
+      --verification "bundle exec rspec spec/requests/resumes_spec.rb" \
+      --verification-results "<N examples, 0 failures>" \
+      --regression-check "<multi-viewport Playwright re-audit results>"
     ```
     Record the returned PR number in the registry as `github_pr_number`.
 
@@ -82,6 +96,13 @@ GH-5. **After PR merge**, close the issue:
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "responsive-ui-audit/<issue_key>"
     ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow responsive-ui-audit
+    ```
+    Output the next recommended task. If in continuous mode, start the next workflow automatically.
 
 ### Phase 3: Implement & Refine Data
 

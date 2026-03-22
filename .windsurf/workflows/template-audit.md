@@ -70,7 +70,7 @@ GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. **Create a GitHub issue** for the discrepancy being fixed:
+GH-2. **Create a GitHub issue** with full structured context for the discrepancy being fixed:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "template-audit" \
@@ -78,7 +78,20 @@ GH-2. **Create a GitHub issue** for the discrepancy being fixed:
       --title "<description of the template discrepancy>" \
       --severity "<severity>" \
       --domain "templates" \
-      --type "discrepancy"
+      --type "discrepancy" \
+      --page-url "<page URL where issue was found, e.g. /resumes/40>" \
+      --description "<clear description with specific evidence>" \
+      --expected "<what the template should look like>" \
+      --actual "<what the template actually looks like>" \
+      --suggested-fix "<approach to fix, e.g. adjust spacing in component>" \
+      --affected-files "<comma-separated file paths>" \
+      --verification "bundle exec rspec spec/services/resume_templates/pdf_rendering_spec.rb" \
+      --screenshots "<comma-separated Playwright screenshot paths>" \
+      --artifacts-dir "<path to template audit artifacts>" \
+      --logs "<console errors, PDF page count, measurements>" \
+      --registry-path "docs/template_audits/registry.yml" \
+      --run-log-path "<path to run log>" \
+      --doc-path "<path to template doc>"
     ```
     Record the returned issue number in `docs/template_audits/registry.yml` under the template entry as `github_issue_number`.
 
@@ -96,13 +109,21 @@ GH-4. **After validation passes** (Phase 4), commit referencing the issue:
 
     Closes #<issue_number>
     ```
-    Then create a PR:
+    Then create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "template-audit" \
       --key "<discrepancy_id>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "<severity>" \
+      --domain "templates" \
+      --affected-files "<comma-separated changed files>" \
+      --verification "bundle exec rspec spec/services/resume_templates/pdf_rendering_spec.rb" \
+      --verification-results "<N examples, 0 failures>" \
+      --regression-check "<cross-template check results>" \
+      --screenshots "<before/after screenshot paths>"
     ```
     Record the returned PR number in the registry as `github_pr_number`.
 
@@ -113,6 +134,13 @@ GH-5. **After PR merge**, close the issue:
       --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
       --delete-branch "template-audit/<discrepancy_id>"
     ```
+
+GH-6. **Determine next task** after completion:
+    ```bash
+    // turbo
+    bin/gh-bridge/next-task --workflow template-audit
+    ```
+    Output the next recommended task to the user. If in continuous mode, start the next workflow automatically.
 
 ### Phase 3: Implement & Refine Data
 

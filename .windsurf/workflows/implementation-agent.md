@@ -22,7 +22,7 @@ GH-1. **Before implementing**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. If not already on a workflow branch (from an upstream `/tdd-red-agent` or `/feature-plan` invocation), **create a GitHub issue** for the implementation:
+GH-2. If not already on a workflow branch (from an upstream `/tdd-red-agent` or `/feature-plan` invocation), **create a GitHub issue** with structured context:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "implementation-agent" \
@@ -30,7 +30,13 @@ GH-2. If not already on a workflow branch (from an upstream `/tdd-red-agent` or 
       --title "<description>" \
       --severity "medium" \
       --domain "<domain>" \
-      --type "feature"
+      --type "feature" \
+      --description "<clear description of what needs to be implemented>" \
+      --expected "<expected behavior from failing specs>" \
+      --actual "<current failing state>" \
+      --suggested-fix "<implementation approach>" \
+      --affected-files "<likely affected files>" \
+      --verification "bundle exec rspec <failing spec paths>"
     ```
 
 GH-3. **Create or switch to a working branch**:
@@ -41,13 +47,19 @@ GH-3. **Create or switch to a working branch**:
     ```
     All implementation work happens on this branch.
 
-GH-4. **After validation passes** (Phase 4), commit referencing the issue and create a PR:
+GH-4. **After validation passes**, commit and create a PR with structured body:
     ```bash
     bin/gh-bridge/create-pr \
       --workflow "implementation-agent" \
       --key "<feature_or_spec_key>" \
       --issue <issue_number> \
-      --title "<description>"
+      --title "Fix: <description>" \
+      --description "<what changed and why>" \
+      --severity "medium" \
+      --domain "<domain>" \
+      --affected-files "<changed files>" \
+      --verification "bundle exec rspec <spec paths>" \
+      --verification-results "<N examples, 0 failures>"
     ```
 
 ### Phase 2: Implement Minimum Code

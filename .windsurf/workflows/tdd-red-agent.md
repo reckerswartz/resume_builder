@@ -23,7 +23,7 @@ GH-1. **Before writing specs**, verify GitHub CLI is authenticated:
     ```
     If not authenticated, stop and ask the user to run `gh auth login`.
 
-GH-2. If not already on a workflow branch, **create a GitHub issue** for the behavior being specified:
+GH-2. If not already on a workflow branch, **create a GitHub issue** with structured context:
     ```bash
     bin/gh-bridge/create-issue \
       --workflow "tdd-red-agent" \
@@ -31,7 +31,12 @@ GH-2. If not already on a workflow branch, **create a GitHub issue** for the beh
       --title "<description>" \
       --severity "medium" \
       --domain "<domain>" \
-      --type "coverage-gap"
+      --type "coverage-gap" \
+      --description "<clear description of the behavior to specify>" \
+      --expected "<expected test-driven behavior>" \
+      --actual "<current uncovered behavior>" \
+      --suggested-fix "<spec file paths and approach>" \
+      --affected-files "<likely affected spec and implementation files>"
     ```
 
 GH-3. **Create or switch to a working branch**:

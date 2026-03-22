@@ -1,0 +1,269 @@
+#!/usr/bin/env bash
+# Generates a structured issue body from parameters by populating a template.
+# Outputs the populated body to stdout or to a file via --output.
+#
+# Usage: bin/gh-bridge/build-issue-body \
+#   --template "audit" \
+#   --workflow "template-audit" \
+#   --key "MOD-006" \
+#   --severity "medium" \
+#   --domain "templates" \
+#   --type "discrepancy" \
+#   --description "Page count overflow on Modern template full profile" \
+#   --page-url "/resumes/40" \
+#   --expected "Resume renders within 2 pages for minimal profiles" \
+#   --actual "Resume renders to 4 pages with excessive whitespace" \
+#   --suggested-fix "Reduce section spacing in modern_component.html.erb" \
+#   --affected-files "app/components/resume_templates/modern_component.html.erb" \
+#   --verification "bundle exec rspec spec/services/resume_templates/pdf_rendering_spec.rb" \
+#   --screenshots "/path/to/screenshot1.png,/path/to/screenshot2.png" \
+#   --artifacts-dir "docs/template_audits/artifacts/modern/" \
+#   --logs "Console: 0 errors. PDF export: 4 pages rendered." \
+#   --registry-path "docs/template_audits/registry.yml" \
+#   --run-log-path "docs/template_audits/runs/2026-03-22-modern-overflow/00-overview.md" \
+#   --doc-path "docs/template_audits/templates/modern.md" \
+#   [--output "/tmp/issue_body.md"]
+#
+# Outputs: populated Markdown body
+
+set -euo pipefail
+
+# Defaults
+TEMPLATE_NAME=""
+WORKFLOW=""
+KEY=""
+SEVERITY="unclassified"
+DOMAIN="unclassified"
+TYPE=""
+DESCRIPTION=""
+PAGE_URL=""
+EXPECTED=""
+ACTUAL=""
+SUGGESTED_FIX=""
+AFFECTED_FILES=""
+VERIFICATION=""
+SCREENSHOTS=""
+ARTIFACTS_DIR=""
+LOGS=""
+REGISTRY_PATH=""
+RUN_LOG_PATH=""
+DOC_PATH=""
+OUTPUT=""
+
+# Extra fields for specific templates
+BUG_CATEGORY=""
+ROOT_CAUSE=""
+REPRODUCTION_STEPS=""
+SOURCE_REFERENCE=""
+SPEC_PATH=""
+ACCEPTANCE_CRITERIA=""
+ERROR_REFERENCE=""
+RELATED_WORKFLOW=""
+REFERENCE_DOC_PATH=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --template)          TEMPLATE_NAME="$2";      shift 2 ;;
+    --workflow)          WORKFLOW="$2";            shift 2 ;;
+    --key)               KEY="$2";                shift 2 ;;
+    --severity)          SEVERITY="$2";           shift 2 ;;
+    --domain)            DOMAIN="$2";             shift 2 ;;
+    --type)              TYPE="$2";               shift 2 ;;
+    --description)       DESCRIPTION="$2";        shift 2 ;;
+    --page-url)          PAGE_URL="$2";           shift 2 ;;
+    --expected)          EXPECTED="$2";           shift 2 ;;
+    --actual)            ACTUAL="$2";             shift 2 ;;
+    --suggested-fix)     SUGGESTED_FIX="$2";      shift 2 ;;
+    --affected-files)    AFFECTED_FILES="$2";     shift 2 ;;
+    --verification)      VERIFICATION="$2";       shift 2 ;;
+    --screenshots)       SCREENSHOTS="$2";        shift 2 ;;
+    --artifacts-dir)     ARTIFACTS_DIR="$2";      shift 2 ;;
+    --logs)              LOGS="$2";               shift 2 ;;
+    --registry-path)     REGISTRY_PATH="$2";      shift 2 ;;
+    --run-log-path)      RUN_LOG_PATH="$2";       shift 2 ;;
+    --doc-path)          DOC_PATH="$2";           shift 2 ;;
+    --output)            OUTPUT="$2";             shift 2 ;;
+    --bug-category)      BUG_CATEGORY="$2";       shift 2 ;;
+    --root-cause)        ROOT_CAUSE="$2";         shift 2 ;;
+    --reproduction-steps) REPRODUCTION_STEPS="$2"; shift 2 ;;
+    --source-reference)  SOURCE_REFERENCE="$2";   shift 2 ;;
+    --spec-path)         SPEC_PATH="$2";          shift 2 ;;
+    --acceptance-criteria) ACCEPTANCE_CRITERIA="$2"; shift 2 ;;
+    --error-reference)   ERROR_REFERENCE="$2";    shift 2 ;;
+    --related-workflow)  RELATED_WORKFLOW="$2";   shift 2 ;;
+    --reference-doc-path) REFERENCE_DOC_PATH="$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$TEMPLATE_NAME" ] || [ -z "$WORKFLOW" ] || [ -z "$KEY" ]; then
+  echo "ERROR: --template, --workflow, and --key are required." >&2
+  exit 1
+fi
+
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# Resolve template file
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+TEMPLATE_FILE="${PROJECT_ROOT}/docs/github_ops/issue_templates/${TEMPLATE_NAME}.md"
+
+if [ ! -f "$TEMPLATE_FILE" ]; then
+  echo "ERROR: Template not found: ${TEMPLATE_FILE}" >&2
+  echo "Available templates: audit, bug, feature, rollout, pull_request" >&2
+  exit 1
+fi
+
+# Format affected files as a bullet list if comma-separated
+format_file_list() {
+  local raw="$1"
+  if [ -z "$raw" ]; then
+    echo "_None identified yet._"
+    return
+  fi
+  echo "$raw" | tr ',' '\n' | while read -r f; do
+    f=$(echo "$f" | xargs) # trim whitespace
+    [ -n "$f" ] && echo "- \`${f}\`"
+  done
+}
+
+# Format screenshots as Markdown image links
+# For local paths, reference them as relative repo paths
+# For URLs, embed directly
+format_screenshots() {
+  local raw="$1"
+  local artifacts="$2"
+  local result=""
+
+  if [ -n "$raw" ]; then
+    local idx=1
+    echo "$raw" | tr ',' '\n' | while read -r img; do
+      img=$(echo "$img" | xargs)
+      if [ -z "$img" ]; then continue; fi
+      if [[ "$img" == http* ]]; then
+        echo "![Screenshot ${idx}](${img})"
+      else
+        echo "**Screenshot ${idx}**: \`${img}\`"
+      fi
+      idx=$((idx + 1))
+    done
+    result="(screenshots listed above)"
+  fi
+
+  if [ -n "$artifacts" ]; then
+    if [ -n "$result" ]; then
+      echo ""
+    fi
+    echo "**Artifacts directory**: \`${artifacts}\`"
+  fi
+
+  if [ -z "$raw" ] && [ -z "$artifacts" ]; then
+    echo "_No screenshots captured._"
+  fi
+}
+
+# Format logs section
+format_logs() {
+  local raw="$1"
+  if [ -z "$raw" ]; then
+    echo "_No additional logs._"
+    return
+  fi
+  echo '```'
+  echo "$raw"
+  echo '```'
+}
+
+# Build formatted values
+FORMATTED_FILES=$(format_file_list "$AFFECTED_FILES")
+FORMATTED_SCREENSHOTS=$(format_screenshots "$SCREENSHOTS" "$ARTIFACTS_DIR")
+FORMATTED_LOGS=$(format_logs "$LOGS")
+
+# Apply defaults for empty optional fields
+[ -z "$PAGE_URL" ]       && PAGE_URL="_Not applicable_"
+[ -z "$EXPECTED" ]       && EXPECTED="_To be determined during investigation._"
+[ -z "$ACTUAL" ]         && ACTUAL="_See description above._"
+[ -z "$SUGGESTED_FIX" ]  && SUGGESTED_FIX="_To be determined during investigation._"
+[ -z "$VERIFICATION" ]   && VERIFICATION="# Add verification command"
+[ -z "$REGISTRY_PATH" ]  && REGISTRY_PATH="_N/A_"
+[ -z "$RUN_LOG_PATH" ]   && RUN_LOG_PATH="_N/A_"
+[ -z "$DOC_PATH" ]       && DOC_PATH="_N/A_"
+[ -z "$TYPE" ]           && TYPE="$TEMPLATE_NAME"
+[ -z "$BUG_CATEGORY" ]   && BUG_CATEGORY="runtime"
+[ -z "$ROOT_CAUSE" ]     && ROOT_CAUSE="_To be determined during investigation._"
+[ -z "$REPRODUCTION_STEPS" ] && REPRODUCTION_STEPS="_To be determined._"
+[ -z "$SOURCE_REFERENCE" ]   && SOURCE_REFERENCE="_N/A_"
+[ -z "$SPEC_PATH" ]          && SPEC_PATH="_N/A_"
+[ -z "$ACCEPTANCE_CRITERIA" ] && ACCEPTANCE_CRITERIA="_Defined in feature spec._"
+[ -z "$ERROR_REFERENCE" ]    && ERROR_REFERENCE="_N/A_"
+[ -z "$RELATED_WORKFLOW" ]   && RELATED_WORKFLOW="$WORKFLOW"
+[ -z "$REFERENCE_DOC_PATH" ] && REFERENCE_DOC_PATH="$DOC_PATH"
+
+# Read template and perform substitutions
+BODY=$(cat "$TEMPLATE_FILE")
+
+# Use sed for substitutions (escape special chars in values for sed)
+sed_escape() {
+  printf '%s\n' "$1" | sed -e 's/[\/&]/\\&/g' -e 's/$/\\/' -e '$s/\\$//'
+}
+
+# Use Ruby for reliable multi-line substitutions
+BODY=$(ruby -e '
+  body = File.read(ARGV[0])
+  replacements = {
+    "${WORKFLOW}" => ARGV[1],
+    "${ISSUE_KEY}" => ARGV[2],
+    "${SEVERITY}" => ARGV[3],
+    "${DOMAIN}" => ARGV[4],
+    "${TYPE}" => ARGV[5],
+    "${PAGE_URL}" => ARGV[6],
+    "${TIMESTAMP}" => ARGV[7],
+    "${DESCRIPTION}" => ARGV[8],
+    "${EXPECTED}" => ARGV[9],
+    "${ACTUAL}" => ARGV[10],
+    "${SCREENSHOTS}" => ARGV[11],
+    "${SUGGESTED_FIX}" => ARGV[12],
+    "${AFFECTED_FILES}" => ARGV[13],
+    "${LOGS}" => ARGV[14],
+    "${VERIFICATION_COMMAND}" => ARGV[15],
+    "${REGISTRY_PATH}" => ARGV[16],
+    "${RUN_LOG_PATH}" => ARGV[17],
+    "${DOC_PATH}" => ARGV[18],
+    "${BUG_CATEGORY}" => ARGV[19],
+    "${ROOT_CAUSE}" => ARGV[20],
+    "${REPRODUCTION_STEPS}" => ARGV[21],
+    "${SOURCE_REFERENCE}" => ARGV[22],
+    "${SPEC_PATH}" => ARGV[23],
+    "${ACCEPTANCE_CRITERIA}" => ARGV[24],
+    "${ERROR_REFERENCE}" => ARGV[25],
+    "${RELATED_WORKFLOW}" => ARGV[26],
+    "${REFERENCE_DOC_PATH}" => ARGV[27],
+    "${SLICE_KEY}" => ARGV[2],
+    "${ISSUE_NUMBER}" => ARGV[2],
+    "${FEATURE_NAME}" => ARGV[8],
+    "${PRIORITY}" => ARGV[3],
+    "${CURRENT_STATE}" => ARGV[10],
+    "${TARGET_STATE}" => ARGV[9],
+    "${IMPLEMENTATION_PLAN}" => ARGV[12],
+    "${EVIDENCE}" => ARGV[11],
+    "${EXPECTED_BEHAVIOR}" => ARGV[9],
+    "${ACTUAL_BEHAVIOR}" => ARGV[10],
+  }
+  replacements.each { |k, v| body.gsub!(k, v || "") }
+  puts body
+' "$TEMPLATE_FILE" \
+  "$WORKFLOW" "$KEY" "$SEVERITY" "$DOMAIN" "$TYPE" "$PAGE_URL" "$TIMESTAMP" \
+  "$DESCRIPTION" "$EXPECTED" "$ACTUAL" "$FORMATTED_SCREENSHOTS" "$SUGGESTED_FIX" \
+  "$FORMATTED_FILES" "$FORMATTED_LOGS" "$VERIFICATION" "$REGISTRY_PATH" \
+  "$RUN_LOG_PATH" "$DOC_PATH" "$BUG_CATEGORY" "$ROOT_CAUSE" "$REPRODUCTION_STEPS" \
+  "$SOURCE_REFERENCE" "$SPEC_PATH" "$ACCEPTANCE_CRITERIA" "$ERROR_REFERENCE" \
+  "$RELATED_WORKFLOW" "$REFERENCE_DOC_PATH" \
+  2>/dev/null)
+
+if [ -n "$OUTPUT" ]; then
+  mkdir -p "$(dirname "$OUTPUT")"
+  echo "$BODY" > "$OUTPUT"
+  echo "$OUTPUT"
+else
+  echo "$BODY"
+fi
