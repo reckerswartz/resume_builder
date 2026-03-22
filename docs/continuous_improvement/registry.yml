@@ -122,11 +122,11 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 10
-  last_cycle_date: "2026-03-22T06:05:00Z"
+  cycle_count: 11
+  last_cycle_date: "2026-03-22T06:10:00Z"
   proposals_discovered: 14
-  proposals_implemented: 10
-  proposals_remaining: 4
+  proposals_implemented: 11
+  proposals_remaining: 3
   proposals_routed: 0
   competitive_scans_completed: 0
   journeys_simulated: 3
@@ -191,7 +191,7 @@ cycle_metrics:
 next_step:
   recommended_mode: "implement-next"
   recommended_persona: "power_user"
-  reason: "4 new power_user proposals discovered in cycle 10. CI-WORKSPACE-004 (workspace pagination) has the highest impact/effort ratio. Start with implement-next."
+  reason: "CI-WORKSPACE-004 (pagination) implemented in cycle 11. 3 proposals remain: CI-WORKSPACE-005 (search, high/medium), CI-WORKSPACE-006 (sort, medium/small), CI-EXPORT-001 (bulk actions, medium/medium). Next: CI-WORKSPACE-006 (medium impact, small effort)."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -530,7 +530,8 @@ proposals:
     category: remove_friction
     impact: critical
     effort: small
-    status: discovered
+    status: implemented
+    implemented_at: "2026-03-22T06:10:00Z"
     user_personas:
       - power_user
     journey_step: "View workspace with 112 resumes — all rendered on single page"

@@ -89,21 +89,21 @@ pages:
     status: "improved"
     usability_score: 92
     page_doc_path: "docs/ui_audits/usability_review/pages/home.md"
-    open_issue_keys:
-      - "UX-HOME-004"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-HOME-001"
       - "UX-HOME-002"
       - "UX-HOME-003"
+      - "UX-HOME-004"
     last_audited_at: "2026-03-22T05:24:00Z"
     last_changed_at: "2026-03-22T05:24:00Z"
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-home-faq-disclosures/00-overview.md"
-    next_step: "UX-HOME-004 (icon usage) is the only remaining open issue at low priority."
+    next_step: "No open issues remain on the home page."
     cycle_count: 2
     last_cycle_date: "2026-03-22T05:24:00Z"
     issues_found: 4
-    issues_resolved: 3
-    issues_remaining: 1
+    issues_resolved: 4
+    issues_remaining: 0
     regression_detected: false
   - page_key: "sign-in"
     title: "Sign in"
@@ -165,10 +165,10 @@ pages:
     status: "improved"
     usability_score: 86
     page_doc_path: "docs/ui_audits/usability_review/pages/resumes-index.md"
-    open_issue_keys:
-      - "UX-RIDX-002"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-RIDX-001"
+      - "UX-RIDX-002"
       - "UX-RIDX-003"
     last_audited_at: "2026-03-21T22:08:00Z"
     last_changed_at: "2026-03-21T22:08:00Z"
@@ -332,11 +332,11 @@ pages:
     status: "improved"
     usability_score: 81
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-personal-details.md"
-    open_issue_keys:
-      - "UX-BLDPD-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDPD-001"
       - "UX-BLDPD-002"
+      - "UX-BLDPD-003"
     last_audited_at: "2026-03-22T06:31:00Z"
     last_changed_at: "2026-03-22T06:31:00Z"
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-plain-language-headshot-copy/00-overview.md"
@@ -435,10 +435,10 @@ pages:
     status: "improved"
     usability_score: 81
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-summary.md"
-    open_issue_keys:
-      - "UX-BLDSUM-002"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDSUM-001"
+      - "UX-BLDSUM-002"
       - "UX-BLDSUM-003"
     last_audited_at: "2026-03-22T06:05:00Z"
     last_changed_at: "2026-03-22T06:05:00Z"

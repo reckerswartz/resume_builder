@@ -303,6 +303,45 @@ RSpec.describe 'Resumes', type: :request do
     end
   end
 
+  describe 'GET /resumes (pagination)' do
+    it 'paginates the workspace at 12 cards per page and renders navigation when needed' do
+      15.times { |i| create(:resume, user:, template:, title: "Resume #{i + 1}") }
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      cards = document.css('article')
+      pagination_nav = document.at_css('nav[aria-label]')
+
+      expect(cards.size).to eq(12)
+      expect(pagination_nav).to be_present
+      expect(pagination_nav.text).to include(I18n.t('shared.pagination.page_info', current: 1, total: 2))
+      expect(pagination_nav.text).to include(I18n.t('shared.pagination.next'))
+
+      get resumes_path, params: { page: 2 }
+
+      expect(response).to have_http_status(:ok)
+      page2_doc = Nokogiri::HTML.parse(response.body)
+      page2_cards = page2_doc.css('article')
+
+      expect(page2_cards.size).to eq(3)
+      expect(page2_doc.at_css('nav[aria-label]').text).to include(I18n.t('shared.pagination.previous'))
+    end
+
+    it 'omits pagination navigation when all resumes fit on one page' do
+      3.times { |i| create(:resume, user:, template:, title: "Small Set #{i + 1}") }
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+
+      expect(document.css('article').size).to eq(3)
+      expect(document.at_css('nav[aria-label]')).to be_nil
+    end
+  end
+
   describe 'GET /resumes (workspace card actions)' do
     it 'shows Download PDF on cards with an attached export and hides it on draft-only cards' do
       exported_resume = create(:resume, user:, template:, title: 'Exported Resume')
