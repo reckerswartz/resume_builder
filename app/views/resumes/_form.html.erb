@@ -1,5 +1,12 @@
 <% start_flow_state = local_assigns[:start_flow_state] %>
 <% autofill_enabled = feature_enabled?("autofill_content") && llm_role_enabled?(:text_generation) %>
+<% template_picker_state = resume_template_picker_state(
+     resume: resume,
+     form_object_name: "resume",
+     field_label: t(".template_field_label"),
+     description: t(".template_picker_description"),
+     mode: :compact
+   ) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :lg, extra_classes: "resume-create-fast-path mx-auto w-full max-w-5xl") do %>
   <%= form_with model: resume, class: "space-y-6" do |form| %>
@@ -66,16 +73,22 @@
           </div>
         </details>
 
-        <%= render "resumes/template_picker",
-          form: form,
-          resume: resume,
-          template_picker_state: resume_template_picker_state(
-            resume: resume,
-            form_object_name: form.object_name,
-            field_label: t(".template_field_label"),
-            description: t(".template_picker_description"),
-            mode: :compact
-          ) %>
+        <details class="<%= [ui_inset_panel_classes(tone: :subtle), 'resume-create-template-picker group'].join(' ') %>" data-resume-template-disclosure>
+          <summary class="flex cursor-pointer list-none items-start justify-between gap-3 [&::-webkit-details-marker]:hidden">
+            <div>
+              <span class="text-sm font-semibold tracking-tight text-ink-950"><%= t(".template_disclosure_summary") %></span>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".template_disclosure_description", template: template_picker_state.selected_card_state.fetch(:template).name) %></p>
+            </div>
+            <span class="text-xs font-medium uppercase tracking-[0.2em] text-ink-700/70"><%= t(".template_disclosure_badge") %></span>
+          </summary>
+
+          <div class="mt-4">
+            <%= render "resumes/template_picker",
+              form: form,
+              resume: resume,
+              template_picker_state: template_picker_state %>
+          </div>
+        </details>
       </div>
 
       <%= render Ui::DashboardPanelComponent.new(

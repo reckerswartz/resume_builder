@@ -31,7 +31,7 @@
 - **Accent color**: #0F172A applied to name, marker dots, and highlight bullets
 - **Card shell**: rounded-[2rem] with shadow-sm applied correctly
 - **PDF export**: ✅ `Resumes::PdfExporter` produces a 5-page PDF for the full audit resume, which lands within the 3–5 page target
-- **Regression baseline**: Post-fix re-review confirmed no console errors or hidden-section regressions after the shared Tailwind utility fix
+- **Regression baseline**: Local shared/template edits were re-reviewed with no new drift. Full/minimal previews stayed free of horizontal overflow, hidden sections still suppressed correctly, and PDF export remained at 5 A4 pages.
 
 ## Discrepancies
 
@@ -60,11 +60,14 @@
 - `docs/template_audits/artifacts/modern/senior-engineer-full/2026-03-21-preview.png`
 - `docs/template_audits/artifacts/modern/senior-engineer-full/2026-03-21-post-fix.png`
 - `docs/template_audits/artifacts/modern/senior-engineer-full/2026-03-21T03-42-23Z-postfix.png`
+- `docs/template_audits/artifacts/modern/senior-engineer-full/2026-03-21T20-40-51Z-review.png`
 - `docs/template_audits/artifacts/modern/design-director-minimal/2026-03-21-preview.png`
 - `docs/template_audits/artifacts/modern/design-director-minimal/2026-03-21T03-42-23Z-postfix.png`
+- `docs/template_audits/artifacts/modern/design-director-minimal/2026-03-21T20-40-51Z-review.png`
 
 ## Changelog
 
 - **2026-03-21** — Initial audit with senior-engineer (full) and design-director (minimal) profiles. 7 discrepancies identified (1 major, 1 moderate, 5 minor). Hidden sections verified working.
 - **2026-03-21** — Implement-next: resolved MOD-005 (page-break in PDF layout), MOD-004 (summary leading-6), MOD-007 (language level in subtitle). 4 open discrepancies remain (0 major, 1 moderate, 3 minor).
 - **2026-03-21** — Review-only re-review after the shared Tailwind utility fix. Full/minimal previews showed no console errors or hidden-section regressions, and direct PDF export verification resolved MOD-006 with a 5-page A4 output. 3 minor discrepancies remain.
+- **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. Full/minimal previews stayed free of horizontal overflow, the hidden-section behavior remained intact, and direct PDF export still produced 5 A4 pages. No new discrepancies were identified.

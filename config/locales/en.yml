@@ -84,6 +84,18 @@ en:
           compact: "Compact"
           comfortable: "Comfortable"
           relaxed: "Relaxed"
+        section_spacing:
+          tight: "Tight"
+          standard: "Standard"
+          relaxed: "Relaxed"
+        paragraph_spacing:
+          tight: "Tight"
+          standard: "Standard"
+          relaxed: "Relaxed"
+        line_spacing:
+          tight: "Tight"
+          standard: "Standard"
+          relaxed: "Relaxed"
         column_count:
           single_column: "1 column"
           two_column: "2 columns"

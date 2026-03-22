@@ -33,9 +33,13 @@ Resume Builder is a conventional Rails 8, server-rendered application for creati
 - Use `docs/ai_suggestions.md` for the AI-assisted entry improvement flow, feature gating, model/provider orchestration, and interaction logging behavior
 - Use `docs/admin_operations.md` for the admin namespace entry points, dashboard responsibilities, queue/error observability, and operational configuration workflows
 - Use `docs/template_rollouts/README.md` for the reusable Behance capture and implementation workflows, no-duplicate registry rules, and rollout tracking artifacts
+- Use `docs/resumebuilder_rollouts/README.md` for the ResumeBuilder.com reference implementation workflow, capability-slice registry rules, and run tracking artifacts
 - Use `docs/maintainability_audits/README.md` for the reusable maintainability audit workflow, hotspot registry rules, and timestamped refactor tracking artifacts
 - Use `docs/template_audits/README.md` for the reusable Playwright-driven template pixel-perfect audit workflow, diverse seed profile catalog, per-template discrepancy tracking, and iterative fix-and-re-audit artifacts
 - Use `docs/job_monitoring_and_recovery.md` for the Active Job lifecycle logging, persistent `JobLog` monitoring record, Solid Queue runtime inspection, and admin recovery controls
+- Use `docs/github_workflow_integration.md` for the GitHub workflow integration architecture, `gh` CLI bridge scripts, label taxonomy, issue/branch/PR naming conventions, and cross-workflow coordination
+- Use `docs/github_ops/registry.yml` for the central state of GitHub integration across all 19 workflows
+- Use `docs/ci_cd_pipeline.md` for the autonomous CI/CD pipeline architecture, workflow inventory, self-improvement loop, deployment strategies, and getting-started guide
 
 ## Local setup
 
@@ -54,12 +58,15 @@ This repository is configured for Windsurf with project guidance and Rails AI sk
 - `.windsurfrules` keeps the existing project rules active in the workspace
 - `.windsurf/skills/` includes the main `rails_ai_agents` skill pack from `ThibautBaissac/rails_ai_agents`
 - `.windsurf/workflows/` provides Windsurf-native slash commands for the core feature-spec, TDD, review, security, RSpec, maintainability audit, responsive UI audit, UI guidelines audit, and Behance template rollout/implementation flows
+- `.windsurf/workflows/` also includes the ResumeBuilder.com reference rollout workflow for capability-first hosted-reference implementation slices
+- `.windsurf/workflows/github-ops.md` provides the GitHub integration workflow for issue creation, branch management, PR lifecycle, and roadmap generation via `gh` CLI
+- `bin/gh-bridge/` contains idempotent shell scripts for `ensure-labels`, `create-issue`, `create-branch`, `create-pr`, `update-issue`, `close-issue`, `sync-registry`, and `roadmap-summary`
 
 ## Using the installed Windsurf skills
 
 - Ask naturally for Rails help and Cascade can auto-invoke matching skills
 - Invoke a skill directly with `@skill-name`, such as `@rails-architecture` or `@rspec-agent`
-- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/responsive-ui-audit`, `/ui-guidelines-audit`, `/behance-template-rollout`, `/behance-template-implementation`, `/template-audit`, and `/ux-usability-audit`
+- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/responsive-ui-audit`, `/ui-guidelines-audit`, `/behance-template-rollout`, `/behance-template-implementation`, `/resumebuilder-reference-rollout`, `/template-audit`, and `/ux-usability-audit`
 
 ## Notes
 

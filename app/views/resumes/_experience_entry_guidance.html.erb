@@ -1,0 +1,52 @@
+<% guidance_state = resume_experience_step_state(resume).suggestions_for(entry) %>
+
+<details class="<%= [ui_inset_panel_classes(tone: :subtle), 'group overflow-hidden'].join(' ') %>" data-experience-entry-guidance>
+  <summary class="flex cursor-pointer list-none items-start justify-between gap-4 [&::-webkit-details-marker]:hidden">
+    <div class="space-y-1">
+      <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.experience_step_state.eyebrow") %></p>
+      <p class="text-sm font-semibold text-ink-950"><%= guidance_state.fetch(:title) %></p>
+      <p class="text-sm leading-6 text-ink-700/80"><%= guidance_state.fetch(:description) %></p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="<%= ui_badge_classes(:info) %>"><%= guidance_state.fetch(:badge_label) %></span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= guidance_state.fetch(:results_label) %></span>
+    </div>
+  </summary>
+
+  <div class="mt-4 grid gap-3 xl:grid-cols-2">
+    <% guidance_state.fetch(:results).each do |suggestion| %>
+      <div class="<%= [ui_inset_panel_classes(tone: :default, padding: :sm), 'space-y-3'].join(' ') %>" data-experience-suggestions-card>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="space-y-2">
+            <p class="text-sm font-semibold text-ink-950"><%= suggestion.fetch(:role_title) %></p>
+            <div class="flex flex-wrap gap-2">
+              <% if suggestion.fetch(:expert_recommended) %>
+                <span class="<%= ui_badge_classes(:success) %>"><%= suggestion.fetch(:expert_badge_label) %></span>
+              <% end %>
+              <span class="<%= ui_badge_classes(:info) %>"><%= suggestion.fetch(:audience_badge_label) %></span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="<%= ui_button_classes(:secondary, size: :sm) %>"
+            data-action="experience-suggestions#insert">
+            <%= guidance_state.fetch(:insert_button_label) %>
+          </button>
+        </div>
+
+        <div data-experience-suggestions-text class="hidden"><%= suggestion.fetch(:highlights_text) %></div>
+
+        <ul class="space-y-2 text-sm leading-6 text-ink-700/80">
+          <% suggestion.fetch(:highlights).each do |highlight| %>
+            <li class="flex gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-ink-900/60"></span>
+              <span><%= highlight %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+</details>

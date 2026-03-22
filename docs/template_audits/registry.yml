@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T03:51:30Z"
+updated_at: "2026-03-21T22:04:19Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/template-audit.md"
@@ -10,7 +10,7 @@ tracking:
   template_doc_template: "docs/template_audits/templates/TEMPLATE.md"
   run_doc_template: "docs/template_audits/runs/TEMPLATE.md"
   artifact_root: "docs/template_audits/artifacts"
-  latest_run: "docs/template_audits/runs/2026-03-21-modern-rereview-shared-utility-fix/00-overview.md"
+  latest_run: "docs/template_audits/runs/2026-03-21-sidebar-accent-sidebar-width/00-overview.md"
 seed_profiles:
   catalog_path: "app/services/resumes/seed_profile_catalog.rb"
   profile_count: 8
@@ -29,9 +29,9 @@ templates:
     open_discrepancy_count: 3
     resolved_discrepancy_count: 4
     last_audit_at: "2026-03-21"
-    notes: "PDF export verified at 5 A4 pages after re-review. 3 minor discrepancies remain (contact_pills, section_marker, entry_card_shadow)."
-    cycle_count: 3
-    last_cycle_date: "2026-03-21T03:51:30Z"
+    notes: "Regression-baseline re-review after local template changes showed no new drift. PDF export remains at 5 A4 pages and 3 minor discrepancies remain (contact_pills, section_marker, entry_card_shadow)."
+    cycle_count: 4
+    last_cycle_date: "2026-03-21T20:40:51Z"
     discrepancies_found: 7
     discrepancies_resolved: 4
     discrepancies_remaining: 3
@@ -41,31 +41,37 @@ templates:
     open_discrepancy_count: 0
     resolved_discrepancy_count: 5
     last_audit_at: "2026-03-21"
-    notes: "Pixel-perfect status retained after the shared Tailwind utility fix restored the 3px header rule and tightened tracking."
-    cycle_count: 3
-    last_cycle_date: "2026-03-21T03:51:30Z"
+    notes: "Regression-baseline re-review after local template changes retained the 3px header rule, compact tracking, and list hierarchy with no new discrepancies."
+    cycle_count: 4
+    last_cycle_date: "2026-03-21T20:40:51Z"
     discrepancies_found: 5
     discrepancies_resolved: 5
     discrepancies_remaining: 0
-    regression_detected: true
+    regression_detected: false
   - slug: "ats-minimal"
-    pixel_status: "in_progress"
-    open_discrepancy_count: 4
-    resolved_discrepancy_count: 1
+    pixel_status: "pixel_perfect"
+    open_discrepancy_count: 0
+    resolved_discrepancy_count: 5
     last_audit_at: "2026-03-21"
-    notes: "Major pdf_encoding resolved. 2 moderate, 2 minor remain."
+    notes: "Implement-next resolved ATS-001 by strengthening the header and section accent rules. Re-audit confirmed stronger accent visibility, no horizontal overflow, and a 4-page full PDF export. No discrepancies remain."
+    cycle_count: 6
+    last_cycle_date: "2026-03-21T21:13:58Z"
+    discrepancies_found: 5
+    discrepancies_resolved: 5
+    discrepancies_remaining: 0
+    regression_detected: false
   - slug: "professional"
     pixel_status: "close"
     open_discrepancy_count: 2
     resolved_discrepancy_count: 3
     last_audit_at: "2026-03-21"
-    notes: "Shared Tailwind utility regression fixed; accent heading borders and summary callout re-verified. 2 minor discrepancies remain (header_balance, entry_spacing)."
-    cycle_count: 3
-    last_cycle_date: "2026-03-21T03:51:30Z"
+    notes: "Regression-baseline re-review after local template changes retained the accent section borders and standalone summary callout. 2 minor discrepancies remain (header_balance, entry_spacing)."
+    cycle_count: 4
+    last_cycle_date: "2026-03-21T20:40:51Z"
     discrepancies_found: 5
     discrepancies_resolved: 3
     discrepancies_remaining: 2
-    regression_detected: true
+    regression_detected: false
   - slug: "modern-clean"
     pixel_status: "in_progress"
     open_discrepancy_count: 2
@@ -73,20 +79,26 @@ templates:
     last_audit_at: "2026-03-21"
     notes: "MCL-001 density improved (192px reduction, still over target). MCL-006 accent contrast remains."
   - slug: "sidebar-accent"
-    pixel_status: "in_progress"
-    open_discrepancy_count: 5
-    resolved_discrepancy_count: 1
+    pixel_status: "close"
+    open_discrepancy_count: 4
+    resolved_discrepancy_count: 2
     last_audit_at: "2026-03-21"
-    notes: "Major mobile_order resolved. 1 moderate (sidebar_width), 4 minor remain."
+    notes: "Resolved SAC-001 desktop sidebar width (~27.8%) and retained the mobile-order fix. 4 minor discrepancies remain (sidebar_tint, profile_card_radius, skill_chip_bg, contact_weight)."
+    cycle_count: 2
+    last_cycle_date: "2026-03-21T22:04:19Z"
+    discrepancies_found: 6
+    discrepancies_resolved: 2
+    discrepancies_remaining: 4
+    regression_detected: false
   - slug: "editorial-split"
     pixel_status: "close"
     open_discrepancy_count: 3
     resolved_discrepancy_count: 4
     last_audit_at: "2026-03-21"
-    notes: "Shared Tailwind utility regression fixed; vertical utility rail and editorial tracking re-verified. 3 minor discrepancies remain (badge_size, badge_border, mobile_badges)."
-    cycle_count: 3
-    last_cycle_date: "2026-03-21T03:51:30Z"
+    notes: "Regression-baseline re-review after local template changes retained the utility rail, badge rail, and monogram fallback. 3 minor discrepancies remain (badge_size, badge_border, mobile_badges)."
+    cycle_count: 4
+    last_cycle_date: "2026-03-21T20:40:51Z"
     discrepancies_found: 7
     discrepancies_resolved: 4
     discrepancies_remaining: 3
-    regression_detected: true
+    regression_detected: false

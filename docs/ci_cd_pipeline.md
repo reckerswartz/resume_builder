@@ -1,0 +1,240 @@
+# CI/CD Pipeline Architecture
+
+> A fully autonomous, self-improving CI/CD system built on GitHub Actions.
+
+## Overview
+
+The pipeline operates as a continuous improvement loop:
+
+```
+Push/PR/Schedule
+    │
+    ▼
+┌─────────────┐    ┌──────────────────┐    ┌─────────────┐
+│   CI Gate   │───▶│ Playwright Audit  │───▶│ Issue Sync  │
+│ test/lint/  │    │ 4 viewports ×     │    │ create/     │
+│ security    │    │ all pages         │    │ update GH   │
+└─────────────┘    └──────────────────┘    │ issues      │
+                                            └──────┬──────┘
+                                                   │
+                   ┌──────────────────┐            │
+                   │  PR Cleanup      │            ▼
+                   │  close issues    │    ┌─────────────┐
+                   │  delete branches │◀───│ Issue Queue │
+                   │  re-trigger      │    │ pick by     │
+                   └──────────────────┘    │ priority    │
+                          ▲                └──────┬──────┘
+                          │                       │
+                   ┌──────┴──────┐                ▼
+                   │  Auto-Merge │        ┌─────────────┐
+                   │  if green   │◀───────│  Auto-Fix   │
+                   └─────────────┘        │  branch/    │
+                                          │  validate/  │
+                                          │  PR         │
+                                          └─────────────┘
+```
+
+## Workflows
+
+### 1. CI (`ci.yml`)
+
+**Triggers:** push to `main`, pull requests, manual dispatch
+
+**Jobs:**
+
+| Job | Purpose | Required |
+|-----|---------|----------|
+| `scan_ruby` | Brakeman + bundler-audit | Yes |
+| `scan_js` | Yarn dependency audit | No (soft fail) |
+| `lint` | RuboCop with GitHub formatter | Yes |
+| `test` | RSpec (unit/request/service/helper/presenter) | Yes |
+| `test_system` | System specs with headless Chrome | On main/full-ci label |
+| `ci_gate` | Aggregate pass/fail decision | Yes |
+
+**Outputs:** `rspec-results.json`, `brakeman-report.json`, coverage reports
+
+### 2. Playwright UI Audit (`playwright-audit.yml`)
+
+**Triggers:** push to `main`, UI-affecting PRs, weekly schedule, manual dispatch
+
+**Matrix:** 4 viewports (mobile 390×844, tablet 768×1024, desktop 1280×800, wide 1440×900)
+
+**Checks per page:**
+- HTTP status codes
+- Horizontal overflow detection
+- `Translation missing` leakage
+- Broken images
+- Console errors
+- Network failures
+- Accessibility snapshot capture
+
+**Page inventory:** public (4), authenticated (3), admin (7) = 14 pages × 4 viewports = 56 audit points
+
+**Outputs:** Per-page screenshots, reports, console logs, consolidated summary JSON
+
+### 3. Issue Sync (`issue-sync.yml`)
+
+**Triggers:** after CI or Playwright workflow completes
+
+**Behavior:**
+- Parses RSpec failure JSON → creates/updates `[CI]` issues with `ci-auto` label
+- Parses Brakeman warnings → creates/updates `[Security]` issues
+- Parses Playwright audit failures → creates/updates `[UI]` issues with `ui-audit` label
+- Groups UI failures by URL to avoid duplicates
+- Auto-closes issues when their triggering workflow passes
+
+### 4. Issue Queue Engine (`issue-queue.yml`)
+
+**Triggers:** new/labeled issues, every 30 minutes, manual dispatch
+
+**Priority order:** `priority:critical` → `priority:high` → `priority:medium` → `ci-auto` → `ui-audit`
+
+**Behavior:**
+- Picks the highest-priority open issue not already `in-progress`
+- Labels it `in-progress`
+- Creates a fix branch (`auto-fix/<number>-<slug>`)
+- Dispatches the auto-fix workflow on that branch
+
+**Concurrency:** Single instance — only one issue processed at a time
+
+### 5. Auto Fix & PR (`auto-fix.yml`)
+
+**Triggers:** dispatched by issue queue engine
+
+**Jobs:**
+1. **Validate** — runs full RSpec + RuboCop + Brakeman on the fix branch
+2. **Open PR** — creates/updates a PR linked to the issue with validation status
+3. **Auto-Merge** — enables squash auto-merge if all checks pass
+4. **Cleanup on Failure** — labels issue `needs-review` if validation fails
+
+### 6. PR Cleanup (`pr-cleanup.yml`)
+
+**Triggers:** PR merged
+
+**Behavior:**
+- Closes linked issues (parses `Closes #N` from PR body + branch name)
+- Removes `in-progress`/`needs-review` labels
+- Deletes `auto-fix/*` branches
+- Triggers a new continuous audit cycle after auto-fix merges
+
+### 7. Continuous Audit Cycle (`continuous-audit.yml`)
+
+**Triggers:** daily at 2 AM UTC, after auto-fix workflow completes, manual dispatch
+
+**Scopes:** `full`, `ui-only`, `tests-only`, `security-only`
+
+**Behavior:**
+- Dispatches CI and/or Playwright audit workflows
+- Generates a health report: open issues by category, recently auto-fixed count
+
+### 8. Deploy (`deploy.yml`)
+
+**Triggers:** push to `main` (auto-deploy to staging), manual dispatch for production
+
+**Environments:** staging → production (with GitHub environment protection rules)
+
+**Strategies:** rolling (default), blue-green, canary
+
+**Safety:**
+- Verifies CI passed on the commit before deploying
+- Health checks after deployment
+- Automatic rollback on production failure
+- Creates a `priority:critical` issue on rollback
+
+## Reusable Composite Actions
+
+Located in `.github/actions/`:
+
+| Action | Purpose |
+|--------|---------|
+| `setup-ruby` | Install Ruby with bundler cache |
+| `setup-node` | Install Node.js with Yarn 4 via corepack |
+| `setup-db` | Create + schema-load PostgreSQL test database |
+| `build-assets` | Webpack build with filesystem cache |
+
+## Scripts
+
+Located in `.github/scripts/`:
+
+| Script | Purpose |
+|--------|---------|
+| `playwright-audit.mjs` | Playwright page auditor with login, screenshot, overflow/translation/error detection |
+| `audit-summarize.mjs` | Consolidates per-viewport audit results into a single summary |
+| `bootstrap-labels.mjs` | Creates required GitHub labels for the pipeline |
+
+## Required GitHub Labels
+
+Run `node .github/scripts/bootstrap-labels.mjs --dry-run` to preview, or set `GITHUB_TOKEN` + `GITHUB_REPOSITORY` to create them.
+
+**Pipeline labels:** `ci-auto`, `ui-audit`, `auto-fix`, `in-progress`, `needs-review`, `full-ci`
+
+**Priority labels:** `priority:critical`, `priority:high`, `priority:medium`, `priority:low`
+
+**Category labels:** `bug`, `security`, `test-failure`, `performance`, `architecture`, `deploy`
+
+**Scope labels:** `scope:ui`, `scope:api`, `scope:ci-cd`, `scope:templates`, `scope:admin`
+
+## Required Secrets & Variables
+
+| Name | Type | Purpose |
+|------|------|---------|
+| `GITHUB_TOKEN` | Auto | Standard token for API calls (auto-provided) |
+| `STAGING_URL` | Variable | Staging environment URL for health checks |
+| `PRODUCTION_URL` | Variable | Production environment URL for health checks |
+| `RESUME_BUILDER_DATABASE_PASSWORD` | Secret | Production database password |
+
+## Caching Strategy
+
+| Cache | Key | Scope |
+|-------|-----|-------|
+| Ruby gems | `bundler-cache` via setup-ruby | Per Gemfile.lock |
+| Yarn packages | `yarn-cache` via setup-node | Per yarn.lock |
+| RuboCop | `rubocop-<os>-<deps-hash>` | Per .rubocop.yml + Gemfile.lock |
+| Webpack | `webpack-<os>-<config-hash>` | Per webpack.config.js + yarn.lock |
+| Docker layers | `gha` buildx cache | Per Dockerfile |
+
+## Self-Improvement Loop
+
+The pipeline continuously improves itself through:
+
+1. **Detection** — CI tests, security scans, and Playwright audits find issues
+2. **Tracking** — Issues are auto-created on GitHub with full context
+3. **Prioritization** — Queue engine picks highest-priority issues first
+4. **Resolution** — Fix branches are created, validated, and merged
+5. **Verification** — Post-merge audit confirms the fix and finds new issues
+6. **Repeat** — The cycle restarts automatically
+
+The system stabilizes when all audits pass and the issue queue is empty. Any new code change restarts the cycle.
+
+## File Inventory
+
+```
+.github/
+├── actions/
+│   ├── build-assets/action.yml
+│   ├── setup-db/action.yml
+│   ├── setup-node/action.yml
+│   └── setup-ruby/action.yml
+├── scripts/
+│   ├── audit-summarize.mjs
+│   ├── bootstrap-labels.mjs
+│   └── playwright-audit.mjs
+├── workflows/
+│   ├── auto-fix.yml
+│   ├── ci.yml
+│   ├── continuous-audit.yml
+│   ├── deploy.yml
+│   ├── issue-queue.yml
+│   ├── issue-sync.yml
+│   ├── playwright-audit.yml
+│   └── pr-cleanup.yml
+└── dependabot.yml
+```
+
+## Getting Started
+
+1. **Bootstrap labels:** `GITHUB_TOKEN=<token> GITHUB_REPOSITORY=owner/repo node .github/scripts/bootstrap-labels.mjs`
+2. **Enable auto-merge** on the repository (Settings → General → Allow auto-merge)
+3. **Set branch protection** on `main` requiring the `CI Gate` status check
+4. **Configure environments** for `staging` and `production` in repository settings
+5. **Push to `main`** — the full cycle starts automatically

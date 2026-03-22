@@ -41,6 +41,24 @@
       </div>
 
       <div>
+        <%= label_tag "resume_settings_section_spacing", t("resumes.editor_finalize_step.design_workspace.section_spacing"), class: ui_label_classes %>
+        <%= select_tag "resume[settings][section_spacing]", options_for_select(finalize_workspace_state.section_spacing_options, finalize_workspace_state.selected_section_spacing), class: ui_input_classes %>
+        <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.section_spacing_description") %></p>
+      </div>
+
+      <div>
+        <%= label_tag "resume_settings_paragraph_spacing", t("resumes.editor_finalize_step.design_workspace.paragraph_spacing"), class: ui_label_classes %>
+        <%= select_tag "resume[settings][paragraph_spacing]", options_for_select(finalize_workspace_state.paragraph_spacing_options, finalize_workspace_state.selected_paragraph_spacing), class: ui_input_classes %>
+        <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.paragraph_spacing_description") %></p>
+      </div>
+
+      <div>
+        <%= label_tag "resume_settings_line_spacing", t("resumes.editor_finalize_step.design_workspace.line_spacing"), class: ui_label_classes %>
+        <%= select_tag "resume[settings][line_spacing]", options_for_select(finalize_workspace_state.line_spacing_options, finalize_workspace_state.selected_line_spacing), class: ui_input_classes %>
+        <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.line_spacing_description") %></p>
+      </div>
+
+      <div>
         <%= label_tag "resume_settings_accent_color", t("resumes.editor_finalize_step.output_settings.accent_color"), class: ui_label_classes %>
         <%= color_field_tag "resume[settings][accent_color]", finalize_workspace_state.selected_accent_color, class: "#{ui_input_classes} h-12 px-2 py-2" %>
       </div>

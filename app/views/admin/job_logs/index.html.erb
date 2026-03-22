@@ -1,12 +1,12 @@
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Admin",
-    title: "Job logs",
-    description: "Review background jobs, queue health, and failures.",
+    eyebrow: t("admin.job_logs.index.page_header.eyebrow"),
+    title: t("admin.job_logs.index.page_header.title"),
+    description: t("admin.job_logs.index.page_header.description"),
     density: :compact,
     badges: [
       { label: throughput_label(@job_log_stats.completed_last_hour), tone: :neutral },
-      { label: pluralize(@job_log_stats.stale_running, "stale running job"), tone: @job_log_stats.stale_running.positive? ? :warning : :neutral }
+      { label: t("admin.job_logs.index.page_header.badges.stale_running", count: @job_log_stats.stale_running), tone: @job_log_stats.stale_running.positive? ? :warning : :neutral }
     ]
   ) %>
 

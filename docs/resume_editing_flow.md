@@ -248,6 +248,8 @@ Behavior:
 - only `experience` sections are shown in this step
 - new sections created from this step are restricted to `experience`
 - the section editor renders both existing entries and a blank entry form for adding a new one
+- each experience entry editor now includes a collapsed, deterministic bullet-guidance panel that writes curated examples into `highlights_text`
+- the guidance query falls back from the entry title to the resume headline, and early-career intake can surface internship, tutoring, teaching-assistant, and volunteer examples
 
 ### 3. Education Step
 
@@ -288,6 +290,11 @@ It currently includes:
 - `slug`
 - `template_id`
 - `settings[accent_color]`
+- `settings[font_scale]`
+- `settings[density]`
+- `settings[section_spacing]`
+- `settings[paragraph_spacing]`
+- `settings[line_spacing]`
 - `settings[page_size]`
 - `settings[show_contact_icons]`
 - export and download controls

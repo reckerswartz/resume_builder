@@ -1,0 +1,13 @@
+name: "Setup Database"
+description: "Prepare PostgreSQL test database with schema load"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup database
+      shell: bash
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/resume_builder_test
+      run: |
+        bin/rails db:create db:schema:load

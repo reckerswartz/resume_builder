@@ -80,6 +80,19 @@ RSpec.describe "db/seeds.rb" do
       expect(implementation.source_artifact).to eq(reference)
       expect(implementation.render_profile).to eq(template.normalized_layout_config)
 
+      seed_snapshot = artifacts.find_by(artifact_type: "seed_snapshot", version_label: "#{implementation.identifier}-seeded")
+      if implementation.seeded?
+        expect(seed_snapshot).to be_present, "Expected a seed_snapshot artifact for seeded baseline #{template.slug}"
+        expect(seed_snapshot).to be_active
+        expect(seed_snapshot.metadata["template_implementation_identifier"]).to eq(implementation.identifier)
+      else
+        if seed_snapshot.present?
+          expect(seed_snapshot.status).to eq("superseded")
+        else
+          expect(seed_snapshot).to be_nil
+        end
+      end
+
       validation_run = template.template_validation_runs.find_by!(identifier: "#{template.slug}-baseline-manual-review")
       expect(validation_run.template_implementation).to eq(implementation)
       expect(validation_run.reference_artifact).to eq(reference)

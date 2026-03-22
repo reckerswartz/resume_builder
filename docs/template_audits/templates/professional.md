@@ -25,7 +25,7 @@
 - **Hidden sections**: ✅ Working
 - **Language levels**: ✅ Rendering (shared fix)
 - **Page breaks**: ✅ CSS applied (shared fix)
-- **Regression baseline**: Post-fix re-review restored the resolved accent-left-border heading treatment and standalone summary callout after the shared Tailwind utility fix
+- **Regression baseline**: Local shared/template edits were re-reviewed with no new drift. The accent section borders, standalone summary callout, and right-column contact layout remained intact.
 
 ## Discrepancies
 
@@ -53,6 +53,7 @@ Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 
 - `docs/template_audits/artifacts/professional/marketing-strategist-full/2026-03-21-preview.png`
 - `docs/template_audits/artifacts/professional/marketing-strategist-full/2026-03-21T03-42-23Z-postfix.png`
+- `docs/template_audits/artifacts/professional/marketing-strategist-full/2026-03-21T20-40-51Z-review.png`
 - `docs/template_audits/artifacts/professional/education-specialist-minimal/2026-03-21-preview.png`
 
 ## Changelog
@@ -60,3 +61,4 @@ Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 - **2026-03-21** — Initial audit. 5 discrepancies (2 moderate, 3 minor).
 - **2026-03-21** — Resolved PRO-001/003/005. 2 minor remain (PRO-002 header balance, PRO-004 entry spacing). Advanced to `close`.
 - **2026-03-21** — Re-reviewed after the shared Tailwind utility fix. Accent section borders, uppercase tracking, and summary callout now render correctly again; no new discrepancies were identified and the 2 minor issues remain the only open items.
+- **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. The full preview stayed free of horizontal overflow, the restored accent section borders and summary callout remained intact, and no resolved discrepancies resurfaced.

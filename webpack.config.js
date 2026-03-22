@@ -10,7 +10,7 @@ module.exports = (_env, argv = {}) => {
     mode,
     devtool: isProduction ? false : "source-map",
     stats: "errors-warnings",
-    cache: {
+    cache: isProduction ? {
       type: "filesystem",
       buildDependencies: {
         config: [
@@ -18,7 +18,7 @@ module.exports = (_env, argv = {}) => {
           path.resolve(__dirname, "postcss.config.js")
         ]
       }
-    },
+    } : false,
     entry: {
       application: [
         "./app/javascript/application.js",

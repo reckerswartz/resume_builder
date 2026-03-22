@@ -11,8 +11,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `add_targeted_specs`
-- Last reviewed: `2026-03-21T03:39:00Z`
-- Last changed: `2026-03-21T03:39:00Z`
+- Last reviewed: `2026-03-21T22:54:00Z`
+- Last changed: `2026-03-21T22:54:00Z`
 
 ## Hotspot summary
 
@@ -20,8 +20,6 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
   - Full codebase scan revealed ~60 missing spec files across all layers: 8 models, 15 services, 5 jobs, 1 presenter, 3 helpers, 9 policies, and 25 components.
 - Signals:
   - `ApplicationJob` (91 lines) — shared base class for all background jobs with automatic JobLog lifecycle, error capture, and output tracking — zero dedicated coverage.
-  - Authorization policies for admin-scoped resources (JobLog, LlmProvider, LlmModel) lack boundary verification.
-  - All 25 UI components lack dedicated component specs.
 - Risks:
   - JobLog lifecycle regressions (enqueue tracking, success/failure marking, error capture) would affect ALL background jobs.
   - Policy changes could silently widen or narrow authorization boundaries.
@@ -119,17 +117,62 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 
 - Added `spec/services/llm/parallel_vision_runner_spec.rb` (4 examples) covering the blank-model guard, generation branch image preparation and interaction persistence, verification branch selection without resume-backed interaction logging, and provider failure capture.
 
+### Slice 22: photos-normalization-service-spec
+
+- Added `spec/services/photos/normalization_service_spec.rb` (3 examples) covering successful normalization with Vips-backed metadata, passthrough fallback when image processing is unavailable, and the failure path that marks the source asset failed.
+- Re-verified adjacent photo-processing coverage in `spec/jobs/photo_normalize_job_spec.rb`, `spec/services/photos/background_removal_service_spec.rb`, `spec/services/photos/verification_service_spec.rb`, and `spec/services/photos/generation_orchestrator_spec.rb`.
+
+### Slice 23: photos-enhancement-service-spec
+
+- Added `spec/services/photos/enhancement_service_spec.rb` (3 examples) covering successful enhancement with Vips-backed metadata, passthrough fallback when image processing is unavailable, and the failure path that returns an error result without mutating the source asset state.
+- Re-verified adjacent job coverage in `spec/jobs/photo_enhancement_job_spec.rb` and corrected the stale missing-job inventory entry for `PhotoNormalizeJob` after confirming `spec/jobs/photo_normalize_job_spec.rb` remains green.
+
+### Slice 24: photos-asset-builder-spec
+
+- Added `spec/services/photos/asset_builder_spec.rb` (3 examples) covering attachment metadata enrichment from the persisted blob, IO rewind before attach, and the explicit status override on the shared builder API.
+- Re-verified adjacent photo-processing consumer coverage in `spec/services/photos/normalization_service_spec.rb`, `spec/services/photos/enhancement_service_spec.rb`, `spec/services/photos/background_removal_service_spec.rb`, and `spec/services/photos/generation_orchestrator_spec.rb`.
+
+### Slice 25: photos-tempfile-manager-spec
+
+- Added `spec/services/photos/tempfile_manager_spec.rb` (4 examples) covering tempfile cleanup, exception-safe cleanup, downloaded-attachment rewind, and base64 decode rewind across the shared tempfile utility.
+- Re-verified adjacent photo-processing consumer coverage in `spec/services/photos/normalization_service_spec.rb`, `spec/services/photos/enhancement_service_spec.rb`, `spec/services/photos/background_removal_service_spec.rb`, and `spec/services/photos/generation_orchestrator_spec.rb`.
+
+### Slice 26: photos-template-prompt-builder-spec
+
+- Added `spec/services/photos/template_prompt_builder_spec.rb` (2 examples) covering explicit prompt composition from resume identity plus headshot slot hints, and fallback prompt composition when the resume lacks a full name or headline and the template lacks explicit headshot slot configuration.
+- Re-verified adjacent photo-generation consumer coverage in `spec/services/photos/generation_orchestrator_spec.rb`.
+
+### Slice 27: llm-providers-nvidia-build-client-spec
+
+- Added `spec/services/llm/providers/nvidia_build_client_spec.rb` (3 examples) covering `/v1/models` normalization, chat-completions request and response shaping, and the explicit missing-api-key guard.
+- Re-verified adjacent LLM consumer coverage in `spec/services/llm/provider_model_sync_service_spec.rb` and `spec/services/llm/client_factory_spec.rb`.
+
+### Slice 28: llm-providers-ollama-client-spec
+
+- Added `spec/services/llm/providers/ollama_client_spec.rb` (3 examples) covering `/api/tags` normalization, `/api/generate` request and response shaping, and omission of blank Ollama options.
+- Re-verified adjacent LLM consumer coverage in `spec/services/llm/client_factory_spec.rb`, `spec/services/llm/parallel_text_runner_spec.rb`, and `spec/services/llm/provider_model_sync_service_spec.rb`.
+
+### Slice 29: llm-providers-base-client-spec
+
+- Added `spec/services/llm/providers/base_client_spec.rb` (7 examples) covering shared GET/POST request behavior, timeout wiring, parsed error payload handling, invalid JSON/network failures, and the default unsupported image-method guards.
+- Re-verified adjacent LLM provider and consumer coverage in `spec/services/llm/providers/nvidia_build_client_spec.rb`, `spec/services/llm/providers/ollama_client_spec.rb`, `spec/services/llm/client_factory_spec.rb`, `spec/services/llm/provider_model_sync_service_spec.rb`, `spec/services/llm/parallel_text_runner_spec.rb`, and `spec/services/llm/parallel_vision_runner_spec.rb`.
+
+### Slice 30: resumes-cloud-import-provider-catalog-spec
+
+- Added `spec/services/resumes/cloud_import_provider_catalog_spec.rb` (6 examples) covering hydrated provider metadata from `.all`, known and unknown provider lookup via `.fetch`, and the `provider_unavailable`, `configured`, and `setup_required` feedback branches from `.launch_feedback`.
+- Re-verified adjacent consumer coverage in `spec/presenters/resumes/source_step_state_spec.rb`, `spec/helpers/resumes_helper_spec.rb`, `spec/helpers/admin/settings_helper_spec.rb`, and `spec/requests/resume_source_imports_spec.rb`.
+
 ### Spec fix: registrations_spec.rb
 
 - Fixed stale assertion `expect(Resume.last.sections.count).to eq(4)` → `eq(ResumeBuilder::SectionRegistry.starter_sections.size)` since starter sections grew from 4 to 6 (added certifications and languages).
 
 ## Pending
 
-- Remaining coverage gaps are now concentrated in shared photo-processing services, one remaining background job, helper utilities, and UI components.
+- Remaining coverage gaps are now concentrated in low-priority shared service utilities and UI components.
 
 ## Open follow-up keys
 
-- `add-photos-normalization-service-spec`
+- `add-resumes-docx-text-extractor-spec`
 
 ## Closed follow-up keys
 
@@ -139,13 +182,22 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - `fix-registrations-spec-stale-section-count`
 - `add-parallel-text-runner-spec`
 - `add-parallel-vision-runner-spec`
+- `add-photos-normalization-service-spec`
+- `add-photos-enhancement-service-spec`
+- `add-photos-asset-builder-spec`
+- `add-photos-tempfile-manager-spec`
+- `add-photos-template-prompt-builder-spec`
+- `add-llm-providers-nvidia-build-client-spec`
+- `add-llm-providers-ollama-client-spec`
+- `add-llm-providers-base-client-spec`
+- `add-resumes-cloud-import-provider-catalog-spec`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/services/llm/parallel_vision_runner_spec.rb spec/services/photos/background_removal_service_spec.rb spec/services/photos/verification_service_spec.rb spec/services/photos/generation_orchestrator_spec.rb` (14 examples, 0 failures)
+  - `bundle exec rspec spec/services/resumes/cloud_import_provider_catalog_spec.rb spec/presenters/resumes/source_step_state_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/admin/settings_helper_spec.rb spec/requests/resume_source_imports_spec.rb` (55 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/services/llm/parallel_vision_runner.rb spec/services/llm/parallel_vision_runner_spec.rb` (Syntax OK)
+  - `ruby -c app/services/resumes/cloud_import_provider_catalog.rb spec/services/resumes/cloud_import_provider_catalog_spec.rb spec/presenters/resumes/source_step_state_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/admin/settings_helper_spec.rb spec/requests/resume_source_imports_spec.rb` (Syntax OK)
 
 ## Full missing-spec inventory (as of 2026-03-21)
 
@@ -156,27 +208,18 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 | `ApplicationRecord` | ~5 | skip |
 | `Current` | ~10 | skip |
 
-### Services (13 remaining missing)
+### Services (4 remaining missing)
 | File | Lines | Priority |
 |------|-------|----------|
-| `Photos::NormalizationService` | ~122 | medium |
-| `Photos::EnhancementService` | ~130 | medium |
-| `Photos::AssetBuilder` | ~50 | medium |
-| `Llm::Providers::NvidiaBuildClient` | ~70 | medium |
-| `Llm::Providers::OllamaClient` | ~60 | medium |
-| `Llm::Providers::BaseClient` | ~77 | low |
-| `Photos::TempfileManager` | ~40 | low |
-| `Photos::TemplatePromptBuilder` | ~50 | low |
-| `Resumes::CloudImportProviderCatalog` | 51 | low |
 | `Resumes::DocxTextExtractor` | ~40 | low |
 | `Resumes::PdfTextExtractor` | ~30 | low |
 | `Resumes::ExportStatusBroadcaster` | ~20 | low |
 | `Errors::Tracker` | ~30 | low |
 
-### Jobs (1 remaining)
+### Jobs (0 remaining)
 | File | Lines | Priority |
 |------|-------|----------|
-| `PhotoNormalizeJob` | ~44 | low |
+| All inventoried photo-processing jobs for this area now have dedicated coverage. |
 
 ### Policies (0 remaining)
 | File | Lines | Priority |

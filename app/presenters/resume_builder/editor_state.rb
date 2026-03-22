@@ -79,8 +79,8 @@ module ResumeBuilder
     def next_step_card_attributes
       {
         eyebrow: I18n.t("resume_builder.editor_state.next_step_card.eyebrow"),
-        title: next_step&.fetch(:label, nil) || I18n.t("resume_builder.editor_state.next_step_card.finalize_title"),
-        description: next_step.present? ? I18n.t("resume_builder.editor_state.next_step_card.with_next_description") : I18n.t("resume_builder.editor_state.next_step_card.finalize_description"),
+        title: recommended_next_step&.fetch(:label, nil) || I18n.t("resume_builder.editor_state.next_step_card.finalize_title"),
+        description: next_step_card_description,
         tone: :subtle,
         padding: :sm
       }
@@ -138,26 +138,29 @@ module ResumeBuilder
 
     def navigation_actions
       @navigation_actions ||= [
-        {
-          label: I18n.t("resume_builder.editor_state.navigation.back_to_workspace"),
-          path: view_context.resumes_path,
-          style: :secondary,
-          options: { data: { turbo_frame: "_top" } }
-        },
-        {
-          label: I18n.t("resume_builder.editor_state.navigation.preview"),
-          path: view_context.resume_path(resume, step: current_step_key),
-          style: :secondary,
-          options: { data: { turbo_frame: "_top" } }
-        },
-        {
-          label: I18n.t("resume_builder.editor_state.navigation.go_back"),
-          path: go_back_path,
-          style: :secondary,
-          options: go_back_link_options
-        },
+        back_to_workspace_action,
+        preview_action,
+        go_back_action,
         next_navigation_action
       ].compact
+    end
+
+    def primary_navigation_actions
+      return navigation_actions unless section_step?
+
+      [
+        go_back_action,
+        next_navigation_action
+      ].compact
+    end
+
+    def secondary_navigation_actions
+      return [] unless section_step?
+
+      [
+        back_to_workspace_action,
+        preview_action
+      ]
     end
 
     private
@@ -167,15 +170,70 @@ module ResumeBuilder
         current_step.fetch(:key)
       end
 
+      def section_step?
+        step_partial == "editor_section_step"
+      end
+
+      def back_to_workspace_action
+        {
+          label: I18n.t("resume_builder.editor_state.navigation.back_to_workspace"),
+          path: view_context.resumes_path,
+          style: :secondary,
+          options: { data: { turbo_frame: "_top" } }
+        }
+      end
+
+      def preview_action
+        {
+          label: I18n.t("resume_builder.editor_state.navigation.preview"),
+          path: view_context.resume_path(resume, step: current_step_key),
+          style: :secondary,
+          options: { data: { turbo_frame: "_top" } }
+        }
+      end
+
+      def go_back_action
+        {
+          label: I18n.t("resume_builder.editor_state.navigation.go_back"),
+          path: go_back_path,
+          style: :secondary,
+          options: go_back_link_options
+        }
+      end
+
       def next_navigation_action
-        return unless next_step_path.present? && next_step.present?
+        return unless recommended_next_step_path.present? && recommended_next_step.present?
 
         {
-          label: I18n.t("resume_builder.editor_state.navigation.next", step: next_step.fetch(:label)),
-          path: next_step_path,
+          label: I18n.t("resume_builder.editor_state.navigation.next", step: recommended_next_step.fetch(:label)),
+          path: recommended_next_step_path,
           style: :primary,
           options: {}
         }
+      end
+
+      def recommended_next_step
+        @recommended_next_step ||= begin
+          return finalize_step if completion_percentage == 100 && current_step_key != "finalize"
+
+          next_step
+        end
+      end
+
+      def recommended_next_step_path
+        @recommended_next_step_path ||= recommended_next_step&.fetch(:path, nil)
+      end
+
+      def next_step_card_description
+        if recommended_next_step.present? && recommended_next_step.fetch(:key) != "finalize"
+          I18n.t("resume_builder.editor_state.next_step_card.with_next_description")
+        else
+          I18n.t("resume_builder.editor_state.next_step_card.finalize_description")
+        end
+      end
+
+      def finalize_step
+        steps.find { |step| step[:key] == "finalize" }
       end
   end
 end

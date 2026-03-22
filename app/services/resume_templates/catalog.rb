@@ -9,6 +9,12 @@ module ResumeTemplates
       "lg" => "Large"
     }.freeze
 
+    SPACING_OPTIONS = {
+      "tight" => "Tight",
+      "standard" => "Standard",
+      "relaxed" => "Relaxed"
+    }.freeze
+
     FONT_SCALES = {
       "sm" => {
         name: "text-3xl",
@@ -69,6 +75,60 @@ module ResumeTemplates
       }
     }.freeze
 
+    SECTION_SPACING_SCALES = {
+      "tight" => {
+        stack_margin_top: "mt-7",
+        stack_space: "space-y-7",
+        compact_stack_space: "space-y-4",
+        content_margin_top: "mt-3"
+      },
+      "standard" => {
+        stack_margin_top: "mt-8",
+        stack_space: "space-y-8",
+        compact_stack_space: "space-y-5",
+        content_margin_top: "mt-3"
+      },
+      "relaxed" => {
+        stack_margin_top: "mt-10",
+        stack_space: "space-y-10",
+        compact_stack_space: "space-y-6",
+        content_margin_top: "mt-4"
+      }
+    }.freeze
+
+    PARAGRAPH_SPACING_SCALES = {
+      "tight" => {
+        summary_margin_top: "mt-4",
+        entry_body_spacing: "mt-2"
+      },
+      "standard" => {
+        summary_margin_top: "mt-5",
+        entry_body_spacing: "mt-3"
+      },
+      "relaxed" => {
+        summary_margin_top: "mt-6",
+        entry_body_spacing: "mt-4"
+      }
+    }.freeze
+
+    LINE_SPACING_SCALES = {
+      "tight" => {
+        body: "leading-5",
+        relaxed_body: "leading-6",
+        meta: "leading-5"
+      },
+      "standard" => {
+        body: "leading-6",
+        relaxed_body: "leading-7",
+        meta: "leading-6"
+      },
+      "relaxed" => {
+        body: "leading-7",
+        relaxed_body: "leading-8",
+        meta: "leading-7"
+      }
+    }.freeze
+
     SHELL_STYLES = %w[flat card].freeze
     HEADER_STYLES = %w[rule split].freeze
     SECTION_HEADING_STYLES = %w[rule marker].freeze
@@ -110,6 +170,9 @@ module ResumeTemplates
           "accent_color" => "#0F172A",
           "font_scale" => "base",
           "density" => "comfortable",
+          "section_spacing" => "standard",
+          "paragraph_spacing" => "standard",
+          "line_spacing" => "standard",
           "column_count" => "single_column",
           "theme_tone" => "slate",
           "supports_headshot" => false,
@@ -129,6 +192,9 @@ module ResumeTemplates
           "accent_color" => "#1D4ED8",
           "font_scale" => "sm",
           "density" => "compact",
+          "section_spacing" => "tight",
+          "paragraph_spacing" => "tight",
+          "line_spacing" => "standard",
           "column_count" => "single_column",
           "theme_tone" => "blue",
           "supports_headshot" => false,
@@ -148,6 +214,9 @@ module ResumeTemplates
           "accent_color" => "#334155",
           "font_scale" => "sm",
           "density" => "compact",
+          "section_spacing" => "tight",
+          "paragraph_spacing" => "tight",
+          "line_spacing" => "standard",
           "column_count" => "single_column",
           "theme_tone" => "slate",
           "supports_headshot" => false,
@@ -167,6 +236,9 @@ module ResumeTemplates
           "accent_color" => "#0F4C81",
           "font_scale" => "base",
           "density" => "comfortable",
+          "section_spacing" => "standard",
+          "paragraph_spacing" => "standard",
+          "line_spacing" => "standard",
           "column_count" => "single_column",
           "theme_tone" => "blue",
           "supports_headshot" => false,
@@ -186,6 +258,9 @@ module ResumeTemplates
           "accent_color" => "#0F766E",
           "font_scale" => "base",
           "density" => "relaxed",
+          "section_spacing" => "relaxed",
+          "paragraph_spacing" => "relaxed",
+          "line_spacing" => "standard",
           "column_count" => "single_column",
           "theme_tone" => "teal",
           "supports_headshot" => false,
@@ -205,6 +280,9 @@ module ResumeTemplates
           "accent_color" => "#4338CA",
           "font_scale" => "base",
           "density" => "comfortable",
+          "section_spacing" => "standard",
+          "paragraph_spacing" => "standard",
+          "line_spacing" => "standard",
           "column_count" => "two_column",
           "theme_tone" => "indigo",
           "supports_headshot" => false,
@@ -226,6 +304,9 @@ module ResumeTemplates
           "accent_color" => "#D7F038",
           "font_scale" => "sm",
           "density" => "compact",
+          "section_spacing" => "standard",
+          "paragraph_spacing" => "standard",
+          "line_spacing" => "standard",
           "column_count" => "two_column",
           "theme_tone" => "lime",
           "supports_headshot" => true,
@@ -275,6 +356,30 @@ module ResumeTemplates
         font_scale_key = font_scale.to_s
 
         I18n.t("resume_templates.catalog.labels.font_scale.#{font_scale_key}", default: FONT_SCALE_OPTIONS.fetch(font_scale_key, font_scale_key.humanize))
+      end
+
+      def section_spacing_options
+        SPACING_OPTIONS.map { |value, label| [ label, value ] }
+      end
+
+      def section_spacing_label(section_spacing)
+        option_label("section_spacing", section_spacing)
+      end
+
+      def paragraph_spacing_options
+        SPACING_OPTIONS.map { |value, label| [ label, value ] }
+      end
+
+      def paragraph_spacing_label(paragraph_spacing)
+        option_label("paragraph_spacing", paragraph_spacing)
+      end
+
+      def line_spacing_options
+        SPACING_OPTIONS.map { |value, label| [ label, value ] }
+      end
+
+      def line_spacing_label(line_spacing)
+        option_label("line_spacing", line_spacing)
       end
 
       def density_options
@@ -348,6 +453,9 @@ module ResumeTemplates
         normalized["accent_color"] = normalize_accent_color(config["accent_color"], defaults.fetch("accent_color"))
         normalized["font_scale"] = normalize_option(config["font_scale"], FONT_SCALES.keys, defaults.fetch("font_scale"))
         normalized["density"] = normalize_option(config["density"], DENSITY_SCALES.keys, defaults.fetch("density"))
+        normalized["section_spacing"] = normalize_option(config["section_spacing"], SECTION_SPACING_SCALES.keys, defaults.fetch("section_spacing"))
+        normalized["paragraph_spacing"] = normalize_option(config["paragraph_spacing"], PARAGRAPH_SPACING_SCALES.keys, defaults.fetch("paragraph_spacing"))
+        normalized["line_spacing"] = normalize_option(config["line_spacing"], LINE_SPACING_SCALES.keys, defaults.fetch("line_spacing"))
         normalized["column_count"] = normalize_option(config["column_count"], COLUMN_COUNTS.keys, defaults.fetch("column_count"))
         normalized["theme_tone"] = normalize_option(config["theme_tone"], THEME_TONES.keys, defaults.fetch("theme_tone"))
         normalized["supports_headshot"] = BOOLEAN_TYPE.cast(config.key?("supports_headshot") ? config["supports_headshot"] : defaults.fetch("supports_headshot"))
@@ -377,12 +485,36 @@ module ResumeTemplates
         normalize_option(value, DENSITY_SCALES.keys, fallback)
       end
 
+      def normalized_section_spacing(value, fallback: default_layout_config.fetch("section_spacing"))
+        normalize_option(value, SECTION_SPACING_SCALES.keys, fallback)
+      end
+
+      def normalized_paragraph_spacing(value, fallback: default_layout_config.fetch("paragraph_spacing"))
+        normalize_option(value, PARAGRAPH_SPACING_SCALES.keys, fallback)
+      end
+
+      def normalized_line_spacing(value, fallback: default_layout_config.fetch("line_spacing"))
+        normalize_option(value, LINE_SPACING_SCALES.keys, fallback)
+      end
+
       def typography_scale(font_scale)
         FONT_SCALES.fetch(normalized_font_scale(font_scale, fallback: "base"))
       end
 
       def density_scale(density)
         DENSITY_SCALES.fetch(normalized_density(density, fallback: "comfortable"))
+      end
+
+      def section_spacing_scale(section_spacing)
+        SECTION_SPACING_SCALES.fetch(normalized_section_spacing(section_spacing, fallback: "standard"))
+      end
+
+      def paragraph_spacing_scale(paragraph_spacing)
+        PARAGRAPH_SPACING_SCALES.fetch(normalized_paragraph_spacing(paragraph_spacing, fallback: "standard"))
+      end
+
+      def line_spacing_scale(line_spacing)
+        LINE_SPACING_SCALES.fetch(normalized_line_spacing(line_spacing, fallback: "standard"))
       end
 
       def accent_variants(layout_config_or_family, selected_accent_color: nil)

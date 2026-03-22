@@ -1,0 +1,230 @@
+version: 1
+updated_at: "2026-03-22T00:00:00Z"
+
+github:
+  remote: "origin"
+  repo: "reckerswartz/resume_builder"
+  default_branch: "main"
+
+label_taxonomy:
+  synced_at: null
+  workflow_labels: 19
+  domain_labels: 13
+  severity_labels: 4
+  status_labels: 6
+  type_labels: 12
+  coordination_labels: 1
+
+bridge_scripts:
+  ensure_labels: "bin/gh-bridge/ensure-labels"
+  create_issue: "bin/gh-bridge/create-issue"
+  create_branch: "bin/gh-bridge/create-branch"
+  create_pr: "bin/gh-bridge/create-pr"
+  update_issue: "bin/gh-bridge/update-issue"
+  close_issue: "bin/gh-bridge/close-issue"
+  sync_registry: "bin/gh-bridge/sync-registry"
+  roadmap_summary: "bin/gh-bridge/roadmap-summary"
+
+issue_templates:
+  audit: "docs/github_ops/issue_templates/audit.md"
+  rollout: "docs/github_ops/issue_templates/rollout.md"
+  feature: "docs/github_ops/issue_templates/feature.md"
+  bug: "docs/github_ops/issue_templates/bug.md"
+
+workflow_registries:
+  - workflow: "template-audit"
+    registry_path: "docs/template_audits/registry.yml"
+    tracking_unit: "template discrepancy"
+    issue_prefix: "template-audit"
+    domain: "templates"
+    type: "discrepancy"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "responsive-ui-audit"
+    registry_path: "docs/ui_audits/responsive_review/registry.yml"
+    tracking_unit: "page issue key"
+    issue_prefix: "responsive-ui-audit"
+    domain: "builder"
+    type: "responsive-issue"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "ui-guidelines-audit"
+    registry_path: "docs/ui_audits/guidelines_review/registry.yml"
+    tracking_unit: "page issue key"
+    issue_prefix: "ui-guidelines-audit"
+    domain: "templates"
+    type: "compliance-gap"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "ux-usability-audit"
+    registry_path: "docs/ui_audits/usability_review/registry.yml"
+    tracking_unit: "page issue key"
+    issue_prefix: "ux-usability-audit"
+    domain: "builder"
+    type: "usability-issue"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "maintainability-audit"
+    registry_path: "docs/maintainability_audits/registry.yml"
+    tracking_unit: "area key"
+    issue_prefix: "maintainability-audit"
+    domain: "infrastructure"
+    type: "maintainability"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "security-audit"
+    registry_path: null
+    tracking_unit: "finding ID"
+    issue_prefix: "security-audit"
+    domain: "security"
+    type: "security-finding"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "code-review"
+    registry_path: null
+    tracking_unit: "finding ID"
+    issue_prefix: "code-review"
+    domain: "infrastructure"
+    type: "refactor"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "behance-template-rollout"
+    registry_path: "docs/template_rollouts/registry.yml"
+    tracking_unit: "candidate key"
+    issue_prefix: "behance-template-rollout"
+    domain: "templates"
+    type: "rollout-slice"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "behance-template-implementation"
+    registry_path: "docs/template_rollouts/registry.yml"
+    tracking_unit: "improvement key"
+    issue_prefix: "behance-template-implementation"
+    domain: "templates"
+    type: "rollout-slice"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "resumebuilder-reference-rollout"
+    registry_path: "docs/resumebuilder_rollouts/registry.yml"
+    tracking_unit: "slice key"
+    issue_prefix: "resumebuilder-reference-rollout"
+    domain: "builder"
+    type: "rollout-slice"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "feature-spec"
+    registry_path: null
+    tracking_unit: "feature name"
+    issue_prefix: "feature-spec"
+    domain: "infrastructure"
+    type: "feature"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "feature-review"
+    registry_path: null
+    tracking_unit: "review finding"
+    issue_prefix: "feature-review"
+    domain: "infrastructure"
+    type: "feature"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "feature-plan"
+    registry_path: null
+    tracking_unit: "PR slice"
+    issue_prefix: "feature-plan"
+    domain: "infrastructure"
+    type: "feature"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "tdd-red-agent"
+    registry_path: null
+    tracking_unit: "test file"
+    issue_prefix: "tdd-red-agent"
+    domain: "testing"
+    type: "coverage-gap"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "implementation-agent"
+    registry_path: null
+    tracking_unit: "implementation slice"
+    issue_prefix: "implementation-agent"
+    domain: "infrastructure"
+    type: "feature"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "tdd-refactoring-agent"
+    registry_path: null
+    tracking_unit: "refactor slice"
+    issue_prefix: "tdd-refactoring-agent"
+    domain: "infrastructure"
+    type: "refactor"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "rspec-agent"
+    registry_path: null
+    tracking_unit: "coverage gap"
+    issue_prefix: "rspec-agent"
+    domain: "testing"
+    type: "coverage-gap"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "c4-architecture"
+    registry_path: null
+    tracking_unit: "architecture concern"
+    issue_prefix: "c4-architecture"
+    domain: "docs"
+    type: "documentation"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+  - workflow: "smart-fix"
+    registry_path: null
+    tracking_unit: "bug report"
+    issue_prefix: "smart-fix"
+    domain: "infrastructure"
+    type: "bug"
+    issue_count: { open: 0, closed: 0 }
+    pr_count: { open: 0, merged: 0 }
+    last_synced_at: null
+
+file_locks:
+  active: []
+
+roadmap:
+  generated_at: null
+  path: "docs/github_ops/roadmap.md"

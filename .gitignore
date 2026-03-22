@@ -43,6 +43,25 @@ vendor/bundle/
 /docs/template_audits/artifacts/
 /docs/templates/*.pdf
 
+# Audit run logs (ephemeral per-execution chronicles — registries hold cumulative state)
+docs/*/runs/
+docs/*/*/runs/
+docs/*/*/*/runs/
+
+# Historical one-time audit snapshots (superseded by ongoing audit pages)
+/docs/ui_audits/2026-03-20/
+
+# Scaffolding templates (not source code)
+docs/*/areas/TEMPLATE.md
+docs/*/*/areas/TEMPLATE.md
+docs/*/*/pages/TEMPLATE.md
+docs/*/*/*/pages/TEMPLATE.md
+
+# Playwright and audit artifacts (generated locally)
+/tmp/ui_audit_artifacts/
+/tmp/reference_captures/
+/tmp/reference_artifacts/
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 

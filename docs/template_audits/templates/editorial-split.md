@@ -28,7 +28,7 @@
 - **Two-column layout**: Sidebar (education, skills, projects) renders left, main content (experience) renders right
 - **Identity tile**: Monogram fallback renders correctly (no headshot on audit resumes)
 - **Utility rail**: Dark rail with template name and page-size badges renders on lg+ viewports
-- **Regression baseline**: Post-fix re-review restored the vertical utility rail writing mode and editorial tracking utilities after the shared Tailwind utility fix
+- **Regression baseline**: Local shared/template edits were re-reviewed with no new drift. The vertical utility rail, badge rail, and monogram fallback all remained intact.
 
 ## Discrepancies
 
@@ -59,6 +59,7 @@ Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 
 - `docs/template_audits/artifacts/editorial-split/data-scientist-full/2026-03-21-preview.png`
 - `docs/template_audits/artifacts/editorial-split/data-scientist-full/2026-03-21T03-42-23Z-postfix.png`
+- `docs/template_audits/artifacts/editorial-split/data-scientist-full/2026-03-21T20-40-51Z-review.png`
 - `docs/template_audits/artifacts/editorial-split/finance-analyst-minimal/2026-03-21-preview.png`
 
 ## Changelog
@@ -66,3 +67,4 @@ Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 - **2026-03-21** — Initial audit. 7 discrepancies (2 moderate, 5 minor).
 - **2026-03-21** — Resolved EDT-001/003/004/005. 3 minor remain (EDT-002 badge size, EDT-006 border, EDT-007 mobile badges). Advanced to `close`.
 - **2026-03-21** — Re-reviewed after the shared Tailwind utility fix. Utility rail writing mode, tightened editorial tracking, and accent divider styling render correctly again; no new discrepancies were identified and the 3 minor issues remain open.
+- **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. The full preview stayed free of horizontal overflow, the utility rail and badge rail remained intact, and no resolved discrepancies resurfaced.

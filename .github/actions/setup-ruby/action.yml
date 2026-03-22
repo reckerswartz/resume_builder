@@ -1,0 +1,17 @@
+name: "Setup Ruby"
+description: "Install Ruby with bundler cache and optional system dependencies"
+
+inputs:
+  ruby-version:
+    description: "Ruby version to install (reads .ruby-version by default)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.ruby-version || '' }}
+        bundler-cache: true

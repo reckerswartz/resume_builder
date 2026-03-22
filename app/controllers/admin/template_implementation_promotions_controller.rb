@@ -8,7 +8,8 @@ class Admin::TemplateImplementationPromotionsController < Admin::BaseController
     result = ResumeTemplates::ImplementationPromotionService.new(
       template: @template,
       template_implementation: @template_implementation,
-      user: current_user
+      user: current_user,
+      target_status: promotion_params[:target_status]
     ).call
 
     if result.success?
@@ -33,12 +34,21 @@ class Admin::TemplateImplementationPromotionsController < Admin::BaseController
       @template_implementation = @template.template_implementations.find(params[:implementation_id])
     end
 
+    def promotion_params
+      params.fetch(:promotion, ActionController::Parameters.new).permit(:target_status)
+    end
+
     def promotion_notice(result)
-      key = result.promoted? ? "admin.template_implementation_promotions_controller.implementation_promoted" : "admin.template_implementation_promotions_controller.implementation_already_promoted"
+      key = if result.promoted?
+        "admin.template_implementation_promotions_controller.implementation_promoted"
+      else
+        "admin.template_implementation_promotions_controller.implementation_already_promoted"
+      end
 
       I18n.t(
         key,
-        implementation_name: result.template_implementation.name
+        implementation_name: result.template_implementation.name,
+        target_status: result.target_status.to_s.tr("_", " ").titleize
       )
     end
 end

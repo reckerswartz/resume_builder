@@ -1,0 +1,155 @@
+name: Continuous Audit Cycle
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_run:
+    workflows: ["Auto Fix & PR"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Audit scope"
+        type: choice
+        options:
+          - full
+          - ui-only
+          - tests-only
+          - security-only
+        default: full
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+concurrency:
+  group: continuous-audit
+  cancel-in-progress: false
+
+jobs:
+  determine_scope:
+    name: "Determine Audit Scope"
+    runs-on: ubuntu-latest
+    outputs:
+      run_tests: ${{ steps.scope.outputs.run_tests }}
+      run_ui: ${{ steps.scope.outputs.run_ui }}
+      run_security: ${{ steps.scope.outputs.run_security }}
+    steps:
+      - name: Calculate scope
+        id: scope
+        run: |
+          SCOPE="${{ github.event.inputs.scope || 'full' }}"
+          case "$SCOPE" in
+            full)
+              echo "run_tests=true" >> "$GITHUB_OUTPUT"
+              echo "run_ui=true" >> "$GITHUB_OUTPUT"
+              echo "run_security=true" >> "$GITHUB_OUTPUT"
+              ;;
+            ui-only)
+              echo "run_tests=false" >> "$GITHUB_OUTPUT"
+              echo "run_ui=true" >> "$GITHUB_OUTPUT"
+              echo "run_security=false" >> "$GITHUB_OUTPUT"
+              ;;
+            tests-only)
+              echo "run_tests=true" >> "$GITHUB_OUTPUT"
+              echo "run_ui=false" >> "$GITHUB_OUTPUT"
+              echo "run_security=false" >> "$GITHUB_OUTPUT"
+              ;;
+            security-only)
+              echo "run_tests=false" >> "$GITHUB_OUTPUT"
+              echo "run_ui=false" >> "$GITHUB_OUTPUT"
+              echo "run_security=true" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+  trigger_ci:
+    name: "Trigger CI Pipeline"
+    runs-on: ubuntu-latest
+    needs: [determine_scope]
+    if: needs.determine_scope.outputs.run_tests == 'true' || needs.determine_scope.outputs.run_security == 'true'
+    steps:
+      - name: Dispatch CI workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ci.yml',
+              ref: 'main',
+              inputs: { full_suite: 'true' },
+            });
+            console.log('CI pipeline dispatched');
+
+  trigger_ui_audit:
+    name: "Trigger UI Audit"
+    runs-on: ubuntu-latest
+    needs: [determine_scope]
+    if: needs.determine_scope.outputs.run_ui == 'true'
+    steps:
+      - name: Dispatch Playwright audit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'playwright-audit.yml',
+              ref: 'main',
+              inputs: { pages: '' },
+            });
+            console.log('Playwright audit dispatched');
+
+  cycle_report:
+    name: "Cycle Health Report"
+    runs-on: ubuntu-latest
+    needs: [trigger_ci, trigger_ui_audit]
+    if: always()
+    steps:
+      - name: Generate cycle report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Count open issues by category
+            const labels = ['ci-auto', 'ui-audit', 'security', 'in-progress', 'needs-review'];
+            const counts = {};
+
+            for (const label of labels) {
+              try {
+                const resp = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: label,
+                  state: 'open',
+                  per_page: 1,
+                });
+                counts[label] = resp.headers['x-total-count']
+                  ? parseInt(resp.headers['x-total-count'], 10)
+                  : resp.data.length;
+              } catch {
+                counts[label] = 0;
+              }
+            }
+
+            // Count recently closed issues (last 7 days)
+            const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+            const closed = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              since: weekAgo,
+              per_page: 100,
+            });
+            const autoFixed = closed.data.filter(i =>
+              (i.labels || []).some(l => l.name === 'ci-auto' || l.name === 'ui-audit')
+            );
+
+            console.log('=== Continuous Audit Cycle Report ===');
+            console.log(`Open CI issues:        ${counts['ci-auto']}`);
+            console.log(`Open UI issues:        ${counts['ui-audit']}`);
+            console.log(`Open security issues:  ${counts['security']}`);
+            console.log(`In progress:           ${counts['in-progress']}`);
+            console.log(`Needs review:          ${counts['needs-review']}`);
+            console.log(`Auto-fixed (7 days):   ${autoFixed.length}`);
+            console.log('=====================================');

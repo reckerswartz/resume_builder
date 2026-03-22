@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# Reads a workflow registry YAML and creates GitHub issues for all open items
+# that don't yet have a github_issue_number.
+#
+# Usage: bin/gh-bridge/sync-registry \
+#   --workflow "template-audit" \
+#   --registry "docs/template_audits/registry.yml" \
+#   [--dry-run]
+#
+# This script reads the registry, identifies open items without GitHub issue
+# numbers, and reports them. Actual issue creation should be done through
+# the workflow's own create-issue calls for full context and body generation.
+#
+# In non-dry-run mode, it outputs a JSON array of items needing issues.
+
+set -euo pipefail
+
+WORKFLOW=""
+REGISTRY=""
+DRY_RUN=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow) WORKFLOW="$2"; shift 2 ;;
+    --registry) REGISTRY="$2"; shift 2 ;;
+    --dry-run)  DRY_RUN="true"; shift ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$WORKFLOW" ] || [ -z "$REGISTRY" ]; then
+  echo "ERROR: --workflow and --registry are required." >&2
+  exit 1
+fi
+
+if [ ! -f "$REGISTRY" ]; then
+  echo "ERROR: Registry file not found: $REGISTRY" >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+echo "=== Registry Sync Report ==="
+echo "Workflow: ${WORKFLOW}"
+echo "Registry: ${REGISTRY}"
+echo "Repository: ${REPO}"
+echo ""
+
+# Use ruby to parse the YAML and extract open items without github_issue_number
+# This handles the various registry formats across workflows
+ruby -ryaml -rjson -e '
+  registry = YAML.safe_load(File.read(ARGV[0]), permitted_classes: [Date, Time])
+  workflow = ARGV[1]
+  items = []
+
+  # Template audit format: templates[].discrepancies or top-level open counts
+  if registry["templates"]
+    registry["templates"].each do |t|
+      slug = t["slug"]
+      status = t["pixel_status"]
+      open_count = t["open_discrepancy_count"] || 0
+      if open_count > 0 && !t.dig("github_issue_number")
+        items << { key: slug, status: status, open_count: open_count, type: "template" }
+      end
+    end
+  end
+
+  # Responsive/guidelines/usability format: pages[].open_issue_keys
+  if registry["pages"]
+    registry["pages"].each do |p|
+      key = p["page_key"]
+      status = p["status"]
+      open_keys = p["open_issue_keys"] || []
+      open_keys.each do |ik|
+        items << { key: ik, page: key, status: status, type: "page_issue" }
+      end
+    end
+  end
+
+  # Maintainability format: areas[]
+  if registry["areas"]
+    registry["areas"].each do |a|
+      key = a["key"]
+      status = a["status"]
+      if status != "closed" && !a.dig("github_issue_number")
+        items << { key: key, status: status, type: "area" }
+      end
+    end
+  end
+
+  # Rollout format: candidates[] or slices[]
+  ["candidates", "slices"].each do |collection|
+    next unless registry[collection]
+    registry[collection].each do |c|
+      key = c["key"] || c["slug"] || c["reference_key"]
+      status = c["status"]
+      if status != "closed" && status != "implemented" && !c.dig("github_issue_number")
+        items << { key: key, status: status, type: "rollout" }
+      end
+    end
+  end
+
+  puts JSON.pretty_generate(items)
+' "$REGISTRY" "$WORKFLOW" 2>/dev/null || echo "[]"
+
+echo ""
+if [ -n "$DRY_RUN" ]; then
+  echo "[dry-run] No issues created. Use without --dry-run and pipe items to create-issue."
+else
+  echo "Use the output above to identify items needing GitHub issues."
+  echo "Create issues with: bin/gh-bridge/create-issue --workflow ${WORKFLOW} --key <key> ..."
+fi

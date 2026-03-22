@@ -1,16 +1,17 @@
-<% related_error_reference = job_log_related_error_reference(@job_log) %>
-<% related_error_log = job_log_related_error_log(@job_log) %>
+<% related_error_state = job_log_related_error_state(@job_log) %>
+<% related_error_reference = related_error_state.reference %>
+<% related_error_log = related_error_state.error_log %>
 <% runtime_label = job_log_runtime_label(@queue_snapshot) %>
 <% runtime_tone = job_log_runtime_tone(@queue_snapshot) %>
 <% runtime_description = job_log_runtime_description(@job_log, @queue_snapshot) %>
 <% control_actions = [] %>
 <% if retry_job_control_available?(@queue_snapshot) %>
   <% control_actions << {
-       label: "Retry queue job",
+       label: t(".actions.retry"),
        path: retry_admin_job_log_path(@job_log),
        style: :secondary,
        method: :post,
-       confirm: "Retry this failed queue job with the same active job ID?"
+       confirm: t(".actions.retry_confirm")
      } %>
 <% end %>
 <% if requeue_job_control_available?(@job_log, @queue_snapshot) %>
@@ -24,7 +25,7 @@
 <% end %>
 <% if discard_job_control_available?(@queue_snapshot) %>
   <% control_actions << {
-       label: "Discard queue job",
+       label: t(".actions.discard"),
        path: discard_admin_job_log_path(@job_log),
        style: :danger,
        method: :post,
@@ -32,59 +33,59 @@
      } %>
 <% end %>
 <% section_links = [
-     { id: "queue-controls", label: "Queue controls", caption: "Retry, requeue, discard, and action guidance" },
-     { id: "runtime-snapshot", label: "Runtime snapshot", caption: "Lifecycle, queue state, worker heartbeat, and references" },
-     { id: "captured-payloads", label: "Captured payloads", caption: "Queue runtime, input, output, and error payloads" }
+     { id: "queue-controls", label: t(".navigation.sections.follow_up.label"), caption: t(".navigation.sections.follow_up.caption") },
+     { id: "runtime-snapshot", label: t(".navigation.sections.live_queue.label"), caption: t(".navigation.sections.live_queue.caption") },
+     { id: "captured-payloads", label: t(".navigation.sections.payloads.label"), caption: t(".navigation.sections.payloads.caption") }
    ] %>
 <% runtime_items = [] %>
 <% if @job_log.stale? %>
   <% runtime_items << {
-       label: "Stale running job",
-       detail: "This job has been marked as running for more than 15 minutes. Review the queue state and worker heartbeat before mutating it.",
+       label: t(".triage.items.stale_running.label"),
+       detail: t(".triage.items.stale_running.detail"),
        tone: :warning
      } %>
 <% end %>
 <% if @queue_snapshot.unavailable? %>
   <% runtime_items << {
-       label: "Queue runtime unavailable",
+       label: t(".triage.items.queue_unavailable"),
        detail: runtime_description,
        tone: :neutral
      } %>
 <% elsif !@queue_snapshot.found? %>
   <% runtime_items << {
-       label: "Queue row missing",
+       label: t(".triage.items.queue_missing"),
        detail: runtime_description,
        tone: :neutral
      } %>
 <% elsif @queue_snapshot.orphaned_claimed? %>
   <% runtime_items << {
-       label: "Orphaned running execution",
+       label: t(".triage.items.orphaned_running"),
        detail: runtime_description,
        tone: :warning
      } %>
 <% elsif @queue_snapshot.retryable? && @job_log.failed? %>
   <% runtime_items << {
-       label: "Failed execution can be retried",
-       detail: "Retry keeps the same active job ID, requeue creates a fresh job ID, and discard clears the failed queue row while keeping this log for debugging.",
+       label: t(".triage.items.retryable_failed.label"),
+       detail: t(".triage.items.retryable_failed.detail"),
        tone: :warning
      } %>
 <% else %>
   <% runtime_items << {
-       label: "Runtime data available",
+       label: t(".triage.items.live_queue_available"),
        detail: runtime_description,
        tone: :success
      } %>
 <% end %>
 <% if related_error_log.present? %>
   <% runtime_items << {
-       label: "Linked error log available",
-       detail: "Open #{related_error_log.reference_id} for the full captured error context and backtrace.",
+       label: t(".triage.items.related_error_available.label"),
+       detail: t(".triage.items.related_error_available.detail", reference_id: related_error_log.reference_id),
        tone: :neutral
      } %>
 <% elsif related_error_reference.present? %>
   <% runtime_items << {
-       label: "Linked error reference recorded",
-       detail: "Reference #{related_error_reference} was captured in the job log, but no matching error log record is currently available.",
+       label: t(".triage.items.related_error_reference.label"),
+       detail: t(".triage.items.related_error_reference.detail", reference_id: related_error_reference),
        tone: :neutral
      } %>
 <% end %>
@@ -96,29 +97,29 @@
      :success
    end %>
 <% triage_title = case triage_tone
-   when :warning
-     "Needs queue follow-up"
-   when :neutral
-     "Review runtime context"
-   else
-     "Runtime looks healthy"
-   end %>
+  when :warning
+    t(".triage.titles.warning")
+  when :neutral
+    t(".triage.titles.neutral")
+  else
+    t(".triage.titles.success")
+  end %>
 
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Job log",
+    eyebrow: t(".page_header.eyebrow"),
     title: @job_log.job_type,
-    description: "Check lifecycle state, Queue runtime, and related error context before opening deeper payload details.",
+    description: t(".page_header.description"),
     badges: [
       { label: @job_log.status.humanize, tone: job_log_status_badge_tone(@job_log) },
       { label: runtime_label, tone: runtime_tone },
-      (@job_log.stale? ? { label: "Stale running", tone: :warning } : nil),
+      (@job_log.stale? ? { label: t(".page_header.badges.stale_running"), tone: :warning } : nil),
       { label: job_duration_label(@job_log.duration_seconds), tone: :neutral }
     ].compact,
     actions: [
-      { label: "Back to job logs", path: admin_job_logs_path, style: :secondary },
-      (related_error_log.present? ? { label: "Open related error", path: admin_error_log_path(related_error_log), style: :secondary } : nil),
-      { label: "Error logs", path: admin_error_logs_path, style: :secondary }
+      { label: t(".page_header.actions.back"), path: admin_job_logs_path, style: :secondary },
+      (related_error_log.present? ? { label: t(".page_header.actions.open_related_error"), path: admin_error_log_path(related_error_log), style: :secondary } : nil),
+      { label: t(".page_header.actions.error_logs"), path: admin_error_logs_path, style: :secondary }
     ].compact,
     density: :compact
   ) %>
@@ -129,10 +130,10 @@
         <div>
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-            Fast triage
+            <%= t(".triage.pill") %>
           </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Review this job</h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Start with runtime blockers and related error context, then decide whether a safe queue mutation or deeper payload review is needed.</p>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t(".triage.title") %></h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t(".triage.description") %></p>
         </div>
 
         <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
@@ -141,8 +142,8 @@
       <div class="flex flex-wrap gap-2">
         <span class="<%= ui_badge_classes(job_log_status_badge_tone(@job_log)) %>"><%= @job_log.status.humanize %></span>
         <span class="<%= ui_badge_classes(runtime_tone) %>"><%= runtime_label %></span>
-        <span class="<%= ui_badge_classes(control_actions.any? ? :warning : :neutral) %>"><%= control_actions.any? ? pluralize(control_actions.size, "safe action") : "Read-only" %></span>
-        <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_log.present? ? "Linked error" : related_error_reference.present? ? "Error reference" : "No linked error" %></span>
+        <span class="<%= ui_badge_classes(control_actions.any? ? :warning : :neutral) %>"><%= control_actions.any? ? t(".triage.badges.safe_action_count", count: control_actions.size) : t(".triage.badges.read_only") %></span>
+        <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_log.present? ? t(".triage.badges.related_error") : related_error_reference.present? ? t(".triage.badges.error_reference") : t(".triage.badges.no_related_error") %></span>
       </div>
 
       <div class="space-y-3">
@@ -155,7 +156,7 @@
               </div>
 
               <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
+                <%= item.fetch(:tone) == :success ? t(".triage.badges.ready") : item.fetch(:tone) == :warning ? t(".triage.badges.attention") : t(".triage.badges.follow_up") %>
               </span>
             </div>
           </div>
@@ -167,7 +168,7 @@
           <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), data: { turbo_method: action.fetch(:method), turbo_confirm: action.fetch(:confirm) }.compact %>
         <% end %>
         <% if related_error_log.present? %>
-          <%= link_to "Open related error", admin_error_log_path(related_error_log), class: ui_button_classes(:secondary, size: :sm) %>
+          <%= link_to t(".page_header.actions.open_related_error"), admin_error_log_path(related_error_log), class: ui_button_classes(:secondary, size: :sm) %>
         <% end %>
       </div>
     </div>
@@ -180,10 +181,10 @@
           <div>
             <span class="atelier-pill">
               <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-              Job sections
+              <%= t(".navigation.pill") %>
             </span>
-            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Jump to details</h2>
-            <p class="mt-2 text-sm leading-6 text-ink-700/80">Move between safe mutations, runtime state, and captured payloads without re-scanning the full page.</p>
+            <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t(".navigation.title") %></h2>
+            <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t(".navigation.description") %></p>
           </div>
 
           <div class="space-y-3">
@@ -197,15 +198,15 @@
           </div>
 
           <div class="<%= ui_inset_panel_classes(tone: related_error_log.present? ? :success : :subtle) %>">
-            <p class="text-sm font-medium text-ink-950">Related error</p>
-            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= job_log_related_error_description(@job_log) %></p>
+            <p class="text-sm font-medium text-ink-950"><%= t(".navigation.related_error.title") %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= related_error_state.description %></p>
             <div class="mt-3 flex flex-wrap gap-2">
-              <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_log&.reference_id || related_error_reference || "No error reference" %></span>
+              <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_log&.reference_id || related_error_reference || t(".navigation.related_error.missing_reference") %></span>
             </div>
           </div>
 
           <div class="flex flex-wrap gap-2">
-            <%= link_to "Error logs", admin_error_logs_path, class: ui_button_classes(:secondary, size: :sm) %>
+            <%= link_to t(".page_header.actions.error_logs"), admin_error_logs_path, class: ui_button_classes(:secondary, size: :sm) %>
           </div>
         </div>
       <% end %>
@@ -213,10 +214,10 @@
 
     <div class="space-y-6">
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Queue controls",
+        title: t(".follow_up_section.title"),
         anchor: "queue-controls",
-        eyebrow: "Safe mutations",
-        description: "Use these controls only when the queue runtime state makes it safe to retry, requeue, or discard the job.",
+        eyebrow: t(".follow_up_section.eyebrow"),
+        description: t(".follow_up_section.description"),
         badges: [
           { label: @job_log.status.humanize, tone: job_log_status_badge_tone(@job_log) },
           { label: runtime_label, tone: runtime_tone }
@@ -224,11 +225,11 @@
       ) do %>
         <div class="space-y-4">
           <div class="<%= ui_inset_panel_classes(tone: control_actions.any? ? :default : :subtle) %>">
-            <p class="text-sm font-medium text-ink-950">Safe mutations</p>
+            <p class="text-sm font-medium text-ink-950"><%= t(".follow_up_section.summary.title") %></p>
             <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= job_control_summary(@job_log, @queue_snapshot) %></p>
             <div class="mt-3 flex flex-wrap gap-2">
-              <span class="<%= ui_badge_classes(control_actions.any? ? :warning : :neutral) %>"><%= control_actions.any? ? "Actionable" : "No mutations" %></span>
-              <span class="<%= ui_badge_classes(related_error_reference.present? ? :warning : :neutral) %>"><%= related_error_reference.present? ? "Error ref recorded" : "No error ref" %></span>
+              <span class="<%= ui_badge_classes(control_actions.any? ? :warning : :neutral) %>"><%= control_actions.any? ? t(".follow_up_section.summary.safe_action_count", count: control_actions.size) : t(".follow_up_section.summary.no_safe_action") %></span>
+              <span class="<%= ui_badge_classes(related_error_reference.present? ? :warning : :neutral) %>"><%= related_error_reference.present? ? t(".follow_up_section.summary.error_reference_recorded") : t(".follow_up_section.summary.no_error_reference") %></span>
             </div>
           </div>
 
@@ -242,7 +243,7 @@
                   </div>
 
                   <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                    <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
+                    <%= item.fetch(:tone) == :success ? t(".triage.badges.ready") : item.fetch(:tone) == :warning ? t(".triage.badges.attention") : t(".triage.badges.follow_up") %>
                   </span>
                 </div>
               </div>
@@ -251,27 +252,27 @@
 
           <% unless control_actions.any? %>
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-              <p class="text-sm font-medium text-ink-950">No queue mutations available</p>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80">This job is currently read-only because the runtime state does not support a safe admin action.</p>
+              <p class="text-sm font-medium text-ink-950"><%= t(".follow_up_section.empty_state.title") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".follow_up_section.empty_state.description") %></p>
             </div>
           <% end %>
         </div>
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Runtime snapshot",
+        title: t(".live_queue_section.title"),
         anchor: "runtime-snapshot",
-        eyebrow: "Lifecycle & worker state",
-        description: "Inspect the stored job log alongside the current Solid Queue runtime and worker heartbeat information.",
+        eyebrow: t(".live_queue_section.eyebrow"),
+        description: t(".live_queue_section.description"),
         badges: [
-          { label: @job_log.stale? ? "Stale running" : @job_log.status.humanize, tone: @job_log.stale? ? :warning : job_log_status_badge_tone(@job_log) },
+          { label: @job_log.stale? ? t(".page_header.badges.stale_running") : @job_log.status.humanize, tone: @job_log.stale? ? :warning : job_log_status_badge_tone(@job_log) },
           { label: runtime_label, tone: runtime_tone }
         ]
       ) do %>
         <div class="space-y-4">
           <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <div class="<%= ui_inset_panel_classes(tone: runtime_tone == :success ? :success : runtime_tone == :warning || runtime_tone == :danger ? :default : :subtle) %>">
-              <p class="text-sm font-medium text-ink-700/80">Queue runtime</p>
+              <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.cards.status") %></p>
               <div class="mt-2 flex flex-wrap items-center gap-2">
                 <span class="<%= ui_badge_classes(runtime_tone) %>"><%= runtime_label %></span>
                 <span class="text-sm leading-6 text-ink-700/80"><%= runtime_description %></span>
@@ -279,28 +280,28 @@
             </div>
 
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-              <p class="text-sm font-medium text-ink-700/80">Active Job ID</p>
+              <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.cards.job_reference") %></p>
               <p class="mt-2 break-all text-sm text-ink-950"><%= @job_log.active_job_id.presence || "N/A" %></p>
             </div>
 
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-              <p class="text-sm font-medium text-ink-700/80">Duration</p>
+              <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.cards.duration") %></p>
               <p class="mt-2 text-sm text-ink-950"><%= job_duration_label(@job_log.duration_seconds) %></p>
             </div>
 
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-              <p class="text-sm font-medium text-ink-700/80">Queue name</p>
+              <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.cards.queue_name") %></p>
               <p class="mt-2 text-sm text-ink-950"><%= @job_log.queue_name %></p>
             </div>
 
             <div class="<%= [ui_inset_panel_classes(tone: related_error_log.present? ? :success : :subtle), 'sm:col-span-2'].join(' ') %>">
-              <p class="text-sm font-medium text-ink-700/80">Related error reference</p>
+              <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.cards.related_error_reference") %></p>
               <div class="mt-2 flex flex-wrap items-center gap-2">
-                <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_reference || "None" %></span>
+                <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_reference || t(".live_queue_section.cards.none") %></span>
                 <% if related_error_log.present? %>
-                  <%= link_to "Open related error", admin_error_log_path(related_error_log), class: ui_button_classes(:secondary, size: :sm) %>
+                  <%= link_to t(".page_header.actions.open_related_error"), admin_error_log_path(related_error_log), class: ui_button_classes(:secondary, size: :sm) %>
                 <% else %>
-                  <span class="text-sm leading-6 text-ink-700/80"><%= related_error_reference.present? ? "No matching error log record is currently available." : "No related error reference was captured." %></span>
+                  <span class="text-sm leading-6 text-ink-700/80"><%= related_error_reference.present? ? t(".live_queue_section.cards.no_matching_error") : t(".live_queue_section.cards.no_related_error") %></span>
                 <% end %>
               </div>
             </div>
@@ -310,43 +311,43 @@
             <summary class="cursor-pointer px-5 py-4">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm font-medium text-ink-950">Lifecycle and worker references</p>
-                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Open the deeper timing, queue row, and worker heartbeat details only when the fast triage summary is not enough.</p>
+                  <p class="text-sm font-medium text-ink-950"><%= t(".live_queue_section.details.title") %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".live_queue_section.details.description") %></p>
                 </div>
 
-                <span class="<%= ui_badge_classes(:neutral) %>">Deep detail</span>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".live_queue_section.details.badge") %></span>
               </div>
             </summary>
 
             <div class="border-t border-canvas-200/80 px-5 py-5">
               <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-                  <p class="text-sm font-medium text-ink-700/80">Created at</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.created_at") %></p>
                   <p class="mt-2 text-sm text-ink-950"><%= l(@job_log.created_at, format: :long) %></p>
                 </div>
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-                  <p class="text-sm font-medium text-ink-700/80">Started at</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.started_at") %></p>
                   <p class="mt-2 text-sm text-ink-950"><%= @job_log.started_at ? l(@job_log.started_at, format: :long) : "N/A" %></p>
                 </div>
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-                  <p class="text-sm font-medium text-ink-700/80">Finished at</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.finished_at") %></p>
                   <p class="mt-2 text-sm text-ink-950"><%= @job_log.finished_at ? l(@job_log.finished_at, format: :long) : "N/A" %></p>
                 </div>
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-                  <p class="text-sm font-medium text-ink-700/80">Solid Queue job row</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.queue_record") %></p>
                   <p class="mt-2 text-sm text-ink-950"><%= @queue_snapshot.job&.id || "N/A" %></p>
                 </div>
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-                  <p class="text-sm font-medium text-ink-700/80">Worker process</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.worker_process") %></p>
                   <p class="mt-2 text-sm text-ink-950"><%= job_log_worker_label(@queue_snapshot) %></p>
                 </div>
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-                  <p class="text-sm font-medium text-ink-700/80">Last heartbeat</p>
+                  <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.last_heartbeat") %></p>
                   <p class="mt-2 text-sm text-ink-950"><%= @queue_snapshot.process&.last_heartbeat_at ? l(@queue_snapshot.process.last_heartbeat_at, format: :long) : "N/A" %></p>
                 </div>
               </div>
@@ -356,19 +357,19 @@
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Captured payloads",
+        title: t(".payloads_section.title"),
         anchor: "captured-payloads",
-        eyebrow: "Debug data",
-        description: "Review the application log payloads captured for this job together with any available Solid Queue runtime details.",
+        eyebrow: t(".payloads_section.eyebrow"),
+        description: t(".payloads_section.description"),
         badges: [
-          { label: @queue_snapshot.available && @queue_snapshot.found? ? "Runtime payload" : "Log payload only", tone: @queue_snapshot.available && @queue_snapshot.found? ? :success : :neutral },
-          { label: related_error_reference.present? ? "Error ref recorded" : "No error ref", tone: related_error_reference.present? ? :warning : :neutral }
+          { label: @queue_snapshot.available && @queue_snapshot.found? ? t(".payloads_section.badges.queue_details_available") : t(".payloads_section.badges.log_payload_only"), tone: @queue_snapshot.available && @queue_snapshot.found? ? :success : :neutral },
+          { label: related_error_reference.present? ? t(".payloads_section.badges.error_reference_recorded") : t(".payloads_section.badges.no_error_reference"), tone: related_error_reference.present? ? :warning : :neutral }
         ]
       ) do %>
         <div class="min-w-0 space-y-4">
           <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <p class="text-sm font-medium text-ink-950">Captured payloads</p>
-            <p class="mt-1 text-sm leading-6 text-ink-700/80">Open these payload groups only when the fast triage and runtime snapshot are not enough for debugging.</p>
+            <p class="text-sm font-medium text-ink-950"><%= t(".payloads_section.intro.title") %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".payloads_section.intro.description") %></p>
           </div>
 
           <% if @queue_snapshot.available && @queue_snapshot.found? %>
@@ -376,18 +377,18 @@
               <summary class="cursor-pointer px-5 py-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p class="text-sm font-medium text-ink-950">Queue runtime payload</p>
-                    <p class="mt-1 text-sm leading-6 text-ink-700/80">Current Solid Queue job row and serialized arguments.</p>
+                    <p class="text-sm font-medium text-ink-950"><%= t(".payloads_section.queue_record.title") %></p>
+                    <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".payloads_section.queue_record.description") %></p>
                   </div>
 
-                  <span class="<%= ui_badge_classes(:neutral) %>">Reference only</span>
+                  <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".payloads_section.queue_record.badge") %></span>
                 </div>
               </summary>
 
               <div class="border-t border-canvas-200/80 px-5 py-5">
                 <%= render Ui::CodeBlockComponent.new(
-                  title: "Queue runtime payload",
-                  description: "Current Solid Queue job row and serialized arguments.",
+                  title: t(".payloads_section.queue_record.code_block_title"),
+                  description: t(".payloads_section.queue_record.description"),
                   body: formatted_debug_payload(@queue_snapshot.job.attributes.slice("id", "active_job_id", "class_name", "queue_name", "priority", "scheduled_at", "finished_at", "concurrency_key", "created_at", "updated_at").merge("arguments" => @queue_snapshot.job.arguments))
                 ) %>
               </div>
@@ -398,31 +399,31 @@
             <summary class="cursor-pointer px-5 py-4">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm font-medium text-ink-950">Application payloads</p>
-                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Serialized input, output, and stored failure metadata captured by the application log.</p>
+                  <p class="text-sm font-medium text-ink-950"><%= t(".payloads_section.application_payloads.title") %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".payloads_section.application_payloads.description") %></p>
                 </div>
 
-                <span class="<%= ui_badge_classes(:neutral) %>">Reference only</span>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".payloads_section.application_payloads.badge") %></span>
               </div>
             </summary>
 
             <div class="border-t border-canvas-200/80 px-5 py-5">
               <div class="space-y-4">
                 <%= render Ui::CodeBlockComponent.new(
-                  title: "Input",
-                  description: "Serialized input captured from the enqueue and perform lifecycle.",
+                  title: t(".payloads_section.application_payloads.input_title"),
+                  description: t(".payloads_section.application_payloads.input_description"),
                   body: formatted_debug_payload(@job_log.input)
                 ) %>
 
                 <%= render Ui::CodeBlockComponent.new(
-                  title: "Output",
-                  description: "Structured job output captured by the application log.",
+                  title: t(".payloads_section.application_payloads.output_title"),
+                  description: t(".payloads_section.application_payloads.output_description"),
                   body: formatted_debug_payload(@job_log.output)
                 ) %>
 
                 <%= render Ui::CodeBlockComponent.new(
-                  title: "Errors",
-                  description: "Failure metadata stored on the job log record.",
+                  title: t(".payloads_section.application_payloads.errors_title"),
+                  description: t(".payloads_section.application_payloads.errors_description"),
                   body: formatted_debug_payload(@job_log.error_details),
                   tone: @job_log.failed? ? :danger : :default
                 ) %>
@@ -435,11 +436,11 @@
               <summary class="cursor-pointer px-5 py-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p class="text-sm font-medium text-ink-950">Deep runtime debug</p>
-                    <p class="mt-1 text-sm leading-6 text-ink-700/80">Lower-priority queue failure and worker-process detail for deeper investigation.</p>
+                    <p class="text-sm font-medium text-ink-950"><%= t(".payloads_section.deep_queue_details.title") %></p>
+                    <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".payloads_section.deep_queue_details.description") %></p>
                   </div>
 
-                  <span class="<%= ui_badge_classes(:neutral) %>">Deep detail</span>
+                  <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".payloads_section.deep_queue_details.badge") %></span>
                 </div>
               </summary>
 
@@ -447,8 +448,8 @@
                 <div class="space-y-4">
                   <% if @queue_snapshot.failed_execution.present? %>
                     <%= render Ui::CodeBlockComponent.new(
-                      title: "Solid Queue failure",
-                      description: "Failed execution payload still present in the queue runtime.",
+                      title: t(".payloads_section.deep_queue_details.failure_title"),
+                      description: t(".payloads_section.deep_queue_details.failure_description"),
                       body: formatted_debug_payload(@queue_snapshot.failed_execution.error),
                       tone: :danger
                     ) %>
@@ -456,8 +457,8 @@
 
                   <% if @queue_snapshot.process.present? %>
                     <%= render Ui::CodeBlockComponent.new(
-                      title: "Worker process details",
-                      description: "Observed process metadata for the worker currently attached to this queue execution.",
+                      title: t(".payloads_section.deep_queue_details.worker_title"),
+                      description: t(".payloads_section.deep_queue_details.worker_description"),
                       body: formatted_debug_payload(@queue_snapshot.process.attributes.slice("id", "kind", "name", "hostname", "pid", "supervisor_id", "last_heartbeat_at", "created_at").merge("metadata" => @queue_snapshot.process.metadata))
                     ) %>
                   <% end %>

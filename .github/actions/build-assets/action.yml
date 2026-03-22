@@ -1,0 +1,19 @@
+name: "Build Assets"
+description: "Precompile Rails assets with Webpack/Tailwind"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Webpack build
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules/.cache
+          tmp/cache/webpack
+        key: webpack-${{ runner.os }}-${{ hashFiles('yarn.lock', 'webpack.config.js', 'postcss.config.js') }}
+        restore-keys: |
+          webpack-${{ runner.os }}-
+
+    - name: Precompile assets
+      shell: bash
+      run: SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile

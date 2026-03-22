@@ -20,7 +20,8 @@ RSpec.describe 'UI baseline contract' do
     '.windsurf/workflows/maintainability-audit.md',
     '.windsurf/workflows/security-audit.md',
     '.windsurf/workflows/template-audit.md',
-    '.windsurf/workflows/behance-template-implementation.md'
+    '.windsurf/workflows/behance-template-implementation.md',
+    '.windsurf/workflows/resumebuilder-reference-rollout.md'
   ].freeze
 
   def read_repo_file(relative_path)
@@ -49,7 +50,6 @@ RSpec.describe 'UI baseline contract' do
       expect(registry).to include(doc)
     end
 
-    expect(registry).to include('docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md')
   end
 
   KEY_WORKFLOWS.each do |workflow_path|

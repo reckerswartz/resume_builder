@@ -25,6 +25,46 @@ RSpec.describe 'Admin::LlmModels', type: :request do
       expect(response.body).to include('page-header-compact')
     end
 
+    it 'builds summary cards from the full filtered scope, not only the current page' do
+      inactive_provider = create(:llm_provider, :inactive, name: 'Archived Provider')
+
+      10.times do |index|
+        create(
+          :llm_model,
+          :inactive,
+          llm_provider: inactive_provider,
+          name: format('Alpha Model %02d', index),
+          identifier: format('alpha-model-%02d', index)
+        )
+      end
+
+      ready_provider = create(:llm_provider, name: 'Ready Provider')
+      ready_model = create(
+        :llm_model,
+        llm_provider: ready_provider,
+        name: 'Zulu Ready Model',
+        identifier: 'zulu-ready-model',
+        metadata: { 'catalog_source' => Llm::ProviderModelSyncService::CATALOG_SOURCE }
+      )
+      create(:llm_model_assignment, llm_model: ready_model, role: 'text_generation', position: 0)
+
+      get admin_llm_models_path
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      matches_card = document.xpath("//article[.//p[normalize-space()='Matches']]").first
+      ready_card = document.xpath("//article[.//p[normalize-space()='Ready for orchestration']]").first
+      assigned_card = document.xpath("//article[.//p[normalize-space()='Assigned roles']]").first
+      attention_card = document.xpath("//article[.//p[normalize-space()='Needs attention']]").first
+
+      expect(matches_card.css('p')[1].text.strip).to eq('11')
+      expect(matches_card.at_css('span')&.text&.strip).to eq('10 on this page')
+      expect(ready_card.css('p')[1].text.strip).to eq('1')
+      expect(assigned_card.css('p')[1].text.strip).to eq('1')
+      expect(attention_card.css('p')[1].text.strip).to eq('10')
+    end
+
     it 'filters and sorts models' do
       text_provider = create(:llm_provider, name: 'Text Provider')
       vision_provider = create(:llm_provider, name: 'Vision Provider')

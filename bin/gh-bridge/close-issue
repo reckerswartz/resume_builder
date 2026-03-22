@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Closes a GitHub issue after merge, with a final summary comment.
+#
+# Usage: bin/gh-bridge/close-issue \
+#   --issue 42 \
+#   [--reason "completed"] \
+#   [--comment "Resolved in PR #45. Verified with ..."] \
+#   [--comment-file "/path/to/summary.md"] \
+#   [--delete-branch "template-audit/MOD-006-page-count-overflow"]
+#
+# Outputs: issue number
+
+set -euo pipefail
+
+ISSUE=""
+REASON="completed"
+COMMENT=""
+COMMENT_FILE=""
+DELETE_BRANCH=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --issue)         ISSUE="$2";         shift 2 ;;
+    --reason)        REASON="$2";        shift 2 ;;
+    --comment)       COMMENT="$2";       shift 2 ;;
+    --comment-file)  COMMENT_FILE="$2";  shift 2 ;;
+    --delete-branch) DELETE_BRANCH="$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$ISSUE" ]; then
+  echo "ERROR: --issue is required." >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+# Add final comment before closing
+if [ -n "$COMMENT_FILE" ] && [ -f "$COMMENT_FILE" ]; then
+  gh issue comment "$ISSUE" --repo "$REPO" --body-file "$COMMENT_FILE" 2>/dev/null || true
+elif [ -n "$COMMENT" ]; then
+  gh issue comment "$ISSUE" --repo "$REPO" --body "$COMMENT" 2>/dev/null || true
+fi
+
+# Update status label to verified before closing
+for old_status in open in-progress needs-review blocked deferred; do
+  gh issue edit "$ISSUE" --repo "$REPO" --remove-label "status:${old_status}" 2>/dev/null || true
+done
+gh issue edit "$ISSUE" --repo "$REPO" --add-label "status:verified" 2>/dev/null || true
+
+# Close the issue
+gh issue close "$ISSUE" --repo "$REPO" --reason "$REASON" 2>/dev/null
+
+# Delete the feature branch if requested
+if [ -n "$DELETE_BRANCH" ]; then
+  git branch -d "$DELETE_BRANCH" 2>/dev/null || true
+  git push origin --delete "$DELETE_BRANCH" 2>/dev/null || true
+fi
+
+echo "$ISSUE"

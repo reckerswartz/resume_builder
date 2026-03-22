@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# Opens a pull request linked to a GitHub issue.
+# Idempotent: returns existing PR number if the branch already has an open PR.
+#
+# Usage: bin/gh-bridge/create-pr \
+#   --workflow "template-audit" \
+#   --key "MOD-006-page-count-overflow" \
+#   --issue 42 \
+#   --title "Fix: Resolve page count overflow on Modern template" \
+#   [--body-file "/path/to/pr_body.md"] \
+#   [--base "main"] \
+#   [--draft]
+#
+# Outputs: GitHub PR number
+
+set -euo pipefail
+
+WORKFLOW=""
+KEY=""
+ISSUE=""
+TITLE=""
+BODY_FILE=""
+BASE="main"
+DRAFT=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow)  WORKFLOW="$2";  shift 2 ;;
+    --key)       KEY="$2";      shift 2 ;;
+    --issue)     ISSUE="$2";    shift 2 ;;
+    --title)     TITLE="$2";    shift 2 ;;
+    --body-file) BODY_FILE="$2"; shift 2 ;;
+    --base)      BASE="$2";     shift 2 ;;
+    --draft)     DRAFT="--draft"; shift ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$WORKFLOW" ] || [ -z "$KEY" ] || [ -z "$TITLE" ]; then
+  echo "ERROR: --workflow, --key, and --title are required." >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+# Determine branch name
+BRANCH="${WORKFLOW}/${KEY}"
+BRANCH=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | cut -c1-80)
+
+# Check for existing open PR on this branch
+EXISTING_PR=$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json number -q '.[0].number' 2>/dev/null || true)
+
+if [ -n "$EXISTING_PR" ]; then
+  echo "$EXISTING_PR"
+  exit 0
+fi
+
+# Push branch to remote
+git push -u origin "$BRANCH" 2>/dev/null || true
+
+# Build PR title
+FULL_TITLE="[${WORKFLOW}] ${TITLE}"
+[ -n "$ISSUE" ] && FULL_TITLE="${FULL_TITLE} (#${ISSUE})"
+
+# Build labels
+LABELS="workflow:${WORKFLOW},status:needs-review"
+
+# Build body
+if [ -n "$BODY_FILE" ] && [ -f "$BODY_FILE" ]; then
+  BODY_CONTENT=$(cat "$BODY_FILE")
+else
+  BODY_CONTENT="## Summary
+
+**Workflow**: \`/${WORKFLOW}\`
+**Tracking key**: \`${KEY}\`"
+
+  if [ -n "$ISSUE" ]; then
+    BODY_CONTENT="${BODY_CONTENT}
+
+Closes #${ISSUE}"
+  fi
+fi
+
+# Append closes directive if issue provided and not already in body
+if [ -n "$ISSUE" ]; then
+  if ! echo "$BODY_CONTENT" | grep -qiP "closes?\s+#${ISSUE}"; then
+    BODY_CONTENT="${BODY_CONTENT}
+
+---
+Closes #${ISSUE}"
+  fi
+fi
+
+# Create the PR
+PR_CMD="gh pr create --repo \"$REPO\" --head \"$BRANCH\" --base \"$BASE\" --title \"$FULL_TITLE\" --label \"$LABELS\" --body \"$BODY_CONTENT\""
+[ -n "$DRAFT" ] && PR_CMD="${PR_CMD} ${DRAFT}"
+
+PR_URL=$(eval "$PR_CMD" 2>/dev/null)
+PR_NUMBER=$(echo "$PR_URL" | grep -oP '\d+$')
+
+echo "$PR_NUMBER"

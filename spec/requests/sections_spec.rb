@@ -63,5 +63,20 @@ RSpec.describe 'Sections', type: :request do
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
       expect(response.body).to include(I18n.t('resumes.sections_controller.moved'))
     end
+
+    it 'skips the workspace overview replacement on section-step Turbo updates' do
+      first_section = create(:section, resume:, position: 0, section_type: 'experience')
+      second_section = create(:section, resume:, position: 1, title: 'Earlier experience', section_type: 'experience')
+
+      patch move_resume_section_path(resume, second_section), params: { position: 0, step: 'experience' }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(second_section.reload.position).to eq(0)
+      expect(first_section.reload.position).to eq(1)
+      expect(response.body).not_to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
+      expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
+      expect(response.body).to include(I18n.t('resumes.sections_controller.moved'))
+    end
   end
 end

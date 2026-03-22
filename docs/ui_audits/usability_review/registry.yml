@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T03:43:04Z"
+updated_at: "2026-03-21T22:47:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldexp-add-section-disclosure/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldexp-collapse-section-actions/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "resume-builder-experience"
-    - "resumes-new"
-    - "resumes-index"
-  reason: "resume-builder-experience still has task-overload and repeated-cue issues (score 77). resumes-new still has one open flow-clarity issue (score 80). resumes-index is the next unaudited high-priority workspace page."
+    - "resume-builder-skills"
+    - "resume-builder-finalize"
+    - "resume-show"
+  reason: "resume-builder-experience improved to 84 after collapsing section header controls behind a disclosure, and it now has no tracked open usability issues. resume-builder-skills and resume-builder-finalize are the next unaudited high-priority builder surfaces, and resume-show remains the next signed-in destination after opening the full preview page."
 pages:
   - page_key: "home"
     title: "Home"
@@ -103,7 +103,25 @@ pages:
   - { page_key: "create-account", title: "Create account", path: "/registration/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "password-reset-request", title: "Password reset request", path: "/passwords/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "resumes-index", title: "Resume workspace", path: "/resumes", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resumes-index"
+    title: "Resume workspace"
+    path: "/resumes"
+    access_level: "authenticated"
+    auth_context: "authenticated_user"
+    page_family: "workspace"
+    priority: "high"
+    status: "improved"
+    usability_score: 86
+    page_doc_path: "docs/ui_audits/usability_review/pages/resumes-index.md"
+    open_issue_keys:
+      - "UX-RIDX-002"
+    closed_issue_keys:
+      - "UX-RIDX-001"
+      - "UX-RIDX-003"
+    last_audited_at: "2026-03-21T22:08:00Z"
+    last_changed_at: "2026-03-21T22:08:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-resumes-index-review-ready-rail/00-overview.md"
+    next_step: "If this page is revisited, consolidate the overlapping Summary ready and Ready for review cues on completed cards."
   - page_key: "resumes-new"
     title: "New resume"
     path: "/resumes/new"
@@ -112,10 +130,9 @@ pages:
     page_family: "workspace"
     priority: "high"
     status: "improved"
-    usability_score: 80
+    usability_score: 82
     page_doc_path: "docs/ui_audits/usability_review/pages/resumes-new.md"
-    open_issue_keys:
-      - "UX-NEW-007"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-NEW-001"
       - "UX-NEW-002"
@@ -123,10 +140,11 @@ pages:
       - "UX-NEW-004"
       - "UX-NEW-005"
       - "UX-NEW-006"
-    last_audited_at: "2026-03-21T03:20:00Z"
-    last_changed_at: "2026-03-21T03:20:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-resumes-new-dedup-copy/00-overview.md"
-    next_step: "UX-NEW-007: user flow clarity for non-technical users."
+      - "UX-NEW-007"
+    last_audited_at: "2026-03-21T21:26:29Z"
+    last_changed_at: "2026-03-21T21:26:29Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-resumes-new-template-disclosure/00-overview.md"
+    next_step: "No open issues are currently tracked on resumes-new. Revisit only if setup-flow structure or copy changes."
   - { page_key: "resume-show", title: "Resume preview", path: "/resumes/:id", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "workspace", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "templates-index", title: "Template marketplace", path: "/templates", access_level: "authenticated", auth_context: "authenticated_user", page_family: "templates", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "template-show", title: "Template detail", path: "/templates/:id", access_level: "authenticated", auth_context: "authenticated_user", page_family: "templates", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
@@ -142,28 +160,51 @@ pages:
     page_family: "builder"
     priority: "high"
     status: "improved"
-    usability_score: 77
+    usability_score: 84
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-experience.md"
-    open_issue_keys:
-      - "UX-BLDEXP-003"
-      - "UX-BLDEXP-005"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDEXP-001"
       - "UX-BLDEXP-002"
+      - "UX-BLDEXP-003"
+      - "UX-BLDEXP-005"
       - "UX-BLDEXP-004"
       - "UX-BLDEXP-006"
       - "UX-BLDEXP-007"
-    last_audited_at: "2026-03-21T03:43:04Z"
-    last_changed_at: "2026-03-21T03:43:04Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldexp-add-section-disclosure/00-overview.md"
-    next_step: "UX-BLDEXP-003: reduce visible action count further, especially across builder header actions and preview/export actions. UX-BLDEXP-005 also remains open."
-    cycle_count: 4
-    last_cycle_date: "2026-03-21T03:43:04Z"
-    issues_found: 0
-    issues_resolved: 1
-    issues_remaining: 2
+    last_audited_at: "2026-03-21T22:47:00Z"
+    last_changed_at: "2026-03-21T22:47:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldexp-collapse-section-actions/00-overview.md"
+    next_step: "No open issues are currently tracked on resume-builder-experience. Revisit only if the shared builder chrome or section-step control patterns change."
+    cycle_count: 9
+    last_cycle_date: "2026-03-21T22:47:00Z"
+    issues_found: 7
+    issues_resolved: 7
+    issues_remaining: 0
     regression_detected: false
-  - { page_key: "resume-builder-education", title: "Resume builder education step", path: "/resumes/:id/edit?step=education", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-education"
+    title: "Resume builder education step"
+    path: "/resumes/:id/edit?step=education"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "high"
+    status: "improved"
+    usability_score: 84
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-education.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-BLDEDU-001"
+      - "UX-BLDEDU-002"
+    last_audited_at: "2026-03-21T22:35:00Z"
+    last_changed_at: "2026-03-21T22:35:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldexp-hide-redundant-section-title/00-overview.md"
+    next_step: "No open issues are currently tracked on resume-builder-education. Revisit only if the shared section-step shell or preview headings change."
+    cycle_count: 2
+    last_cycle_date: "2026-03-21T22:35:00Z"
+    issues_found: 2
+    issues_resolved: 2
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "resume-builder-skills", title: "Resume builder skills step", path: "/resumes/:id/edit?step=skills", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "resume-builder-finalize", title: "Resume builder finalize step", path: "/resumes/:id/edit?step=finalize", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }

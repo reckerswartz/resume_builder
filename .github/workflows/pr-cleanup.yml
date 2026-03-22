@@ -1,0 +1,121 @@
+name: PR Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  cleanup:
+    name: "Post-Merge Cleanup"
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Close linked issues and clean up labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const branchName = context.payload.pull_request.head.ref;
+
+            // Extract issue numbers from "Closes #N" or "Fixes #N" patterns
+            const issuePattern = /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi;
+            const linkedIssues = [];
+            let match;
+            while ((match = issuePattern.exec(prBody)) !== null) {
+              linkedIssues.push(parseInt(match[1], 10));
+            }
+
+            // Also check for auto-fix branch pattern: auto-fix/123-description
+            const branchMatch = branchName.match(/^auto-fix\/(\d+)/);
+            if (branchMatch) {
+              const branchIssue = parseInt(branchMatch[1], 10);
+              if (!linkedIssues.includes(branchIssue)) {
+                linkedIssues.push(branchIssue);
+              }
+            }
+
+            console.log(`PR #${context.payload.pull_request.number} merged`);
+            console.log(`Branch: ${branchName}`);
+            console.log(`Linked issues: ${linkedIssues.join(', ') || 'none'}`);
+
+            for (const issueNumber of linkedIssues) {
+              try {
+                const issue = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                });
+
+                if (issue.data.state === 'open') {
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    state: 'closed',
+                    state_reason: 'completed',
+                  });
+
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    body: `Resolved by PR #${context.payload.pull_request.number} (merged into \`main\`).`,
+                  });
+
+                  // Remove workflow labels
+                  for (const label of ['in-progress', 'needs-review']) {
+                    try {
+                      await github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issueNumber,
+                        name: label,
+                      });
+                    } catch {}
+                  }
+
+                  console.log(`Closed issue #${issueNumber}`);
+                }
+              } catch (err) {
+                console.log(`Could not process issue #${issueNumber}: ${err.message}`);
+              }
+            }
+
+      - name: Delete merged branch
+        if: startsWith(github.event.pull_request.head.ref, 'auto-fix/')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branch}`,
+              });
+              console.log(`Deleted branch: ${branch}`);
+            } catch (err) {
+              console.log(`Branch ${branch} may already be deleted: ${err.message}`);
+            }
+
+      - name: Trigger continuous audit after merge
+        if: startsWith(github.event.pull_request.head.ref, 'auto-fix/')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'continuous-audit.yml',
+                ref: 'main',
+                inputs: { scope: 'full' },
+              });
+              console.log('Triggered continuous audit after auto-fix merge');
+            } catch (err) {
+              console.log(`Could not trigger audit: ${err.message}`);
+            }

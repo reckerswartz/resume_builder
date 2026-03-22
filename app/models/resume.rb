@@ -77,6 +77,18 @@ class Resume < ApplicationRecord
     ResumeTemplates::Catalog.normalized_density((settings || {})["density"], fallback: render_layout_config.fetch("density"))
   end
 
+  def section_spacing
+    ResumeTemplates::Catalog.normalized_section_spacing((settings || {})["section_spacing"], fallback: render_layout_config.fetch("section_spacing"))
+  end
+
+  def paragraph_spacing
+    ResumeTemplates::Catalog.normalized_paragraph_spacing((settings || {})["paragraph_spacing"], fallback: render_layout_config.fetch("paragraph_spacing"))
+  end
+
+  def line_spacing
+    ResumeTemplates::Catalog.normalized_line_spacing((settings || {})["line_spacing"], fallback: render_layout_config.fetch("line_spacing"))
+  end
+
   def page_size
     (settings || {})["page_size"].to_s.presence_in(PAGE_SIZES) || DEFAULT_PAGE_SIZE
   end
@@ -157,6 +169,9 @@ class Resume < ApplicationRecord
     settings["page_size"] = page_size if settings.key?("page_size")
     normalized_font_scale_setting if settings.key?("font_scale")
     normalized_density_setting if settings.key?("density")
+    normalized_section_spacing_setting if settings.key?("section_spacing")
+    normalized_paragraph_spacing_setting if settings.key?("paragraph_spacing")
+    normalized_line_spacing_setting if settings.key?("line_spacing")
     settings["hidden_sections"] = normalize_hidden_sections(settings["hidden_sections"]) if settings.key?("hidden_sections")
     self.intake_details = normalized_intake_details
   end
@@ -279,6 +294,27 @@ class Resume < ApplicationRecord
     return settings.delete("density") if candidate.blank?
 
     settings["density"] = ResumeTemplates::Catalog.normalized_density(candidate, fallback: render_layout_config.fetch("density"))
+  end
+
+  def normalized_section_spacing_setting
+    candidate = settings["section_spacing"].to_s
+    return settings.delete("section_spacing") if candidate.blank?
+
+    settings["section_spacing"] = ResumeTemplates::Catalog.normalized_section_spacing(candidate, fallback: render_layout_config.fetch("section_spacing"))
+  end
+
+  def normalized_paragraph_spacing_setting
+    candidate = settings["paragraph_spacing"].to_s
+    return settings.delete("paragraph_spacing") if candidate.blank?
+
+    settings["paragraph_spacing"] = ResumeTemplates::Catalog.normalized_paragraph_spacing(candidate, fallback: render_layout_config.fetch("paragraph_spacing"))
+  end
+
+  def normalized_line_spacing_setting
+    candidate = settings["line_spacing"].to_s
+    return settings.delete("line_spacing") if candidate.blank?
+
+    settings["line_spacing"] = ResumeTemplates::Catalog.normalized_line_spacing(candidate, fallback: render_layout_config.fetch("line_spacing"))
   end
 
   def render_layout_config

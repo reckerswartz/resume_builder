@@ -15,15 +15,19 @@ This workflow audits each routed page of the application against the documented 
 - Reusable Markdown templates exist for per-page tracking and per-run reporting.
 - The guidelines changelog tracks refinements made to `docs/ui_guidelines.md` and `docs/behance_product_ui_system.md` through this workflow.
 - The page inventory is seeded from `config/routes.rb`, `lib/resume_builder/step_registry.rb`, and the existing responsive-review registry.
-- Twenty-four routed pages have now been Playwright-reviewed through the workflow.
-- Twenty-one routed pages are currently marked `compliant`.
-- Three additional admin pages have first-pass review docs and batch tracking metadata.
+- Thirty-one routed pages have now been Playwright-reviewed through the workflow.
+- Thirty-one routed pages are currently marked `compliant`.
+- The Batch 8 admin models/job-logs cluster is now closed and tracked as compliant.
+- The adjacent admin observability trio is now closed and tracked as compliant after the operator-copy cleanup and final close-page verification.
+- The remaining medium-priority unaudited builder steps, `resume-builder-personal-details` and `resume-builder-summary`, now have first-pass page docs and are tracked as compliant.
+- The admin template form routes, `admin-template-new` and `admin-template-edit`, now have first-pass page docs and are tracked as compliant.
 - Timestamped page docs, run logs, and raw accessibility artifacts now exist for real audit cycles under `docs/ui_audits/guidelines_review/` and `tmp/ui_audit_artifacts/`.
 
 ### Pending
 
-- The next recommended slice is `implement-next` for `admin-llm-models-index` and `admin-job-logs-index`.
-- `admin-llm-model-show` is essentially compliant and waiting for a later `close-page` verification.
+- The next recommended slice is `review-only` for `admin-llm-provider-new` and `admin-llm-provider-edit`.
+- The highest-value remaining follow-up is medium-priority coverage on the remaining unaudited admin provider/model form pages before moving on to the lower-priority public/authenticated stragglers.
+- The recently closed Batch 8 admin pages should now only be re-reviewed if shared admin shell, helper, or copy patterns change.
 - The remaining unaudited routed pages should continue through the normal cycle of review, implement-next when needed, and close-page verification.
 
 ## Installed workflow

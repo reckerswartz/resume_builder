@@ -1,14 +1,13 @@
-<%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
-  <%= render Ui::StepHeaderComponent.new(
-    title: current_step[:title],
-    description: current_step[:description]
-  ) do %>
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="<%= ui_badge_classes(:neutral) %>"><%= current_step[:label] %></span>
-      <% if current_step[:key] == "experience" %>
+<% if current_step[:key] == "experience" %>
+  <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
+    <%= render Ui::StepHeaderComponent.new(
+      title: current_step[:title],
+      description: current_step[:description]
+    ) do %>
+      <div class="flex flex-wrap items-center gap-2">
         <%= link_to t("resumes.editor_section_step.current_step.open_examples"), "#experience-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   <% end %>
 <% end %>
 
@@ -43,7 +42,7 @@
     <div class="space-y-4" data-controller="sortable">
       <% step_sections.each do |section| %>
         <div id="<%= dom_id(section, :sortable_item) %>" data-action="dragstart->sortable#dragstart dragover->sortable#dragover drop->sortable#drop dragend->sortable#dragend" data-sortable-target="item" data-sortable-move-url="<%= move_resume_section_path(resume, section, **resume_builder_step_params) %>" draggable="true">
-          <%= render "resumes/section_editor", resume: resume, section: section, allowed_section_types: add_section_types %>
+          <%= render "resumes/section_editor", resume: resume, section: section, allowed_section_types: add_section_types, show_section_type_badge: false, hide_redundant_title: true, collapse_section_actions: true %>
         </div>
       <% end %>
     </div>

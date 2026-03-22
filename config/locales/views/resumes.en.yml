@@ -133,6 +133,14 @@ en:
         create_resume: "Create resume"
         browse_templates: "Browse templates"
         open_admin_hub: "Open admin hub"
+        review_ready:
+          eyebrow: "Review-ready workspace"
+          title: "Everything here is ready to review"
+          description: "Open a draft when you want to preview, refine the wording, or export the next version."
+          counts_summary:
+            one: "1 resume ready to review"
+            other: "%{count} resumes ready to review"
+          focus_note: "Use the card actions to jump back into editing or preview without starting another draft first."
     resume_card:
       canvas_pill: "Resume canvas"
       summary_status:
@@ -152,7 +160,6 @@ en:
           paste: "Paste start"
           upload: "Upload start"
           default: "%{mode} start"
-      footer_description: "Jump back into editing, open the preview page, or remove the draft once you no longer need it."
       actions:
         edit: "Edit"
         preview: "Preview"
@@ -196,6 +203,9 @@ en:
       import_description: "Start the draft with pasted text or an attached source file. You can still refine the structure, run autofill later, and keep the original upload attached from the builder."
       template_field_label: "Template"
       template_picker_description: "Choose a look for this draft. You can change it later from finalize."
+      template_disclosure_summary: "Review or change the template"
+      template_disclosure_description: "Starting with %{template}. Open this only if you want a different look before creating the draft."
+      template_disclosure_badge: "Optional"
       next_panel_eyebrow: "What happens next"
       next_panel_title_create: "Create the draft and start editing"
       next_panel_title_update: "Keep refining the draft"

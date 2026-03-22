@@ -2,6 +2,7 @@ import { application } from "./application"
 
 import AutosaveController from "./autosave_controller"
 import DisclosureController from "./disclosure_controller"
+import ExperienceSuggestionsController from "./experience_suggestions_controller"
 import HelloController from "./hello_controller"
 import PasswordFieldController from "./password_field_controller"
 import SourceUploadController from "./source_upload_controller"
@@ -12,6 +13,7 @@ import TemplatePickerController from "./template_picker_controller"
 
 application.register("autosave", AutosaveController)
 application.register("disclosure", DisclosureController)
+application.register("experience-suggestions", ExperienceSuggestionsController)
 application.register("hello", HelloController)
 application.register("password-field", PasswordFieldController)
 application.register("source-upload", SourceUploadController)

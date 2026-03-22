@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T03:55:57Z"
+updated_at: "2026-03-21T21:27:16Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ui-guidelines-audit.md"
@@ -10,7 +10,7 @@ tracking:
   guidelines_changelog_path: "docs/ui_audits/guidelines_review/guidelines_changelog.md"
   page_doc_template: "docs/ui_audits/guidelines_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/guidelines_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-review/00-overview.md"
+  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-observability-review/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "guidelines"
@@ -24,7 +24,6 @@ guideline_sources:
   - "docs/ui_guidelines.md"
   - "docs/behance_product_ui_system.md"
   - "docs/references/behance/ai_voice_generator_reference.md"
-  - "docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md"
   - "docs/architecture_overview.md"
   - "docs/application_documentation_guidelines.md"
 component_inventory:
@@ -137,10 +136,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "admin-llm-models-index"
-    - "admin-job-logs-index"
-  reason: "Batch 8 surfaced one structural admin-registry issue and one operator-copy issue, while admin-llm-model-show is essentially compliant and waiting for a later close-page pass."
-  recommended_implementation: "Implement the models-index summary-scope fix and the job-logs runtime-copy cleanup, then re-review the affected batch and close admin-llm-model-show if it remains unchanged."
+    - "admin-llm-provider-new"
+    - "admin-llm-provider-edit"
+  reason: "The unaudited admin template form pages are now compliant, so the next honest step is to continue medium-priority admin form coverage with the remaining provider setup routes."
+  recommended_implementation: "Run review-only for admin-llm-provider-new and admin-llm-provider-edit, then continue through the remaining unaudited admin/provider/model form pages in priority order."
 pages:
   - page_key: "home"
     title: "Home"
@@ -332,7 +331,30 @@ pages:
     last_audited_at: "2026-03-21T02:51:00Z"
     latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-4-fixes/00-overview.md"
     next_step: "All issues closed. Re-review after shared builder shell or component changes."
-  - { page_key: "resume-builder-personal-details", title: "Resume builder personal details step", path: "/resumes/:id/edit?step=personal_details", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-personal-details"
+    title: "Resume builder personal details step"
+    path: "/resumes/:id/edit?step=personal_details"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "compliant"
+    compliance_score: 94
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-builder-personal-details.md"
+    open_issue_keys: []
+    closed_issue_keys: []
+    last_audited_at: "2026-03-21T22:48:42Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-builder-personal-summary-review/00-overview.md"
+    next_step: "All issues closed. Re-review after shared builder shell, photo-library, or non-section step patterns change."
+    cycle_count: 1
+    last_cycle_date: "2026-03-21T22:48:42Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T22:48:42Z"
+        score: 94
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
     path: "/resumes/:id/edit?step=experience"
@@ -380,7 +402,30 @@ pages:
     last_audited_at: "2026-03-21T02:58:00Z"
     latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-5-fixes/00-overview.md"
     next_step: "All issues closed. Re-review after shared builder shell or component changes."
-  - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-summary"
+    title: "Resume builder summary step"
+    path: "/resumes/:id/edit?step=summary"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "compliant"
+    compliance_score: 93
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-builder-summary.md"
+    open_issue_keys: []
+    closed_issue_keys: []
+    last_audited_at: "2026-03-21T22:48:42Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-builder-personal-summary-review/00-overview.md"
+    next_step: "All issues closed. Re-review after shared builder shell or summary-suggestion patterns change."
+    cycle_count: 1
+    last_cycle_date: "2026-03-21T22:48:42Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T22:48:42Z"
+        score: 93
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"
     path: "/resumes/:id/edit?step=finalize"
@@ -454,8 +499,54 @@ pages:
     issues_resolved: 0
     issues_remaining: 0
     guideline_refinements_triggered: 0
-  - { page_key: "admin-template-new", title: "Admin template new", path: "/admin/templates/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-template-edit", title: "Admin template edit", path: "/admin/templates/:id/edit", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "admin-template-new"
+    title: "Admin template new"
+    path: "/admin/templates/new"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "medium"
+    status: "compliant"
+    compliance_score: 94
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-template-new.md"
+    open_issue_keys: []
+    closed_issue_keys: []
+    last_audited_at: "2026-03-21T22:53:31Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-template-form-review/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin form primitives, template setup copy, or preview-card patterns change."
+    cycle_count: 1
+    last_cycle_date: "2026-03-21T22:53:31Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T22:53:31Z"
+        score: 94
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
+  - page_key: "admin-template-edit"
+    title: "Admin template edit"
+    path: "/admin/templates/:id/edit"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "medium"
+    status: "compliant"
+    compliance_score: 94
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-template-edit.md"
+    open_issue_keys: []
+    closed_issue_keys: []
+    last_audited_at: "2026-03-21T22:53:31Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-template-form-review/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin form primitives, template setup copy, or preview-card patterns change."
+    cycle_count: 1
+    last_cycle_date: "2026-03-21T22:53:31Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T22:53:31Z"
+        score: 94
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "admin-llm-providers-index"
     title: "Admin LLM providers index"
     path: "/admin/llm_providers"
@@ -517,23 +608,28 @@ pages:
     auth_context: "admin"
     page_family: "admin"
     priority: "medium"
-    status: "reviewed"
-    compliance_score: 93
+    status: "compliant"
+    compliance_score: 95
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-llm-models-index.md"
-    open_issue_keys:
+    open_issue_keys: []
+    closed_issue_keys:
       - "admin-llm-models-index-summary-scope-mismatch"
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:43:07Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-review/00-overview.md"
-    next_step: "Fix the summary cards to use full filtered-scope counts, then re-review the page."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T03:43:07Z"
+    last_audited_at: "2026-03-21T21:09:22Z"
+    last_changed_at: "2026-03-21T21:09:22Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-admin-close-page/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin model surfaces or summary logic change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T21:09:22Z"
     compliance_score_history:
       - timestamp: "2026-03-21T03:43:07Z"
         score: 93
+      - timestamp: "2026-03-21T20:43:04Z"
+        score: 95
+      - timestamp: "2026-03-21T21:09:22Z"
+        score: 95
     issues_found: 1
-    issues_resolved: 0
-    issues_remaining: 1
+    issues_resolved: 1
+    issues_remaining: 0
     guideline_refinements_triggered: 0
   - page_key: "admin-llm-model-show"
     title: "Admin LLM model detail"
@@ -542,18 +638,21 @@ pages:
     auth_context: "admin"
     page_family: "admin"
     priority: "high"
-    status: "reviewed"
+    status: "compliant"
     compliance_score: 95
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-llm-model-show.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:43:07Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-review/00-overview.md"
-    next_step: "Essentially compliant. Mark compliant after a clean close-page verification."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T03:43:07Z"
+    last_audited_at: "2026-03-21T21:09:22Z"
+    last_changed_at: "2026-03-21T21:09:22Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-admin-close-page/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin detail surfaces or helper copy change."
+    cycle_count: 2
+    last_cycle_date: "2026-03-21T21:09:22Z"
     compliance_score_history:
       - timestamp: "2026-03-21T03:43:07Z"
+        score: 95
+      - timestamp: "2026-03-21T21:09:22Z"
         score: 95
     issues_found: 0
     issues_resolved: 0
@@ -583,24 +682,116 @@ pages:
     auth_context: "admin"
     page_family: "admin"
     priority: "medium"
-    status: "reviewed"
-    compliance_score: 92
+    status: "compliant"
+    compliance_score: 95
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-job-logs-index.md"
-    open_issue_keys:
+    open_issue_keys: []
+    closed_issue_keys:
       - "admin-job-logs-index-framework-copy-leak"
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:43:07Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-review/00-overview.md"
-    next_step: "Replace framework-specific runtime copy with operator-facing language, then re-review the page."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T03:43:07Z"
+    last_audited_at: "2026-03-21T21:09:22Z"
+    last_changed_at: "2026-03-21T21:09:22Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-8-admin-close-page/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin monitoring surfaces or helper copy change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T21:09:22Z"
     compliance_score_history:
       - timestamp: "2026-03-21T03:43:07Z"
         score: 92
+      - timestamp: "2026-03-21T20:58:25Z"
+        score: 95
+      - timestamp: "2026-03-21T21:09:22Z"
+        score: 95
     issues_found: 1
-    issues_resolved: 0
-    issues_remaining: 1
+    issues_resolved: 1
+    issues_remaining: 0
     guideline_refinements_triggered: 0
-  - { page_key: "admin-job-log-show", title: "Admin job log detail", path: "/admin/job_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-error-logs-index", title: "Admin error logs index", path: "/admin/error_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-error-log-show", title: "Admin error log detail", path: "/admin/error_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "admin-job-log-show"
+    title: "Admin job log detail"
+    path: "/admin/job_logs/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "compliant"
+    compliance_score: 95
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-job-log-show.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "admin-job-log-show-framework-copy-leak"
+    last_audited_at: "2026-03-21T22:37:53Z"
+    last_changed_at: "2026-03-21T22:37:53Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-observability-close-page/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin observability surfaces or helper copy change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T22:37:53Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T21:27:16Z"
+        score: 92
+      - timestamp: "2026-03-21T22:27:09Z"
+        score: 95
+      - timestamp: "2026-03-21T22:37:53Z"
+        score: 95
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
+  - page_key: "admin-error-logs-index"
+    title: "Admin error logs index"
+    path: "/admin/error_logs"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "medium"
+    status: "compliant"
+    compliance_score: 95
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-error-logs-index.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "admin-error-logs-index-technical-copy-leak"
+    last_audited_at: "2026-03-21T22:37:53Z"
+    last_changed_at: "2026-03-21T22:37:53Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-observability-close-page/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin observability surfaces or helper copy change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T22:37:53Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T21:27:16Z"
+        score: 92
+      - timestamp: "2026-03-21T22:27:09Z"
+        score: 95
+      - timestamp: "2026-03-21T22:37:53Z"
+        score: 95
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
+  - page_key: "admin-error-log-show"
+    title: "Admin error log detail"
+    path: "/admin/error_logs/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "compliant"
+    compliance_score: 95
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-error-log-show.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "admin-error-log-show-technical-copy-leak"
+    last_audited_at: "2026-03-21T22:37:53Z"
+    last_changed_at: "2026-03-21T22:37:53Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-observability-close-page/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin observability surfaces or helper copy change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-21T22:37:53Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T21:27:16Z"
+        score: 93
+      - timestamp: "2026-03-21T22:27:09Z"
+        score: 95
+      - timestamp: "2026-03-21T22:37:53Z"
+        score: 95
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    guideline_refinements_triggered: 0

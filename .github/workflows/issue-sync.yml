@@ -1,0 +1,322 @@
+name: Issue Sync
+
+on:
+  workflow_run:
+    workflows: ["CI", "Playwright UI Audit"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Workflow run ID to process (leave empty for latest)"
+        type: string
+        default: ""
+
+permissions:
+  issues: write
+  contents: read
+  actions: read
+
+concurrency:
+  group: issue-sync
+  cancel-in-progress: false
+
+jobs:
+  sync_ci_failures:
+    name: "Sync CI Failures → Issues"
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download CI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id || github.run_id }}
+          path: tmp/ci-artifacts/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Process RSpec failures into issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // ── Load RSpec results ────────────────────────────────────
+            const rspecPath = 'tmp/ci-artifacts/rspec-results/tmp/rspec-results.json';
+            let rspecFailures = [];
+            if (fs.existsSync(rspecPath)) {
+              const data = JSON.parse(fs.readFileSync(rspecPath, 'utf8'));
+              rspecFailures = (data.examples || [])
+                .filter(e => e.status === 'failed')
+                .map(e => ({
+                  description: e.full_description,
+                  file: e.file_path,
+                  line: e.line_number,
+                  message: e.exception?.message?.substring(0, 500) || 'Unknown failure',
+                  category: 'test',
+                }));
+            }
+
+            // ── Load Brakeman results ─────────────────────────────────
+            const brakemanPath = 'tmp/ci-artifacts/brakeman-report/tmp/brakeman-report.json';
+            let brakemanWarnings = [];
+            if (fs.existsSync(brakemanPath)) {
+              const data = JSON.parse(fs.readFileSync(brakemanPath, 'utf8'));
+              brakemanWarnings = (data.warnings || [])
+                .filter(w => w.confidence === 'High' || w.confidence === 'Medium')
+                .map(w => ({
+                  description: `[Security] ${w.warning_type}: ${w.message}`,
+                  file: w.file,
+                  line: w.line,
+                  message: w.message,
+                  category: 'security',
+                  confidence: w.confidence,
+                }));
+            }
+
+            const allIssues = [...rspecFailures, ...brakemanWarnings];
+            if (allIssues.length === 0) {
+              console.log('No failures to sync');
+              return;
+            }
+
+            console.log(`Found ${allIssues.length} issue(s) to sync`);
+
+            // ── Fetch existing auto-created issues ────────────────────
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'ci-auto',
+              state: 'open',
+              per_page: 100,
+            });
+            const existingByTitle = new Map();
+            for (const issue of existingIssues.data) {
+              existingByTitle.set(issue.title, issue);
+            }
+
+            // ── Create or update issues ───────────────────────────────
+            const labelMap = {
+              test: ['ci-auto', 'bug', 'test-failure'],
+              security: ['ci-auto', 'security'],
+            };
+
+            let created = 0;
+            let updated = 0;
+
+            for (const item of allIssues) {
+              const title = `[CI] ${item.description}`.substring(0, 256);
+              const body = [
+                `## Automated CI Issue`,
+                '',
+                `**Category:** ${item.category}`,
+                `**File:** \`${item.file}\`${item.line ? `:${item.line}` : ''}`,
+                '',
+                '### Details',
+                '',
+                '```',
+                item.message,
+                '```',
+                '',
+                `**Workflow Run:** [#${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+                `**Detected:** ${new Date().toISOString()}`,
+                '',
+                '---',
+                '_This issue was auto-created by the CI pipeline. It will be auto-closed when the fix is merged._',
+              ].join('\n');
+
+              const labels = labelMap[item.category] || ['ci-auto'];
+              const existing = existingByTitle.get(title);
+
+              if (existing) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existing.number,
+                  body,
+                });
+                updated++;
+                console.log(`  Updated #${existing.number}: ${title}`);
+              } else {
+                const resp = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                  labels,
+                });
+                created++;
+                console.log(`  Created #${resp.data.number}: ${title}`);
+              }
+            }
+
+            console.log(`\nSync complete: ${created} created, ${updated} updated`);
+
+      - name: Process Playwright audit failures into issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // ── Find all audit results.json files ─────────────────────
+            function findFiles(dir, name) {
+              const results = [];
+              if (!fs.existsSync(dir)) return results;
+              for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                const full = path.join(dir, entry.name);
+                if (entry.isDirectory()) results.push(...findFiles(full, name));
+                else if (entry.name === name) results.push(full);
+              }
+              return results;
+            }
+
+            const resultFiles = findFiles('tmp/ci-artifacts', 'results.json');
+            const failures = [];
+
+            for (const file of resultFiles) {
+              try {
+                const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+                for (const page of data.pages || []) {
+                  if (page.status === 'failed') {
+                    failures.push({
+                      url: page.url,
+                      viewport: page.viewportName || data.viewportName,
+                      issues: page.issues || [],
+                    });
+                  }
+                }
+              } catch (e) {
+                console.log(`Skipping malformed file: ${file}`);
+              }
+            }
+
+            if (failures.length === 0) {
+              console.log('No Playwright audit failures to sync');
+              return;
+            }
+
+            console.log(`Found ${failures.length} Playwright failure(s)`);
+
+            // ── Group failures by URL ─────────────────────────────────
+            const byUrl = new Map();
+            for (const f of failures) {
+              if (!byUrl.has(f.url)) byUrl.set(f.url, []);
+              byUrl.get(f.url).push(f);
+            }
+
+            // ── Fetch existing UI issues ──────────────────────────────
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'ui-audit',
+              state: 'open',
+              per_page: 100,
+            });
+            const existingByTitle = new Map();
+            for (const issue of existing.data) {
+              existingByTitle.set(issue.title, issue);
+            }
+
+            let created = 0;
+            let updated = 0;
+
+            for (const [url, viewportFailures] of byUrl) {
+              const title = `[UI] Audit failure: ${url}`.substring(0, 256);
+              const lines = [
+                `## UI Audit Failure`,
+                '',
+                `**Page:** \`${url}\``,
+                '',
+                '### Viewport Issues',
+                '',
+              ];
+
+              for (const vf of viewportFailures) {
+                lines.push(`#### ${vf.viewport}`);
+                for (const issue of vf.issues) {
+                  lines.push(`- ${issue}`);
+                }
+                lines.push('');
+              }
+
+              lines.push('---');
+              lines.push(`**Workflow Run:** [#${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`);
+              lines.push('_Check artifacts for screenshots._');
+
+              const body = lines.join('\n');
+              const labels = ['ui-audit', 'ci-auto'];
+              const existingIssue = existingByTitle.get(title);
+
+              if (existingIssue) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingIssue.number,
+                  body,
+                });
+                updated++;
+              } else {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                  labels,
+                });
+                created++;
+              }
+            }
+
+            console.log(`Playwright sync: ${created} created, ${updated} updated`);
+
+  close_resolved:
+    name: "Close Resolved Issues"
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Auto-close passing CI issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'ci-auto',
+              state: 'open',
+              per_page: 100,
+            });
+
+            // Only close issues whose triggering workflow now passes
+            const workflowName = '${{ github.event.workflow_run.name || '' }}';
+            if (!workflowName) return;
+
+            let closed = 0;
+            for (const issue of issues.data) {
+              // Only close if the issue is from the now-passing workflow
+              if (issue.body?.includes(workflowName) || workflowName === 'CI') {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                  state_reason: 'completed',
+                });
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `Automatically closed — the **${workflowName}** pipeline is now passing.\n\nWorkflow Run: [#${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+                });
+                closed++;
+                console.log(`Closed #${issue.number}: ${issue.title}`);
+              }
+            }
+            console.log(`Closed ${closed} resolved issue(s)`);

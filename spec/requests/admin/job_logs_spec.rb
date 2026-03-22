@@ -18,9 +18,23 @@ RSpec.describe 'Admin::JobLogs', type: :request do
       expect(response.body).to include('Jobs in scope')
       expect(response.body).to include('Failure rate')
       expect(response.body).to include('Average runtime')
-      expect(response.body).to include('Paste an Active Job ID')
-      expect(response.body).to include('Solid Queue overview')
+      expect(response.body).to include('Find a job by reference')
+      expect(response.body).to include('Queue overview')
+      expect(response.body).to include('Queue health data is unavailable in this environment.')
+      expect(response.body).not_to include('Paste an Active Job ID')
+      expect(response.body).not_to include('Solid Queue overview')
+      expect(response.body).not_to include('active_job_id')
       expect(response.body).to include('page-header-compact')
+    end
+
+    it 'shows an operator-facing fallback when a job reference was not recorded' do
+      create(:job_log, active_job_id: nil)
+
+      get admin_job_logs_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('No job reference recorded')
+      expect(response.body).not_to include('No active job id')
     end
 
     it 'renders inline related error summaries for job rows' do
@@ -52,9 +66,9 @@ RSpec.describe 'Admin::JobLogs', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to include('ERR-JOB-0001')
       expect(response_body).to include('Open related error')
-      expect(response_body).to include('Captured error log is available for full context and backtrace review.')
+      expect(response_body).to include('Captured error details are available for full context and backtrace review.')
       expect(response_body).to include('No error reference')
-      expect(response_body).to include('This failed job did not capture a linked error reference.')
+      expect(response_body).to include('This failed job did not capture a related error reference.')
     end
 
     it 'filters and sorts job logs' do
@@ -86,7 +100,7 @@ RSpec.describe 'Admin::JobLogs', type: :request do
       }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('Paste an Active Job ID')
+      expect(response.body).to include('Find a job by reference')
       expect(response.body).to include(matching_job.active_job_id)
       expect(response.body).to include('Open detail')
     end
@@ -113,11 +127,11 @@ RSpec.describe 'Admin::JobLogs', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to include(job_log.job_type)
       expect(response_body).to include('Review this job')
-      expect(response_body).to include('Queue controls')
-      expect(response_body).to include('Runtime snapshot')
+      expect(response_body).to include('Follow-up actions')
+      expect(response_body).to include('Live queue status')
       expect(response_body).to include('Captured payloads')
-      expect(response_body).to include('Safe mutations')
-      expect(response_body).to include('Lifecycle & worker state')
+      expect(response_body).to include('Safe actions')
+      expect(response_body).to include('Lifecycle and worker details')
       expect(response_body).to include('Open related error')
     end
 
@@ -130,7 +144,7 @@ RSpec.describe 'Admin::JobLogs', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to include(job_log.job_type)
       expect(response_body).to include('Succeeded')
-      expect(response_body).to include('Queue runtime')
+      expect(response_body).to include('Live queue status')
     end
   end
 

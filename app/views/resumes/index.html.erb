@@ -6,6 +6,25 @@
   { label: t("resumes.index.actions.browse_templates"), path: templates_path, style: :secondary },
   (current_user.admin? ? { label: t("resumes.index.actions.open_admin"), path: admin_root_path, style: :secondary } : nil)
 ].compact %>
+<% quick_actions_state = if resume_count.positive? && draft_count.zero?
+     {
+       eyebrow: t("resumes.index.quick_actions.review_ready.eyebrow"),
+       title: t("resumes.index.quick_actions.review_ready.title"),
+       description: t("resumes.index.quick_actions.review_ready.description"),
+       counts_summary: t("resumes.index.quick_actions.review_ready.counts_summary", count: ready_count),
+       focus_note: t("resumes.index.quick_actions.review_ready.focus_note"),
+       action: nil
+     }
+   else
+     {
+       eyebrow: t("resumes.index.quick_actions.eyebrow"),
+       title: t("resumes.index.quick_actions.title"),
+       description: t("resumes.index.quick_actions.description"),
+       counts_summary: t("resumes.index.quick_actions.counts_summary", ready_count:, draft_count:),
+       focus_note: t("resumes.index.quick_actions.focus_note"),
+       action: { label: t("resumes.index.quick_actions.create_resume"), path: new_resume_path }
+     }
+   end %>
 
 <section class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
   <div class="space-y-6">
@@ -41,21 +60,23 @@
 
   <aside class="space-y-4 xl:sticky xl:top-6">
     <%= render Ui::DashboardPanelComponent.new(
-      eyebrow: t("resumes.index.quick_actions.eyebrow"),
-      title: t("resumes.index.quick_actions.title"),
-      description: t("resumes.index.quick_actions.description"),
+      eyebrow: quick_actions_state.fetch(:eyebrow),
+      title: quick_actions_state.fetch(:title),
+      description: quick_actions_state.fetch(:description),
       padding: :sm,
       density: :compact
     ) do %>
       <div class="space-y-3">
         <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-          <p class="text-sm font-semibold text-ink-950"><%= t("resumes.index.quick_actions.counts_summary", ready_count:, draft_count:) %></p>
-          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.index.quick_actions.focus_note") %></p>
+          <p class="text-sm font-semibold text-ink-950"><%= quick_actions_state.fetch(:counts_summary) %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= quick_actions_state.fetch(:focus_note) %></p>
         </div>
 
-        <div class="flex flex-col gap-2 text-sm">
-          <%= link_to t("resumes.index.quick_actions.create_resume"), new_resume_path, class: "#{ui_button_classes(:primary)} w-full justify-center" %>
-        </div>
+        <% if (quick_action = quick_actions_state[:action]) %>
+          <div class="flex flex-col gap-2 text-sm">
+            <%= link_to quick_action.fetch(:label), quick_action.fetch(:path), class: "#{ui_button_classes(:primary)} w-full justify-center" %>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </aside>

@@ -21,6 +21,21 @@ RSpec.describe Admin::JobLogsHelper, type: :helper do
     end
   end
 
+  describe '#job_log_related_error_state' do
+    it 'builds a related error state with the preloaded matching error log when available' do
+      job_log = create(:job_log, :failed, error_details: { 'reference_id' => 'ERR-JOB-0001' })
+      error_log = create(:error_log, :job, reference_id: 'ERR-JOB-0001')
+
+      helper.instance_variable_set(:@job_log_related_error_logs, { 'ERR-JOB-0001' => error_log })
+
+      state = helper.job_log_related_error_state(job_log)
+
+      expect(state).to be_a(Admin::JobLogs::RelatedErrorState)
+      expect(state.reference).to eq('ERR-JOB-0001')
+      expect(state.error_log).to eq(error_log)
+    end
+  end
+
   describe '#formatted_debug_payload' do
     it 'serializes hashes with string keys' do
       payload = helper.formatted_debug_payload(resume_id: 12, nested: { status: 'ok' })

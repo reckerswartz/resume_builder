@@ -29,7 +29,7 @@
     <% end %>
 
     <% if resume.summary.present? %>
-      <p class="<%= [summary_margin_top_class, body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
+      <p class="<%= [summary_margin_top_class, body_text_class, relaxed_body_leading_class, "text-slate-700"].join(" ") %>"><%= resume.summary %></p>
     <% end %>
   </header>
 
@@ -58,7 +58,7 @@
               <% end %>
             </div>
           <% else %>
-            <p class="<%= [body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= inline_skill_summary(section) %></p>
+            <p class="<%= [body_text_class, relaxed_body_leading_class, "text-slate-700"].join(" ") %>"><%= inline_skill_summary(section) %></p>
           <% end %>
         <% else %>
           <div class="<%= entry_stack_classes %>">
@@ -90,11 +90,11 @@
                 </div>
 
                 <% entry_body_paragraphs(entry).each do |paragraph| %>
-                  <p class="<%= [entry_body_spacing_class, body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= paragraph %></p>
+                  <p class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "text-slate-700"].join(" ") %>"><%= paragraph %></p>
                 <% end %>
 
                 <% if highlights.any? %>
-                  <ul class="<%= [entry_body_spacing_class, body_text_class, "list-[square] space-y-1 pl-5 leading-6 text-slate-700"].join(" ") %>">
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "list-[square] space-y-1 pl-5 text-slate-700"].join(" ") %>">
                     <% highlights.each do |highlight| %>
                       <li><%= highlight %></li>
                     <% end %>

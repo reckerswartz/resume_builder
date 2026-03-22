@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# Creates the full GitHub label taxonomy for workflow integration.
+# Idempotent: skips labels that already exist.
+#
+# Usage: bin/gh-bridge/ensure-labels
+
+set -euo pipefail
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+if [ -z "$REPO" ]; then
+  echo "ERROR: Could not determine repository. Set GH_REPO or run from a git repo with a GitHub remote." >&2
+  exit 1
+fi
+
+create_label() {
+  local name="$1"
+  local color="$2"
+  local description="${3:-}"
+
+  if gh label list --repo "$REPO" --search "$name" --json name -q '.[].name' 2>/dev/null | grep -qx "$name"; then
+    return 0
+  fi
+
+  gh label create "$name" --repo "$REPO" --color "$color" --description "$description" 2>/dev/null || true
+}
+
+echo "Syncing labels to $REPO..."
+
+# Workflow labels (blue family)
+create_label "workflow:template-audit"                "1d76db" "Template pixel-perfect audit"
+create_label "workflow:responsive-ui-audit"           "1d76db" "Multi-viewport responsive audit"
+create_label "workflow:ui-guidelines-audit"            "1d76db" "UI guidelines compliance audit"
+create_label "workflow:ux-usability-audit"             "1d76db" "UX usability audit"
+create_label "workflow:maintainability-audit"          "1d76db" "Code maintainability audit"
+create_label "workflow:security-audit"                 "1d76db" "Security audit"
+create_label "workflow:code-review"                    "1d76db" "Code quality review"
+create_label "workflow:behance-template-rollout"       "1d76db" "Behance template discovery"
+create_label "workflow:behance-template-implementation" "1d76db" "Behance template implementation"
+create_label "workflow:resumebuilder-reference-rollout" "1d76db" "ResumeBuilder.com reference rollout"
+create_label "workflow:feature-spec"                   "1d76db" "Feature specification"
+create_label "workflow:feature-review"                 "1d76db" "Feature review"
+create_label "workflow:feature-plan"                   "1d76db" "Feature planning"
+create_label "workflow:tdd-red-agent"                  "1d76db" "TDD red phase"
+create_label "workflow:implementation-agent"           "1d76db" "TDD green phase"
+create_label "workflow:tdd-refactoring-agent"          "1d76db" "TDD refactor phase"
+create_label "workflow:rspec-agent"                    "1d76db" "RSpec coverage"
+create_label "workflow:c4-architecture"                "1d76db" "C4 architecture documentation"
+create_label "workflow:smart-fix"                      "1d76db" "Bug investigation and fix"
+
+# Domain labels (green family)
+create_label "domain:templates"       "0e8a16" "Template rendering, catalog, components"
+create_label "domain:builder"         "0e8a16" "Resume builder steps, editor, preview"
+create_label "domain:workspace"       "0e8a16" "Resume index, cards, workspace actions"
+create_label "domain:admin"           "0e8a16" "Admin namespace pages, settings, observability"
+create_label "domain:auth"            "0e8a16" "Authentication, sessions, registration"
+create_label "domain:photos"          "0e8a16" "Photo library, processing pipeline, headshots"
+create_label "domain:llm"             "0e8a16" "LLM providers, models, orchestration"
+create_label "domain:i18n"            "0e8a16" "Localization, locale files, translations"
+create_label "domain:infrastructure"  "0e8a16" "Migrations, seeds, CI, dependencies"
+create_label "domain:docs"            "0e8a16" "Documentation, architecture, guidelines"
+create_label "domain:marketplace"     "0e8a16" "Template marketplace, public gallery"
+create_label "domain:security"        "0e8a16" "Authorization, input validation, secrets"
+create_label "domain:testing"         "0e8a16" "Specs, coverage, test infrastructure"
+
+# Severity labels (red-to-yellow gradient)
+create_label "severity:critical" "b60205" "Critical severity"
+create_label "severity:high"     "d93f0b" "High severity"
+create_label "severity:medium"   "fbca04" "Medium severity"
+create_label "severity:low"      "c5def5" "Low severity"
+
+# Status labels (purple family)
+create_label "status:open"          "d4c5f9" "Newly created, not yet started"
+create_label "status:in-progress"   "7057ff" "Actively being worked on"
+create_label "status:needs-review"  "5319e7" "PR opened, awaiting review"
+create_label "status:verified"      "0075ca" "Fix verified, ready for merge"
+create_label "status:blocked"       "e4e669" "Blocked on external dependency"
+create_label "status:deferred"      "bfdadc" "Intentionally postponed"
+
+# Type labels (orange family)
+create_label "type:discrepancy"      "f9d0c4" "Template audit finding"
+create_label "type:responsive-issue" "f9d0c4" "Responsive audit finding"
+create_label "type:compliance-gap"   "f9d0c4" "UI guidelines finding"
+create_label "type:usability-issue"  "f9d0c4" "UX usability finding"
+create_label "type:maintainability"  "f9d0c4" "Code quality hotspot"
+create_label "type:security-finding" "f9d0c4" "Security vulnerability"
+create_label "type:bug"              "d73a4a" "Runtime bug"
+create_label "type:feature"          "a2eeef" "New capability"
+create_label "type:refactor"         "f9d0c4" "Structural improvement"
+create_label "type:coverage-gap"     "f9d0c4" "Missing test coverage"
+create_label "type:documentation"    "f9d0c4" "Documentation drift or gap"
+create_label "type:rollout-slice"    "f9d0c4" "Reference implementation slice"
+
+# Coordination labels
+create_label "coordination:shared-file" "e6e6e6" "Multiple workflows touch the same file"
+
+echo "Label sync complete."

@@ -1,0 +1,342 @@
+name: Auto Fix & PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "GitHub issue number to fix"
+        required: true
+        type: string
+      branch_name:
+        description: "Branch name for the fix"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+concurrency:
+  group: auto-fix-${{ github.event.inputs.issue_number }}
+  cancel-in-progress: false
+
+env:
+  RAILS_ENV: test
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/resume_builder_test
+  CI: true
+
+jobs:
+  validate:
+    name: "Validate Fix · Issue #${{ github.event.inputs.issue_number }}"
+    runs-on: ubuntu-latest
+    outputs:
+      tests_pass: ${{ steps.test.outputs.tests_pass }}
+      lint_pass: ${{ steps.lint.outputs.lint_pass }}
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: resume_builder_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch_name }}
+          fetch-depth: 0
+
+      - name: Check for code changes vs main
+        id: changes
+        run: |
+          git fetch origin main
+          DIFF=$(git diff --name-only origin/main..HEAD)
+          if [ -z "$DIFF" ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No code changes detected on branch"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changed files:"
+            echo "$DIFF"
+          fi
+
+      - name: Install system dependencies
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libvips-dev
+
+      - name: Set up Ruby
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: ./.github/actions/setup-ruby
+
+      - name: Set up Node + Yarn
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: ./.github/actions/setup-node
+
+      - name: Build assets
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: ./.github/actions/build-assets
+
+      - name: Setup database
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: ./.github/actions/setup-db
+
+      - name: Run RSpec
+        id: test
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          set +e
+          bundle exec rspec --format progress --exclude-pattern "spec/system/**/*_spec.rb" 2>&1
+          TEST_EXIT=$?
+          if [ $TEST_EXIT -eq 0 ]; then
+            echo "tests_pass=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tests_pass=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run RuboCop
+        id: lint
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          set +e
+          bin/rubocop --format progress 2>&1
+          LINT_EXIT=$?
+          if [ $LINT_EXIT -eq 0 ]; then
+            echo "lint_pass=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "lint_pass=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Brakeman
+        if: steps.changes.outputs.has_changes == 'true'
+        run: bin/brakeman --no-pager
+        continue-on-error: true
+
+  open_pr:
+    name: "Open Pull Request"
+    runs-on: ubuntu-latest
+    needs: [validate]
+    if: needs.validate.outputs.has_changes == 'true'
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch_name }}
+          fetch-depth: 0
+
+      - name: Build PR description
+        id: pr_body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);
+            const testsPassed = '${{ needs.validate.outputs.tests_pass }}' === 'true';
+            const lintPassed = '${{ needs.validate.outputs.lint_pass }}' === 'true';
+
+            const issue = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+
+            const testIcon = testsPassed ? ':white_check_mark:' : ':x:';
+            const lintIcon = lintPassed ? ':white_check_mark:' : ':warning:';
+
+            const body = [
+              `Closes #${issueNumber}`,
+              '',
+              '## Summary',
+              '',
+              `Automated fix for: **${issue.data.title}**`,
+              '',
+              '## Validation',
+              '',
+              '| Check | Status |',
+              '|-------|--------|',
+              `| RSpec tests | ${testIcon} ${testsPassed ? 'Passing' : 'Failing'} |`,
+              `| RuboCop lint | ${lintIcon} ${lintPassed ? 'Passing' : 'Has warnings'} |`,
+              '',
+              '## Changes',
+              '',
+              '_See diff for details._',
+              '',
+              '---',
+              `_Auto-generated by the CI/CD pipeline from issue #${issueNumber}._`,
+            ].join('\n');
+
+            core.setOutput('body', body);
+
+      - name: Create or update pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);
+            const branchName = '${{ github.event.inputs.branch_name }}';
+            const testsPassed = '${{ needs.validate.outputs.tests_pass }}' === 'true';
+
+            // Check if PR already exists for this branch
+            const existingPRs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branchName}`,
+              state: 'open',
+            });
+
+            const prTitle = `[Auto-Fix] Issue #${issueNumber}`;
+            const prBody = `${{ steps.pr_body.outputs.body }}`;
+            const labels = ['auto-fix'];
+
+            if (!testsPassed) labels.push('needs-review');
+
+            if (existingPRs.data.length > 0) {
+              const pr = existingPRs.data[0];
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                body: prBody,
+              });
+              console.log(`Updated PR #${pr.number}`);
+            } else {
+              const pr = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: prTitle,
+                body: prBody,
+                head: branchName,
+                base: 'main',
+              });
+              console.log(`Created PR #${pr.data.number}`);
+
+              // Add labels
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.data.number,
+                labels,
+              });
+            }
+
+  auto_merge:
+    name: "Auto-Merge if Green"
+    runs-on: ubuntu-latest
+    needs: [validate, open_pr]
+    if: >-
+      needs.validate.outputs.tests_pass == 'true'
+      && needs.validate.outputs.lint_pass == 'true'
+    steps:
+      - name: Enable auto-merge
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branchName = '${{ github.event.inputs.branch_name }}';
+            const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);
+
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branchName}`,
+              state: 'open',
+            });
+
+            if (prs.data.length === 0) {
+              console.log('No open PR found for auto-merge');
+              return;
+            }
+
+            const pr = prs.data[0];
+
+            // Enable auto-merge via GraphQL
+            try {
+              await github.graphql(`
+                mutation($prId: ID!) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $prId,
+                    mergeMethod: SQUASH
+                  }) {
+                    pullRequest { number }
+                  }
+                }
+              `, { prId: pr.node_id });
+              console.log(`Auto-merge enabled for PR #${pr.number}`);
+            } catch (err) {
+              console.log(`Could not enable auto-merge: ${err.message}`);
+              console.log('PR may need manual merge or auto-merge may not be enabled on the repo');
+            }
+
+            // Update issue with progress
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: [
+                `All validations passed for PR #${pr.number}:`,
+                '- :white_check_mark: RSpec tests passing',
+                '- :white_check_mark: RuboCop lint passing',
+                '',
+                'Auto-merge has been requested. The issue will close automatically when the PR merges.',
+              ].join('\n'),
+            });
+
+  cleanup_on_failure:
+    name: "Report Failure"
+    runs-on: ubuntu-latest
+    needs: [validate]
+    if: >-
+      needs.validate.outputs.tests_pass == 'false'
+      || needs.validate.outputs.has_changes == 'false'
+    steps:
+      - name: Comment failure on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);
+            const testsPassed = '${{ needs.validate.outputs.tests_pass }}' === 'true';
+            const hasChanges = '${{ needs.validate.outputs.has_changes }}' === 'true';
+
+            let message;
+            if (!hasChanges) {
+              message = 'No code changes were found on the fix branch. The branch may need manual implementation.';
+            } else {
+              message = [
+                'Validation did not fully pass:',
+                `- Tests: ${testsPassed ? ':white_check_mark: Passing' : ':x: Failing'}`,
+                '',
+                'The PR has been opened with a `needs-review` label for manual intervention.',
+              ].join('\n');
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: message,
+            });
+
+            // Remove in-progress, add needs-review
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                name: 'in-progress',
+              });
+            } catch {}
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              labels: ['needs-review'],
+            });
