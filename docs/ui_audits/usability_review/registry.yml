@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:23:08Z"
+updated_at: "2026-03-22T23:34:55Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-collapse-additional-sections/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-carry-through-copy-closeout/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -75,9 +75,9 @@ inventory_notes:
 next_step:
   recommended_scope:
     - "password-reset-edit"
-    - "template-show"
+    - "resume-builder-personal-details"
     - "resumes-index"
-  reason: "resume-builder-finalize is now closed with no open usability issues. password-reset-edit is the next unaudited public/auth recovery page, template-show retains the low-priority carry-through copy cleanup, and resumes-index should be re-reviewed after the current workspace bulk-actions regression is fixed."
+  reason: "template-show is now closed with no open usability issues. password-reset-edit is the next unaudited public/auth recovery page, resume-builder-personal-details is the lowest-scoring audited page with a remaining open follow-up, and resumes-index should be re-reviewed after the current workspace bulk-actions regression is fixed."
 pages:
   - page_key: "home"
     title: "Home"
@@ -176,7 +176,29 @@ pages:
     issues_resolved: 1
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "password-reset-edit"
+    title: "Password reset edit"
+    path: "/passwords/:token/edit"
+    access_level: "public"
+    auth_context: "guest"
+    page_family: "public_auth"
+    priority: "low"
+    status: "improved"
+    usability_score: 88
+    page_doc_path: "docs/ui_audits/usability_review/pages/password-reset-edit.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-PWEDIT-001"
+    last_audited_at: "2026-03-22T23:32:03Z"
+    last_changed_at: "2026-03-22T23:32:03Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-password-reset-edit-action-first/00-overview.md"
+    next_step: "No open issues remain on the password reset edit page. Revisit only if the recovery copy, password-field behavior, or public auth shell changes materially."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T23:32:03Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - page_key: "resumes-index"
     title: "Resume workspace"
     path: "/resumes"
@@ -274,26 +296,24 @@ pages:
     page_family: "templates"
     priority: "medium"
     status: "improved"
-    usability_score: 86
+    usability_score: 87
     page_doc_path: "docs/ui_audits/usability_review/pages/template-show.md"
-    open_issue_keys:
-      - "UX-TSHOW-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-TSHOW-001"
       - "UX-TSHOW-002"
+      - "UX-TSHOW-003"
       - "UX-TSHOW-004"
-    last_audited_at: "2026-03-22T05:24:00Z"
-    last_changed_at: "2026-03-22T05:24:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-consolidate-cta/00-overview.md"
-    next_step: "UX-TSHOW-003 (verbose carry-through copy) is the only remaining open issue at low priority."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T05:24:00Z"
+    last_audited_at: "2026-03-22T23:34:55Z"
+    last_changed_at: "2026-03-22T23:34:55Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-carry-through-copy-closeout/00-overview.md"
+    next_step: "No open issues remain on template-show. Revisit only if the carry-through card, quick-take rail, or preview/detail balance changes materially."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T23:34:55Z"
     issues_found: 4
-    issues_resolved: 3
-    issues_remaining: 1
+    issues_resolved: 4
+    issues_remaining: 0
     regression_detected: false
-    github_issue_numbers:
-      UX-TSHOW-003: 70
   - { page_key: "resume-source-import", title: "Resume source import launcher", path: "/resume_source_imports/:provider", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - page_key: "resume-builder-source"
     title: "Resume builder source step"

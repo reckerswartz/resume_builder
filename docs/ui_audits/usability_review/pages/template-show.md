@@ -11,15 +11,15 @@
 ## Current status
 
 - **Status**: improved
-- **Usability score**: 86 (post-fix)
-- **Cycle count**: 3
-- **Last audited**: 2026-03-22T05:24:00Z
+- **Usability score**: 87 (post-fix)
+- **Cycle count**: 4
+- **Last audited**: 2026-03-22T23:34:55Z
 
 ## Dimension scores
 
 | Dimension | Pre-fix | Post-fix |
 |---|---|---|
-| Content brevity | 75 | 81 |
+| Content brevity | 75 | 87 |
 | Information density | 70 | 78 |
 | Progressive disclosure | 80 | 80 |
 | Repeated content | 55 | 80 |
@@ -57,9 +57,9 @@
 
 - **Severity**: low
 - **Category**: content_brevity
-- **Status**: open
-- **Evidence**: The "Builder carry-through" card has verbose descriptions for accent color ("Treat this as the starting visual cue for the builder, not a locked brand decision.") and layout focus ("Balanced layouts suit broad experience storytelling, while sidebar-heavy layouts keep secondary sections grouped and quieter."). These are informative but push the card beyond first-fold reading efficiency.
-- **Suggested fix**: Shorten the carry-through descriptions to single-line summaries, or wrap the card in a disclosure.
+- **Status**: resolved
+- **Evidence**: The live template detail page now renders the shorter carry-through descriptions `You can change this in the builder anytime.` and `Balanced layouts work well for broad experience. Sidebar layouts group secondary sections.` The older verbose strings no longer render in the request response.
+- **Fix**: Kept the shortened locale-backed carry-through copy in `config/locales/views/templates.en.yml` and added focused request assertions in `spec/requests/templates_spec.rb` so the shorter descriptions remain locked in and the old verbose strings stay absent.
 
 ### UX-TSHOW-004 — Redundant quick-take guidance inset (resolved)
 
@@ -71,6 +71,12 @@
 - **Files changed**: `app/views/templates/show.html.erb`, `spec/requests/templates_spec.rb`
 - **Verified**: `bundle exec rspec spec/requests/templates_spec.rb` (11 examples, 0 failures), Playwright re-audit at 1440×900 confirmed zero console errors.
 
+### Verification update — 2026-03-22
+
+- **Files changed**: `spec/requests/templates_spec.rb`
+- **Verified**: `bundle exec rspec spec/requests/templates_spec.rb` (17 examples, 0 failures)
+- **Run log**: `docs/ui_audits/usability_review/runs/2026-03-22-tshow-carry-through-copy-closeout/00-overview.md`
+
 ## Next step
 
-UX-TSHOW-003 (verbose carry-through copy) is the only remaining open issue at low priority. Revisit only if the carry-through card copy is shortened or wrapped in a disclosure.
+No open issues remain on `template-show`. Revisit only if the carry-through card, quick-take rail, or preview/detail balance changes materially.
