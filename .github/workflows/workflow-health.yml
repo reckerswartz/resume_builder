@@ -1,0 +1,138 @@
+name: Workflow Health Monitor
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+concurrency:
+  group: workflow-health-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: "Monitor Workflow Activity"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Generate workflow health report
+        id: health
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_HEALTH_OUTPUT: tmp/workflow-health/report.json
+        run: node .github/scripts/workflow-health-check.mjs
+
+      - name: Sync dormant workflow alert issue
+        uses: actions/github-script@v8
+        env:
+          WORKFLOW_HEALTH_REPORT_PATH: ${{ steps.health.outputs.report_path }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            const reportPath = process.env.WORKFLOW_HEALTH_REPORT_PATH;
+            if (!reportPath || !fs.existsSync(reportPath)) {
+              throw new Error(`Workflow health report not found at ${reportPath || 'unknown path'}`);
+            }
+
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            const title = '[Meta-Learning] Dormant workflow health alert';
+            const labels = [
+              'workflow:meta-learning',
+              'domain:infrastructure',
+              'severity:high',
+              'type:automation',
+              'status:open',
+            ];
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+
+            function buildBody(currentReport) {
+              const lines = [
+                '## Dormant Workflow Alert',
+                '',
+                `Detected at: ${currentReport.generated_at}`,
+                '',
+                '| Workflow | Latest run | Age (days) | Threshold | Status |',
+                '| --- | --- | --- | --- | --- |',
+              ];
+
+              for (const workflow of currentReport.monitored_workflows) {
+                const latestRun = workflow.latest_run
+                  ? `[${workflow.latest_run.display_title || workflow.latest_run.name || workflow.latest_run.id}](${workflow.latest_run.html_url})`
+                  : 'No runs found';
+                const age = workflow.latest_run_age_days == null ? 'n/a' : workflow.latest_run_age_days;
+                lines.push(`| ${workflow.workflow_name} | ${latestRun} | ${age} | ${workflow.max_age_days} days | ${workflow.status} |`);
+              }
+
+              if (currentReport.dormant_workflows.length > 0) {
+                lines.push('', '### Dormant workflows', '');
+                for (const workflow of currentReport.dormant_workflows) {
+                  lines.push(`- **${workflow.workflow_name}** — ${workflow.reason}`);
+                }
+              }
+
+              lines.push('', '### Expected follow-up', '', '- Audit trigger coverage, dispatch paths, and recent workflow run history', '- Confirm whether dormancy is expected or indicates a broken self-improvement loop', '', '---', '', '_This issue is maintained automatically by `workflow-health.yml`._');
+              return lines.join('\n');
+            }
+
+            if (report.dormant_workflows.length > 0) {
+              const body = buildBody(report);
+
+              if (existing) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existing.number,
+                  state: 'open',
+                  body,
+                  labels,
+                });
+                console.log(`Updated dormant workflow alert issue #${existing.number}`);
+              } else {
+                const created = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                  labels,
+                });
+                console.log(`Created dormant workflow alert issue #${created.data.number}`);
+              }
+            } else if (existing && existing.state === 'open') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Workflow health recovered on ${report.generated_at}. All monitored workflows are running within their configured freshness windows.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                labels: [
+                  'workflow:meta-learning',
+                  'domain:infrastructure',
+                  'severity:high',
+                  'type:automation',
+                ],
+                state: 'closed',
+                state_reason: 'completed',
+              });
+              console.log(`Closed dormant workflow alert issue #${existing.number}`);
+            } else {
+              console.log('No dormant workflows detected and no open alert issue found.');
+            }

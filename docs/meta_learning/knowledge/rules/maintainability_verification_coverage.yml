@@ -1,0 +1,33 @@
+id: "ML-PATTERN-002"
+title: "Maintainability verification coverage rule"
+category: recurring_issue
+status: extracted
+severity: high
+confidence: high
+discovered_at: "2026-03-22T23:13:43Z"
+source_analysis: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
+pattern: >
+  Maintainability findings in the infrastructure domain recur around missing
+  dedicated coverage, broad codebase verification, and extraction follow-ups.
+evidence:
+  issue_numbers:
+    - 75
+    - 56
+    - 54
+    - 51
+    - 48
+  recurring_shape:
+    - "Missing dedicated specs for a service or extractor"
+    - "Broad-codebase coverage scan turns into repeated verification follow-ups"
+    - "Refactor slices close faster when adjacent focused specs already exist"
+automation_rule:
+  trigger:
+    - "A `/maintainability-audit` area enters the verification lane"
+    - "A service/helper/model is identified as broad-codebase coverage debt"
+  required_actions:
+    - "Search for a dedicated spec file before implementation starts."
+    - "If no dedicated spec exists, create the smallest direct spec before broader regression passes."
+    - "Record adjacent baseline suites and rerun them after the dedicated spec lands."
+  expected_outcome: >
+    Reduce repeat maintainability findings caused by uncovered verification debt
+    and shrink the broad-codebase follow-up queue.

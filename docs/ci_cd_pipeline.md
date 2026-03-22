@@ -127,7 +127,16 @@ Push/PR/Schedule
 - Dispatches CI and/or Playwright audit workflows
 - Generates a health report: open issues by category, recently auto-fixed count
 
-### 8. Deploy (`deploy.yml`)
+### 8. Workflow Health Monitor (`workflow-health.yml`)
+
+**Triggers:** daily at 3 AM UTC, manual dispatch
+
+**Behavior:**
+- Checks whether `auto-fix.yml` and `continuous-audit.yml` have run within a rolling 7-day window
+- Publishes a step summary with last-run age and status for each monitored workflow
+- Creates, updates, or closes a single dormant-workflow alert issue when freshness falls outside the threshold
+
+### 9. Deploy (`deploy.yml`)
 
 **Triggers:** push to `main` (auto-deploy to staging), manual dispatch for production
 
@@ -161,6 +170,8 @@ Located in `.github/scripts/`:
 | `playwright-audit.mjs` | Playwright page auditor with login, screenshot, overflow/translation/error detection |
 | `audit-summarize.mjs` | Consolidates per-viewport audit results into a single summary |
 | `bootstrap-labels.mjs` | Preview tool listing pipeline labels (actual sync via `bootstrap-labels.yml`) |
+| `pattern-analyzer.mjs` | Analyzes collected GitHub data to identify recurring patterns, effective solutions, and automation gaps |
+| `workflow-health-check.mjs` | Checks monitored GitHub workflow freshness and writes a dormant-workflow health report |
 
 ## Required GitHub Labels
 
@@ -235,7 +246,9 @@ The system stabilizes when all audits pass and the issue queue is empty. Any new
 ├── scripts/
 │   ├── audit-summarize.mjs
 │   ├── bootstrap-labels.mjs
-│   └── playwright-audit.mjs
+│   ├── pattern-analyzer.mjs
+│   ├── playwright-audit.mjs
+│   └── workflow-health-check.mjs
 ├── workflows/
 │   ├── auto-fix.yml
 │   ├── bootstrap-labels.yml
@@ -245,7 +258,8 @@ The system stabilizes when all audits pass and the issue queue is empty. Any new
 │   ├── issue-queue.yml
 │   ├── issue-sync.yml
 │   ├── playwright-audit.yml
-│   └── pr-cleanup.yml
+│   ├── pr-cleanup.yml
+│   └── workflow-health.yml
 └── dependabot.yml
 ```
 

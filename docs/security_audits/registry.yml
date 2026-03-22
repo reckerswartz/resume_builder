@@ -1,0 +1,43 @@
+version: 1
+updated_at: "2026-03-22T23:20:00Z"
+workflow:
+  status: active
+  path: ".windsurf/workflows/security-audit.md"
+  default_mode: review-only
+tracking:
+  overview_path: "docs/security_audits/README.md"
+  run_doc_pattern: "docs/security_audits/runs/<date>-<slug>/00-overview.md"
+  latest_run: null
+severity_levels:
+  - critical
+  - high
+  - medium
+  - low
+finding_categories:
+  - authorization
+  - input_validation
+  - output_escaping
+  - dependency_risk
+  - configuration
+  - session_security
+  - upload_handling
+finding_statuses:
+  - discovered
+  - confirmed
+  - remediated
+  - validated
+  - closed
+  - deferred
+cycle_metrics:
+  cycle_count: 0
+  last_cycle_date: null
+  findings_found: 0
+  findings_remediated: 0
+  findings_remaining: 0
+  brakeman_warning_count: null
+  bundler_audit_advisory_count: null
+  regression_detected: false
+findings: []
+next_step:
+  recommended_mode: "review-only"
+  reason: "No durable security findings are tracked yet. Start with a focused audit scope or tooling baseline and record the results here."

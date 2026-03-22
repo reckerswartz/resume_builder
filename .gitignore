@@ -63,6 +63,7 @@ docs/*/*/*/pages/TEMPLATE.md
 /tmp/reference_artifacts/
 /tmp/playwright-sessions/
 /tmp/playwright-audit/
+/tmp/meta_learning/
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key

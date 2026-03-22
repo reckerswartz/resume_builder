@@ -1,0 +1,40 @@
+version: 1
+updated_at: "2026-03-22T23:20:00Z"
+workflow:
+  status: active
+  path: ".windsurf/workflows/code-review.md"
+  default_mode: review-only
+tracking:
+  overview_path: "docs/code_reviews/README.md"
+  run_doc_pattern: "docs/code_reviews/runs/<date>-<slug>/00-overview.md"
+  latest_run: null
+severity_levels:
+  - critical
+  - high
+  - medium
+  - low
+finding_categories:
+  - correctness
+  - architecture
+  - security
+  - performance
+  - testing
+  - maintainability
+finding_statuses:
+  - discovered
+  - confirmed
+  - remediated
+  - validated
+  - closed
+  - deferred
+cycle_metrics:
+  cycle_count: 0
+  last_cycle_date: null
+  findings_found: 0
+  findings_remediated: 0
+  findings_remaining: 0
+  regression_detected: false
+findings: []
+next_step:
+  recommended_mode: "review-only"
+  reason: "No durable code review findings are tracked yet. Start with a focused review on a coherent file cluster or feature area."

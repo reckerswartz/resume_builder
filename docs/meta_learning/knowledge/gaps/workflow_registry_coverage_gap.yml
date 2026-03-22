@@ -1,0 +1,35 @@
+id: "ML-GAP-019"
+title: "Workflow registry coverage gap"
+category: automation_gap
+status: validated
+severity: medium
+confidence: high
+discovered_at: "2026-03-22T23:13:43Z"
+source_analysis: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
+validated_at: "2026-03-22T23:21:00Z"
+validated_by: "ML-GEN-001"
+evidence:
+  untracked_workflows:
+    - code-review
+    - security-audit
+  registered_workflows:
+    - template-audit
+    - responsive-ui-audit
+    - ui-guidelines-audit
+    - ux-usability-audit
+    - maintainability-audit
+    - behance-template-rollout
+    - behance-template-implementation
+    - resumebuilder-reference-rollout
+    - continuous-improvement
+impact: >
+  GitHub issues exist for workflows that do not have durable local registries,
+  which weakens state recovery, historical comparisons, and cross-workflow
+  aggregation.
+recommended_automation:
+  type: registry_foundation
+  actions:
+    - "Create durable registry formats for `/code-review` and `/security-audit` findings."
+    - "Extend `docs/github_ops/registry.yml` expectations so workflows without registries are explicitly flagged during aggregation."
+    - "Teach `bin/gh-bridge/sync-registry` to emit a missing-registry warning in non-dry-run mode."
+next_owner: "/meta-learning generate"

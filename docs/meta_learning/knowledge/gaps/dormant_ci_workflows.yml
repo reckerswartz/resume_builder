@@ -1,0 +1,32 @@
+id: "ML-GAP-020"
+title: "Dormant CI/CD workflows"
+category: automation_gap
+status: automated
+severity: high
+confidence: high
+discovered_at: "2026-03-22T23:13:43Z"
+source_analysis: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
+automated_at: "2026-03-22T23:32:00Z"
+automated_by: "ML-GEN-002"
+evidence:
+  dormant_workflows:
+    - auto-fix
+    - continuous-audit
+  active_workflows:
+    - ci
+    - playwright-audit
+    - issue-sync
+    - issue-queue
+    - deploy
+    - pr-cleanup
+impact: >
+  The self-improvement loop is incomplete when `auto-fix` and `continuous-audit`
+  do not run. Issues can still be created, but the queue-to-fix and re-audit
+  stages are effectively disabled.
+recommended_automation:
+  type: workflow_observability
+  actions:
+    - "Monitor `auto-fix.yml` and `continuous-audit.yml` freshness from a separate scheduled workflow."
+    - "Create or close a durable GitHub alert issue when monitored workflows cross the dormancy threshold."
+    - "Follow with a live workflow dispatch validation run to confirm alert lifecycle behavior."
+next_owner: "/meta-learning generate"

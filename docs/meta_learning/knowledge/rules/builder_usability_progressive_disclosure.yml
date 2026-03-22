@@ -1,0 +1,35 @@
+id: "ML-PATTERN-003"
+title: "Builder usability progressive disclosure rule"
+category: recurring_issue
+status: extracted
+severity: high
+confidence: high
+discovered_at: "2026-03-22T23:13:43Z"
+source_analysis: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
+pattern: >
+  Builder usability findings cluster around overloaded first folds, repeated
+  guidance chrome, and optional tooling competing with the primary edit task.
+evidence:
+  issue_numbers:
+    - 74
+    - 73
+    - 72
+    - 71
+    - 66
+    - 61
+    - 42
+    - 41
+    - 40
+  recurring_shape:
+    - "Optional guidance pushes the primary input below the fold"
+    - "Verbose helper copy lingers after larger structural fixes"
+    - "Multiple task clusters remain visible at once on builder pages"
+automation_rule:
+  trigger:
+    - "A builder page introduces a new optional panel, library, or settings surface"
+  required_actions:
+    - "Keep the primary user input visible in the first fold before optional support UI."
+    - "Prefer closed-by-default `details` disclosures for optional guidance, settings, or examples."
+    - "Collapse or move non-essential copy after structural fixes so follow-up verbosity does not linger."
+  expected_outcome: >
+    Reduce repeated usability findings on builder steps by enforcing a primary-task-first layout rule.

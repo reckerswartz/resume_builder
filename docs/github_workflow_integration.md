@@ -1,10 +1,10 @@
 # GitHub Workflow Integration Architecture
 
-> Connects the 19 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI, enabling automated issue tracking, change management, and roadmap generation at scale.
+> Connects the 20 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI, enabling automated issue tracking, change management, and roadmap generation at scale.
 
 ## 1. Problem Statement
 
-The Resume Builder project has **19 Windsurf workflows** that continuously audit, fix, and refine the codebase across 7 domain registries. Today, all findings, fixes, and decisions are tracked in local YAML registries and Markdown run logs. This works well for single-session continuity but lacks:
+The Resume Builder project has **20 Windsurf workflows** that continuously audit, fix, and refine the codebase across 7 domain registries. Today, all findings, fixes, and decisions are tracked in local YAML registries and Markdown run logs. This works well for single-session continuity but lacks:
 
 - **External visibility** — stakeholders cannot see open work without reading YAML files
 - **Change traceability** — fixes are committed to working branches without formal PR review gates
@@ -89,6 +89,7 @@ workflow:tdd-refactoring-agent
 workflow:rspec-agent
 workflow:c4-architecture
 workflow:smart-fix
+workflow:meta-learning
 ```
 
 ### 4.2 Domain Labels (`domain:*`)

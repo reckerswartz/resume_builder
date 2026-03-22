@@ -1,0 +1,333 @@
+#!/usr/bin/env bash
+# Aggregates historical GitHub data (issues, PRs, commits, workflow runs)
+# and local registry state into a single JSON collection for meta-learning analysis.
+#
+# Usage: bin/gh-bridge/aggregate-history \
+#   [--output "tmp/meta_learning/collection.json"] \
+#   [--since "2026-03-01"] \
+#   [--workflow "template-audit"] \
+#   [--limit 100]
+#
+# Outputs: JSON collection to stdout or to the specified file.
+# Requires: gh CLI authenticated, ruby for YAML parsing.
+
+set -euo pipefail
+
+OUTPUT=""
+SINCE=""
+WORKFLOW_FILTER=""
+LIMIT=200
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --output)   OUTPUT="$2"; shift 2 ;;
+    --since)    SINCE="$2"; shift 2 ;;
+    --workflow) WORKFLOW_FILTER="$2"; shift 2 ;;
+    --limit)    LIMIT="$2"; shift 2 ;;
+    --help|-h)
+      echo "Usage: bin/gh-bridge/aggregate-history [OPTIONS]"
+      echo ""
+      echo "Options:"
+      echo "  --output FILE      Write JSON to file instead of stdout"
+      echo "  --since DATE       Only include data after this date (YYYY-MM-DD)"
+      echo "  --workflow NAME    Filter to a specific workflow"
+      echo "  --limit N          Max items per category (default: 200)"
+      echo ""
+      echo "Aggregates GitHub issues, PRs, commits, workflow runs, and local"
+      echo "registry state into a single JSON collection for meta-learning."
+      exit 0
+      ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo 'unknown')}"
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# Build date filter for gh CLI
+SINCE_FLAG=""
+if [ -n "$SINCE" ]; then
+  SINCE_FLAG="--search \"created:>=${SINCE}\""
+fi
+
+# Build label filter
+LABEL_FLAG=""
+if [ -n "$WORKFLOW_FILTER" ]; then
+  LABEL_FLAG="--label workflow:${WORKFLOW_FILTER}"
+fi
+
+collect_data() {
+  # Use ruby to build the final JSON from multiple gh CLI calls
+  ruby -rjson -ryaml -e '
+    require "open3"
+    require "time"
+
+    repo = ARGV[0]
+    limit = ARGV[1].to_i
+    since = ARGV[2].to_s.strip
+    workflow_filter = ARGV[3].to_s.strip
+    timestamp = ARGV[4]
+
+    collection = {
+      "meta" => {
+        "repo" => repo,
+        "collected_at" => timestamp,
+        "since" => since.empty? ? nil : since,
+        "workflow_filter" => workflow_filter.empty? ? nil : workflow_filter,
+        "limit_per_category" => limit
+      },
+      "issues" => { "open" => [], "closed" => [] },
+      "pull_requests" => { "merged" => [], "open" => [] },
+      "commits" => [],
+      "workflow_runs" => [],
+      "local_registries" => {},
+      "cross_workflow_summary" => {}
+    }
+
+    def run_gh(cmd)
+      stdout, stderr, status = Open3.capture3(cmd)
+      return stdout if status.success?
+      $stderr.puts "Warning: #{cmd} failed: #{stderr.strip}" unless stderr.strip.empty?
+      "[]"
+    end
+
+    # ── Issues (open) ──────────────────────────────────────────────────
+    label_flag = workflow_filter.empty? ? "" : "--label \"workflow:#{workflow_filter}\""
+    since_flag = since.empty? ? "" : "--search \"created:>=#{since}\""
+
+    open_issues_json = run_gh(
+      "gh issue list --repo #{repo} --state open #{label_flag} " \
+      "--limit #{limit} --json number,title,labels,createdAt,updatedAt,body"
+    )
+    begin
+      open_issues = JSON.parse(open_issues_json)
+      collection["issues"]["open"] = open_issues.map { |i|
+        labels = (i["labels"] || []).map { |l| l.is_a?(Hash) ? l["name"] : l }
+        {
+          "number" => i["number"],
+          "title" => i["title"],
+          "labels" => labels,
+          "created_at" => i["createdAt"],
+          "updated_at" => i["updatedAt"],
+          "body_excerpt" => (i["body"] || "")[0..500],
+          "workflow" => labels.find { |l| l.start_with?("workflow:") }&.sub("workflow:", ""),
+          "domain" => labels.find { |l| l.start_with?("domain:") }&.sub("domain:", ""),
+          "severity" => labels.find { |l| l.start_with?("severity:") }&.sub("severity:", ""),
+          "type" => labels.find { |l| l.start_with?("type:") }&.sub("type:", "")
+        }
+      }
+    rescue JSON::ParserError
+      $stderr.puts "Warning: failed to parse open issues JSON"
+    end
+
+    # ── Issues (closed) ────────────────────────────────────────────────
+    closed_issues_json = run_gh(
+      "gh issue list --repo #{repo} --state closed #{label_flag} " \
+      "--limit #{limit} --json number,title,labels,createdAt,closedAt,body"
+    )
+    begin
+      closed_issues = JSON.parse(closed_issues_json)
+      collection["issues"]["closed"] = closed_issues.map { |i|
+        labels = (i["labels"] || []).map { |l| l.is_a?(Hash) ? l["name"] : l }
+        created = Time.parse(i["createdAt"]) rescue nil
+        closed = Time.parse(i["closedAt"]) rescue nil
+        resolution_hours = (created && closed) ? ((closed - created) / 3600.0).round(1) : nil
+        {
+          "number" => i["number"],
+          "title" => i["title"],
+          "labels" => labels,
+          "created_at" => i["createdAt"],
+          "closed_at" => i["closedAt"],
+          "resolution_hours" => resolution_hours,
+          "body_excerpt" => (i["body"] || "")[0..500],
+          "workflow" => labels.find { |l| l.start_with?("workflow:") }&.sub("workflow:", ""),
+          "domain" => labels.find { |l| l.start_with?("domain:") }&.sub("domain:", ""),
+          "severity" => labels.find { |l| l.start_with?("severity:") }&.sub("severity:", ""),
+          "type" => labels.find { |l| l.start_with?("type:") }&.sub("type:", "")
+        }
+      }
+    rescue JSON::ParserError
+      $stderr.puts "Warning: failed to parse closed issues JSON"
+    end
+
+    # ── Pull Requests (merged) ─────────────────────────────────────────
+    merged_prs_json = run_gh(
+      "gh pr list --repo #{repo} --state merged " \
+      "--limit #{limit} --json number,title,labels,createdAt,mergedAt,additions,deletions,changedFiles"
+    )
+    begin
+      merged_prs = JSON.parse(merged_prs_json)
+      collection["pull_requests"]["merged"] = merged_prs.map { |pr|
+        labels = (pr["labels"] || []).map { |l| l.is_a?(Hash) ? l["name"] : l }
+        created = Time.parse(pr["createdAt"]) rescue nil
+        merged = Time.parse(pr["mergedAt"]) rescue nil
+        merge_hours = (created && merged) ? ((merged - created) / 3600.0).round(1) : nil
+        {
+          "number" => pr["number"],
+          "title" => pr["title"],
+          "labels" => labels,
+          "created_at" => pr["createdAt"],
+          "merged_at" => pr["mergedAt"],
+          "merge_hours" => merge_hours,
+          "additions" => pr["additions"],
+          "deletions" => pr["deletions"],
+          "changed_files" => pr["changedFiles"]
+        }
+      }
+    rescue JSON::ParserError
+      $stderr.puts "Warning: failed to parse merged PRs JSON"
+    end
+
+    # ── Commits (recent on main) ───────────────────────────────────────
+    since_git = since.empty? ? "--since=\"4 weeks ago\"" : "--since=\"#{since}\""
+    commit_log, _, _ = Open3.capture3(
+      "git log #{since_git} --format=\"%H||%aI||%an||%s\" -n #{limit} origin/main 2>/dev/null || " \
+      "git log #{since_git} --format=\"%H||%aI||%an||%s\" -n #{limit} main 2>/dev/null || echo \"\""
+    )
+    collection["commits"] = commit_log.strip.split("\n").reject(&:empty?).map { |line|
+      parts = line.split("||", 4)
+      next nil if parts.length < 4
+      {
+        "sha" => parts[0][0..11],
+        "date" => parts[1],
+        "author" => parts[2],
+        "message" => parts[3],
+        "workflow" => parts[3][/^([a-z-]+):/, 1]
+      }
+    }.compact
+
+    # ── Workflow Runs (GitHub Actions) ──────────────────────────────────
+    workflow_names = %w[ci.yml playwright-audit.yml issue-sync.yml issue-queue.yml auto-fix.yml continuous-audit.yml deploy.yml pr-cleanup.yml]
+    workflow_names.each do |wf|
+      runs_json = run_gh(
+        "gh run list --repo #{repo} --workflow #{wf} --limit 20 " \
+        "--json databaseId,displayTitle,status,conclusion,createdAt,updatedAt,name"
+      )
+      begin
+        runs = JSON.parse(runs_json)
+        runs.each do |r|
+          created = Time.parse(r["createdAt"]) rescue nil
+          updated = Time.parse(r["updatedAt"]) rescue nil
+          duration_min = (created && updated) ? ((updated - created) / 60.0).round(1) : nil
+          collection["workflow_runs"] << {
+            "workflow" => wf.sub(".yml", ""),
+            "run_id" => r["databaseId"],
+            "title" => r["displayTitle"],
+            "status" => r["status"],
+            "conclusion" => r["conclusion"],
+            "created_at" => r["createdAt"],
+            "duration_minutes" => duration_min
+          }
+        end
+      rescue JSON::ParserError
+        $stderr.puts "Warning: failed to parse workflow runs for #{wf}"
+      end
+    end
+
+    # ── Local Registry Aggregation ─────────────────────────────────────
+    github_ops_path = "docs/github_ops/registry.yml"
+    if File.exist?(github_ops_path)
+      ops_registry = YAML.safe_load(File.read(github_ops_path), permitted_classes: [Date, Time]) rescue {}
+      (ops_registry["workflow_registries"] || []).each do |wr|
+        wf_name = wr["workflow"]
+        reg_path = wr["registry_path"]
+        next unless reg_path && File.exist?(reg_path)
+
+        begin
+          reg = YAML.safe_load(File.read(reg_path), permitted_classes: [Date, Time]) || {}
+          summary = {
+            "path" => reg_path,
+            "issue_count" => wr["issue_count"],
+            "pr_count" => wr["pr_count"],
+            "last_synced_at" => wr["last_synced_at"]
+          }
+
+          # Extract workflow-specific metrics
+          if reg["cycle_metrics"]
+            summary["cycle_metrics"] = reg["cycle_metrics"].slice(
+              "cycle_count", "last_cycle_date",
+              "proposals_discovered", "proposals_implemented", "proposals_remaining"
+            )
+          end
+
+          if reg["templates"]
+            summary["template_count"] = reg["templates"].length
+            summary["pixel_perfect_count"] = reg["templates"].count { |t| t["pixel_status"] == "pixel_perfect" }
+            summary["open_discrepancies"] = reg["templates"].sum { |t| t["open_discrepancy_count"] || 0 }
+          end
+
+          if reg["pages"]
+            summary["page_count"] = reg["pages"].length
+            total_open = reg["pages"].sum { |p| (p["open_issue_keys"] || []).length }
+            summary["open_page_issues"] = total_open
+          end
+
+          if reg["areas"]
+            summary["area_count"] = reg["areas"].length
+            summary["closed_areas"] = reg["areas"].count { |a| a["status"] == "closed" }
+          end
+
+          collection["local_registries"][wf_name] = summary
+        rescue => e
+          $stderr.puts "Warning: failed to parse #{reg_path}: #{e.message}"
+        end
+      end
+    end
+
+    # ── Cross-Workflow Summary ─────────────────────────────────────────
+    all_issues = collection["issues"]["open"] + collection["issues"]["closed"]
+    workflows_seen = all_issues.map { |i| i["workflow"] }.compact.tally
+    domains_seen = all_issues.map { |i| i["domain"] }.compact.tally
+    types_seen = all_issues.map { |i| i["type"] }.compact.tally
+
+    closed = collection["issues"]["closed"]
+    resolution_times = closed.map { |i| i["resolution_hours"] }.compact
+    avg_resolution = resolution_times.empty? ? nil : (resolution_times.sum / resolution_times.length).round(1)
+
+    commit_workflows = collection["commits"].map { |c| c["workflow"] }.compact.tally
+
+    collection["cross_workflow_summary"] = {
+      "total_issues" => all_issues.length,
+      "open_issues" => collection["issues"]["open"].length,
+      "closed_issues" => closed.length,
+      "merged_prs" => collection["pull_requests"]["merged"].length,
+      "recent_commits" => collection["commits"].length,
+      "workflow_runs" => collection["workflow_runs"].length,
+      "issues_by_workflow" => workflows_seen,
+      "issues_by_domain" => domains_seen,
+      "issues_by_type" => types_seen,
+      "commits_by_workflow" => commit_workflows,
+      "avg_resolution_hours" => avg_resolution,
+      "fastest_resolution_hours" => resolution_times.min,
+      "slowest_resolution_hours" => resolution_times.max,
+      "local_registries_parsed" => collection["local_registries"].length,
+      "workflow_run_success_rate" => begin
+        completed = collection["workflow_runs"].select { |r| r["conclusion"] }
+        successes = completed.count { |r| r["conclusion"] == "success" }
+        completed.empty? ? nil : (successes.to_f / completed.length * 100).round(1)
+      end
+    }
+
+    puts JSON.pretty_generate(collection)
+  ' "$REPO" "$LIMIT" "$SINCE" "$WORKFLOW_FILTER" "$TIMESTAMP"
+}
+
+if [ -n "$OUTPUT" ]; then
+  mkdir -p "$(dirname "$OUTPUT")"
+  collect_data > "$OUTPUT"
+  echo "Collection written to ${OUTPUT}" >&2
+  echo "Summary:" >&2
+  ruby -rjson -e '
+    c = JSON.parse(File.read(ARGV[0]))
+    s = c["cross_workflow_summary"]
+    puts "  Issues: #{s["open_issues"]} open, #{s["closed_issues"]} closed"
+    puts "  PRs: #{s["merged_prs"]} merged"
+    puts "  Commits: #{s["recent_commits"]} recent"
+    puts "  Workflow runs: #{s["workflow_runs"]} collected"
+    puts "  Local registries: #{s["local_registries_parsed"]} parsed"
+    puts "  Avg resolution: #{s["avg_resolution_hours"] || "N/A"} hours"
+    puts "  CI success rate: #{s["workflow_run_success_rate"] || "N/A"}%"
+  ' "$OUTPUT" >&2
+else
+  collect_data
+fi

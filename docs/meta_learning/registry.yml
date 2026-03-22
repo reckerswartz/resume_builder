@@ -1,0 +1,200 @@
+version: 1
+updated_at: "2026-03-22T23:32:00Z"
+workflow:
+  status: active
+  path: ".windsurf/workflows/meta-learning.md"
+  default_mode: collect
+  default_batch_size: 1
+tracking:
+  overview_path: "docs/meta_learning/README.md"
+  knowledge_path: "docs/meta_learning/knowledge"
+  run_doc_pattern: "docs/meta_learning/runs/<date>-<slug>/00-overview.md"
+  latest_run: "docs/meta_learning/runs/2026-03-22-workflow-health-generate/00-overview.md"
+artifacts:
+  cache_root: "tmp/meta_learning"
+  collection_subfolder: "collections"
+  commit_policy: "knowledge_only"
+finding_categories:
+  - recurring_issue
+  - effective_solution
+  - workflow_inefficiency
+  - automation_gap
+  - cross_correlation
+severity_levels:
+  - critical
+  - high
+  - medium
+  - low
+confidence_levels:
+  - high
+  - medium
+  - low
+actionability_levels:
+  - automate
+  - optimize
+  - inform
+finding_statuses:
+  - discovered
+  - confirmed
+  - extracted
+  - automated
+  - validated
+  - closed
+  - deferred
+run_modes:
+  - collect
+  - analyze
+  - extract
+  - generate
+  - integrate
+  - validate
+  - full-cycle
+  - report
+finding_id_format: "ML-<CATEGORY>-<NNN>"
+data_sources:
+  github:
+    issues: true
+    pull_requests: true
+    commits: true
+    workflow_runs: true
+    artifacts: true
+  local_registries:
+    - path: "docs/code_reviews/registry.yml"
+      workflow: "code-review"
+    - path: "docs/security_audits/registry.yml"
+      workflow: "security-audit"
+    - path: "docs/template_audits/registry.yml"
+      workflow: "template-audit"
+    - path: "docs/ui_audits/responsive_review/registry.yml"
+      workflow: "responsive-ui-audit"
+    - path: "docs/ui_audits/guidelines_review/registry.yml"
+      workflow: "ui-guidelines-audit"
+    - path: "docs/ui_audits/usability_review/registry.yml"
+      workflow: "ux-usability-audit"
+    - path: "docs/maintainability_audits/registry.yml"
+      workflow: "maintainability-audit"
+    - path: "docs/continuous_improvement/registry.yml"
+      workflow: "continuous-improvement"
+    - path: "docs/resumebuilder_rollouts/registry.yml"
+      workflow: "resumebuilder-reference-rollout"
+cross_workflow_routing:
+  recurring_template_issues: "/template-audit"
+  usability_patterns: "/ux-usability-audit"
+  code_quality_patterns: "/maintainability-audit"
+  security_patterns: "/security-audit"
+  feature_gaps: "/continuous-improvement"
+  ci_cd_gaps: ".github/workflows/"
+cycle_metrics:
+  cycle_count: 3
+  last_cycle_date: "2026-03-22T23:32:00Z"
+  patterns_discovered: 22
+  knowledge_entries: 6
+  automations_generated: 2
+  automations_validated: 1
+  automations_active: 1
+  effectiveness_score: null
+  collection_log:
+    - collected_at: "2026-03-22T23:13:16Z"
+      artifact_path: "tmp/meta_learning/2026-03-22T23-13-15Z-collection.json"
+      summary:
+        open_issues: 14
+        closed_issues: 41
+        merged_prs: 17
+        recent_commits: 97
+        workflow_runs: 118
+        local_registries_parsed: 9
+  analysis_log:
+    - analyzed_at: "2026-03-22T23:13:43Z"
+      artifact_path: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
+      summary:
+        findings: 22
+        automatable: 6
+        optimizable: 10
+knowledge_inventory:
+  rules:
+    - "docs/meta_learning/knowledge/rules/maintainability_verification_coverage.yml"
+    - "docs/meta_learning/knowledge/rules/builder_usability_progressive_disclosure.yml"
+    - "docs/meta_learning/knowledge/rules/template_discrepancy_batching.yml"
+  practices:
+    - "docs/meta_learning/knowledge/practices/small_focused_changes.md"
+  gaps:
+    - "docs/meta_learning/knowledge/gaps/dormant_ci_workflows.yml"
+    - "docs/meta_learning/knowledge/gaps/workflow_registry_coverage_gap.yml"
+automation_inventory:
+  - id: "ML-GEN-001"
+    title: "Registry foundation for code-review and security-audit"
+    status: validated
+    generated_at: "2026-03-22T23:20:00Z"
+    validated_at: "2026-03-22T23:21:00Z"
+    outputs:
+      - "docs/code_reviews/README.md"
+      - "docs/code_reviews/registry.yml"
+      - "docs/security_audits/README.md"
+      - "docs/security_audits/registry.yml"
+      - "bin/gh-bridge/sync-registry"
+      - "docs/github_ops/registry.yml"
+    source_findings:
+      - "ML-GAP-019"
+    validation_notes:
+      - "Registry auto-discovery works for code-review and security-audit."
+      - "Missing-registry warning path works for smart-fix."
+  - id: "ML-GEN-002"
+    title: "Dormant workflow health monitor for auto-fix and continuous-audit"
+    status: generated
+    generated_at: "2026-03-22T23:32:00Z"
+    outputs:
+      - ".github/scripts/workflow-health-check.mjs"
+      - ".github/workflows/workflow-health.yml"
+      - "docs/ci_cd_pipeline.md"
+    source_findings:
+      - "ML-GAP-020"
+    validation_notes:
+      - "Local syntax validation passed for workflow-health-check.mjs."
+      - "Workflow YAML parsing passed for workflow-health.yml."
+      - "Live GitHub run validation is still required."
+findings:
+  - id: "ML-PATTERN-002"
+    category: recurring_issue
+    severity: high
+    confidence: high
+    status: extracted
+    actionability: automate
+    title: "Recurring maintainability issues in infrastructure domain"
+  - id: "ML-PATTERN-003"
+    category: recurring_issue
+    severity: high
+    confidence: high
+    status: extracted
+    actionability: automate
+    title: "Recurring usability-issue issues in builder domain"
+  - id: "ML-PATTERN-005"
+    category: recurring_issue
+    severity: high
+    confidence: high
+    status: extracted
+    actionability: automate
+    title: "Recurring discrepancy issues in templates domain"
+  - id: "ML-GAP-019"
+    category: automation_gap
+    severity: medium
+    confidence: high
+    status: automated
+    actionability: automate
+    title: "2 workflows have issues but no local registry"
+  - id: "ML-GAP-020"
+    category: automation_gap
+    severity: high
+    confidence: high
+    status: automated
+    actionability: automate
+    title: "2 CI/CD workflows have no recent runs"
+  - id: "ML-SOLUTION-018"
+    category: effective_solution
+    severity: low
+    confidence: high
+    status: extracted
+    actionability: inform
+    title: "Small, focused PRs are the dominant merge pattern"
+next_step:
+  recommended_mode: "validate"
+  reason: "The workflow health monitor is implemented and locally syntax-checked. The next step is a live GitHub validation run to confirm dormant-workflow issue creation and closure behavior against real Actions history."

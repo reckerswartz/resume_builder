@@ -48,6 +48,7 @@ create_label "workflow:rspec-agent"                    "1d76db" "RSpec coverage"
 create_label "workflow:c4-architecture"                "1d76db" "C4 architecture documentation"
 create_label "workflow:smart-fix"                      "1d76db" "Bug investigation and fix"
 create_label "workflow:continuous-improvement"          "1d76db" "Continuous improvement cycle"
+create_label "workflow:meta-learning"                   "1d76db" "Meta-learning and automation generation"
 
 # Domain labels (green family)
 create_label "domain:templates"       "0e8a16" "Template rendering, catalog, components"
@@ -92,6 +93,7 @@ create_label "type:coverage-gap"     "f9d0c4" "Missing test coverage"
 create_label "type:documentation"    "f9d0c4" "Documentation drift or gap"
 create_label "type:rollout-slice"    "f9d0c4" "Reference implementation slice"
 create_label "type:improvement"      "a2eeef" "Continuous improvement proposal"
+create_label "type:automation"       "a2eeef" "Automation rule or workflow improvement"
 
 # Coordination labels
 create_label "coordination:shared-file" "e6e6e6" "Multiple workflows touch the same file"

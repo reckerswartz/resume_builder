@@ -1,0 +1,38 @@
+id: "ML-PATTERN-005"
+title: "Template discrepancy batching rule"
+category: recurring_issue
+status: extracted
+severity: high
+confidence: high
+discovered_at: "2026-03-22T23:13:43Z"
+source_analysis: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
+pattern: >
+  Template audit work repeatedly surfaces small discrepancy clusters on the same
+  template family, often resolved through short, focused implement-next passes.
+evidence:
+  issue_numbers:
+    - 67
+    - 39
+    - 38
+    - 37
+    - 36
+    - 35
+    - 6
+    - 5
+    - 4
+    - 3
+    - 2
+  recurring_shape:
+    - "Same template family reappears with 1-4 remaining discrepancies"
+    - "Minor style fixes close quickly when bundled per template family"
+    - "Pixel-perfect progression depends on preserving template-specific audit history"
+automation_rule:
+  trigger:
+    - "A template has multiple open low/moderate discrepancies in the same family"
+  required_actions:
+    - "Batch same-template discrepancies into one focused implement-next slice when they share adjacent files."
+    - "Preserve per-template regression evidence before promoting pixel status."
+    - "Prefer template-family-specific verification suites over broad template sweeps when the discrepancy set is narrow."
+  expected_outcome: >
+    Reduce repeated template reopenings and accelerate progression from `close`
+    to `pixel_perfect`.
