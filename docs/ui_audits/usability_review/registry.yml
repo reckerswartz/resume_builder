@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "sign-in"
     - "create-account"
     - "resume-builder-personal-details"
-  reason: "resume-builder-finalize improved to 83 after replacing design workspace jargon. Only UX-BLDFIN-005 (task_overload) remains open. sign-in and create-account are still unaudited public pages. resume-builder-personal-details (81) has UX-BLDPD-003 open."
+    - "resume-builder-summary"
+  reason: "sign-in audited and improved to 85 with both findings resolved. create-account is the next unaudited public page. resume-builder-personal-details (81) and resume-builder-summary (81) are the lowest-scoring audited pages with open issues."
 pages:
   - page_key: "home"
     title: "Home"
@@ -105,7 +105,30 @@ pages:
     issues_resolved: 3
     issues_remaining: 1
     regression_detected: false
-  - { page_key: "sign-in", title: "Sign in", path: "/session/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "sign-in"
+    title: "Sign in"
+    path: "/session/new"
+    access_level: "public"
+    auth_context: "guest"
+    page_family: "public_auth"
+    priority: "medium"
+    status: "improved"
+    usability_score: 85
+    page_doc_path: "docs/ui_audits/usability_review/pages/sign-in.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-SIGN-001"
+      - "UX-SIGN-002"
+    last_audited_at: "2026-03-22T05:34:00Z"
+    last_changed_at: "2026-03-22T05:34:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-sign-in-remove-redundant-header/00-overview.md"
+    next_step: "No open issues. Revisit only if the sign-in flow structure or copy changes."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T05:34:00Z"
+    issues_found: 2
+    issues_resolved: 2
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "create-account", title: "Create account", path: "/registration/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "password-reset-request", title: "Password reset request", path: "/passwords/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
