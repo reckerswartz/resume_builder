@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:34:55Z"
+updated_at: "2026-03-22T23:45:22Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-carry-through-copy-closeout/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-task-overload-closeout/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -75,9 +75,9 @@ inventory_notes:
 next_step:
   recommended_scope:
     - "password-reset-edit"
-    - "resume-builder-personal-details"
+    - "resume-builder-heading"
     - "resumes-index"
-  reason: "template-show is now closed with no open usability issues. password-reset-edit is the next unaudited public/auth recovery page, resume-builder-personal-details is the lowest-scoring audited page with a remaining open follow-up, and resumes-index should be re-reviewed after the current workspace bulk-actions regression is fixed."
+  reason: "resume-builder-personal-details is now closed with no open usability issues. password-reset-edit is the next unaudited public/auth recovery page, resume-builder-heading retains the lowest-priority remaining audited builder follow-up, and resumes-index should be re-reviewed after the current workspace bulk-actions regression is fixed."
 pages:
   - page_key: "home"
     title: "Home"
@@ -378,25 +378,23 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "improved"
-    usability_score: 81
+    usability_score: 84
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-personal-details.md"
-    open_issue_keys:
-      - "UX-BLDPD-003"
+    open_issue_keys: []
     closed_issue_keys:
       - "UX-BLDPD-001"
       - "UX-BLDPD-002"
-    last_audited_at: "2026-03-22T06:31:00Z"
-    last_changed_at: "2026-03-22T06:31:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-plain-language-headshot-copy/00-overview.md"
-    next_step: "UX-BLDPD-003 (task_overload) is the only remaining open issue. Consider wrapping secondary sections behind a disclosure."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T06:31:00Z"
+      - "UX-BLDPD-003"
+    last_audited_at: "2026-03-22T23:45:22Z"
+    last_changed_at: "2026-03-22T23:45:22Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-task-overload-closeout/00-overview.md"
+    next_step: "No open issues remain on resume-builder-personal-details. Revisit only if the disclosure structure or personal-details workload changes materially."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T23:45:22Z"
     issues_found: 3
-    issues_resolved: 2
-    issues_remaining: 1
+    issues_resolved: 3
+    issues_remaining: 0
     regression_detected: false
-    github_issue_numbers:
-      UX-BLDPD-003: 79
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
     path: "/resumes/:id/edit?step=experience"

@@ -754,9 +754,12 @@ RSpec.describe 'Resumes', type: :request do
       get edit_resume_path(resume), params: { step: 'personal_details' }
 
       expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
       profile_links_index = response.body.index(I18n.t('resumes.editor_personal_details_step.profile_links.eyebrow'))
       personal_information_index = response.body.index(I18n.t('resumes.editor_personal_details_step.personal_information.eyebrow'))
       headshot_index = response.body.index(I18n.t('resumes.editor_personal_details_step.headshot.eyebrow'))
+      personal_information_disclosure = document.at_css('details[data-personal-information-disclosure]')
+      headshot_disclosure = document.at_css('details[data-headshot-disclosure]')
 
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.profile_links.eyebrow'))
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.personal_information.eyebrow'))
@@ -764,6 +767,10 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include(I18n.t('resumes.editor_personal_details_step.optional_step.title'))
       expect(profile_links_index).to be < personal_information_index
       expect(personal_information_index).to be < headshot_index
+      expect(personal_information_disclosure).to be_present
+      expect(personal_information_disclosure['open']).to be_nil
+      expect(headshot_disclosure).to be_present
+      expect(headshot_disclosure['open']).to be_nil
 
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.headshot.description'))
       expect(response.body).not_to include('truthful headshot support')
@@ -1152,8 +1159,8 @@ RSpec.describe 'Resumes', type: :request do
       expect(photo_library_disclosure).to be_present
       expect(photo_library_disclosure['open']).to be_nil
 
-      expect(document.at_css("form[action='/photo_profiles/#{photo_profile.id}/photo_assets']")).to be_present
-      expect(document.at_css('input[name="resume[selected_headshot_photo_asset_id]"][value="#{selected_asset.id}"]')).to be_present
+      expect(document.at_css("form[action*='/photo_profiles/#{photo_profile.id}/photo_assets']")).to be_present
+      expect(document.at_css("input[name='resume[selected_headshot_photo_asset_id]'][value='#{selected_asset.id}']")).to be_present
       selected_radio = document.at_css("input[name='resume[selected_headshot_photo_asset_id]'][value='#{selected_asset.id}']")
 
       expect(selected_radio).to be_present

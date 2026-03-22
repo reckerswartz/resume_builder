@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>">
+    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>" data-personal-information-disclosure>
       <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
         <div class="flex-1 space-y-1">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.personal_information.eyebrow") %></p>
@@ -64,7 +64,7 @@
       </div>
     </details>
 
-    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>" data-autosave-ignore="true">
+    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>" data-autosave-ignore="true" data-headshot-disclosure>
       <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
         <div class="flex-1 space-y-1">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.headshot.eyebrow") %></p>
