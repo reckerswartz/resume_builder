@@ -1,15 +1,5 @@
 require 'rails_helper'
 
-# Specs in this file have access to a helper object that includes
-# the Admin::JobLogsHelper. For example:
-#
-# describe Admin::JobLogsHelper do
-#   describe "string concat" do
-#     it "concats two strings with spaces" do
-#       expect(helper.concat_strings("this","that")).to eq("this that")
-#     end
-#   end
-# end
 RSpec.describe Admin::JobLogsHelper, type: :helper do
   describe '#job_duration_label' do
     it 'formats a duration in seconds' do
@@ -42,6 +32,28 @@ RSpec.describe Admin::JobLogsHelper, type: :helper do
 
       expect(payload).to include('"resume_id": 12')
       expect(payload).to include('"status": "ok"')
+    end
+  end
+
+  describe '#job_log_runtime_state' do
+    it 'returns a RuntimeState presenter' do
+      job_log = create(:job_log)
+      queue_snapshot = double("QueueSnapshot", unavailable?: true)
+
+      state = helper.job_log_runtime_state(job_log, queue_snapshot)
+
+      expect(state).to be_a(Admin::JobLogs::RuntimeState)
+    end
+  end
+
+  describe '#job_log_control_state' do
+    it 'returns a ControlState presenter' do
+      job_log = create(:job_log, :failed)
+      queue_snapshot = double("QueueSnapshot", retryable?: false)
+
+      state = helper.job_log_control_state(job_log, queue_snapshot)
+
+      expect(state).to be_a(Admin::JobLogs::ControlState)
     end
   end
 end

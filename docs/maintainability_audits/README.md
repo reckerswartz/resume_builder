@@ -16,13 +16,15 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next post-correction verification slice is complete: `Llm::Providers::BaseClient` now has direct shared-contract coverage.
 - The next post-correction structural slice is complete: `ApplicationHelper` now delegates table/query behavior to `TableHelper`.
 - The next post-correction verification slice is complete: `Resumes::CloudImportProviderCatalog` now has dedicated shared-service coverage.
-- The next structural slice is complete: `LlmProvider` credential management extracted to `LlmProvider::CredentialManagement` concern with 15 focused examples.
+- The next verification slice is complete: `Resumes::PdfTextExtractor` (6 examples) and `Resumes::DocxTextExtractor` (11 examples) now have dedicated spec coverage under `broad-codebase-coverage-scan`.
+- The next structural slice is complete: `Admin::JobLogsHelper` runtime-state and control-state clusters extracted to `Admin::JobLogs::RuntimeState` and `Admin::JobLogs::ControlState` presenters. Helper reduced from 181 to 85 lines. Area `admin-job-logs-helper-mixed-responsibilities` is now closed.
+- The next post-correction structural slice is complete: `LlmProvider` credential management extracted to `LlmProvider::CredentialManagement` concern with 15 focused examples.
 
 ### Pending
 
 - The next `implement-next` maintainability slice should come from the verification lane, because the last completed lane was structural.
-- The next verification candidate should start with `app/services/resumes/docx_text_extractor.rb`.
-- The remaining structural backlog includes `app/models/llm_provider.rb` (sync-state follow-up) and `Admin::JobLogsHelper` lower-priority open follow-ups.
+- The remaining verification backlog includes `app/services/resumes/export_status_broadcaster.rb` and `app/services/errors/tracker.rb`.
+- The structural candidate queue is empty. A fresh whole-codebase scan should be performed to discover new structural hotspots when the verification lane is exhausted.
 
 ## Installed workflow
 
@@ -100,12 +102,10 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ### Current structural candidates
 
-- `app/models/llm_provider.rb` (sync-state follow-up)
+(none — queue exhausted; discover new hotspots on next whole-codebase scan)
 
 ### Current verification candidates
 
-- `app/services/resumes/docx_text_extractor.rb`
-- `app/services/resumes/pdf_text_extractor.rb`
 - `app/services/resumes/export_status_broadcaster.rb`
 - `app/services/errors/tracker.rb`
 
@@ -125,7 +125,7 @@ If this overview is stale, the workflow is considered incomplete even if code an
   - status: `closed`
 - `app/helpers/admin/job_logs_helper.rb`
   - area: `admin-job-logs-helper-mixed-responsibilities`
-  - status: `improved`
+  - status: `closed`
 - `app/helpers/application_helper.rb`
   - area: `application-helper-mixed-responsibilities`
   - status: `closed`
