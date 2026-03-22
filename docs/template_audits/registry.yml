@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:14:00Z"
+updated_at: "2026-03-22T05:30:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/template-audit.md"
@@ -10,7 +10,7 @@ tracking:
   template_doc_template: "docs/template_audits/templates/TEMPLATE.md"
   run_doc_template: "docs/template_audits/runs/TEMPLATE.md"
   artifact_root: "docs/template_audits/artifacts"
-  latest_run: "docs/template_audits/runs/2026-03-22-font-family-regression-reaudit/00-overview.md"
+  latest_run: "docs/template_audits/runs/2026-03-22-finalize-workspace-regression-reaudit/00-overview.md"
 seed_profiles:
   catalog_path: "app/services/resumes/seed_profile_catalog.rb"
   profile_count: 8
@@ -29,9 +29,9 @@ templates:
     open_discrepancy_count: 1
     resolved_discrepancy_count: 6
     last_audit_at: "2026-03-22"
-    notes: "Font-family regression re-audit after base_component.rb shared change. All fixes hold, font_family_class applied via shell_classes. Zero console errors. MOD-001 (contact_pills minor) remains."
-    cycle_count: 7
-    last_cycle_date: "2026-03-22T05:14:00Z"
+    notes: "Regression re-audit after finalize-workspace commit (48a3230). MOD-002 baseline-alignment, MOD-003 shadow-sm fixes hold. Zero console errors. MOD-001 (contact_pills minor) remains."
+    cycle_count: 8
+    last_cycle_date: "2026-03-22T05:30:00Z"
     discrepancies_found: 7
     discrepancies_resolved: 6
     discrepancies_remaining: 1
@@ -65,9 +65,9 @@ templates:
     open_discrepancy_count: 1
     resolved_discrepancy_count: 4
     last_audit_at: "2026-03-22"
-    notes: "Font-family regression re-audit after base_component.rb shared change. PRO-002 fix holds, contact max-width intact, zero console errors. PRO-004 (entry_spacing minor) remains."
-    cycle_count: 7
-    last_cycle_date: "2026-03-22T05:14:00Z"
+    notes: "Regression re-audit after finalize-workspace commit (48a3230). PRO-002 sm:max-w-xs contact fix holds. Zero console errors. PRO-004 (entry_spacing minor) remains."
+    cycle_count: 8
+    last_cycle_date: "2026-03-22T05:30:00Z"
     discrepancies_found: 5
     discrepancies_resolved: 4
     discrepancies_remaining: 1
@@ -77,9 +77,9 @@ templates:
     open_discrepancy_count: 1
     resolved_discrepancy_count: 5
     last_audit_at: "2026-03-22"
-    notes: "Font-family regression re-audit after base_component.rb shared change. MCL-001 density fixes hold, card entries and contact chips intact, zero console errors. MCL-006 (minor accent_contrast guidance) remains."
-    cycle_count: 7
-    last_cycle_date: "2026-03-22T05:14:00Z"
+    notes: "Regression re-audit after finalize-workspace commit (48a3230). Density gap/chip/entry tweaks hold. Zero console errors. MCL-006 (minor accent_contrast guidance) remains."
+    cycle_count: 8
+    last_cycle_date: "2026-03-22T05:30:00Z"
     discrepancies_found: 6
     discrepancies_resolved: 5
     discrepancies_remaining: 1
@@ -89,9 +89,9 @@ templates:
     open_discrepancy_count: 0
     resolved_discrepancy_count: 6
     last_audit_at: "2026-03-22"
-    notes: "Font-family regression re-audit after base_component.rb shared change. SAC fixes hold, two-column layout intact, tinted skill chips present, zero console errors."
-    cycle_count: 6
-    last_cycle_date: "2026-03-22T05:14:00Z"
+    notes: "Regression re-audit after finalize-workspace commit (48a3230). SAC-004 rounded-2xl, SAC-005 tinted chips, SAC-006 font-medium labels all hold. Zero console errors."
+    cycle_count: 7
+    last_cycle_date: "2026-03-22T05:30:00Z"
     discrepancies_found: 6
     discrepancies_resolved: 6
     discrepancies_remaining: 0
@@ -101,9 +101,9 @@ templates:
     open_discrepancy_count: 0
     resolved_discrepancy_count: 7
     last_audit_at: "2026-03-22"
-    notes: "Font-family regression re-audit after base_component.rb shared change. EDT fixes hold, editorial split layout with monogram badge intact, zero console errors."
-    cycle_count: 7
-    last_cycle_date: "2026-03-22T05:14:00Z"
+    notes: "Regression re-audit after finalize-workspace commit (48a3230). EDT-002 badge, EDT-006 border, EDT-007 mobile overflow fixes hold. Monogram badge intact. Zero console errors."
+    cycle_count: 8
+    last_cycle_date: "2026-03-22T05:30:00Z"
     discrepancies_found: 7
     discrepancies_resolved: 7
     discrepancies_remaining: 0
