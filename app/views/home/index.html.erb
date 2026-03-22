@@ -72,11 +72,11 @@
         density: :compact
       ) do %>
         <div class="space-y-3">
-          <%= render "shared/glyph_inset_card", glyph: :spark, title: t("home.index.start_here.cards.scratch.title"), description: t("home.index.start_here.cards.scratch.description") %>
+          <%= render "shared/glyph_inset_card", glyph: :spark, title: t("home.index.start_here.cards.scratch.title"), description: t("home.index.start_here.cards.scratch.description"), href: new_registration_path %>
 
-          <%= render "shared/glyph_inset_card", glyph: :layers, title: t("home.index.start_here.cards.existing_resume.title"), description: t("home.index.start_here.cards.existing_resume.description") %>
+          <%= render "shared/glyph_inset_card", glyph: :layers, title: t("home.index.start_here.cards.existing_resume.title"), description: t("home.index.start_here.cards.existing_resume.description"), href: new_registration_path %>
 
-          <%= render "shared/glyph_inset_card", glyph: :preview, title: t("home.index.start_here.cards.keep_preview.title"), description: t("home.index.start_here.cards.keep_preview.description") %>
+          <%= render "shared/glyph_inset_card", glyph: :preview, title: t("home.index.start_here.cards.keep_preview.title"), description: t("home.index.start_here.cards.keep_preview.description"), href: new_registration_path %>
         </div>
       <% end %>
     </aside>

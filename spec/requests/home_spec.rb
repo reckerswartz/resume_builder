@@ -14,6 +14,21 @@ RSpec.describe 'Home', type: :request do
       expect(response.body).to include('atelier-pill')
     end
 
+    it 'renders Start here cards as clickable links to registration' do
+      get root_path
+
+      doc = Nokogiri::HTML(response.body)
+      start_here_links = doc.css('a').select { |a| a['href']&.include?(new_registration_path) }
+
+      # Hero CTA + 3 Start here cards = at least 4 links to registration
+      expect(start_here_links.size).to be >= 4
+
+      card_titles = start_here_links.flat_map { |a| a.css('p.text-sm.font-semibold').map(&:text) }
+      expect(card_titles).to include('Start from scratch')
+      expect(card_titles).to include('Bring an existing resume')
+      expect(card_titles).to include('Keep the preview in view')
+    end
+
     it 'preserves locale query params through public entry links' do
       get root_path(locale: :en)
 

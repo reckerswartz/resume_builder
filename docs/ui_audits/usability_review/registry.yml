@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T23:12:00Z"
+updated_at: "2026-03-22T06:08:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldskl-single-guidance/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-trim-duplicate-personal-details-cta/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "resume-builder-finalize"
     - "resume-show"
-    - "resume-builder-summary"
-  reason: "resume-builder-skills improved to 88 with no open issues after suppressing generic fallback entry text. resume-builder-finalize and resume-show are the next unaudited high-priority surfaces, followed by resume-builder-summary."
+    - "resume-builder-personal-details"
+    - "resume-show"
+  reason: "resume-builder-heading improved to 87 after trimming the duplicate personal-details CTA card, and it now has only one low-priority footer-note copy follow-up. resume-show is the next preview/workspace surface if the audit returns from the builder flow, while resume-builder-personal-details is the next identity-details step if the builder sequence continues forward."
 pages:
   - page_key: "home"
     title: "Home"
@@ -146,12 +146,132 @@ pages:
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-resumes-new-template-disclosure/00-overview.md"
     next_step: "No open issues are currently tracked on resumes-new. Revisit only if setup-flow structure or copy changes."
   - { page_key: "resume-show", title: "Resume preview", path: "/resumes/:id", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "workspace", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "templates-index", title: "Template marketplace", path: "/templates", access_level: "authenticated", auth_context: "authenticated_user", page_family: "templates", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "template-show", title: "Template detail", path: "/templates/:id", access_level: "authenticated", auth_context: "authenticated_user", page_family: "templates", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "templates-index"
+    title: "Template marketplace"
+    path: "/templates"
+    access_level: "authenticated"
+    auth_context: "authenticated_user"
+    page_family: "templates"
+    priority: "medium"
+    status: "improved"
+    usability_score: 86
+    page_doc_path: "docs/ui_audits/usability_review/pages/templates-index.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-TIDX-001"
+    last_audited_at: "2026-03-22T05:13:00Z"
+    last_changed_at: "2026-03-22T05:13:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tidx-hide-default-all-quick-choices/00-overview.md"
+    next_step: "No open issues are currently tracked on templates-index. Revisit only if the marketplace quick rail, full filter tray, or template-card comparison hierarchy changes."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T05:13:00Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
+  - page_key: "template-show"
+    title: "Template detail"
+    path: "/templates/:id"
+    access_level: "authenticated"
+    auth_context: "authenticated_user"
+    page_family: "templates"
+    priority: "medium"
+    status: "improved"
+    usability_score: 83
+    page_doc_path: "docs/ui_audits/usability_review/pages/template-show.md"
+    open_issue_keys:
+      - "UX-TSHOW-002"
+      - "UX-TSHOW-003"
+    closed_issue_keys:
+      - "UX-TSHOW-001"
+      - "UX-TSHOW-004"
+    last_audited_at: "2026-03-22T05:31:00Z"
+    last_changed_at: "2026-03-22T05:31:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-trim-quick-take-inset/00-overview.md"
+    next_step: "UX-TSHOW-002 remains the next highest-value open issue. If the page is revisited, consolidate the duplicate header and quick-take CTA clusters before addressing the lower-priority carry-through copy length."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:31:00Z"
+    issues_found: 4
+    issues_resolved: 2
+    issues_remaining: 2
+    regression_detected: false
   - { page_key: "resume-source-import", title: "Resume source import launcher", path: "/resume_source_imports/:provider", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "resume-builder-source", title: "Resume builder source step", path: "/resumes/:id/edit?step=source", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "resume-builder-heading", title: "Resume builder heading step", path: "/resumes/:id/edit?step=heading", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "resume-builder-personal-details", title: "Resume builder personal details step", path: "/resumes/:id/edit?step=personal_details", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-source"
+    title: "Resume builder source step"
+    path: "/resumes/:id/edit?step=source"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "improved"
+    usability_score: 82
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-source.md"
+    open_issue_keys:
+      - "UX-BLDSRC-002"
+      - "UX-BLDSRC-003"
+    closed_issue_keys:
+      - "UX-BLDSRC-001"
+      - "UX-BLDSRC-004"
+    last_audited_at: "2026-03-22T05:54:00Z"
+    last_changed_at: "2026-03-22T05:54:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsrc-contextual-supported-formats/00-overview.md"
+    next_step: "UX-BLDSRC-002 remains the next highest-value open issue. If this page is revisited, demote the remaining Import status card below the source-mode chooser or into a lighter disclosure before addressing the lower-priority guidance copy length."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:54:00Z"
+    issues_found: 4
+    issues_resolved: 2
+    issues_remaining: 2
+    regression_detected: false
+  - page_key: "resume-builder-heading"
+    title: "Resume builder heading step"
+    path: "/resumes/:id/edit?step=heading"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "improved"
+    usability_score: 87
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-heading.md"
+    open_issue_keys:
+      - "UX-BLDHDG-003"
+    closed_issue_keys:
+      - "UX-BLDHDG-001"
+      - "UX-BLDHDG-002"
+    last_audited_at: "2026-03-22T06:08:00Z"
+    last_changed_at: "2026-03-22T06:08:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-trim-duplicate-personal-details-cta/00-overview.md"
+    next_step: "No medium or high heading-step issues remain open. If this page is revisited, UX-BLDHDG-003 is the only remaining low-priority follow-up."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T06:08:00Z"
+    issues_found: 3
+    issues_resolved: 2
+    issues_remaining: 1
+    regression_detected: false
+  - page_key: "resume-builder-personal-details"
+    title: "Resume builder personal details step"
+    path: "/resumes/:id/edit?step=personal_details"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "improved"
+    usability_score: 78
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-personal-details.md"
+    open_issue_keys:
+      - "UX-BLDPD-002"
+      - "UX-BLDPD-003"
+    closed_issue_keys:
+      - "UX-BLDPD-001"
+    last_audited_at: "2026-03-22T05:55:00Z"
+    last_changed_at: "2026-03-22T05:55:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-remove-duplicate-step-header/00-overview.md"
+    next_step: "UX-BLDPD-002 (content_brevity) is the next highest-value open issue — shorten technical jargon in headshot and photo library descriptions. UX-BLDPD-003 (task_overload) is structural and lower priority."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T05:55:00Z"
+    issues_found: 3
+    issues_resolved: 1
+    issues_remaining: 2
+    regression_detected: false
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
     path: "/resumes/:id/edit?step=experience"
@@ -231,7 +351,33 @@ pages:
     issues_remaining: 0
     regression_detected: false
   - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "resume-builder-finalize", title: "Resume builder finalize step", path: "/resumes/:id/edit?step=finalize", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-finalize"
+    title: "Resume builder finalize step"
+    path: "/resumes/:id/edit?step=finalize"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "high"
+    status: "improved"
+    usability_score: 79
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-finalize.md"
+    open_issue_keys:
+      - "UX-BLDFIN-004"
+      - "UX-BLDFIN-005"
+    closed_issue_keys:
+      - "UX-BLDFIN-001"
+      - "UX-BLDFIN-002"
+      - "UX-BLDFIN-003"
+    last_audited_at: "2026-03-22T04:50:00Z"
+    last_changed_at: "2026-03-22T04:50:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-remove-duplicate-step-header/00-overview.md"
+    next_step: "Fix UX-BLDFIN-004 (content_brevity) by shortening developer-facing jargon in design workspace descriptions. UX-BLDFIN-005 (task_overload) is structural and lower priority."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T04:50:00Z"
+    issues_found: 5
+    issues_resolved: 3
+    issues_remaining: 2
+    regression_detected: false
   - { page_key: "admin-dashboard", title: "Admin dashboard", path: "/admin", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-templates-index", title: "Admin templates index", path: "/admin/templates", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-template-show", title: "Admin template detail", path: "/admin/templates/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }

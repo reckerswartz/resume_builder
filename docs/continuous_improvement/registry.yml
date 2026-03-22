@@ -1,0 +1,309 @@
+version: 1
+updated_at: "2026-03-22T04:30:00Z"
+workflow:
+  status: active
+  path: ".windsurf/workflows/continuous-improvement.md"
+  default_mode: explore
+  default_viewports:
+    - "1440x900"
+    - "390x844"
+  default_batch_size: 1
+tracking:
+  overview_path: "docs/continuous_improvement/README.md"
+  run_doc_pattern: "docs/continuous_improvement/runs/<date>-<slug>/00-overview.md"
+  proposal_doc_pattern: "docs/continuous_improvement/proposals/<proposal_id>.md"
+  latest_run: "docs/continuous_improvement/runs/2026-03-22-new-user-journey-explore/00-overview.md"
+artifacts:
+  cache_root: "tmp/ci_artifacts"
+  competitive_subfolder: "competitive"
+  commit_policy: "metadata_only"
+proposal_categories:
+  - remove_friction
+  - new_feature
+  - simplify_workflow
+  - improve_content
+  - add_delight
+  - competitive_parity
+  - productivity_boost
+impact_levels:
+  - critical
+  - high
+  - medium
+  - low
+effort_levels:
+  - small
+  - medium
+  - large
+proposal_statuses:
+  - discovered
+  - prioritized
+  - in_progress
+  - implemented
+  - validated
+  - closed
+  - deferred
+  - routed
+run_modes:
+  - explore
+  - implement-next
+  - review-proposals
+  - competitive-scan
+  - full-cycle
+user_personas:
+  - new_user
+  - returning_user
+  - power_user
+  - admin
+feature_domains:
+  - resume_creation
+  - template_selection
+  - export
+  - import
+  - editing
+  - navigation
+  - workspace
+  - admin
+  - auth
+proposal_id_format: "CI-<DOMAIN>-<NNN>"
+cross_workflow_routing:
+  usability_issues: "/ux-usability-audit"
+  responsive_issues: "/responsive-ui-audit"
+  compliance_gaps: "/ui-guidelines-audit"
+  code_quality: "/maintainability-audit"
+  bugs: "/smart-fix"
+  security: "/security-audit"
+journey_definitions:
+  new_user:
+    description: "First-time visitor creating their first resume"
+    steps:
+      - "Visit homepage"
+      - "Create account"
+      - "Start new resume (setup step)"
+      - "Choose template"
+      - "Add heading/contact info"
+      - "Add personal details"
+      - "Add experience entries"
+      - "Add education entries"
+      - "Add skills"
+      - "Write summary"
+      - "Finalize and adjust formatting"
+      - "Export PDF"
+    success_criteria: "User completes a presentable resume and downloads a PDF in under 20 minutes"
+  returning_user:
+    description: "Signed-in user editing an existing resume"
+    steps:
+      - "Sign in"
+      - "Open resume workspace"
+      - "Select existing resume"
+      - "Edit experience section"
+      - "Preview changes"
+      - "Export updated PDF"
+    success_criteria: "User makes targeted edits and exports in under 5 minutes"
+  power_user:
+    description: "Managing multiple resumes with advanced features"
+    steps:
+      - "Sign in"
+      - "Browse resume workspace"
+      - "Compare templates in marketplace"
+      - "Switch template on existing resume"
+      - "Use cloud import"
+      - "Fine-tune formatting in finalize"
+      - "Export multiple formats"
+    success_criteria: "User can efficiently manage multiple resumes and leverage advanced features"
+  admin:
+    description: "Managing platform configuration and monitoring"
+    steps:
+      - "Sign in as admin"
+      - "Review admin dashboard"
+      - "Manage templates"
+      - "Configure LLM providers"
+      - "Monitor job logs"
+      - "Review error logs"
+      - "Adjust platform settings"
+    success_criteria: "Admin can monitor and configure the platform efficiently"
+cycle_metrics:
+  cycle_count: 2
+  last_cycle_date: "2026-03-22T04:57:00Z"
+  proposals_discovered: 5
+  proposals_implemented: 3
+  proposals_remaining: 2
+  proposals_routed: 0
+  competitive_scans_completed: 0
+  journeys_simulated: 1
+  journey_log:
+    - persona: new_user
+      date: "2026-03-22T04:30:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Visit homepage (guest)"
+        - "Navigate to sign-in"
+        - "Navigate to registration"
+        - "Sign in as demo user"
+        - "View workspace"
+        - "Navigate to /resumes/new"
+        - "View experience level selector"
+        - "View template detail page"
+        - "View builder (heading step)"
+        - "View resume preview"
+      console_errors: 0
+      observations:
+        - "Root / renders proper public landing page for guests"
+        - "Sign-in page uses returning-user copy for all visitors"
+        - "/templates redirects guests to sign-in — no public template browsing"
+        - "Resume creation requires experience level selection before setup form"
+        - "After resume creation, user lands on source step (import/paste)"
+next_step:
+  recommended_mode: "implement-next"
+  recommended_persona: "new_user"
+  reason: "CI-BUILDER-001, CI-AUTH-001, and CI-NAV-001 validated. Next candidate is CI-WORKSPACE-001 (post-registration onboarding, high impact, medium effort) or CI-TEMPLATE-001 (guest template browsing, medium impact, medium effort)."
+proposals:
+  - id: "CI-BUILDER-001"
+    category: remove_friction
+    impact: high
+    effort: small
+    status: validated
+    implemented_at: "2026-03-22T04:43:00Z"
+    user_personas:
+      - new_user
+      - returning_user
+    journey_step: "Start new resume → land on source step"
+    problem: >
+      After creating a resume, ResumesController#create redirects to
+      edit_resume_path(@resume, step: 'source'). For users starting from
+      scratch (no existing resume to import), the source step is a forced
+      detour that adds no value — they must click 'Next' to skip past
+      paste/upload fields before reaching the heading step where actual
+      content editing begins.
+    proposed_improvement: >
+      Detect the resume's source_mode at creation time. When the user
+      chose 'scratch' or did not provide source content, redirect
+      directly to step: 'heading' instead of step: 'source'. Keep the
+      source step accessible from the builder sidebar for users who
+      want to import content later.
+    evidence:
+      page_url: "/resumes/new"
+      redirect_target: "/resumes/:id/edit?step=source"
+      interaction_count: "1 extra click to skip source step"
+    affected_files:
+      - "app/controllers/resumes_controller.rb"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-AUTH-001"
+    category: improve_content
+    impact: medium
+    effort: small
+    status: validated
+    implemented_at: "2026-03-22T04:47:00Z"
+    user_personas:
+      - new_user
+    journey_step: "Visit sign-in page as first-time visitor"
+    problem: >
+      The sign-in page at /session/new shows 'Welcome back' eyebrow and
+      'Pick up where you left off' heading. When a first-time visitor
+      clicks 'Sign in' from the homepage or gets redirected from a
+      protected route, this returning-user copy creates a false
+      assumption that the visitor already has an account.
+    proposed_improvement: >
+      Change the sign-in page copy to be neutral rather than
+      returning-user specific. Use copy like 'Sign in to your workspace'
+      that works for both new and returning visitors. Keep the 'Need an
+      account? Create one' link prominent.
+    evidence:
+      page_url: "/session/new"
+      current_copy: "Welcome back / Pick up where you left off"
+    affected_files:
+      - "config/locales/views/sessions.en.yml"
+      - "app/views/sessions/new.html.erb"
+    estimated_spec_paths:
+      - "spec/requests/sessions_spec.rb"
+
+  - id: "CI-TEMPLATE-001"
+    category: new_feature
+    impact: medium
+    effort: medium
+    status: discovered
+    user_personas:
+      - new_user
+    journey_step: "Browse templates before creating account"
+    problem: >
+      Unauthenticated users cannot browse the template gallery. Visiting
+      /templates redirects to sign-in. This means potential users cannot
+      see what layout options are available before committing to account
+      creation, reducing conversion confidence.
+    proposed_improvement: >
+      Allow guest access to templates#index and templates#show by
+      updating TemplatePolicy#index? and #show? to return true for all
+      visitors (or add allow_unauthenticated_access to
+      TemplatesController). The 'Use this template' CTA can redirect
+      guests to registration with the template_id preserved.
+    evidence:
+      page_url: "/templates"
+      redirect_target: "/session/new"
+    affected_files:
+      - "app/policies/template_policy.rb"
+      - "app/controllers/templates_controller.rb"
+    estimated_spec_paths:
+      - "spec/requests/templates_spec.rb"
+
+  - id: "CI-WORKSPACE-001"
+    category: improve_content
+    impact: high
+    effort: medium
+    status: discovered
+    user_personas:
+      - new_user
+    journey_step: "Land on workspace after first registration"
+    problem: >
+      After creating an account, the user lands on the workspace with
+      their starter resume but no welcome message, onboarding guidance,
+      or first-action prompt. The workspace looks identical whether the
+      user has been using the app for months or just signed up seconds
+      ago. There is no contextual help explaining what the starter
+      resume is or what to do next.
+    proposed_improvement: >
+      Add a first-visit welcome card or banner on the workspace that
+      appears only when the user has exactly 1 resume and it was
+      created within the last few minutes (or track a 'welcomed' flag).
+      The card should explain 'Your starter draft is ready — click Edit
+      to start building' with a direct link to the builder.
+    evidence:
+      page_url: "/resumes"
+      interaction_count: "0 contextual guidance for new users"
+    affected_files:
+      - "app/views/resumes/index.html.erb"
+      - "app/helpers/resumes_helper.rb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-NAV-001"
+    category: remove_friction
+    impact: medium
+    effort: small
+    status: validated
+    implemented_at: "2026-03-22T04:57:00Z"
+    github_issue: 58
+    user_personas:
+      - new_user
+      - returning_user
+    journey_step: "Navigate from homepage to resume creation"
+    problem: >
+      The public homepage has a 'Create account' CTA but the three
+      'Start here' cards ('Start from scratch', 'Bring an existing
+      resume', 'Keep the preview in view') are informational but not
+      clickable — they describe features without linking to the
+      corresponding actions.
+    proposed_improvement: >
+      Make the three 'Start here' cards on the homepage clickable,
+      linking to registration/new with appropriate query parameters
+      (e.g., source_mode=scratch, source_mode=import). This turns
+      passive feature descriptions into active conversion paths.
+    evidence:
+      page_url: "/"
+      current_behavior: "Cards are read-only informational blocks"
+    affected_files:
+      - "app/views/home/index.html.erb"
+      - "config/locales/en.yml"
+    estimated_spec_paths:
+      - "spec/requests/home_spec.rb"

@@ -1,23 +1,4 @@
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
-  <%= render Ui::StepHeaderComponent.new(
-    title: current_step.fetch(:title),
-    description: current_step.fetch(:description)
-  ) do %>
-    <%= render Ui::WidgetCardComponent.new(
-      eyebrow: t("resumes.editor_personal_details_step.optional_step.eyebrow"),
-      title: t("resumes.editor_personal_details_step.optional_step.title"),
-      description: t("resumes.editor_personal_details_step.optional_step.description"),
-      padding: :sm
-    ) do %>
-      <div class="flex flex-wrap gap-2">
-        <% if next_step_path.present? %>
-          <%= link_to t("resumes.editor_personal_details_step.optional_step.skip_for_now"), next_step_path, class: ui_button_classes(:secondary, size: :sm) %>
-        <% end %>
-        <%= link_to t("resumes.editor_personal_details_step.optional_step.back_to_heading"), edit_resume_path(resume, step: "heading"), class: ui_button_classes(:secondary, size: :sm) %>
-      </div>
-    <% end %>
-  <% end %>
-
   <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
     <% if resume.errors.any? %>
       <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">

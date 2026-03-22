@@ -4,6 +4,7 @@
     title:       String — bold title text
     description: String — supporting description text
   Optional locals:
+    href:        String — when present, renders the card as a clickable <a> instead of a <div>
     tone:        Symbol — inset panel tone (default: :subtle)
     glyph_size:  Symbol — glyph size (default: :sm)
     glyph_tone:  Symbol — glyph tone (default: :soft)
@@ -11,8 +12,13 @@
 <% tone       = local_assigns.fetch(:tone, :subtle) %>
 <% glyph_size = local_assigns.fetch(:glyph_size, :sm) %>
 <% glyph_tone = local_assigns.fetch(:glyph_tone, :soft) %>
+<% link_href  = local_assigns[:href] %>
 
-<div class="<%= ui_inset_panel_classes(tone: tone) %>">
+<% tag_name = link_href ? :a : :div %>
+<% tag_attrs = { class: ui_inset_panel_classes(tone: tone) + (link_href ? " block transition-colors hover:bg-ink-50/60" : "") } %>
+<% tag_attrs[:href] = link_href if link_href %>
+
+<%= content_tag(tag_name, **tag_attrs) do %>
   <div class="flex items-start gap-3">
     <%= render Ui::GlyphComponent.new(name: glyph, size: glyph_size, tone: glyph_tone) %>
     <div>
@@ -20,4 +26,4 @@
       <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= description %></p>
     </div>
   </div>
-</div>
+<% end %>
