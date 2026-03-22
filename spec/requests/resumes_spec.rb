@@ -308,10 +308,13 @@ RSpec.describe 'Resumes', type: :request do
       get resume_path(resume)
 
       expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      preview_badges = document.css('[data-preview-artifact-badges] span').map { |badge| badge.text.squish }
+
       expect(response.body).to include(I18n.t('resumes.show.preview_title'))
       expect(response.body).to include(I18n.t('resumes.show.desktop_actions.title'))
       expect(response.body).not_to include(I18n.t('resumes.show.what_this_shows.eyebrow'))
-      expect(response.body.scan(/>#{Regexp.escape(I18n.t('resumes.export_states.draft'))}</).size).to eq(2)
+      expect(preview_badges).to eq([template.name])
       expect(response.body).to include(I18n.t('resumes.helper.export_status.labels.draft_only'))
     end
   end
