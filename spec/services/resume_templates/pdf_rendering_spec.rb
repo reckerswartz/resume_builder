@@ -373,8 +373,9 @@ RSpec.describe 'Resume template PDF rendering' do
     )
 
     document = Nokogiri::HTML.parse(html)
-    entry_container = document.css('div').find { |n| n['class'].to_s.include?('space-y-4') && n['class'].to_s.include?('mt-4') }
+    entry_container = document.css('div').find { |n| n['class'].to_s.include?('space-y-3') && n['class'].to_s.include?('mt-3') }
     expect(entry_container).to be_present
+    expect(entry_container['class']).not_to include('space-y-4')
   end
 
   it 'renders Sidebar Accent with consistent card radius, blended skill chips, and medium-weight contact labels' do

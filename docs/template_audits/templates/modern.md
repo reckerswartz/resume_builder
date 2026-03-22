@@ -47,7 +47,7 @@ No open discrepancies. All 7 issues resolved.
 | MOD-005 | page_break | major | Added page-break-inside:avoid to sections/articles/header in PDF layout | 2026-03-21 | Shared fix in app/views/layouts/pdf.html.erb — benefits all templates |
 | MOD-006 | page_count_overflow | moderate | Browser preview estimates ~6.67 pages, but PDF export renders to 5 pages at A4 | 2026-03-21 | Resolved via direct `Resumes::PdfExporter` verification |
 | MOD-007 | language_entry_level | minor | Added level to entry_subtitle in BaseComponent | 2026-03-21 | Shared fix — languages now show proficiency (e.g. "Native", "Professional") |
-| MOD-001 | contact_pills | minor | Changed gap-2 → gap-x-2 gap-y-1.5 + items-start on both header contact containers | 2026-03-22 | Consistent pill gaps when wrapping |
+| MOD-001 | contact_pills | minor | Added items-start to both header contact containers for consistent top-alignment of wrapped pill rows | 2026-03-22 | Consistent pill alignment when wrapping |
 | MOD-002 | section_marker | minor | Changed items-center → items-baseline, dot h-3 w-3 → h-2.5 w-2.5 shrink-0 mt-0.5 | 2026-03-22 | Optical baseline alignment |
 | MOD-003 | entry_card_shadow | minor | Added shadow-sm to entry card article class | 2026-03-22 | Lifted card feel |
 
