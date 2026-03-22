@@ -1,16 +1,5 @@
 <div class="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
   <div class="space-y-4">
-    <%= render Ui::PageHeaderComponent.new(
-      eyebrow: t("sessions.new.page_header.eyebrow"),
-      title: t("sessions.new.page_header.title"),
-      description: t("sessions.new.page_header.description"),
-      badges: [
-        { label: t("sessions.new.page_header.badges.saved_drafts"), tone: :neutral },
-        { label: t("sessions.new.page_header.badges.live_preview"), tone: :neutral }
-      ],
-      density: :compact
-    ) %>
-
     <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm) do %>
       <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
       <div class="relative space-y-3">

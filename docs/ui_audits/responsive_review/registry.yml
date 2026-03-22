@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:35:00Z"
+updated_at: "2026-03-22T05:37:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/responsive_review/README.md"
   page_doc_template: "docs/ui_audits/responsive_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/responsive_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-review-only-drift-sweep/00-overview.md"
+  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-regression-check-closed-pages/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   commit_policy: "metadata_only"
@@ -65,7 +65,7 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope: []
-  reason: "Review-only drift sweep completed for personal-details, source, and resumes-new. No new issues found. Remaining reviewed pages have minimal drift. Next honest entry point is review-only after future shared UI changes."
+  reason: "Regression check passed for 4 closed pages (finalize, template-show, templates-index, summary) whose source files changed since closure. Zero overflow, zero console errors at 390x844, 768x1024, 1280x800. All closed pages remain stable. Next honest entry point is review-only after future shared UI changes."
 pages:
   - page_key: "home"
     title: "Home"
@@ -188,10 +188,10 @@ pages:
       - "templates-index-mobile-first-fold-density"
     last_audited_at: "2026-03-21T21:09:03Z"
     last_changed_at: "2026-03-21T21:09:03Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-templates-index-close-page/00-overview.md"
-    next_step: "Closed. Re-review after future marketplace layout, filter-tray, or quick-choice sidebar changes."
-    cycle_count: 2
-    last_cycle_date: "2026-03-21T21:09:03Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-regression-check-closed-pages/00-overview.md"
+    next_step: "Closed. Regression check passed 2026-03-22. Re-review after future marketplace layout, filter-tray, or quick-choice sidebar changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T05:37:00Z"
     issues_found: 1
     issues_resolved: 1
     issues_remaining: 0
@@ -205,15 +205,15 @@ pages:
     priority: "medium"
     status: "closed"
     page_doc_path: "docs/ui_audits/responsive_review/pages/template-show.md"
-    last_audited_at: "2026-03-22T05:25:00Z"
+    last_audited_at: "2026-03-22T05:37:00Z"
     last_changed_at: "2026-03-22T05:25:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-template-show-close-page/00-overview.md"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-regression-check-closed-pages/00-overview.md"
     open_issue_keys: []
     closed_issue_keys:
       - "template-show-mobile-sidebar-overflow"
-    next_step: "Closed. Re-review after future template detail layout, preview surface, or shared sidebar changes."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T05:25:00Z"
+    next_step: "Closed. Regression check passed 2026-03-22. Re-review after future template detail layout, preview surface, or shared sidebar changes."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T05:37:00Z"
     issues_found: 1
     issues_resolved: 1
     issues_remaining: 0
@@ -302,13 +302,13 @@ pages:
     page_doc_path: "docs/ui_audits/responsive_review/pages/resume-builder-summary.md"
     last_audited_at: "2026-03-22T04:55:00Z"
     last_changed_at: "2026-03-22T04:55:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-summary-step-close/00-overview.md"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-regression-check-closed-pages/00-overview.md"
     open_issue_keys: []
     closed_issue_keys:
       - "summary-step-mobile-2px-overflow"
-    next_step: "Closed. Original 2px overflow not reproducible at 390x844, 768x1024, or 1280x800. Re-review after major builder chrome or summary step changes."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T04:55:00Z"
+    next_step: "Closed. Regression check passed 2026-03-22. Re-review after major builder chrome or summary step changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T05:37:00Z"
     issues_found: 1
     issues_resolved: 1
     issues_remaining: 0
@@ -327,10 +327,10 @@ pages:
       - "finalize-step-template-picker-scroll-fatigue"
     last_audited_at: "2026-03-21T20:59:24Z"
     last_changed_at: "2026-03-21T20:59:24Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-finalize-close-page/00-overview.md"
-    next_step: "Closed. Re-review after future finalize-step, preview-rail, or shared template-picker changes."
-    cycle_count: 3
-    last_cycle_date: "2026-03-21T20:59:24Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-regression-check-closed-pages/00-overview.md"
+    next_step: "Closed. Regression check passed 2026-03-22 after 5 post-closure commits (tabbed nav, accent palette, font family). Re-review after future finalize-step, preview-rail, or shared template-picker changes."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T05:37:00Z"
     issues_found: 1
     issues_resolved: 1
     issues_remaining: 0
