@@ -209,6 +209,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(action_row.css('a, button').map { |element| element.text.squish }).to eq([
         I18n.t('resumes.resume_card.actions.edit'),
         I18n.t('resumes.resume_card.actions.preview'),
+        I18n.t('resumes.resume_card.actions.export_pdf'),
         I18n.t('resumes.resume_card.actions.delete')
       ])
       expect(card.text).not_to include(resume.slug)
@@ -326,6 +327,13 @@ RSpec.describe 'Resumes', type: :request do
 
       expect(draft_card).to be_present
       expect(draft_card.css('a').map { |a| a.text.squish }).not_to include(I18n.t('resumes.resume_card.actions.download_pdf'))
+
+      draft_card_buttons = draft_card.css('a, button').map { |el| el.text.squish }
+      expect(draft_card_buttons).to include(I18n.t('resumes.resume_card.actions.export_pdf'))
+      expect(draft_card.at_css("form[action='#{export_resume_path(draft_resume)}']")).to be_present
+
+      exported_card_buttons = exported_card.css('a, button').map { |el| el.text.squish }
+      expect(exported_card_buttons).not_to include(I18n.t('resumes.resume_card.actions.export_pdf'))
     end
   end
 
