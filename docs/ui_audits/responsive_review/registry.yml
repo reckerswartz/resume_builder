@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:25:00Z"
+updated_at: "2026-03-22T05:35:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/responsive_review/README.md"
   page_doc_template: "docs/ui_audits/responsive_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/responsive_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-template-show-close-page/00-overview.md"
+  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-review-only-drift-sweep/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   commit_policy: "metadata_only"
@@ -65,7 +65,7 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope: []
-  reason: "All improved responsive backlog closed. No open issue keys remain on any tracked page. Next honest entry point is review-only discovery sweep after future shared UI changes, or re-review of reviewed pages that have accumulated source file drift."
+  reason: "Review-only drift sweep completed for personal-details, source, and resumes-new. No new issues found. Remaining reviewed pages have minimal drift. Next honest entry point is review-only after future shared UI changes."
 pages:
   - page_key: "home"
     title: "Home"
@@ -150,12 +150,12 @@ pages:
     page_doc_path: "docs/ui_audits/responsive_review/pages/resumes-new.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:45:14Z"
-    last_changed_at: "2026-03-21T03:45:14Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-finalize-picker-scroll-fatigue/00-overview.md"
-    next_step: "No issues found. Re-review after future shared template-picker changes that materially affect the setup flow."
-    cycle_count: 2
-    last_cycle_date: "2026-03-21T03:45:14Z"
+    last_audited_at: "2026-03-22T05:35:00Z"
+    last_changed_at: "2026-03-22T05:35:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-review-only-drift-sweep/00-overview.md"
+    next_step: "No issues found after drift sweep. Re-review after future shared template-picker or setup flow changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T05:35:00Z"
     issues_found: 0
     issues_resolved: 0
     issues_remaining: 0
@@ -240,9 +240,9 @@ pages:
     issues_resolved: 1
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "resume-builder-source", title: "Resume builder source step", path: "/resumes/:id/edit?step=source", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:47:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch/00-overview.md", open_issue_keys: [] }
+  - { page_key: "resume-builder-source", title: "Resume builder source step", path: "/resumes/:id/edit?step=source", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-22T05:35:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-review-only-drift-sweep/00-overview.md", open_issue_keys: [], cycle_count: 2, last_cycle_date: "2026-03-22T05:35:00Z", issues_found: 0, issues_resolved: 0, issues_remaining: 0, regression_detected: false }
   - { page_key: "resume-builder-heading", title: "Resume builder heading step", path: "/resumes/:id/edit?step=heading", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T20:44:49Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-mobile-preview-rail/00-overview.md", open_issue_keys: [] }
-  - { page_key: "resume-builder-personal-details", title: "Resume builder personal details step", path: "/resumes/:id/edit?step=personal_details", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:51:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch-2/00-overview.md", open_issue_keys: [] }
+  - { page_key: "resume-builder-personal-details", title: "Resume builder personal details step", path: "/resumes/:id/edit?step=personal_details", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-22T05:35:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-review-only-drift-sweep/00-overview.md", open_issue_keys: [], cycle_count: 2, last_cycle_date: "2026-03-22T05:35:00Z", issues_found: 0, issues_resolved: 0, issues_remaining: 0, regression_detected: false }
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
     path: "/resumes/:id/edit?step=experience"
