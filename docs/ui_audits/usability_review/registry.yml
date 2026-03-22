@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:47:00Z"
+updated_at: "2026-03-22T05:50:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "create-account"
     - "resume-builder-personal-details"
     - "resume-builder-summary"
-  reason: "sign-in audited and improved to 85 with both findings resolved. create-account is the next unaudited public page. resume-builder-personal-details (81) and resume-builder-summary (81) are the lowest-scoring audited pages with open issues."
+    - "password-reset-request"
+  reason: "sign-in (85) and create-account (83) now audited and improved. resume-builder-personal-details (81) and resume-builder-summary (81) are the lowest-scoring audited pages with open issues. password-reset-request is the next unaudited public page."
 pages:
   - page_key: "home"
     title: "Home"
@@ -129,7 +129,30 @@ pages:
     issues_resolved: 2
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "create-account", title: "Create account", path: "/registration/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "create-account"
+    title: "Create account"
+    path: "/registration/new"
+    access_level: "public"
+    auth_context: "guest"
+    page_family: "public_auth"
+    priority: "medium"
+    status: "improved"
+    usability_score: 83
+    page_doc_path: "docs/ui_audits/usability_review/pages/create-account.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-CREG-001"
+      - "UX-CREG-002"
+    last_audited_at: "2026-03-22T05:45:00Z"
+    last_changed_at: "2026-03-22T05:45:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-create-account-remove-redundant-header/00-overview.md"
+    next_step: "No open issues. Revisit only if the registration flow structure or copy changes."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T05:45:00Z"
+    issues_found: 2
+    issues_resolved: 2
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "password-reset-request", title: "Password reset request", path: "/passwords/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - page_key: "resumes-index"
