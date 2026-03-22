@@ -43,8 +43,8 @@ module Errors
 
       def log_message(error_log)
         context_fragments = []
-        context_fragments << "request_id=#{error_log.context['request_id']}" if error_log.context['request_id'].present?
-        context_fragments << "active_job_id=#{error_log.context['active_job_id']}" if error_log.context['active_job_id'].present?
+        context_fragments << "request_id=#{error_log.context['request_id']}" if error_log.context["request_id"].present?
+        context_fragments << "active_job_id=#{error_log.context['active_job_id']}" if error_log.context["active_job_id"].present?
 
         details = context_fragments.any? ? " #{context_fragments.join(' ')}" : ""
 

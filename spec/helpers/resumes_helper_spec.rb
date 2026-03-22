@@ -78,7 +78,7 @@ RSpec.describe ResumesHelper, type: :helper do
         include(key: 'blue', label: 'Blue', accent_color: '#1D4ED8', default: false, custom: false),
         include(key: 'teal', label: 'Teal', accent_color: '#0F766E', default: false, custom: false)
       )
-      expect(template_card.fetch(:preview_resumes_by_accent_color).keys).to match_array(['#0F172A', '#1D4ED8', '#0F766E'])
+      expect(template_card.fetch(:preview_resumes_by_accent_color).keys).to match_array([ '#0F172A', '#1D4ED8', '#0F766E' ])
     end
 
     it 'uses the render-ready implementation profile for shared builder card metadata' do
@@ -132,11 +132,11 @@ RSpec.describe ResumesHelper, type: :helper do
 
   describe '#resume_finalize_workspace_state' do
     it 'builds finalize workspace state with section visibility metadata' do
-      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => ['projects'] })
+      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => [ 'projects' ] })
       projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
       create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
 
-      finalize_workspace_state = helper.resume_finalize_workspace_state(resume, step_sections: [projects_section])
+      finalize_workspace_state = helper.resume_finalize_workspace_state(resume, step_sections: [ projects_section ])
 
       expect(finalize_workspace_state.design_badges).to include(
         include(label: 'Page: A4'),
@@ -157,7 +157,7 @@ RSpec.describe ResumesHelper, type: :helper do
         section_heading_style: 'rule',
         entry_style: 'list',
         sidebar_position: 'left',
-        sidebar_section_labels: ['Skills', 'Education']
+        sidebar_section_labels: [ 'Skills', 'Education' ]
       )
 
       expect(summary).to eq('Sidebar Accent layout with a left sidebar for Skills and Education and list main entries.')
@@ -193,9 +193,9 @@ RSpec.describe ResumesHelper, type: :helper do
       education_section = create(:section, resume:, section_type: 'education', title: 'Education')
       project_section = create(:section, resume:, section_type: 'projects', title: 'Projects')
 
-      expect(helper.resume_builder_sections_for_step(resume, 'experience')).to eq([experience_section])
-      expect(helper.resume_builder_sections_for_step(resume, 'education')).to eq([education_section])
-      expect(helper.resume_builder_sections_for_step(resume, 'finalize')).to eq([project_section])
+      expect(helper.resume_builder_sections_for_step(resume, 'experience')).to eq([ experience_section ])
+      expect(helper.resume_builder_sections_for_step(resume, 'education')).to eq([ education_section ])
+      expect(helper.resume_builder_sections_for_step(resume, 'finalize')).to eq([ project_section ])
     end
   end
 
@@ -228,7 +228,7 @@ RSpec.describe ResumesHelper, type: :helper do
           'name' => 'Resume Builder',
           'role' => 'Lead Engineer',
           'url' => 'https://example.com',
-          'highlights' => ['Implemented shared preview rendering']
+          'highlights' => [ 'Implemented shared preview rendering' ]
         }
       )
 

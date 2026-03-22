@@ -17,8 +17,8 @@ RSpec.describe Templates::MarketplaceState do
       layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'sidebar-accent')
     )
   end
-  let(:templates) { [modern_template, sidebar_template] }
-  let(:filter_templates) { [modern_template, classic_template, sidebar_template] }
+  let(:templates) { [ modern_template, sidebar_template ] }
+  let(:filter_templates) { [ modern_template, classic_template, sidebar_template ] }
   let(:view_context) { instance_double('view_context') }
   let(:template_cards) do
     [
@@ -69,7 +69,7 @@ RSpec.describe Templates::MarketplaceState do
         section_heading_style_label: 'Marker',
         shell_style: 'card',
         shell_style_label: 'Card',
-        sidebar_section_labels: ['Skills', 'Education'],
+        sidebar_section_labels: [ 'Skills', 'Education' ],
         accent_color: '#0F172A',
         summary: 'Sidebar summary',
         short_label: 'SB'
@@ -213,7 +213,7 @@ RSpec.describe Templates::MarketplaceState do
         sort_density_rank: 1,
         selected_accent_color: '#1D4ED8',
         selected_accent_variant_label: 'Slate',
-        badge_labels: ['Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Stacked', 'Entries: Timeline'],
+        badge_labels: [ 'Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Stacked', 'Entries: Timeline' ],
         layout_focus_label: 'Balanced single-column flow'
       )
       expect(modern_card_state.fetch(:search_text)).to include('modern slate')
@@ -231,7 +231,7 @@ RSpec.describe Templates::MarketplaceState do
         sort_density_rank: 1,
         selected_accent_color: '#0F172A',
         selected_accent_variant_label: 'Indigo',
-        badge_labels: ['Density: Comfortable', 'Columns: 2 columns', 'Theme: Indigo', 'Header: Split', 'Entries: Cards', 'Sidebar: Skills and Education'],
+        badge_labels: [ 'Density: Comfortable', 'Columns: 2 columns', 'Theme: Indigo', 'Header: Split', 'Entries: Cards', 'Sidebar: Skills and Education' ],
         layout_focus_label: 'Sidebar: Skills and Education'
       )
       expect(sidebar_card_state.fetch(:search_text)).to include('sidebar indigo')
@@ -266,7 +266,7 @@ RSpec.describe Templates::MarketplaceState do
         layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'sidebar-accent')
       )
     end
-    let(:templates) { [modern_template, sidebar_template, ats_template] }
+    let(:templates) { [ modern_template, sidebar_template, ats_template ] }
     let(:filter_templates) { templates }
     let(:template_cards) do
       [
@@ -317,7 +317,7 @@ RSpec.describe Templates::MarketplaceState do
           section_heading_style_label: 'Rule',
           shell_style: 'card',
           shell_style_label: 'Card',
-          sidebar_section_labels: ['Education', 'Skills'],
+          sidebar_section_labels: [ 'Education', 'Skills' ],
           accent_color: '#4338CA',
           summary: 'Sidebar summary',
           short_label: 'SB'

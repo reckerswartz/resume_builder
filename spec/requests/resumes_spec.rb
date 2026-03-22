@@ -608,7 +608,7 @@ RSpec.describe 'Resumes', type: :request do
             density: 'relaxed',
             accent_color: '#123456',
             show_contact_icons: false,
-            hidden_sections: ['projects', 'unexpected']
+            hidden_sections: [ 'projects', 'unexpected' ]
           }
         }
       }, as: :turbo_stream
@@ -621,7 +621,7 @@ RSpec.describe 'Resumes', type: :request do
         'density' => 'relaxed',
         'accent_color' => '#123456',
         'show_contact_icons' => false,
-        'hidden_sections' => ['projects']
+        'hidden_sections' => [ 'projects' ]
       )
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :preview)}"))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.badges.hidden'))

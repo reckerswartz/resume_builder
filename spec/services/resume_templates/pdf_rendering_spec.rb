@@ -48,7 +48,7 @@ RSpec.describe 'Resume template PDF rendering' do
         'start_date' => '2021',
         'end_date' => '2024',
         'summary' => 'Led the rendering platform for resume previews and exports.',
-        'highlights' => ['Scaled template rendering across preview and PDF surfaces'],
+        'highlights' => [ 'Scaled template rendering across preview and PDF surfaces' ],
         'url' => 'https://example.com/platform'
       }
     )
@@ -256,7 +256,7 @@ RSpec.describe 'Resume template PDF rendering' do
     projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
     create(:entry, section: projects_section, content: { 'name' => 'Hidden Project', 'role' => 'Lead' })
 
-    resume.update!(settings: resume.settings.merge('hidden_sections' => ['projects']))
+    resume.update!(settings: resume.settings.merge('hidden_sections' => [ 'projects' ]))
 
     html = ApplicationController.render(
       template: 'resumes/pdf',

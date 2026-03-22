@@ -7,8 +7,8 @@ RSpec.describe Llm::ModelCapabilityInference do
         identifier: 'nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1',
         raw_attributes: {
           'owned_by' => 'nvidia',
-          'input_modalities' => ['image', 'text'],
-          'output_modalities' => ['embedding']
+          'input_modalities' => [ 'image', 'text' ],
+          'output_modalities' => [ 'embedding' ]
         }
       ).call
 
@@ -24,8 +24,8 @@ RSpec.describe Llm::ModelCapabilityInference do
         identifier: 'microsoft/phi-4-multimodal-instruct',
         raw_attributes: {
           'owned_by' => 'microsoft',
-          'input_modalities' => ['text', 'image'],
-          'output_modalities' => ['text']
+          'input_modalities' => [ 'text', 'image' ],
+          'output_modalities' => [ 'text' ]
         }
       ).call
 

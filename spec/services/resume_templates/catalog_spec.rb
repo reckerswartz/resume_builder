@@ -71,11 +71,11 @@ RSpec.describe ResumeTemplates::Catalog do
       expect(described_class.skill_style_label('bars')).to eq('Bars')
       expect(described_class.section_heading_style_label('marker')).to eq('Marker')
       expect(described_class.sidebar_position_label('left')).to eq('Left')
-      expect(described_class.density_options).to include(['Compact', 'compact'], ['Comfortable', 'comfortable'], ['Relaxed', 'relaxed'])
-      expect(described_class.section_spacing_options).to include(['Tight', 'tight'], ['Standard', 'standard'], ['Relaxed', 'relaxed'])
-      expect(described_class.paragraph_spacing_options).to include(['Tight', 'tight'], ['Standard', 'standard'], ['Relaxed', 'relaxed'])
-      expect(described_class.line_spacing_options).to include(['Tight', 'tight'], ['Standard', 'standard'], ['Relaxed', 'relaxed'])
-      expect(described_class.shell_style_options).to include(['Flat', 'flat'], ['Card', 'card'])
+      expect(described_class.density_options).to include([ 'Compact', 'compact' ], [ 'Comfortable', 'comfortable' ], [ 'Relaxed', 'relaxed' ])
+      expect(described_class.section_spacing_options).to include([ 'Tight', 'tight' ], [ 'Standard', 'standard' ], [ 'Relaxed', 'relaxed' ])
+      expect(described_class.paragraph_spacing_options).to include([ 'Tight', 'tight' ], [ 'Standard', 'standard' ], [ 'Relaxed', 'relaxed' ])
+      expect(described_class.line_spacing_options).to include([ 'Tight', 'tight' ], [ 'Standard', 'standard' ], [ 'Relaxed', 'relaxed' ])
+      expect(described_class.shell_style_options).to include([ 'Flat', 'flat' ], [ 'Card', 'card' ])
     end
   end
 

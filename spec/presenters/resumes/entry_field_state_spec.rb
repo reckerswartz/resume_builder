@@ -15,7 +15,7 @@ RSpec.describe Resumes::EntryFieldState do
 
     it 'joins highlights into a newline-separated string' do
       section = create(:section, section_type: 'experience')
-      entry = build(:entry, section: section, content: { 'highlights' => ['Built APIs', 'Led team'] })
+      entry = build(:entry, section: section, content: { 'highlights' => [ 'Built APIs', 'Led team' ] })
 
       expect(build_state(entry: entry, section: section).field_value('highlights_text')).to eq("Built APIs\nLed team")
     end
@@ -130,7 +130,7 @@ RSpec.describe Resumes::EntryFieldState do
 
     it 'falls back to the first highlight when summary is blank' do
       section = create(:section, section_type: 'experience')
-      entry = build(:entry, section: section, content: { 'highlights' => ['Built APIs'] })
+      entry = build(:entry, section: section, content: { 'highlights' => [ 'Built APIs' ] })
 
       expect(build_state(entry: entry, section: section).editor_supporting_text).to eq('Built APIs')
     end

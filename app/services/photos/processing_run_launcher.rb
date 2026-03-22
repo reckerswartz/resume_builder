@@ -44,7 +44,7 @@ module Photos
         status: :queued,
         resume: resume,
         template: resume&.template,
-        input_asset_ids: [photo_asset.id],
+        input_asset_ids: [ photo_asset.id ],
         selected_model_ids: LlmModelAssignment.ready_models_for(config[:llm_role]).map(&:id)
       )
 
@@ -59,9 +59,9 @@ module Photos
       def job_trailing_args
         case workflow_type
         when "background_remove"
-          [user.id, resume&.id]
+          [ user.id, resume&.id ]
         else
-          [resume&.id, user.id]
+          [ resume&.id, user.id ]
         end
       end
 

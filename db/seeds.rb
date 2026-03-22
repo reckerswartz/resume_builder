@@ -277,7 +277,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
       "B.F.A. Interaction Design"
     ].sample(random: seed_random)
   end
-  skill_level = -> { ["Expert", "Advanced", "Advanced"].sample(random: seed_random) }
+  skill_level = -> { [ "Expert", "Advanced", "Advanced" ].sample(random: seed_random) }
 
   find_or_create_seed_photo_asset = lambda do |photo_profile:, asset_kind:, filename:, source_asset: nil|
     existing_asset = photo_profile.photo_assets
@@ -378,11 +378,11 @@ seed_users = if Rails.env.development? || Rails.env.test?
     undergrad_start_year = (undergrad_end_year - 4).to_s
     website = "https://#{Faker::Internet.domain_name}"
 
-    third_title = ["Technical Lead", "Lead Developer", "Staff Engineer", "Principal Designer"].sample(random: seed_random)
-    fourth_title = ["Software Engineer", "Junior Developer", "Associate Designer", "Product Analyst"].sample(random: seed_random)
-    fifth_title = ["Engineering Intern", "Design Intern", "Graduate Assistant", "Junior Analyst"].sample(random: seed_random)
+    third_title = [ "Technical Lead", "Lead Developer", "Staff Engineer", "Principal Designer" ].sample(random: seed_random)
+    fourth_title = [ "Software Engineer", "Junior Developer", "Associate Designer", "Product Analyst" ].sample(random: seed_random)
+    fifth_title = [ "Engineering Intern", "Design Intern", "Graduate Assistant", "Junior Analyst" ].sample(random: seed_random)
     second_project_name = "#{Faker::App.name} Platform"
-    second_project_role = ["Architect", "Tech Lead", "Core Contributor", "Design Lead"].sample(random: seed_random)
+    second_project_role = [ "Architect", "Tech Lead", "Core Contributor", "Design Lead" ].sample(random: seed_random)
 
     {
       slug: "#{full_name_slug}-#{template_slug}",
@@ -482,7 +482,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
           entries: [
             {
               "institution" => "#{Faker::Address.city} University",
-              "degree" => ["M.S. Computer Science", "M.B.A.", "M.A. Design Strategy", "M.S. Data Science"].sample(random: seed_random),
+              "degree" => [ "M.S. Computer Science", "M.B.A.", "M.A. Design Strategy", "M.S. Data Science" ].sample(random: seed_random),
               "location" => grad_school_location,
               "start_date" => grad_start_year,
               "end_date" => grad_end_year.to_s,
@@ -545,7 +545,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
               }
             end
           }
-        end),
+         end),
         (if languages.any?
           {
             title: "Languages",
@@ -554,7 +554,7 @@ seed_users = if Rails.env.development? || Rails.env.test?
               { "name" => lang.fetch(:name), "level" => lang.fetch(:level) }
             end
           }
-        end)
+         end)
       ].compact
     }
   end
@@ -811,7 +811,7 @@ ApplicationRecord.transaction do
             metadata: {
               "pixel_status" => "close",
               "reference_source_url" => "",
-              "design_principles" => ["bold_headings", "balanced_spacing", "card_shell", "marker_sections"],
+              "design_principles" => [ "bold_headings", "balanced_spacing", "card_shell", "marker_sections" ],
               "target_page_count" => 2
             },
             version_label: "v1.0"
@@ -861,7 +861,7 @@ ApplicationRecord.transaction do
             content: "",
             metadata: {
               "pixel_status" => "close",
-              "design_principles" => ["traditional_hierarchy", "compact_density", "ats_friendly", "rule_headings"],
+              "design_principles" => [ "traditional_hierarchy", "compact_density", "ats_friendly", "rule_headings" ],
               "target_page_count" => 2
             },
             version_label: "v1.0"
@@ -897,7 +897,7 @@ ApplicationRecord.transaction do
             content: "",
             metadata: {
               "pixel_status" => "close",
-              "design_principles" => ["maximum_ats_compatibility", "minimal_chrome", "dense_content", "rule_headings"],
+              "design_principles" => [ "maximum_ats_compatibility", "minimal_chrome", "dense_content", "rule_headings" ],
               "target_page_count" => 2
             },
             version_label: "v1.0"
@@ -933,7 +933,7 @@ ApplicationRecord.transaction do
             content: "",
             metadata: {
               "pixel_status" => "close",
-              "design_principles" => ["conservative_hierarchy", "balanced_structure", "professional_tone", "split_header"],
+              "design_principles" => [ "conservative_hierarchy", "balanced_structure", "professional_tone", "split_header" ],
               "target_page_count" => 2
             },
             version_label: "v1.0"
@@ -969,7 +969,7 @@ ApplicationRecord.transaction do
             content: "",
             metadata: {
               "pixel_status" => "close",
-              "design_principles" => ["spacious_layout", "lighter_chrome", "card_entries", "chip_skills"],
+              "design_principles" => [ "spacious_layout", "lighter_chrome", "card_entries", "chip_skills" ],
               "target_page_count" => 3
             },
             version_label: "v1.0"
@@ -1006,7 +1006,7 @@ ApplicationRecord.transaction do
             content: "",
             metadata: {
               "pixel_status" => "close",
-              "design_principles" => ["two_column", "tinted_sidebar", "section_separation", "chip_skills"],
+              "design_principles" => [ "two_column", "tinted_sidebar", "section_separation", "chip_skills" ],
               "target_page_count" => 2
             },
             version_label: "v1.0"
@@ -1044,7 +1044,7 @@ ApplicationRecord.transaction do
             metadata: {
               "pixel_status" => "close",
               "reference_source_url" => "https://www.behance.net/gallery/245736819/Resume-Cv-Template",
-              "design_principles" => ["asymmetric_editorial", "utility_rail", "identity_tile", "lime_accent"],
+              "design_principles" => [ "asymmetric_editorial", "utility_rail", "identity_tile", "lime_accent" ],
               "target_page_count" => 2
             },
             version_label: "v1.0"
@@ -1334,7 +1334,7 @@ unless Rails.env.production?
       skills_section = resume.sections.create!(title: "Skills", section_type: "skills", position: section_position)
       section_position += 1
 
-      skill_levels = ["Expert", "Advanced", "Advanced", "Proficient"]
+      skill_levels = [ "Expert", "Advanced", "Advanced", "Proficient" ]
       profile.fetch(:skills, []).each_with_index do |skill_name, idx|
         skills_section.entries.create!(
           position: idx,

@@ -11,7 +11,7 @@ RSpec.describe Resumes::EntryContentNormalizer do
         'highlights_text' => "Built APIs\n  Led team\n\nShipped features"
       })
 
-      expect(result['highlights']).to eq(['Built APIs', 'Led team', 'Shipped features'])
+      expect(result['highlights']).to eq([ 'Built APIs', 'Led team', 'Shipped features' ])
       expect(result).not_to have_key('highlights_text')
     end
 
@@ -20,15 +20,15 @@ RSpec.describe Resumes::EntryContentNormalizer do
         'highlights_text' => "Line one\r\nLine two"
       })
 
-      expect(result['highlights']).to eq(['Line one', 'Line two'])
+      expect(result['highlights']).to eq([ 'Line one', 'Line two' ])
     end
 
     it 'preserves an existing highlights array when no highlights_text is present' do
       result = normalize(section_type: 'experience', params: {
-        'highlights' => ['Already parsed']
+        'highlights' => [ 'Already parsed' ]
       })
 
-      expect(result['highlights']).to eq(['Already parsed'])
+      expect(result['highlights']).to eq([ 'Already parsed' ])
     end
   end
 

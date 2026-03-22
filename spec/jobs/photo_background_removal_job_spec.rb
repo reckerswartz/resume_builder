@@ -15,7 +15,7 @@ RSpec.describe PhotoBackgroundRemovalJob, type: :job do
   let(:processing_run) do
     photo_profile.photo_processing_runs.create!(
       workflow_type: :background_remove, status: :queued,
-      resume: resume, input_asset_ids: [source_asset.id]
+      resume: resume, input_asset_ids: [ source_asset.id ]
     )
   end
 
@@ -39,7 +39,7 @@ RSpec.describe PhotoBackgroundRemovalJob, type: :job do
       job.perform_now
 
       expect(processing_run.reload).to be_succeeded
-      expect(processing_run.output_asset_ids).to eq([cutout_asset.id])
+      expect(processing_run.output_asset_ids).to eq([ cutout_asset.id ])
       expect(processing_run.next_step_guidance).to be_present
     end
 

@@ -68,7 +68,7 @@ RSpec.describe Resumes::TemplatePickerState do
         section_heading_style_label: 'Rule',
         shell_style: 'card',
         shell_style_label: 'Card',
-        sidebar_section_labels: ['Skills', 'Education'],
+        sidebar_section_labels: [ 'Skills', 'Education' ],
         accent_color: '#4338CA',
         summary: 'Sidebar summary',
         short_label: 'SI'
@@ -156,7 +156,7 @@ RSpec.describe Resumes::TemplatePickerState do
         supporting_text: 'Clean professional resume layout',
         badge_classes: 'badge-hero',
         current_badge_classes: 'badge-hero',
-        selection_badges: ['Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Split', 'Entries: Cards'],
+        selection_badges: [ 'Density: Comfortable', 'Columns: 1 column', 'Theme: Slate', 'Header: Split', 'Entries: Cards' ],
         show_current_only_badge: true,
         current_only_badge_label: 'Current only',
         selected_accent_color: '#0F172A',
@@ -166,7 +166,7 @@ RSpec.describe Resumes::TemplatePickerState do
         summary_hidden: false,
         summary_aria_hidden: 'false',
         summary_card_attributes: { eyebrow: 'Selection summary', title: 'Legacy Blue', description: 'Legacy summary', tone: :default, padding: :sm },
-        summary_badges: ['Legacy', 'Columns: 1 column', 'Theme: Slate', 'Skills: Chips'],
+        summary_badges: [ 'Legacy', 'Columns: 1 column', 'Theme: Slate', 'Skills: Chips' ],
         summary_detail_text: 'Card shell · Marker headings',
         summary_note: 'You can change this template later without losing content.'
       )
@@ -184,7 +184,7 @@ RSpec.describe Resumes::TemplatePickerState do
         supporting_text: 'Clean professional resume layout',
         badge_classes: 'badge-neutral',
         current_badge_classes: 'badge-warning',
-        selection_badges: ['Density: Comfortable', 'Columns: 2 columns', 'Theme: Indigo', 'Header: Split', 'Entries: List', 'Sidebar: Skills and Education'],
+        selection_badges: [ 'Density: Comfortable', 'Columns: 2 columns', 'Theme: Indigo', 'Header: Split', 'Entries: List', 'Sidebar: Skills and Education' ],
         show_current_only_badge: false,
         selected_accent_color: '#4338CA',
         selected_accent_variant_label: 'Indigo',
@@ -192,7 +192,7 @@ RSpec.describe Resumes::TemplatePickerState do
         accent_label: 'Accent: Indigo',
         summary_hidden: true,
         summary_aria_hidden: 'true',
-        summary_badges: ['Sidebar Accent', 'Columns: 2 columns', 'Theme: Indigo', 'Skills: Chips', 'Sidebar: Skills and Education'],
+        summary_badges: [ 'Sidebar Accent', 'Columns: 2 columns', 'Theme: Indigo', 'Skills: Chips', 'Sidebar: Skills and Education' ],
         summary_detail_text: 'Card shell · Rule headings',
         summary_note: 'You can change this template later without losing content.'
       )
@@ -394,7 +394,7 @@ RSpec.describe Resumes::TemplatePickerState do
           section_heading_style_label: 'Rule',
           shell_style: 'card',
           shell_style_label: 'Card',
-          sidebar_section_labels: ['Education', 'Skills'],
+          sidebar_section_labels: [ 'Education', 'Skills' ],
           accent_color: '#4338CA',
           summary: 'Sidebar summary',
           short_label: 'SI'
@@ -420,7 +420,7 @@ RSpec.describe Resumes::TemplatePickerState do
           section_heading_style_label: 'Rule',
           shell_style: 'sheet',
           shell_style_label: 'Sheet',
-          sidebar_section_labels: ['Skills', 'Education'],
+          sidebar_section_labels: [ 'Skills', 'Education' ],
           accent_color: '#1D4ED8',
           summary: 'Modern summary',
           short_label: 'MO'

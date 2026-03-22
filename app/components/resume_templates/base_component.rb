@@ -62,7 +62,7 @@ module ResumeTemplates
     def section_stack_classes
       return density_scale.fetch(:section_stack) unless explicit_section_spacing?
 
-      [section_spacing_scale.fetch(:stack_margin_top), section_spacing_scale.fetch(:stack_space)].join(" ")
+      [ section_spacing_scale.fetch(:stack_margin_top), section_spacing_scale.fetch(:stack_space) ].join(" ")
     end
 
     def section_stack_spacing_class(fallback: nil)
@@ -151,12 +151,12 @@ module ResumeTemplates
 
     def contact_items
       [
-        ["Email", contact_value("email")],
-        ["Phone", contact_value("phone")],
-        ["Location", contact_value("location")],
-        ["Website", contact_value("website")],
-        ["LinkedIn", contact_value("linkedin")],
-        ["Driving licence", contact_value("driving_licence")]
+        [ "Email", contact_value("email") ],
+        [ "Phone", contact_value("phone") ],
+        [ "Location", contact_value("location") ],
+        [ "Website", contact_value("website") ],
+        [ "LinkedIn", contact_value("linkedin") ],
+        [ "Driving licence", contact_value("driving_licence") ]
       ].reject { |_label, value| value.blank? }
     end
 
@@ -245,7 +245,7 @@ module ResumeTemplates
     def date_range_for(entry)
       start_date = value_for(entry, "start_date")
       end_date = BOOLEAN_TYPE.cast(value_for(entry, "current_role")) ? "Current" : value_for(entry, "end_date")
-      [start_date, end_date].reject(&:blank?).join(" - ")
+      [ start_date, end_date ].reject(&:blank?).join(" - ")
     end
 
     def value_for(entry, key)

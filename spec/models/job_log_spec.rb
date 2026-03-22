@@ -12,16 +12,16 @@ RSpec.describe JobLog, type: :model do
   describe '.for_resume_export' do
     it 'filters export logs by the resume id stored in the job arguments' do
       resume = create(:resume)
-      matching_log = create(:job_log, input: { 'arguments' => [resume.id, resume.user.id] })
-      create(:job_log, input: { 'arguments' => [create(:resume).id, resume.user.id] })
+      matching_log = create(:job_log, input: { 'arguments' => [ resume.id, resume.user.id ] })
+      create(:job_log, input: { 'arguments' => [ create(:resume).id, resume.user.id ] })
 
-      expect(described_class.for_resume_export(resume.id)).to eq([matching_log])
+      expect(described_class.for_resume_export(resume.id)).to eq([ matching_log ])
     end
   end
 
   describe '#resume_id' do
     it 'extracts the resume id from the export job payload' do
-      job_log = build(:job_log, input: { 'arguments' => [42, 9] })
+      job_log = build(:job_log, input: { 'arguments' => [ 42, 9 ] })
 
       expect(job_log.resume_id).to eq(42)
     end
@@ -78,12 +78,12 @@ RSpec.describe JobLog, type: :model do
         job_type: 'ResumeExportJob',
         queue_name: 'default',
         status: 'queued',
-        input: [1, 2, 3],
+        input: [ 1, 2, 3 ],
         output: nil,
         error_details: nil
       )
 
-      expect(job_log.input).to eq('value' => [1, 2, 3])
+      expect(job_log.input).to eq('value' => [ 1, 2, 3 ])
       expect(job_log.output).to eq({})
       expect(job_log.error_details).to eq({})
     end

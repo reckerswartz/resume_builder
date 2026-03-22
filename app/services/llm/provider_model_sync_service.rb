@@ -85,7 +85,6 @@ module Llm
         updated_count = 0
 
         normalized_remote_models.each_value do |normalized_model|
-
           llm_model = provider.llm_models.find_or_initialize_by(identifier: normalized_model.fetch(:identifier))
           created_count += 1 if llm_model.new_record?
           updated_count += 1 if llm_model.persisted?

@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe ResumeBuilder::SectionRegistry do
   describe '.section_types_for_step' do
     it 'returns the section types mapped to a builder step' do
-      expect(described_class.section_types_for_step('experience')).to eq(['experience'])
-      expect(described_class.section_types_for_step('finalize')).to eq(['projects', 'certifications', 'languages'])
+      expect(described_class.section_types_for_step('experience')).to eq([ 'experience' ])
+      expect(described_class.section_types_for_step('finalize')).to eq([ 'projects', 'certifications', 'languages' ])
     end
   end
 

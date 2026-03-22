@@ -86,7 +86,7 @@ RSpec.describe TemplateArtifact, type: :model do
 
   describe "#discrepancy_items" do
     it "returns discrepancies from metadata" do
-      items = [{ "id" => "TEST-001", "area" => "header", "severity" => "minor", "status" => "open" }]
+      items = [ { "id" => "TEST-001", "area" => "header", "severity" => "minor", "status" => "open" } ]
       artifact = template.template_artifacts.create!(
         artifact_type: "discrepancy_report",
         name: "Test Report",

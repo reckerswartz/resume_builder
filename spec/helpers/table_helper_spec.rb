@@ -46,8 +46,8 @@ RSpec.describe TableHelper, type: :helper do
 
   describe '#table_page_window' do
     it 'bounds the page window to the valid range' do
-      expect(helper.table_page_window(current_page: 1, total_pages: 3)).to eq([1, 2])
-      expect(helper.table_page_window(current_page: 3, total_pages: 3)).to eq([2, 3])
+      expect(helper.table_page_window(current_page: 1, total_pages: 3)).to eq([ 1, 2 ])
+      expect(helper.table_page_window(current_page: 3, total_pages: 3)).to eq([ 2, 3 ])
     end
   end
 

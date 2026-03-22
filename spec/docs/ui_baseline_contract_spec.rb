@@ -49,7 +49,6 @@ RSpec.describe 'UI baseline contract' do
     UI_BASELINE_DOCS.each do |doc|
       expect(registry).to include(doc)
     end
-
   end
 
   KEY_WORKFLOWS.each do |workflow_path|

@@ -6,8 +6,8 @@ module TemplatesHelper
     resolved_templates = Array(templates)
     resolved_filter_templates = Array(filter_templates)
     resume_key = [
-      resume&.intake_details&.slice('experience_level', 'student_status')&.compact_blank || {},
-      resume&.settings&.to_h&.fetch('accent_color', nil)
+      resume&.intake_details&.slice("experience_level", "student_status")&.compact_blank || {},
+      resume&.settings&.to_h&.fetch("accent_color", nil)
     ]
     state_key = [ resolved_templates.map(&:id), resolved_filter_templates.map(&:id), query, family_filter, density_filter, column_count_filter, theme_tone_filter, shell_style_filter, sort, resume_key ]
 

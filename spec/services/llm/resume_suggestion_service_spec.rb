@@ -4,7 +4,7 @@ RSpec.describe Llm::ResumeSuggestionService do
   let(:user) { create(:user) }
   let(:resume) { create(:resume, user:) }
   let(:section) { create(:section, resume:, section_type: 'experience', position: 0) }
-  let(:entry) { create(:entry, section:, content: { 'title' => 'Engineer', 'organization' => 'Acme', 'highlights' => ['improved search quality'] }) }
+  let(:entry) { create(:entry, section:, content: { 'title' => 'Engineer', 'organization' => 'Acme', 'highlights' => [ 'improved search quality' ] }) }
   let(:llm_provider) { create(:llm_provider) }
   let(:generation_model) { create(:llm_model, llm_provider:, identifier: 'generator-model') }
   let(:verification_model) { create(:llm_model, llm_provider:, identifier: 'verifier-model') }

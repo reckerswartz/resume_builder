@@ -29,7 +29,7 @@ RSpec.describe TemplatesHelper, type: :helper do
       )
 
       filter_groups = helper.template_marketplace_filter_groups(
-        templates: [modern_template, sidebar_template],
+        templates: [ modern_template, sidebar_template ],
         family_filter: 'sidebar-accent',
         density_filter: 'comfortable',
         column_count_filter: 'two_column',

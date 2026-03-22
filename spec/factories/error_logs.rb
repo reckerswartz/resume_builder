@@ -12,7 +12,7 @@ FactoryBot.define do
         "user_id" => 1
       }
     end
-    backtrace_lines { ["app/controllers/resumes_controller.rb:10:in `index'"] }
+    backtrace_lines { [ "app/controllers/resumes_controller.rb:10:in `index'" ] }
     duration_ms { 210 }
     occurred_at { Time.current }
 

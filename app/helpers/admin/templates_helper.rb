@@ -402,7 +402,7 @@ module Admin::TemplatesHelper
     attachment = artifact[:attachment] || {}
     return if attachment.blank?
 
-    [attachment["filename"], number_to_human_size(attachment["byte_size"])].compact.join(" · ")
+    [ attachment["filename"], number_to_human_size(attachment["byte_size"]) ].compact.join(" · ")
   end
 
   def template_artifact_role_label(artifact)

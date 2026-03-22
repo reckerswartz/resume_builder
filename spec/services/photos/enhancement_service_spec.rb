@@ -59,7 +59,7 @@ RSpec.describe Photos::EnhancementService, type: :service do
         'width' => 900,
         'height' => 1100,
         'content_type' => 'image/png',
-        'enhancement_stack' => ['thumbnail']
+        'enhancement_stack' => [ 'thumbnail' ]
       )
       expect(result.metadata['enhanced_at']).to be_present
       expect(source_asset.reload).to be_ready

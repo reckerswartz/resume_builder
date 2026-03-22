@@ -14,16 +14,16 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
 
       state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
 
-      expect(state.font_scale_options.first).to eq(['Template default (Small)', ''])
-      expect(state.font_scale_options).to include(['Base', 'base'], ['Large', 'lg'])
-      expect(state.density_options.first).to eq(['Template default (Compact)', ''])
-      expect(state.density_options).to include(['Comfortable', 'comfortable'], ['Relaxed', 'relaxed'])
-      expect(state.section_spacing_options.first).to eq(['Template default (Tight)', ''])
-      expect(state.section_spacing_options).to include(['Standard', 'standard'], ['Relaxed', 'relaxed'])
-      expect(state.paragraph_spacing_options.first).to eq(['Template default (Tight)', ''])
-      expect(state.paragraph_spacing_options).to include(['Standard', 'standard'], ['Relaxed', 'relaxed'])
-      expect(state.line_spacing_options.first).to eq(['Template default (Standard)', ''])
-      expect(state.line_spacing_options).to include(['Tight', 'tight'], ['Relaxed', 'relaxed'])
+      expect(state.font_scale_options.first).to eq([ 'Template default (Small)', '' ])
+      expect(state.font_scale_options).to include([ 'Base', 'base' ], [ 'Large', 'lg' ])
+      expect(state.density_options.first).to eq([ 'Template default (Compact)', '' ])
+      expect(state.density_options).to include([ 'Comfortable', 'comfortable' ], [ 'Relaxed', 'relaxed' ])
+      expect(state.section_spacing_options.first).to eq([ 'Template default (Tight)', '' ])
+      expect(state.section_spacing_options).to include([ 'Standard', 'standard' ], [ 'Relaxed', 'relaxed' ])
+      expect(state.paragraph_spacing_options.first).to eq([ 'Template default (Tight)', '' ])
+      expect(state.paragraph_spacing_options).to include([ 'Standard', 'standard' ], [ 'Relaxed', 'relaxed' ])
+      expect(state.line_spacing_options.first).to eq([ 'Template default (Standard)', '' ])
+      expect(state.line_spacing_options).to include([ 'Tight', 'tight' ], [ 'Relaxed', 'relaxed' ])
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
 
   describe '#section_visibility_states' do
     it 'groups sections by section type and marks hidden types from resume settings' do
-      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => ['projects'] })
+      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => [ 'projects' ] })
       experience_section = create(:section, resume: resume, title: 'Experience', section_type: 'experience', position: 0)
       projects_primary = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 1)
       projects_secondary = create(:section, resume: resume, title: 'Case Studies', section_type: 'projects', position: 2)
@@ -65,7 +65,7 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
       create(:entry, section: projects_primary, content: { 'name' => 'Resume Builder' })
       create(:entry, section: projects_secondary, content: { 'name' => 'Template Audit' })
 
-      state = described_class.new(resume: resume, step_sections: [projects_primary, projects_secondary], view_context: view_context)
+      state = described_class.new(resume: resume, step_sections: [ projects_primary, projects_secondary ], view_context: view_context)
 
       expect(state.section_visibility_states).to include(
         include(

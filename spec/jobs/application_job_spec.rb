@@ -39,7 +39,7 @@ RSpec.describe ApplicationJob, type: :job do
       job_log = JobLog.last
       expect(job_log.status).to eq("queued")
       expect(job_log.job_type).to eq("TestSuccessJob")
-      expect(job_log.input).to eq({ "arguments" => [42] })
+      expect(job_log.input).to eq({ "arguments" => [ 42 ] })
     end
 
     it 'does not duplicate the JobLog if enqueued twice with the same job_id' do

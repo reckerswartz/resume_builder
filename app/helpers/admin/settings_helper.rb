@@ -48,9 +48,9 @@ module Admin::SettingsHelper
         status_tone: configured ? :success : :warning,
         message: if configured
           I18n.t("resumes.cloud_import_provider_catalog.feedback.configured", provider: provider.fetch(:label))
-        else
+                 else
           I18n.t("resumes.cloud_import_provider_catalog.feedback.setup_required", provider: provider.fetch(:label), env_vars: provider.fetch(:required_env_vars).to_sentence)
-        end
+                 end
       }
     end
   end

@@ -21,7 +21,7 @@ RSpec.describe Resumes::TemplateRecommendationService do
         density: 'comfortable',
         shell_style: 'card',
         entry_style: 'list',
-        sidebar_section_labels: ['Education', 'Skills']
+        sidebar_section_labels: [ 'Education', 'Skills' ]
       },
       {
         template: modern_template,

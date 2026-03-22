@@ -45,6 +45,5 @@ module ResumeBuilder
       def current_step_key
         builder_state.current_step.fetch(:key)
       end
-
   end
 end

@@ -19,7 +19,7 @@ module Resumes
 
       def broadcast_status(context)
         Turbo::StreamsChannel.broadcast_replace_to(
-          [resume, :export],
+          [ resume, :export ],
           target: dom_id(resume, "#{context}_export_status"),
           partial: "resumes/export_status_panel",
           locals: { resume: resume, context: context }
@@ -28,7 +28,7 @@ module Resumes
 
       def broadcast_actions(context)
         Turbo::StreamsChannel.broadcast_replace_to(
-          [resume, :export],
+          [ resume, :export ],
           target: dom_id(resume, "#{context}_export_actions"),
           partial: "resumes/export_actions",
           locals: { resume: resume, context: context }

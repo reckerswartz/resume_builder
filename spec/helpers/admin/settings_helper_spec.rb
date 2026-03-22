@@ -84,8 +84,8 @@ RSpec.describe Admin::SettingsHelper, type: :helper do
         }
       )
 
-      expect(helper.llm_model_options_for_select([llm_model])).to eq([
-        ['Gemma 2 9B IT · NVIDIA Build · Text · 9B · gemma', llm_model.id]
+      expect(helper.llm_model_options_for_select([ llm_model ])).to eq([
+        [ 'Gemma 2 9B IT · NVIDIA Build · Text · 9B · gemma', llm_model.id ]
       ])
     end
   end

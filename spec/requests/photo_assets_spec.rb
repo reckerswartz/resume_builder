@@ -16,7 +16,7 @@ RSpec.describe 'PhotoAssets', type: :request do
   end
 
   def uploaded_png(filename: 'headshot.png')
-    Tempfile.create([File.basename(filename, '.*'), File.extname(filename)]) do |file|
+    Tempfile.create([ File.basename(filename, '.*'), File.extname(filename) ]) do |file|
       file.binmode
       file.write(Base64.decode64(TINY_PNG_BASE64))
       file.rewind
@@ -62,7 +62,7 @@ RSpec.describe 'PhotoAssets', type: :request do
             resume_id: resume.id,
             return_to: return_to,
             photo_assets: {
-              files: [file]
+              files: [ file ]
             }
           }
         end.to change(PhotoAsset, :count).by(1).and change(PhotoProcessingRun, :count).by(1)

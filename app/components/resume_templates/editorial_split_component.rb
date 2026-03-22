@@ -1,7 +1,7 @@
 module ResumeTemplates
   class EditorialSplitComponent < BaseComponent
     DEFAULT_SIDEBAR_SECTION_TYPES = %w[education skills projects].freeze
-    UTILITY_BADGES = [["A4", "Paper size"], ["US", "Letter size"]].freeze
+    UTILITY_BADGES = [ [ "A4", "Paper size" ], [ "US", "Letter size" ] ].freeze
     CONTACT_BADGE_LABELS = {
       "Email" => "@",
       "Phone" => "P",

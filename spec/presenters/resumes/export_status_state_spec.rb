@@ -36,14 +36,14 @@ RSpec.describe Resumes::ExportStatusState do
     it 'returns the queued message with download variant when a previous PDF exists' do
       resume = create(:resume)
       resume.pdf_export.attach(io: StringIO.new('pdf'), filename: 'resume.pdf', content_type: 'application/pdf')
-      create(:job_log, :queued, job_type: 'ResumeExportJob', input: { 'arguments' => [resume.id] })
+      create(:job_log, :queued, job_type: 'ResumeExportJob', input: { 'arguments' => [ resume.id ] })
 
       expect(build_state(resume: resume, context: :editor).status_message).to eq(I18n.t('resumes.helper.export_status.messages.queued.with_download'))
     end
 
     it 'returns the queued message without download variant when no previous PDF exists' do
       resume = create(:resume)
-      create(:job_log, :queued, job_type: 'ResumeExportJob', input: { 'arguments' => [resume.id] })
+      create(:job_log, :queued, job_type: 'ResumeExportJob', input: { 'arguments' => [ resume.id ] })
 
       expect(build_state(resume: resume, context: :editor).status_message).to eq(I18n.t('resumes.helper.export_status.messages.queued.without_download'))
     end

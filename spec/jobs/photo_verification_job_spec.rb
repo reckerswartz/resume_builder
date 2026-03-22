@@ -15,7 +15,7 @@ RSpec.describe PhotoVerificationJob, type: :job do
   let(:processing_run) do
     photo_profile.photo_processing_runs.create!(
       workflow_type: :verify_candidate, status: :queued,
-      resume: resume, input_asset_ids: [source_asset.id]
+      resume: resume, input_asset_ids: [ source_asset.id ]
     )
   end
 

@@ -62,7 +62,7 @@ RSpec.describe Admin::JobControlService do
     end
 
     it 'requeues a failed job as a fresh enqueue' do
-      job_log = create(:job_log, :failed, job_type: 'ResumeExportJob', queue_name: 'default', input: { 'arguments' => [1, 2] })
+      job_log = create(:job_log, :failed, job_type: 'ResumeExportJob', queue_name: 'default', input: { 'arguments' => [ 1, 2 ] })
       snapshot = Admin::JobMonitoringService::QueueSnapshot.new(
         available: false,
         job: nil,

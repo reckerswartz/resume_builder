@@ -12,7 +12,7 @@ module Resumes
       {
         key: "software_engineer",
         label: "Software Engineer",
-        related_roles: ["Backend Engineer", "Full Stack Developer", "Platform Engineer"],
+        related_roles: [ "Backend Engineer", "Full Stack Developer", "Platform Engineer" ],
         suggestions: [
           {
             experience_levels: %w[no_experience less_than_3_years three_to_five_years],
@@ -30,7 +30,7 @@ module Resumes
       {
         key: "product_manager",
         label: "Product Manager",
-        related_roles: ["Project Manager", "Customer Success Manager", "Product Owner"],
+        related_roles: [ "Project Manager", "Customer Success Manager", "Product Owner" ],
         suggestions: [
           {
             experience_levels: %w[less_than_3_years three_to_five_years],
@@ -47,7 +47,7 @@ module Resumes
       {
         key: "product_designer",
         label: "Product Designer",
-        related_roles: ["UX Designer", "UI Designer", "Design Systems Designer"],
+        related_roles: [ "UX Designer", "UI Designer", "Design Systems Designer" ],
         suggestions: [
           {
             experience_levels: %w[no_experience less_than_3_years three_to_five_years],
@@ -64,7 +64,7 @@ module Resumes
       {
         key: "data_analyst",
         label: "Data Analyst",
-        related_roles: ["Business Analyst", "Analytics Engineer", "Data Scientist"],
+        related_roles: [ "Business Analyst", "Analytics Engineer", "Data Scientist" ],
         suggestions: [
           {
             experience_levels: %w[no_experience less_than_3_years three_to_five_years],
@@ -81,7 +81,7 @@ module Resumes
       {
         key: "customer_success_manager",
         label: "Customer Success Manager",
-        related_roles: ["Account Manager", "Implementation Specialist", "Client Success Lead"],
+        related_roles: [ "Account Manager", "Implementation Specialist", "Client Success Lead" ],
         suggestions: [
           {
             experience_levels: %w[less_than_3_years three_to_five_years],
@@ -98,7 +98,7 @@ module Resumes
       {
         key: "project_manager",
         label: "Project Manager",
-        related_roles: ["Program Manager", "Operations Manager", "Delivery Manager"],
+        related_roles: [ "Program Manager", "Operations Manager", "Delivery Manager" ],
         suggestions: [
           {
             experience_levels: %w[less_than_3_years three_to_five_years],

@@ -21,7 +21,7 @@ VCR.configure do |config|
     %w[Authorization X-Api-Key].each do |header|
       next unless interaction.request.headers[header]
 
-      interaction.request.headers[header] = ["<#{header.upcase.tr("-", "_")}>"]
+      interaction.request.headers[header] = [ "<#{header.upcase.tr("-", "_")}>" ]
     end
 
     interaction.response.headers.delete("Set-Cookie")

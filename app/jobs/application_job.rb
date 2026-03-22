@@ -88,4 +88,3 @@ class ApplicationJob < ActiveJob::Base
       { arguments: arguments.as_json }
     end
 end
-

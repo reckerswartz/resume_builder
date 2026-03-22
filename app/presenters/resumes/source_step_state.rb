@@ -97,9 +97,9 @@ module Resumes
           action_path: view_context.resume_source_import_path(provider.fetch(:key), return_to: return_to.presence, resume_id: resume_id),
           message: if configured
             I18n.t("resumes.cloud_import_provider_catalog.feedback.configured", provider: provider_label)
-          else
+                   else
             I18n.t("resumes.cloud_import_provider_catalog.feedback.setup_required", provider: provider_label, env_vars: provider.fetch(:required_env_vars).to_sentence)
-          end
+                   end
         }
       end
     end

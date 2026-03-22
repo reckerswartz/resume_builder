@@ -374,5 +374,4 @@ module ResumesHelper
         view_context: self
       )
     end
-
 end

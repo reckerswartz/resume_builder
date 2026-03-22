@@ -10,7 +10,7 @@ RSpec.describe Resumes::PositionMover do
 
       described_class.new(record: first_section, position: 2).call
 
-      expect(resume.sections.order(:position).pluck(:id)).to eq([second_section.id, third_section.id, first_section.id])
+      expect(resume.sections.order(:position).pluck(:id)).to eq([ second_section.id, third_section.id, first_section.id ])
     end
 
     it 'moves an entry to an explicit position' do
@@ -21,7 +21,7 @@ RSpec.describe Resumes::PositionMover do
 
       described_class.new(record: third_entry, position: 0).call
 
-      expect(section.entries.order(:position).pluck(:id)).to eq([third_entry.id, first_entry.id, second_entry.id])
+      expect(section.entries.order(:position).pluck(:id)).to eq([ third_entry.id, first_entry.id, second_entry.id ])
     end
   end
 end

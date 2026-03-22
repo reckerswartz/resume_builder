@@ -18,7 +18,7 @@ RSpec.describe 'Entries', type: :request do
       end
     end
   end
- 
+
   before do
     PlatformSetting.current.update!(feature_flags: { 'llm_access' => true, 'resume_suggestions' => true, 'autofill_content' => false }, preferences: PlatformSetting.current.preferences)
     sign_in_as(user)
@@ -41,7 +41,7 @@ RSpec.describe 'Entries', type: :request do
 
       expect(response).to redirect_to(edit_resume_path(resume))
       expect(flash[:notice]).to eq(I18n.t('resumes.entries_controller.created'))
-      expect(section.entries.last.highlights).to eq(['improved search quality', 'scaled internal tooling'])
+      expect(section.entries.last.highlights).to eq([ 'improved search quality', 'scaled internal tooling' ])
     end
 
     it 'preserves locale query params on successful create redirects' do
@@ -85,13 +85,13 @@ RSpec.describe 'Entries', type: :request do
 
   describe 'POST /resumes/:resume_id/sections/:section_id/entries/:id/improve' do
     it 'updates entry highlights using the suggestion service' do
-      entry = create(:entry, section:, content: { 'title' => 'Engineer', 'organization' => 'Acme', 'highlights' => ['improved search quality'] })
+      entry = create(:entry, section:, content: { 'title' => 'Engineer', 'organization' => 'Acme', 'highlights' => [ 'improved search quality' ] })
 
       post improve_resume_section_entry_path(resume, section, entry)
 
       expect(response).to redirect_to(edit_resume_path(resume))
       expect(flash[:notice]).to eq(I18n.t('resumes.entries_controller.improved'))
-      expect(entry.reload.highlights).to eq(['Delivered improved search quality'])
+      expect(entry.reload.highlights).to eq([ 'Delivered improved search quality' ])
 
       interaction = resume.reload.llm_interactions.last
       expect(interaction).to be_succeeded

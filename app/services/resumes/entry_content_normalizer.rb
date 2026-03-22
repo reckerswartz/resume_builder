@@ -33,8 +33,8 @@ module Resumes
 
         normalized["remote"] = remote
         normalized["current_role"] = current_role
-        normalized["start_date"] = [start_month, start_year].compact_blank.join(" ")
-        normalized["end_date"] = current_role ? "Current" : [end_month, end_year].compact_blank.join(" ")
+        normalized["start_date"] = [ start_month, start_year ].compact_blank.join(" ")
+        normalized["end_date"] = current_role ? "Current" : [ end_month, end_year ].compact_blank.join(" ")
       end
   end
 end

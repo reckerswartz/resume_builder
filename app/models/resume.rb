@@ -254,12 +254,12 @@ class Resume < ApplicationRecord
   end
 
   def derived_full_name
-    [stored_contact_field("first_name"), stored_contact_field("surname")].reject(&:blank?).join(" ")
+    [ stored_contact_field("first_name"), stored_contact_field("surname") ].reject(&:blank?).join(" ")
   end
 
   def derived_location
-    location_line = [stored_contact_field("city"), stored_contact_field("country")].reject(&:blank?).join(", ")
-    [location_line, stored_contact_field("pin_code")].reject(&:blank?).join(" ")
+    location_line = [ stored_contact_field("city"), stored_contact_field("country") ].reject(&:blank?).join(", ")
+    [ location_line, stored_contact_field("pin_code") ].reject(&:blank?).join(" ")
   end
 
   def stored_contact_field(key)

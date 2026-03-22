@@ -50,7 +50,7 @@ RSpec.describe Resume, type: :model do
       expect(resume.section_spacing).to eq('tight')
       expect(resume.paragraph_spacing).to eq('tight')
       expect(resume.line_spacing).to eq('standard')
-      expect(resume.hidden_section_types).to eq(['projects'])
+      expect(resume.hidden_section_types).to eq([ 'projects' ])
     end
 
     it 'removes blank finalize-formatting overrides so template defaults still apply' do
@@ -186,7 +186,7 @@ RSpec.describe Resume, type: :model do
       earlier_section = create(:section, resume:, title: 'Experience', position: 1, section_type: 'experience')
       later_section = create(:section, resume:, title: 'Projects', position: 2, section_type: 'projects')
 
-      expect(resume.ordered_sections.to_a).to eq([earlier_section, later_section])
+      expect(resume.ordered_sections.to_a).to eq([ earlier_section, later_section ])
     end
   end
 
@@ -205,14 +205,14 @@ RSpec.describe Resume, type: :model do
     it 'prefers the latest queued export over an older attached PDF' do
       resume = create(:resume)
       resume.pdf_export.attach(io: StringIO.new('%PDF-1.4 test content'), filename: "#{resume.slug}.pdf", content_type: 'application/pdf')
-      create(:job_log, input: { 'arguments' => [resume.id, resume.user.id] }, status: 'queued')
+      create(:job_log, input: { 'arguments' => [ resume.id, resume.user.id ] }, status: 'queued')
 
       expect(resume.export_state).to eq('queued')
     end
 
     it 'returns failed when the latest export job failed' do
       resume = create(:resume)
-      create(:job_log, :failed, input: { 'arguments' => [resume.id, resume.user.id] })
+      create(:job_log, :failed, input: { 'arguments' => [ resume.id, resume.user.id ] })
 
       expect(resume.export_state).to eq('failed')
     end

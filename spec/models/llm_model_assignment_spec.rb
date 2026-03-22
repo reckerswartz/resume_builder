@@ -11,7 +11,7 @@ RSpec.describe LlmModelAssignment do
       unconfigured_model = create(:llm_model, llm_provider: unconfigured_provider)
       create(:llm_model_assignment, llm_model: unconfigured_model, role: 'text_generation')
 
-      expect(described_class.ready_models_for(:text_generation)).to eq([ready_model])
+      expect(described_class.ready_models_for(:text_generation)).to eq([ ready_model ])
     end
   end
 

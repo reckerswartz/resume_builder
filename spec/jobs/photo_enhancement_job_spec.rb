@@ -19,7 +19,7 @@ RSpec.describe PhotoEnhancementJob, type: :job do
   end
   let(:processing_run) do
     photo_profile.photo_processing_runs.create!(
-      workflow_type: :enhance, status: :queued, input_asset_ids: [source_asset.id]
+      workflow_type: :enhance, status: :queued, input_asset_ids: [ source_asset.id ]
     )
   end
 
@@ -35,7 +35,7 @@ RSpec.describe PhotoEnhancementJob, type: :job do
       job.perform_now
 
       expect(processing_run.reload).to be_succeeded
-      expect(processing_run.output_asset_ids).to eq([enhanced_asset.id])
+      expect(processing_run.output_asset_ids).to eq([ enhanced_asset.id ])
       expect(processing_run.next_step_guidance).to be_present
     end
 

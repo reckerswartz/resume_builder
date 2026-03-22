@@ -12,19 +12,19 @@ RSpec.describe Llm::RoleAssignmentUpdater do
       it 'assigns a text-capable model to text_generation' do
         model = create(:llm_model, llm_provider: provider, supports_text: true)
 
-        result = build_updater('text_generation' => [model.id]).call
+        result = build_updater('text_generation' => [ model.id ]).call
 
         expect(result).to be_success
-        expect(LlmModelAssignment.for_role('text_generation').map(&:llm_model_id)).to eq([model.id])
+        expect(LlmModelAssignment.for_role('text_generation').map(&:llm_model_id)).to eq([ model.id ])
       end
 
       it 'assigns a vision-capable model to vision_generation' do
         model = create(:llm_model, :vision_capable, llm_provider: provider)
 
-        result = build_updater('vision_generation' => [model.id]).call
+        result = build_updater('vision_generation' => [ model.id ]).call
 
         expect(result).to be_success
-        expect(LlmModelAssignment.for_role('vision_generation').map(&:llm_model_id)).to eq([model.id])
+        expect(LlmModelAssignment.for_role('vision_generation').map(&:llm_model_id)).to eq([ model.id ])
       end
 
       it 'clears existing assignments when given an empty array for a role' do
@@ -42,22 +42,22 @@ RSpec.describe Llm::RoleAssignmentUpdater do
         new_model = create(:llm_model, llm_provider: provider, supports_text: true)
         create(:llm_model_assignment, llm_model: old_model, role: 'text_verification')
 
-        result = build_updater('text_verification' => [new_model.id]).call
+        result = build_updater('text_verification' => [ new_model.id ]).call
 
         expect(result).to be_success
-        expect(LlmModelAssignment.for_role('text_verification').map(&:llm_model_id)).to eq([new_model.id])
+        expect(LlmModelAssignment.for_role('text_verification').map(&:llm_model_id)).to eq([ new_model.id ])
       end
 
       it 'preserves position ordering for verification roles with multiple models' do
         model_a = create(:llm_model, llm_provider: provider, supports_text: true)
         model_b = create(:llm_model, llm_provider: provider, supports_text: true)
 
-        result = build_updater('text_verification' => [model_b.id, model_a.id]).call
+        result = build_updater('text_verification' => [ model_b.id, model_a.id ]).call
 
         expect(result).to be_success
         assignments = LlmModelAssignment.for_role('text_verification')
-        expect(assignments.map(&:llm_model_id)).to eq([model_b.id, model_a.id])
-        expect(assignments.map(&:position)).to eq([0, 1])
+        expect(assignments.map(&:llm_model_id)).to eq([ model_b.id, model_a.id ])
+        expect(assignments.map(&:position)).to eq([ 0, 1 ])
       end
     end
 
@@ -66,14 +66,14 @@ RSpec.describe Llm::RoleAssignmentUpdater do
         model_a = create(:llm_model, llm_provider: provider, supports_text: true)
         model_b = create(:llm_model, llm_provider: provider, supports_text: true)
 
-        result = build_updater('text_generation' => [model_a.id, model_b.id]).call
+        result = build_updater('text_generation' => [ model_a.id, model_b.id ]).call
 
         expect(result).not_to be_success
         expect(result.errors).to include(a_string_matching(/can only have one primary model/))
       end
 
       it 'rejects an unknown model ID' do
-        result = build_updater('text_generation' => [999_999]).call
+        result = build_updater('text_generation' => [ 999_999 ]).call
 
         expect(result).not_to be_success
         expect(result.errors).to include(a_string_matching(/unknown model/))
@@ -82,7 +82,7 @@ RSpec.describe Llm::RoleAssignmentUpdater do
       it 'rejects a model that does not support the assigned role' do
         text_only_model = create(:llm_model, llm_provider: provider, supports_text: true, supports_vision: false)
 
-        result = build_updater('vision_generation' => [text_only_model.id]).call
+        result = build_updater('vision_generation' => [ text_only_model.id ]).call
 
         expect(result).not_to be_success
         expect(result.errors).to include(a_string_matching(/does not support/))
@@ -95,8 +95,8 @@ RSpec.describe Llm::RoleAssignmentUpdater do
 
         expect do
           build_updater(
-            'text_generation' => [text_model.id],
-            'vision_generation' => [text_model.id]
+            'text_generation' => [ text_model.id ],
+            'vision_generation' => [ text_model.id ]
           ).call
         end.not_to change(LlmModelAssignment, :count)
       end

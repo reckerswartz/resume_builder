@@ -40,19 +40,19 @@ RSpec.describe Llm::JsonResponseParser do
     it 'extracts an array by key from valid JSON' do
       response = '{"highlights":["Built APIs","Led team"]}'
 
-      expect(parser.array_from(response, key: "highlights")).to eq(["Built APIs", "Led team"])
+      expect(parser.array_from(response, key: "highlights")).to eq([ "Built APIs", "Led team" ])
     end
 
     it 'accepts a symbol key' do
       response = '{"items":["one","two"]}'
 
-      expect(parser.array_from(response, key: :items)).to eq(["one", "two"])
+      expect(parser.array_from(response, key: :items)).to eq([ "one", "two" ])
     end
 
     it 'strips blank entries from the array' do
       response = '{"items":["valid","","  ","also valid"]}'
 
-      expect(parser.array_from(response, key: "items")).to eq(["valid", "also valid"])
+      expect(parser.array_from(response, key: "items")).to eq([ "valid", "also valid" ])
     end
 
     it 'falls back to line-based parsing when the key is missing' do
@@ -60,7 +60,7 @@ RSpec.describe Llm::JsonResponseParser do
 
       result = parser.array_from(response, key: "highlights")
 
-      expect(result).to eq(["Built APIs", "Led team", "Shipped features"])
+      expect(result).to eq([ "Built APIs", "Led team", "Shipped features" ])
     end
 
     it 'falls back to line-based parsing for unparseable text' do
@@ -68,7 +68,7 @@ RSpec.describe Llm::JsonResponseParser do
 
       result = parser.array_from(response, key: "items")
 
-      expect(result).to eq(["Line one", "Line two"])
+      expect(result).to eq([ "Line one", "Line two" ])
     end
 
     it 'strips bullet markers from fallback lines' do
@@ -76,7 +76,7 @@ RSpec.describe Llm::JsonResponseParser do
 
       result = parser.array_from(response, key: "items")
 
-      expect(result).to eq(["First", "Second", "Third"])
+      expect(result).to eq([ "First", "Second", "Third" ])
     end
 
     it 'returns an empty array for nil input with a missing key' do

@@ -35,7 +35,7 @@ RSpec.describe Resumes::TextExporter do
           'end_date' => '',
           'current_role' => true,
           'summary' => 'Led the guided builder rollout.',
-          'highlights' => ['Built workflow systems', 'Shipped export improvements']
+          'highlights' => [ 'Built workflow systems', 'Shipped export improvements' ]
         }
       )
       create(:entry, section: skills_section, content: { 'name' => 'Ruby on Rails', 'level' => 'Expert' })

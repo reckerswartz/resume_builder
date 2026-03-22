@@ -12,7 +12,7 @@ class CreateTemplateArtifacts < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :template_artifacts, [:template_id, :artifact_type]
+    add_index :template_artifacts, [ :template_id, :artifact_type ]
     add_index :template_artifacts, :artifact_type
     add_index :template_artifacts, :status
   end

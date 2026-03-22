@@ -36,7 +36,7 @@ module Resumes
         end
       end
 
-      [lines.join("\n").gsub(/\n{3,}/, "\n\n").strip, ""].join("\n")
+      [ lines.join("\n").gsub(/\n{3,}/, "\n\n").strip, "" ].join("\n")
     end
 
     private
@@ -92,7 +92,7 @@ module Resumes
       end
 
       def skill_lines(entry)
-        [join_parts(entry.content["name"], entry.content["level"])]
+        [ join_parts(entry.content["name"], entry.content["level"]) ]
       end
 
       def project_lines(entry)

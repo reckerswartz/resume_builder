@@ -30,11 +30,11 @@ RSpec.describe Llm::ProviderModelSyncService do
           'id' => 'google/gemma-2-9b-it',
           'owned_by' => 'google',
           'created' => 1_710_000_000,
-          'input_modalities' => ['text'],
-          'output_modalities' => ['text'],
+          'input_modalities' => [ 'text' ],
+          'output_modalities' => [ 'text' ],
           'details' => {
             'family' => 'gemma',
-            'families' => ['gemma'],
+            'families' => [ 'gemma' ],
             'parameter_size' => '9B',
             'format' => 'nim'
           }
@@ -43,11 +43,11 @@ RSpec.describe Llm::ProviderModelSyncService do
           'id' => 'google/gemma-2-9b-it',
           'owned_by' => 'google',
           'created' => 1_710_000_000,
-          'input_modalities' => ['text'],
-          'output_modalities' => ['text'],
+          'input_modalities' => [ 'text' ],
+          'output_modalities' => [ 'text' ],
           'details' => {
             'family' => 'gemma',
-            'families' => ['gemma'],
+            'families' => [ 'gemma' ],
             'parameter_size' => '9B',
             'format' => 'nim'
           }
@@ -56,8 +56,8 @@ RSpec.describe Llm::ProviderModelSyncService do
           'id' => 'microsoft/phi-4-multimodal-instruct',
           'owned_by' => 'microsoft',
           'created' => '2026-03-19T10:00:00Z',
-          'input_modalities' => ['text', 'image'],
-          'output_modalities' => ['text'],
+          'input_modalities' => [ 'text', 'image' ],
+          'output_modalities' => [ 'text' ],
           'details' => {
             'family' => 'phi',
             'parameter_size' => '14B'

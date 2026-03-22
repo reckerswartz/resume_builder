@@ -18,7 +18,7 @@ RSpec.describe ResumeExportJob, type: :job do
 
       expect(resume.pdf_export).to be_attached
       expect(job_log).to be_succeeded
-      expect(job_log.input).to eq('arguments' => [resume.id, user.id])
+      expect(job_log.input).to eq('arguments' => [ resume.id, user.id ])
       expect(job_log.output).to include(
         'attachment_filename' => "#{resume.slug}.pdf",
         'requested_by_id' => user.id,

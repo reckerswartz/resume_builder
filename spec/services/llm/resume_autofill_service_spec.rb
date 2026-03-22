@@ -225,8 +225,8 @@ RSpec.describe Llm::ResumeAutofillService do
       expect(result).to be_success
       expect(result.resume.reload.title).to eq('Pat Kumar Resume')
       expect(result.interactions.size).to eq(2)
-      expect(result.interactions.map { |interaction| interaction.metadata['source_kind'] }.uniq).to eq(['uploaded_document'])
-      expect(result.interactions.map { |interaction| interaction.metadata['source_content_type'] }.uniq).to eq(['application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+      expect(result.interactions.map { |interaction| interaction.metadata['source_kind'] }.uniq).to eq([ 'uploaded_document' ])
+      expect(result.interactions.map { |interaction| interaction.metadata['source_content_type'] }.uniq).to eq([ 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ])
     end
 
     it 'fills the resume from a supported PDF uploaded source document' do
@@ -243,8 +243,8 @@ RSpec.describe Llm::ResumeAutofillService do
       expect(result).to be_success
       expect(result.resume.reload.title).to eq('Pat Kumar Resume')
       expect(result.interactions.size).to eq(2)
-      expect(result.interactions.map { |interaction| interaction.metadata['source_kind'] }.uniq).to eq(['uploaded_document'])
-      expect(result.interactions.map { |interaction| interaction.metadata['source_content_type'] }.uniq).to eq(['application/pdf'])
+      expect(result.interactions.map { |interaction| interaction.metadata['source_kind'] }.uniq).to eq([ 'uploaded_document' ])
+      expect(result.interactions.map { |interaction| interaction.metadata['source_content_type'] }.uniq).to eq([ 'application/pdf' ])
     end
 
     it 'returns the localized disabled error when autofill is unavailable' do

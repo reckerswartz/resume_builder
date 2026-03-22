@@ -14,7 +14,7 @@ RSpec.describe PhotoProcessingRun, type: :model do
     photo_profile.photo_processing_runs.create!(
       workflow_type: workflow_type,
       status: status,
-      input_asset_ids: [photo_asset.id],
+      input_asset_ids: [ photo_asset.id ],
       **attrs
     )
   end
@@ -71,13 +71,13 @@ RSpec.describe PhotoProcessingRun, type: :model do
       run = create_run(status: :running)
 
       run.mark_succeeded!(
-        output_asset_ids: [photo_asset.id],
+        output_asset_ids: [ photo_asset.id ],
         next_step_guidance: 'Review the output',
         metadata: { 'model_used' => 'test-model' }
       )
 
       expect(run.reload).to be_succeeded
-      expect(run.output_asset_ids).to eq([photo_asset.id])
+      expect(run.output_asset_ids).to eq([ photo_asset.id ])
       expect(run.next_step_guidance).to eq('Review the output')
       expect(run.metadata).to include('model_used' => 'test-model')
       expect(run.error_summary).to be_nil
@@ -106,9 +106,9 @@ RSpec.describe PhotoProcessingRun, type: :model do
     end
 
     it 'normalizes array payloads to arrays' do
-      run = create_run(selected_model_ids: [1, 2])
+      run = create_run(selected_model_ids: [ 1, 2 ])
 
-      expect(run.selected_model_ids).to eq([1, 2])
+      expect(run.selected_model_ids).to eq([ 1, 2 ])
       expect(run.input_asset_ids).to be_an(Array)
     end
   end

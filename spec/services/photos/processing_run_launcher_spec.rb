@@ -40,7 +40,7 @@ RSpec.describe Photos::ProcessingRunLauncher do
         expect(result.run).to be_queued
         expect(result.run.resume).to eq(resume)
         expect(result.run.template).to eq(resume.template)
-        expect(result.run.input_asset_ids).to eq([photo_asset.id])
+        expect(result.run.input_asset_ids).to eq([ photo_asset.id ])
         expect(enqueued_jobs.map { |j| j[:job] }).to include(PhotoBackgroundRemovalJob)
       end
 
