@@ -301,6 +301,19 @@ RSpec.describe 'Resumes', type: :request do
     end
   end
 
+  describe 'GET /resumes/:id' do
+    it 'renders the preview page with export actions and without the redundant explainer block' do
+      resume = create(:resume, user:, template:)
+
+      get resume_path(resume)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('resumes.show.preview_title'))
+      expect(response.body).to include(I18n.t('resumes.show.desktop_actions.title'))
+      expect(response.body).not_to include(I18n.t('resumes.show.what_this_shows.eyebrow'))
+    end
+  end
+
   describe 'GET /resumes/:id/edit' do
     it 'preserves locale query params in builder navigation and preview handoff links' do
       resume = create(:resume, user:, template:)
@@ -425,10 +438,16 @@ RSpec.describe 'Resumes', type: :request do
       get edit_resume_path(resume), params: { step: 'personal_details' }
 
       expect(response).to have_http_status(:ok)
+      profile_links_index = response.body.index(I18n.t('resumes.editor_personal_details_step.profile_links.eyebrow'))
+      personal_information_index = response.body.index(I18n.t('resumes.editor_personal_details_step.personal_information.eyebrow'))
+      headshot_index = response.body.index(I18n.t('resumes.editor_personal_details_step.headshot.eyebrow'))
+
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.profile_links.eyebrow'))
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.personal_information.eyebrow'))
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.optional_step.skip_for_now'))
       expect(response.body).not_to include(I18n.t('resumes.editor_personal_details_step.optional_step.title'))
+      expect(profile_links_index).to be < personal_information_index
+      expect(personal_information_index).to be < headshot_index
     end
 
     it 'renders the summary step without a duplicate step header card and starts with the curated library' do
@@ -514,6 +533,15 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include('template-picker-compact')
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.browse_all_templates'))
+      workspace_tabs = document.at_css('nav[data-finalize-workspace-tabs]')
+      expect(workspace_tabs).to be_present
+      tab_keys = workspace_tabs.css('button[data-tab-key]').map { |btn| btn['data-tab-key'] }
+      expect(tab_keys).to eq(%w[template design sections])
+
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.workspace_tabs.template'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.workspace_tabs.design'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.workspace_tabs.sections'))
+
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.font_family'))
@@ -523,10 +551,8 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
       expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
 
-      output_settings = document.at_css('details[data-finalize-output-settings]')
+      output_settings = document.at_css('[data-finalize-output-settings]')
       expect(output_settings).to be_present
-      expect(output_settings.attribute('open')).to be_nil
-      expect(output_settings.text).to include(I18n.t('resumes.editor_finalize_step.output_settings.eyebrow'))
       expect(document.at_css('select[name="resume[settings][font_family]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present

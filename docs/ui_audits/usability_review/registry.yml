@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:08:00Z"
+updated_at: "2026-03-22T06:15:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsum-remove-duplicate-step-header/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-rshow-remove-what-this-shows/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "resume-show"
     - "sign-in"
     - "create-account"
-  reason: "resume-builder-summary improved to 81 after removing duplicate step header. All builder steps are now audited. resume-show is the next unaudited workspace surface, and sign-in/create-account are the next unaudited public pages."
+    - "resume-source-import"
+  reason: "resume-show improved to 85 after removing redundant explainer. All builder steps and the preview page are now audited. sign-in and create-account are the next unaudited public pages."
 pages:
   - page_key: "home"
     title: "Home"
@@ -145,7 +145,30 @@ pages:
     last_changed_at: "2026-03-21T21:26:29Z"
     latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-resumes-new-template-disclosure/00-overview.md"
     next_step: "No open issues are currently tracked on resumes-new. Revisit only if setup-flow structure or copy changes."
-  - { page_key: "resume-show", title: "Resume preview", path: "/resumes/:id", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "workspace", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-show"
+    title: "Resume preview"
+    path: "/resumes/:id"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "workspace"
+    priority: "medium"
+    status: "improved"
+    usability_score: 85
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-show.md"
+    open_issue_keys:
+      - "UX-RSHOW-002"
+    closed_issue_keys:
+      - "UX-RSHOW-001"
+    last_audited_at: "2026-03-22T06:15:00Z"
+    last_changed_at: "2026-03-22T06:15:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-rshow-remove-what-this-shows/00-overview.md"
+    next_step: "UX-RSHOW-002 (low, repeated_content) is the only open issue — Ready badge appears in multiple positions. Minor and acceptable."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T06:15:00Z"
+    issues_found: 2
+    issues_resolved: 1
+    issues_remaining: 1
+    regression_detected: false
   - page_key: "templates-index"
     title: "Template marketplace"
     path: "/templates"
@@ -204,23 +227,23 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "improved"
-    usability_score: 82
+    usability_score: 85
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-source.md"
     open_issue_keys:
-      - "UX-BLDSRC-002"
       - "UX-BLDSRC-003"
     closed_issue_keys:
       - "UX-BLDSRC-001"
+      - "UX-BLDSRC-002"
       - "UX-BLDSRC-004"
-    last_audited_at: "2026-03-22T05:54:00Z"
-    last_changed_at: "2026-03-22T05:54:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsrc-contextual-supported-formats/00-overview.md"
-    next_step: "UX-BLDSRC-002 remains the next highest-value open issue. If this page is revisited, demote the remaining Import status card below the source-mode chooser or into a lighter disclosure before addressing the lower-priority guidance copy length."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T05:54:00Z"
+    last_audited_at: "2026-03-22T06:18:00Z"
+    last_changed_at: "2026-03-22T06:18:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsrc-demote-import-status/00-overview.md"
+    next_step: "No medium or high source-step issues remain open. If this page is revisited, UX-BLDSRC-003 is the only remaining low-priority follow-up."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T06:18:00Z"
     issues_found: 4
-    issues_resolved: 2
-    issues_remaining: 2
+    issues_resolved: 3
+    issues_remaining: 1
     regression_detected: false
   - page_key: "resume-builder-heading"
     title: "Resume builder heading step"

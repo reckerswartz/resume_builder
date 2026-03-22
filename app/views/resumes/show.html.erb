@@ -62,14 +62,7 @@
         padding: :sm,
         density: :compact
       ) do %>
-        <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
-          <div class="space-y-2">
-            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.show.what_this_shows.eyebrow") %></p>
-            <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.show.what_this_shows.description") %></p>
-          </div>
-
-          <%= render "export_actions", resume: @resume, context: :show, export_actions_state: show_state.export_actions_state %>
-        </div>
+        <%= render "export_actions", resume: @resume, context: :show, export_actions_state: show_state.export_actions_state %>
       <% end %>
 
       <%= render "export_status_panel", resume: @resume, context: :show, export_status_state: show_state.export_status_state %>
