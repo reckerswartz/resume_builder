@@ -1,69 +1,110 @@
 # Resume Builder Roadmap
 
-> Auto-generated from GitHub issues on 2026-03-22T03:45:19Z
+> Auto-generated from GitHub issues on 2026-03-22T04:51:00Z
 > Repository: reckerswartz/resume_builder
 
 ## Summary
 
-- **Open issues**: 14
-- **Closed issues**: 15
+| Metric | Count |
+|---|---|
+| **Open issues** | 14 |
+| **Closed issues** | 26 |
+| **Closed this session** | 9 (#38, #39, #44, #45, #47, #50, #54, #56, #65) |
+| **Created this session** | 5 (#60, #61, #62, #63, #64) |
 
 ## By Severity
 
-- **critical**: 0 open
-- **high**: 0 open
-- **medium**: 7 open
-- **low**: 7 open
+| Severity | Open | Closed |
+|---|---|---|
+| critical | 0 | 0 |
+| high | 0 | 0 |
+| medium | 8 | — |
+| low | 5 | — |
+| deferred | 1 | — |
 
-## By Workflow
+## Open Issues by Workflow
 
-### `/template-audit` (5 open)
+### `/template-audit` (3 open)
 
-- #39 [template-audit] 3 open discrepancies on Editorial Split template (utility_badge_size, contact_badge_border, mobile_badge_layout) (editorial-split)
-- #38 [template-audit] 4 open discrepancies on Sidebar Accent template (sidebar_tint, profile_card_radius, skill_chip_bg, contact_weight) (sidebar-accent)
-- #37 [template-audit] 2 open discrepancies on Modern Clean template (density_overflow, accent_contrast) (modern-clean)
-- #36 [template-audit] 2 open discrepancies on Professional template (header_balance, entry_spacing) (professional)
-- #35 [template-audit] 3 open discrepancies on Modern template (contact_pills, section_marker, entry_card_shadow) (modern)
+| # | Title | Severity | Status |
+|---|---|---|---|
+| #35 | Modern: 1 remaining discrepancy (MOD-001 contact_pills) | low | pixel_perfect |
+| #36 | Professional: 1 remaining discrepancy (PRO-004 entry_spacing) | low | pixel_perfect |
+| #37 | Modern Clean: 2 discrepancies (MCL-001 density_overflow, MCL-006 accent_contrast) | medium | close |
 
-### `/ux-usability-audit` (4 open)
+### `/ux-usability-audit` (6 open)
 
-- #43 [ux-usability-audit] Overlapping readiness cues on completed workspace cards (UX-RIDX-002)
-- #42 [ux-usability-audit] Hero badges lack icons for scanability on home page (UX-HOME-004)
-- #41 [ux-usability-audit] FAQ answers shown inline reduce scroll efficiency on home page (UX-HOME-003)
-- #40 [ux-usability-audit] Repeated template-switching messaging on home page (UX-HOME-002)
+| # | Title | Severity | Page |
+|---|---|---|---|
+| #40 | Repeated template-switching messaging (UX-HOME-002) | medium | home |
+| #41 | FAQ answers inline reduce scroll efficiency (UX-HOME-003) | medium | home |
+| #42 | Hero badges lack icons for scanability (UX-HOME-004) | low | home |
+| #43 | Overlapping readiness cues on workspace cards (UX-RIDX-002) | low | resumes-index |
+| #61 | Technical WidgetCards above primary source-mode cards (UX-BLDSRC-002) | medium | resume-builder-source |
+| #62 | Duplicate header/quick-take CTA cluster (UX-TSHOW-002) | medium | template-show |
 
-### `/maintainability-audit` (4 open)
+### `/responsive-ui-audit` (1 open)
 
-- #46 [maintainability-audit] Extract LlmProvider sync-state and localize syncability errors (llm-provider-credential)
-- #45 [maintainability-audit] Add Resumes::DocxTextExtractor spec coverage (broad-codebase-coverage)
-- #44 [maintainability-audit] Extract runtime-state and control-state from Admin::JobLogsHelper (admin-job-logs-helper)
-- #33 [maintainability-audit] ResumeTemplates::Catalog is 619 lines with mixed metadata, filtering, and label responsibilities (catalog-619-lines)
+| # | Title | Severity | Page |
+|---|---|---|---|
+| #60 | 2px horizontal overflow on summary step at 390px | low | resume-builder-summary |
 
-### `/resumebuilder-reference-rollout` (1 open)
+### `/maintainability-audit` (2 open)
 
-- #47 [resumebuilder-reference-rollout] Template variant carry-through from marketplace to resume creation (template-variant-carry-through)
+| # | Title | Severity | Status |
+|---|---|---|---|
+| #33 | ResumeTemplates::Catalog 619 lines mixed responsibilities | medium | deferred |
+| #46 | LlmProvider sync-state extraction and localized errors | medium | improved |
+
+### `/continuous-improvement` (2 open)
+
+| # | Title | Impact | Effort |
+|---|---|---|---|
+| #63 | Allow guest access to template gallery (CI-TEMPLATE-001) | medium | medium |
+| #64 | Make homepage Start here cards clickable (CI-NAV-001) | medium | small |
 
 ## By Domain
 
-- **templates**: 6 open
-- **builder**: 4 open
-- **workspace**: 1 open
-- **admin**: 1 open
-- **llm**: 1 open
-- **testing**: 1 open
+| Domain | Open |
+|---|---|
+| templates | 3 |
+| builder | 5 |
+| marketplace | 2 |
+| workspace | 2 |
+| llm | 1 |
 
-## Recently Closed
+## Template Status Overview
 
-- #34 [code-review] Admin helpers use titleize/humanize instead of I18n locale keys for display labels (admin-helpers-titleize-humanize) (closed 2026-03-22T03:26:01Z)
-- #32 [security-audit] SQL injection risk in LlmModel sort scope via Arel.sql (SEC-001-sql-injection-llm-model) (closed 2026-03-22T03:22:34Z)
-- #31 [CI] ResumeBuilder::StepRegistry.section_types_for returns the registered section types for the finalize step (closed 2026-03-22T02:56:58Z)
-- #13 [resumebuilder-reference-rollout] Template variant carry-through: pre-create continuity and choose-later framing (template-variant-carry-through) (closed 2026-03-22T00:00:43Z)
-- #12 [resumebuilder-reference-rollout] Skills guidance: role-aware curation and strength-based ordering (skills-guidance) (closed 2026-03-22T00:05:22Z)
-- #11 [resumebuilder-reference-rollout] Experience guidance: role-aware support and early-career framing (experience-guidance) (closed 2026-03-21T23:56:39Z)
-- #10 [maintainability-audit] Add dedicated spec coverage for Resumes::DocxTextExtractor (docx-text-extractor-spec) (closed 2026-03-22T00:14:10Z)
-- #9 [maintainability-audit] Extract runtime-state and control-state presenters from Admin::JobLogsHelper (job-logs-helper-follow-ups) (closed 2026-03-22T00:08:39Z)
-- #8 [ux-usability-audit] Overlapping readiness badges on completed resume cards (UX-RIDX-002) (UX-RIDX-002) (closed 2026-03-22T00:10:22Z)
-- #7 [ux-usability-audit] 3 open usability issues on Home page (UX-HOME-002, UX-HOME-003, UX-HOME-004) (UX-HOME-open) (closed 2026-03-22T00:15:44Z)
+| Template | Pixel Status | Open | Resolved |
+|---|---|---|---|
+| Modern | pixel_perfect | 1 | 6 |
+| Classic | pixel_perfect | 0 | 5 |
+| ATS Minimal | pixel_perfect | 0 | 5 |
+| Professional | pixel_perfect | 1 | 4 |
+| Modern Clean | close | 2 | 4 |
+| Sidebar Accent | pixel_perfect | 0 | 6 |
+| Editorial Split | pixel_perfect | 0 | 7 |
+
+## Recommended Next Actions
+
+1. **`/responsive-ui-audit implement-next resume-builder-summary`** — Fix 2px overflow (#60)
+2. **`/ux-usability-audit implement-next resume-builder-source`** — Reorder WidgetCards (#61)
+3. **`/continuous-improvement implement-next CI-NAV-001`** — Homepage conversion paths (#64)
+4. **`/maintainability-audit implement-next llm-provider-credential`** — LlmProvider sync-state (#46)
+
+## Recently Closed (this session)
+
+| # | Title | Reason |
+|---|---|---|
+| #38 | Sidebar Accent: 4 discrepancies | All resolved, pixel_perfect |
+| #39 | Editorial Split: 3 discrepancies | All resolved, pixel_perfect |
+| #44 | Admin::JobLogsHelper runtime/control state | All follow-ups closed (dup of #56) |
+| #45 | DocxTextExtractor spec coverage | Completed (dup of #54) |
+| #47 | Template variant carry-through | Verified (dup of #50) |
+| #50 | Template variant carry-through accent | Verified (dup of #47) |
+| #54 | PdfTextExtractor + DocxTextExtractor specs | Completed |
+| #56 | Job log runtime + control state presenters | All 3 presenters extracted |
+| #65 | Guest template gallery access | Duplicate of #63 |
 
 ---
-_Generated by `bin/gh-bridge/roadmap-summary` at 2026-03-22T03:45:19Z_
+_Generated by `/github-ops full-sync` at 2026-03-22T04:51:00Z_
