@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T03:30:00Z"
+updated_at: "2026-03-22T04:00:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-22-llm-provider-credential-management/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-22-llm-provider-sync-state/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -46,9 +46,8 @@ round_robin:
   next_preferred_lane: "verification"
   max_consecutive_lane_runs: 1
   structural_candidate_paths:
-    - "app/models/llm_provider.rb (sync-state follow-up)"
+    - "app/helpers/admin/job_logs_helper.rb (runtime-state / control-state follow-ups)"
   verification_candidate_paths:
-    - "app/services/resumes/docx_text_extractor.rb"
     - "app/services/resumes/pdf_text_extractor.rb"
     - "app/services/resumes/export_status_broadcaster.rb"
     - "app/services/errors/tracker.rb"
@@ -312,23 +311,24 @@ areas:
     path: "app/models/llm_provider.rb"
     category: "model"
     priority: "medium"
-    status: "improved"
+    status: "closed"
     reasons:
       - "LlmProvider (183 lines) mixed 5 distinct responsibility clusters including a self-contained credential management subsystem."
       - "The credential cluster (6 public methods + 1 private helper) handled API key resolution, masking, and type detection independently."
     recommended_refactor_shape: "extract_concern"
     area_doc_path: "docs/maintainability_audits/areas/llm-provider-credential-management.md"
-    open_follow_up_keys:
-      - "extract-llm-provider-sync-state"
-      - "localize-syncability-error-strings"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "extract-credential-management-concern"
-    last_reviewed_at: "2026-03-22T03:30:00Z"
-    last_changed_at: "2026-03-22T03:30:00Z"
-    next_step: "Rotate to verification lane for Resumes::DocxTextExtractor, then return to LlmProvider sync-state extraction."
-    cycle_count: 1
-    last_cycle_date: "2026-03-22T03:30:00Z"
+      - "extract-llm-provider-sync-state"
+      - "localize-syncability-error-strings"
+    last_reviewed_at: "2026-03-22T04:00:00Z"
+    last_changed_at: "2026-03-22T04:00:00Z"
+    next_step: "All follow-ups closed. LlmProvider reduced from 183 to 98 lines across two concern extractions."
+    github_issue_number: 51
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T04:00:00Z"
     issues_found: 3
-    issues_resolved: 1
-    issues_remaining: 2
+    issues_resolved: 3
+    issues_remaining: 0
     regression_detected: false

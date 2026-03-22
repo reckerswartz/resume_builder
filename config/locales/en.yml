@@ -65,6 +65,12 @@ en:
           title: "Finalize and export"
           description: "Choose the final layout, review export actions, and manage any extra sections that sit outside the core guided flow."
 
+  llm_provider:
+    syncability_error:
+      needs_api_key: "%{name} needs an API key reference or token."
+      unresolved_env_var: "%{name} could not resolve %{reference}."
+      not_ready: "%{name} is not ready for requests."
+
   resume_templates:
     catalog:
       labels:

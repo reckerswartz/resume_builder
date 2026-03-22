@@ -29,7 +29,9 @@ RSpec.describe LlmProvider do
       allow(ENV).to receive(:[]).with('MISSING_NVIDIA_KEY').and_return(nil)
 
       expect(provider.syncable?).to eq(false)
-      expect(provider.syncability_error).to include('could not resolve MISSING_NVIDIA_KEY')
+      expect(provider.syncability_error).to eq(
+        I18n.t('llm_provider.syncability_error.unresolved_env_var', name: provider.name, reference: 'MISSING_NVIDIA_KEY')
+      )
     end
   end
 end

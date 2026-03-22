@@ -36,23 +36,42 @@ Extracted `LlmProvider::CredentialManagement` concern at `app/models/concerns/ll
 - `env_var_reference?` (private) — pattern match for env var names
 - `API_KEY_ENV_VAR_PATTERN` constant — moved to concern
 
-Model reduced from 183 → 151 lines.
+Model reduced from 183 → 151 → 98 lines.
+
+- Last reviewed: `2026-03-22T04:00:00Z`
+- Last changed: `2026-03-22T04:00:00Z`
+
+### Sync-state extraction (2026-03-22)
+
+Extracted `LlmProvider::SyncState` concern at `app/models/concerns/llm_provider/sync_state.rb` containing:
+
+- `syncable?` — checks base_url presence plus API key for nvidia adapters
+- `syncability_error` — locale-backed error messages via `llm_provider.syncability_error.*` keys
+- `configured_for_requests?` — bridges active state + syncable check
+- `last_synced_at` / `last_sync_attempt_at` — ISO8601 timestamp parsing from settings JSONB
+- `last_synced_model_count` — integer count from settings
+- `last_sync_error` — stored error message from settings
+- `sync_status` — derived `:error` / `:synced` / `:never_synced` state
+- `parse_settings_time` (private) — safe time parsing with error recovery
+
+Also localized the 3 hardcoded English strings in `syncability_error` via `config/locales/en.yml` under `llm_provider.syncability_error`.
 
 ## Verification
 
-- `ruby -c app/models/llm_provider.rb app/models/concerns/llm_provider/credential_management.rb` — Syntax OK
-- `bundle exec rspec spec/models/concerns/llm_provider/credential_management_spec.rb spec/models/llm_provider_spec.rb spec/services/admin/llm_provider_catalog_sync_service_spec.rb spec/requests/admin/llm_providers_spec.rb spec/services/llm/provider_model_sync_service_spec.rb spec/services/llm/client_factory_spec.rb` — 35 examples, 0 failures
-- Cross-area: `bundle exec rspec spec/requests/admin/llm_models_spec.rb spec/requests/admin/settings_spec.rb spec/services/llm/providers/base_client_spec.rb spec/services/llm/providers/nvidia_build_client_spec.rb spec/services/llm/providers/ollama_client_spec.rb` — 23 examples, 0 failures
+- `ruby -c app/models/llm_provider.rb app/models/concerns/llm_provider/sync_state.rb` — Syntax OK
+- `bundle exec rspec spec/models/concerns/llm_provider/sync_state_spec.rb spec/models/concerns/llm_provider/credential_management_spec.rb spec/models/llm_provider_spec.rb spec/services/admin/llm_provider_catalog_sync_service_spec.rb spec/requests/admin/llm_providers_spec.rb spec/services/llm/provider_model_sync_service_spec.rb spec/services/llm/client_factory_spec.rb` — 55 examples, 0 failures
+- Cross-area: `bundle exec rspec spec/requests/admin/llm_models_spec.rb spec/requests/admin/settings_spec.rb spec/requests/admin/llm_providers_spec.rb` — 17 examples, 0 failures
 
 ## Status
 
-`improved`
+`closed`
 
 ## Open follow-ups
 
-- `extract-llm-provider-sync-state` — extract sync state readers (last_synced_at, sync_status, etc.) into a second concern
-- `localize-syncability-error-strings` — replace hardcoded English in `syncability_error` with I18n keys
+None.
 
 ## Closed follow-ups
 
 - `extract-credential-management-concern`
+- `extract-llm-provider-sync-state`
+- `localize-syncability-error-strings`
