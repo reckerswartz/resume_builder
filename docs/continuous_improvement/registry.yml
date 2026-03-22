@@ -122,14 +122,14 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 9
-  last_cycle_date: "2026-03-22T06:00:00Z"
-  proposals_discovered: 10
+  cycle_count: 10
+  last_cycle_date: "2026-03-22T06:05:00Z"
+  proposals_discovered: 14
   proposals_implemented: 10
-  proposals_remaining: 0
+  proposals_remaining: 4
   proposals_routed: 0
   competitive_scans_completed: 0
-  journeys_simulated: 2
+  journeys_simulated: 3
   journey_log:
     - persona: new_user
       date: "2026-03-22T04:30:00Z"
@@ -172,10 +172,26 @@ cycle_metrics:
         - "Marketplace Use template always creates new resume — no apply-to-existing flow"
         - "No quick export/download action on workspace cards — must navigate to preview or finalize"
         - "Preview Edit resume link hardcodes step=heading — ignores user context"
+    - persona: power_user
+      date: "2026-03-22T06:05:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Sign in (auto-redirected to workspace — session active as template-audit user)"
+        - "View workspace with 112 resumes — all rendered on single page"
+        - "Click Edit on first resume → smart default lands on finalize (CI-EDIT-001 working)"
+        - "Verify finalize step with template picker, design tabs, export actions"
+        - "Observe Download PDF on cards with attached exports (CI-WORKSPACE-003 working)"
+        - "Observe Duplicate button on all cards (CI-WORKSPACE-002 working)"
+      console_errors: 0
+      observations:
+        - "112 resume cards rendered on single page with no pagination — massive page height and load time"
+        - "No search or filter capability on workspace — user cannot find a specific resume"
+        - "No sorting options on workspace — always sorted by updated_at desc"
+        - "No bulk actions — cannot select multiple resumes for export or delete"
 next_step:
-  recommended_mode: "explore"
+  recommended_mode: "implement-next"
   recommended_persona: "power_user"
-  reason: "All 10 proposals from cycles 1-9 implemented. Next: explore with power_user or admin persona to discover new improvement opportunities."
+  reason: "4 new power_user proposals discovered in cycle 10. CI-WORKSPACE-004 (workspace pagination) has the highest impact/effort ratio. Start with implement-next."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -509,3 +525,124 @@ proposals:
       - "config/locales/en.yml"
     estimated_spec_paths:
       - "spec/requests/home_spec.rb"
+
+  - id: "CI-WORKSPACE-004"
+    category: remove_friction
+    impact: critical
+    effort: small
+    status: discovered
+    user_personas:
+      - power_user
+    journey_step: "View workspace with 112 resumes — all rendered on single page"
+    problem: >
+      The workspace renders every resume card on a single page with no
+      pagination. A power user with 112 resumes sees a page that is
+      thousands of pixels tall, loads slowly, and makes it impossible
+      to find a specific resume without browser search. The controller
+      uses policy_scope(Resume).order(updated_at: :desc) with no limit
+      or pagination.
+    proposed_improvement: >
+      Add cursor-based or offset pagination to the workspace index.
+      Show 12-20 resume cards per page with prev/next navigation.
+      Use Turbo Frames for seamless page transitions. Keep the
+      existing sort (updated_at desc) as the default.
+    evidence:
+      page_url: "/resumes"
+      resume_count: 112
+      page_height: "massive — all 112 cards rendered at once"
+    affected_files:
+      - "app/controllers/resumes_controller.rb"
+      - "app/views/resumes/index.html.erb"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-WORKSPACE-005"
+    category: productivity_boost
+    impact: high
+    effort: medium
+    status: discovered
+    user_personas:
+      - power_user
+    journey_step: "View workspace with many resumes — no search or filter"
+    problem: >
+      The workspace has no search or filter capability. A power user
+      with many resumes cannot search by title, headline, template,
+      or status. They must scroll through all cards visually or use
+      browser Ctrl+F. The templates marketplace already has a rich
+      search/filter system that could be adapted.
+    proposed_improvement: >
+      Add a search field to the workspace header that filters resumes
+      by title or headline (server-side query). Optionally add a
+      template filter dropdown to narrow by layout family. Keep it
+      lightweight — a single search input is the minimum viable
+      improvement.
+    evidence:
+      page_url: "/resumes"
+      resume_count: 112
+      missing_feature: "search/filter"
+    affected_files:
+      - "app/controllers/resumes_controller.rb"
+      - "app/views/resumes/index.html.erb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-WORKSPACE-006"
+    category: productivity_boost
+    impact: medium
+    effort: small
+    status: discovered
+    user_personas:
+      - power_user
+    journey_step: "View workspace — resumes always sorted by updated_at desc"
+    problem: >
+      The workspace always sorts resumes by updated_at descending.
+      A power user may want to sort by title, template, or creation
+      date. The templates marketplace already supports sort options
+      that could serve as a pattern.
+    proposed_improvement: >
+      Add a sort dropdown to the workspace header with options like
+      'Recently updated' (default), 'Name A-Z', 'Template', and
+      'Oldest first'. Wire through a sort query param to the
+      controller.
+    evidence:
+      page_url: "/resumes"
+      current_sort: "updated_at desc (hardcoded)"
+      missing_feature: "sort options"
+    affected_files:
+      - "app/controllers/resumes_controller.rb"
+      - "app/views/resumes/index.html.erb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-EXPORT-001"
+    category: productivity_boost
+    impact: medium
+    effort: medium
+    status: discovered
+    user_personas:
+      - power_user
+    journey_step: "View workspace — no bulk export capability"
+    problem: >
+      A power user who maintains multiple resumes for different job
+      targets cannot select and export several resumes at once. Each
+      resume must be exported individually by navigating to its
+      preview or finalize step. With many resumes, this is a
+      significant time cost.
+    proposed_improvement: >
+      Add checkbox selection to workspace resume cards with a bulk
+      action bar that supports 'Export selected as PDF' and
+      'Delete selected'. Use Stimulus for client-side selection state
+      and a single POST endpoint for bulk operations.
+    evidence:
+      page_url: "/resumes"
+      resume_count: 112
+      missing_feature: "bulk actions"
+    affected_files:
+      - "app/controllers/resumes_controller.rb"
+      - "app/views/resumes/index.html.erb"
+      - "app/views/resumes/_resume_card.html.erb"
+      - "config/routes.rb"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
