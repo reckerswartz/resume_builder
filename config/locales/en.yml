@@ -130,3 +130,8 @@ en:
           left: "Left"
           right: "Right"
 
+  llm_provider:
+    syncability:
+      needs_api_key: "%{name} needs an API key reference or token."
+      unresolved_env_var: "%{name} could not resolve %{reference}."
+      not_ready: "%{name} is not ready for requests."

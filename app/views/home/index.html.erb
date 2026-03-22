@@ -92,11 +92,20 @@
       <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.description") %></p>
 
       <div class="mt-4 space-y-3">
-        <%= render "shared/glyph_inset_card", glyph: :preview, title: t("home.index.common_questions.questions.design_experience.title"), description: t("home.index.common_questions.questions.design_experience.description") %>
-
-        <%= render "shared/glyph_inset_card", glyph: :layers, title: t("home.index.common_questions.questions.switch_templates.title"), description: t("home.index.common_questions.questions.switch_templates.description") %>
-
-        <%= render "shared/glyph_inset_card", glyph: :spark, title: t("home.index.common_questions.questions.existing_resume.title"), description: t("home.index.common_questions.questions.existing_resume.description") %>
+        <% [
+          { glyph: :preview, key: "design_experience" },
+          { glyph: :layers, key: "switch_templates" },
+          { glyph: :spark, key: "existing_resume" }
+        ].each do |faq| %>
+          <details class="group <%= ui_inset_panel_classes(tone: :subtle) %>">
+            <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
+              <%= render Ui::GlyphComponent.new(name: faq[:glyph], size: :sm, tone: :soft) %>
+              <p class="text-sm font-semibold text-ink-950 flex-1"><%= t("home.index.common_questions.questions.#{faq[:key]}.title") %></p>
+              <span class="text-ink-400 transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p class="mt-2 pl-9 text-sm leading-6 text-ink-700/80"><%= t("home.index.common_questions.questions.#{faq[:key]}.description") %></p>
+          </details>
+        <% end %>
       </div>
     </div>
   <% end %>

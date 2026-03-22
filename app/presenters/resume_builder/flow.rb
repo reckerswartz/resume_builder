@@ -7,7 +7,11 @@ module ResumeBuilder
     end
 
     def current_step_key
-      StepCatalog.current_step_key(requested_step)
+      @current_step_key ||= if requested_step.present?
+        StepCatalog.current_step_key(requested_step)
+      else
+        smart_default_step_key
+      end
     end
 
     def current_step
@@ -89,6 +93,11 @@ module ResumeBuilder
 
     private
       attr_reader :requested_step, :resume, :view_context
+
+      def smart_default_step_key
+        first_incomplete = tracked_steps.find { |step| !step_completed?(step[:key]) }
+        first_incomplete ? first_incomplete[:key] : "finalize"
+      end
 
       def tracked_steps
         StepCatalog.tracked_steps

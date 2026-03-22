@@ -1,5 +1,6 @@
 class LlmProvider < ApplicationRecord
   include LlmProvider::CredentialManagement
+  include LlmProvider::SyncState
 
   OLLAMA_BASE_URL = "http://127.0.0.1:11434".freeze
   NVIDIA_BUILD_BASE_URL = "https://integrate.api.nvidia.com".freeze
@@ -59,51 +60,6 @@ class LlmProvider < ApplicationRecord
   def request_timeout_seconds
     timeout = settings.fetch("request_timeout_seconds", 30).to_i
     timeout.positive? ? timeout : 30
-  end
-
-  def syncable?
-    return false if base_url.blank?
-    return true unless nvidia_build?
-
-    api_key.present?
-  end
-
-  def syncability_error
-    return if syncable?
-    return "#{name} needs an API key reference or token." if nvidia_build? && api_key_reference.blank?
-    return "#{name} could not resolve #{api_key_reference}." if nvidia_build? && api_key_reference_type == "env_var"
-
-    "#{name} is not ready for requests."
-  end
-
-  def configured_for_requests?
-    return false unless active?
-
-    syncable?
-  end
-
-  def last_synced_at
-    parse_settings_time("last_synced_at")
-  end
-
-  def last_sync_attempt_at
-    parse_settings_time("last_sync_attempt_at")
-  end
-
-  def last_synced_model_count
-    count = settings["last_synced_model_count"]
-    count.present? ? count.to_i : nil
-  end
-
-  def last_sync_error
-    settings["last_sync_error"].presence
-  end
-
-  def sync_status
-    return :error if last_sync_error.present?
-    return :synced if last_synced_at.present?
-
-    :never_synced
   end
 
   private

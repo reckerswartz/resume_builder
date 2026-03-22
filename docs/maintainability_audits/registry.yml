@@ -312,23 +312,23 @@ areas:
     path: "app/models/llm_provider.rb"
     category: "model"
     priority: "medium"
-    status: "improved"
+    status: "closed"
     reasons:
       - "LlmProvider (183 lines) mixed 5 distinct responsibility clusters including a self-contained credential management subsystem."
       - "The credential cluster (6 public methods + 1 private helper) handled API key resolution, masking, and type detection independently."
     recommended_refactor_shape: "extract_concern"
     area_doc_path: "docs/maintainability_audits/areas/llm-provider-credential-management.md"
-    open_follow_up_keys:
-      - "extract-llm-provider-sync-state"
-      - "localize-syncability-error-strings"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "extract-credential-management-concern"
-    last_reviewed_at: "2026-03-22T03:30:00Z"
-    last_changed_at: "2026-03-22T03:30:00Z"
-    next_step: "Rotate to verification lane for Resumes::DocxTextExtractor, then return to LlmProvider sync-state extraction."
-    cycle_count: 1
-    last_cycle_date: "2026-03-22T03:30:00Z"
+      - "extract-llm-provider-sync-state"
+      - "localize-syncability-error-strings"
+    last_reviewed_at: "2026-03-22T05:24:00Z"
+    last_changed_at: "2026-03-22T05:24:00Z"
+    next_step: "All follow-ups closed. Model reduced from 183 to 105 lines across 2 extracted concerns."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:24:00Z"
     issues_found: 3
-    issues_resolved: 1
-    issues_remaining: 2
+    issues_resolved: 3
+    issues_remaining: 0
     regression_detected: false

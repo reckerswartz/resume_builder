@@ -8,7 +8,7 @@
 - **Page family**: public_auth
 - **Access level**: public
 - **Status**: improved
-- **Usability score**: 89
+- **Usability score**: 92
 
 ## Dimension scores
 
@@ -30,8 +30,8 @@
 | ID | Severity | Category | Description | Evidence | Status |
 |---|---|---|---|---|---|
 | UX-HOME-001 | high | repeated_content | Reassurance side panel ("No design tools required", "Switch templates later", "Export when ready") repeats hero badges almost verbatim | Snapshot refs e147-e149 vs e28-e30 | resolved |
-| UX-HOME-002 | medium | repeated_content | "Switch templates later" / "content stays reusable" concept appears in side rail and FAQ (reassurance panel removed) | Snapshot | open (reduced) |
-| UX-HOME-003 | medium | scroll_efficiency | FAQ answers shown inline (reassurance panel removed, so page height reduced) | Full-page screenshot | open (reduced) |
+| UX-HOME-002 | medium | repeated_content | "Switch templates later" / "content stays reusable" concept appears in side rail and FAQ (reassurance panel removed) | Snapshot | resolved |
+| UX-HOME-003 | medium | scroll_efficiency | FAQ answers shown inline (reassurance panel removed, so page height reduced) | Full-page screenshot | resolved |
 | UX-HOME-004 | low | icon_usage | Hero badges (Guided steps, Live preview, PDF export) are text-only — small icons would improve scanability | Snapshot refs e28-e30 | open |
 
 ## Fix history
@@ -39,7 +39,8 @@
 | Date | Run | Issue ID | Fix description | Verification |
 |---|---|---|---|---|
 | 2026-03-21 | 2026-03-21-home-remove-reassurance | UX-HOME-001 | Removed the redundant reassurance side panel from the common questions section. Its badges echoed hero badges and its copy overlapped FAQ answers. Changed from 2-column grid to single-column layout. Updated spec to remove panel expectation. | 3 examples, 0 failures; Playwright re-audit confirmed |
+| 2026-03-22 | 2026-03-22-home-faq-disclosures | UX-HOME-002, UX-HOME-003 | Wrapped all 3 FAQ questions in collapsed `<details>` disclosures so answers are hidden by default. Reduces scroll depth and demotes repeated "switch templates" concept. Added spec assertions for 3 disclosure summaries. | 4 examples, 0 failures |
 
 ## Next step
 
-UX-HOME-002 and UX-HOME-003 are reduced but still open. UX-HOME-004 (icon usage) is low priority.
+UX-HOME-002 and UX-HOME-003 resolved. UX-HOME-004 (icon usage) is the only remaining open issue at low priority.

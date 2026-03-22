@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:15:00Z"
+updated_at: "2026-03-22T06:31:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-rshow-remove-what-this-shows/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-plain-language-headshot-copy/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
+    - "resume-builder-finalize"
     - "sign-in"
     - "create-account"
-    - "resume-source-import"
-  reason: "resume-show improved to 85 after removing redundant explainer. All builder steps and the preview page are now audited. sign-in and create-account are the next unaudited public pages."
+  reason: "resume-builder-personal-details improved to 81 after replacing jargon copy. resume-builder-finalize (79) is now the lowest-scoring audited page with open issues. sign-in and create-account remain the next unaudited public pages."
 pages:
   - page_key: "home"
     title: "Home"
@@ -87,18 +87,24 @@ pages:
     page_family: "public_auth"
     priority: "high"
     status: "improved"
-    usability_score: 89
+    usability_score: 92
     page_doc_path: "docs/ui_audits/usability_review/pages/home.md"
     open_issue_keys:
-      - "UX-HOME-002"
-      - "UX-HOME-003"
       - "UX-HOME-004"
     closed_issue_keys:
       - "UX-HOME-001"
-    last_audited_at: "2026-03-21T03:15:00Z"
-    last_changed_at: "2026-03-21T03:15:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-home-remove-reassurance/00-overview.md"
-    next_step: "UX-HOME-002 and UX-HOME-003 are reduced but still open. UX-HOME-004 is low priority."
+      - "UX-HOME-002"
+      - "UX-HOME-003"
+    last_audited_at: "2026-03-22T05:24:00Z"
+    last_changed_at: "2026-03-22T05:24:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-home-faq-disclosures/00-overview.md"
+    next_step: "UX-HOME-004 (icon usage) is the only remaining open issue at low priority."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:24:00Z"
+    issues_found: 4
+    issues_resolved: 3
+    issues_remaining: 1
+    regression_detected: false
   - { page_key: "sign-in", title: "Sign in", path: "/session/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "create-account", title: "Create account", path: "/registration/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "password-reset-request", title: "Password reset request", path: "/passwords/new", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
@@ -278,22 +284,22 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "improved"
-    usability_score: 78
+    usability_score: 81
     page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-personal-details.md"
     open_issue_keys:
-      - "UX-BLDPD-002"
       - "UX-BLDPD-003"
     closed_issue_keys:
       - "UX-BLDPD-001"
-    last_audited_at: "2026-03-22T05:55:00Z"
-    last_changed_at: "2026-03-22T05:55:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-remove-duplicate-step-header/00-overview.md"
-    next_step: "UX-BLDPD-002 (content_brevity) is the next highest-value open issue — shorten technical jargon in headshot and photo library descriptions. UX-BLDPD-003 (task_overload) is structural and lower priority."
-    cycle_count: 1
-    last_cycle_date: "2026-03-22T05:55:00Z"
+      - "UX-BLDPD-002"
+    last_audited_at: "2026-03-22T06:31:00Z"
+    last_changed_at: "2026-03-22T06:31:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldpd-plain-language-headshot-copy/00-overview.md"
+    next_step: "UX-BLDPD-003 (task_overload) is the only remaining open issue. Consider wrapping secondary sections behind a disclosure."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T06:31:00Z"
     issues_found: 3
-    issues_resolved: 1
-    issues_remaining: 2
+    issues_resolved: 2
+    issues_remaining: 1
     regression_detected: false
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"

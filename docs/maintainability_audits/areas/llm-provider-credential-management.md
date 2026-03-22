@@ -46,13 +46,14 @@ Model reduced from 183 → 151 lines.
 
 ## Status
 
-`improved`
+`closed`
 
 ## Open follow-ups
 
-- `extract-llm-provider-sync-state` — extract sync state readers (last_synced_at, sync_status, etc.) into a second concern
-- `localize-syncability-error-strings` — replace hardcoded English in `syncability_error` with I18n keys
+None.
 
 ## Closed follow-ups
 
 - `extract-credential-management-concern`
+- `extract-llm-provider-sync-state` — extracted `LlmProvider::SyncState` concern with `syncable?`, `syncability_error`, `configured_for_requests?`, `last_synced_at`, `last_sync_attempt_at`, `last_synced_model_count`, `last_sync_error`, `sync_status`. Model reduced from 151 → 105 lines.
+- `localize-syncability-error-strings` — replaced 3 hardcoded English strings in `syncability_error` with `I18n.t("llm_provider.syncability.*")` keys in `config/locales/en.yml`. Added `spec/models/concerns/llm_provider/sync_state_spec.rb` (15 examples). Verified with 59 examples, 0 failures across model/concern/service/request specs.

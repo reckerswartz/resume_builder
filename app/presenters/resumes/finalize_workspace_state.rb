@@ -144,6 +144,24 @@ module Resumes
       resume.accent_color
     end
 
+    def default_accent_color
+      layout_config.fetch("accent_color")
+    end
+
+    def accent_color_is_default?
+      selected_accent_color == default_accent_color
+    end
+
+    def accent_color_palette
+      @accent_color_palette ||= ResumeTemplates::Catalog.accent_color_palette.map do |swatch|
+        swatch.merge(selected: swatch.fetch(:hex) == selected_accent_color)
+      end
+    end
+
+    def accent_color_is_custom?
+      accent_color_palette.none? { |swatch| swatch.fetch(:selected) }
+    end
+
     def show_contact_icons?
       resume.show_contact_icons?
     end

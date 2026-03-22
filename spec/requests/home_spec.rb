@@ -12,6 +12,14 @@ RSpec.describe 'Home', type: :request do
       expect(response.body).to include('Common questions')
       expect(response.body).to include('Before you start')
       expect(response.body).to include('atelier-pill')
+
+      doc = Nokogiri::HTML(response.body)
+      faq_disclosures = doc.css('details summary')
+      expect(faq_disclosures.size).to eq(3)
+      faq_titles = faq_disclosures.map { |s| s.css('p').text }
+      expect(faq_titles).to include('Do I need design experience?')
+      expect(faq_titles).to include('Can I switch templates later?')
+      expect(faq_titles).to include('Can I start from an existing resume?')
     end
 
     it 'renders Start here cards as clickable links to registration' do

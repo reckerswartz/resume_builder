@@ -172,6 +172,30 @@ module ResumeTemplates
       "lime" => %w[slate indigo]
     }.freeze
 
+    ACCENT_COLOR_PALETTE = [
+      { key: "slate",    hex: "#334155", label: "Slate" },
+      { key: "gray",     hex: "#374151", label: "Gray" },
+      { key: "zinc",     hex: "#3F3F46", label: "Zinc" },
+      { key: "stone",    hex: "#44403C", label: "Stone" },
+      { key: "red",      hex: "#DC2626", label: "Red" },
+      { key: "rose",     hex: "#E11D48", label: "Rose" },
+      { key: "orange",   hex: "#EA580C", label: "Orange" },
+      { key: "amber",    hex: "#D97706", label: "Amber" },
+      { key: "emerald",  hex: "#059669", label: "Emerald" },
+      { key: "teal",     hex: "#0F766E", label: "Teal" },
+      { key: "cyan",     hex: "#0891B2", label: "Cyan" },
+      { key: "sky",      hex: "#0284C7", label: "Sky" },
+      { key: "blue",     hex: "#1D4ED8", label: "Blue" },
+      { key: "indigo",   hex: "#4338CA", label: "Indigo" },
+      { key: "violet",   hex: "#7C3AED", label: "Violet" },
+      { key: "purple",   hex: "#9333EA", label: "Purple" },
+      { key: "fuchsia",  hex: "#C026D3", label: "Fuchsia" },
+      { key: "pink",     hex: "#DB2777", label: "Pink" },
+      { key: "navy",     hex: "#0F4C81", label: "Navy" },
+      { key: "charcoal", hex: "#0F172A", label: "Charcoal" },
+      { key: "lime",     hex: "#D7F038", label: "Lime" }
+    ].freeze
+
     FAMILY_DEFINITIONS = {
       "modern" => {
         label: "Modern",
@@ -431,6 +455,15 @@ module ResumeTemplates
         column_count_key = column_count.to_s
 
         I18n.t("resume_templates.catalog.labels.column_count.#{column_count_key}", default: COLUMN_COUNTS.fetch(column_count_key, column_count_key.humanize))
+      end
+
+      def accent_color_palette
+        ACCENT_COLOR_PALETTE
+      end
+
+      def default_accent_color_for(layout_config_or_family)
+        config = normalize_layout_config(extract_layout_config(layout_config_or_family))
+        config.fetch("accent_color")
       end
 
       def theme_tone_options

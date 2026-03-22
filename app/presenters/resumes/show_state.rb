@@ -34,8 +34,7 @@ module Resumes
 
     def artifact_badges
       @artifact_badges ||= [
-        { label: resume.template.name, tone: :neutral },
-        { label: export_state_label, tone: export_badge_tone }
+        { label: resume.template.name, tone: :neutral }
       ]
     end
 

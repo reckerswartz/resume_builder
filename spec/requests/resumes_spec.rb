@@ -311,6 +311,8 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.show.preview_title'))
       expect(response.body).to include(I18n.t('resumes.show.desktop_actions.title'))
       expect(response.body).not_to include(I18n.t('resumes.show.what_this_shows.eyebrow'))
+      expect(response.body.scan(/>#{Regexp.escape(I18n.t('resumes.export_states.draft'))}</).size).to eq(2)
+      expect(response.body).to include(I18n.t('resumes.helper.export_status.labels.draft_only'))
     end
   end
 
@@ -448,6 +450,10 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include(I18n.t('resumes.editor_personal_details_step.optional_step.title'))
       expect(profile_links_index).to be < personal_information_index
       expect(personal_information_index).to be < headshot_index
+
+      expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.headshot.description'))
+      expect(response.body).not_to include('truthful headshot support')
+      expect(response.body).not_to include('non-photo fallback')
     end
 
     it 'renders the summary step without a duplicate step header card and starts with the curated library' do
