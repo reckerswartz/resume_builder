@@ -1,6 +1,7 @@
-<% resume_count = @resumes.size %>
-<% ready_count = @resumes.count { |resume| resume.summary.present? && resume.contact_field("email").present? } %>
-<% draft_count = resume_count - ready_count %>
+<% resume_count = @total_count %>
+<% page_resumes = @resumes %>
+<% ready_count = page_resumes.count { |resume| resume.summary.present? && resume.contact_field("email").present? } %>
+<% draft_count = page_resumes.size - ready_count %>
 <% page_header_actions = [
   { label: t("resumes.index.actions.create_new_resume"), path: new_resume_path, style: :primary },
   { label: t("resumes.index.actions.browse_templates"), path: templates_path, style: :secondary },
@@ -56,12 +57,18 @@
       <% end %>
     <% end %>
 
-    <% if @resumes.any? %>
+    <% if page_resumes.any? %>
       <div class="grid gap-5 xl:grid-cols-2">
-        <% @resumes.each do |resume| %>
+        <% page_resumes.each do |resume| %>
           <%= render "resume_card", resume: resume %>
         <% end %>
       </div>
+
+      <%= render "shared/pagination",
+        current_page: @current_page,
+        total_pages: @total_pages,
+        base_path: resumes_path,
+        page_params: {} %>
     <% else %>
       <%= render Ui::EmptyStateComponent.new(
         title: t("resumes.index.empty_state.title"),

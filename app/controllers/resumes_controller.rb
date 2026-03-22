@@ -4,7 +4,12 @@ class ResumesController < ApplicationController
   before_action :set_resume, only: %i[ show edit update destroy duplicate export download download_text ]
 
   def index
-    @resumes = policy_scope(Resume).includes(:template).with_attached_pdf_export.order(updated_at: :desc)
+    scope = policy_scope(Resume).includes(:template).with_attached_pdf_export.order(updated_at: :desc)
+    @total_count = scope.count
+    @per_page = 12
+    @total_pages = [(@total_count.to_f / @per_page).ceil, 1].max
+    @current_page = [[params[:page].to_i, 1].max, @total_pages].min
+    @resumes = scope.offset((@current_page - 1) * @per_page).limit(@per_page)
   end
 
   def show

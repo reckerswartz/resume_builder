@@ -130,6 +130,13 @@ en:
           left: "Left"
           right: "Right"
 
+  shared:
+    pagination:
+      aria_label: "Page navigation"
+      page_info: "Page %{current} of %{total}"
+      previous: "Previous"
+      next: "Next"
+
   llm_provider:
     syncability:
       needs_api_key: "%{name} needs an API key reference or token."
