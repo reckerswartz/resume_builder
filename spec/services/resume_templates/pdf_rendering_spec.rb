@@ -321,11 +321,10 @@ RSpec.describe 'Resume template PDF rendering' do
 
     document = Nokogiri::HTML.parse(html)
 
-    contact_container = document.css('div').find { |n| n['class'].to_s.include?('flex-wrap') && n['class'].to_s.include?('gap-2') && n['class'].to_s.include?('items-start') }
+    contact_container = document.css('div').find { |n| n['class'].to_s.include?('flex-wrap') && n['class'].to_s.include?('gap-x-2') }
     expect(contact_container).to be_present
-    expect(contact_container['class']).to include('gap-2')
-    expect(contact_container['class']).not_to include('gap-x-2')
-    expect(contact_container['class']).not_to include('gap-y-1.5')
+    expect(contact_container['class']).to include('gap-y-1.5')
+    expect(contact_container['class']).to include('items-start')
   end
 
   it 'renders Modern with baseline-aligned marker dots and shadowed entry cards' do
