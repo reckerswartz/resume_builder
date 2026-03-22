@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T23:12:00Z"
+updated_at: "2026-03-22T04:58:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-21-bldskl-single-guidance/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-hide-workspace-overview/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -74,10 +74,10 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "resume-builder-finalize"
-    - "resume-show"
-    - "resume-builder-summary"
-  reason: "resume-builder-skills improved to 88 with no open issues after suppressing generic fallback entry text. resume-builder-finalize and resume-show are the next unaudited high-priority surfaces, followed by resume-builder-summary."
+    - "templates-index"
+    - "template-show"
+    - "resume-builder-source"
+  reason: "resume-builder-finalize improved to 87 after hiding the duplicate desktop workspace overview, and it now has no tracked open usability issues. templates-index is the next unaudited authenticated discovery surface after the core builder and preview workflow, template-show is the next likely detail destination once the marketplace is audited, and resume-builder-source is the next builder step to revisit if focus returns to the guided setup flow."
 pages:
   - page_key: "home"
     title: "Home"
@@ -230,8 +230,53 @@ pages:
     issues_resolved: 2
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "resume-builder-finalize", title: "Resume builder finalize step", path: "/resumes/:id/edit?step=finalize", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-summary"
+    title: "Resume builder summary step"
+    path: "/resumes/:id/edit?step=summary"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "improved"
+    usability_score: 85
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-summary.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-BLDSUM-001"
+    last_audited_at: "2026-03-22T04:41:00Z"
+    last_changed_at: "2026-03-22T04:41:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsum-default-query-results/00-overview.md"
+    next_step: "No open issues are currently tracked on resume-builder-summary. Revisit only if the summary search, role chips, or guided builder shell changes."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T04:41:00Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
+  - page_key: "resume-builder-finalize"
+    title: "Resume builder finalize step"
+    path: "/resumes/:id/edit?step=finalize"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "high"
+    status: "improved"
+    usability_score: 87
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-finalize.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-BLDFIN-001"
+      - "UX-BLDFIN-002"
+    last_audited_at: "2026-03-22T04:58:00Z"
+    last_changed_at: "2026-03-22T04:58:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldfin-hide-workspace-overview/00-overview.md"
+    next_step: "No open issues are currently tracked on resume-builder-finalize. Revisit only if the shared builder desktop overview, finalize hero, or export workspace hierarchy changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T04:58:00Z"
+    issues_found: 2
+    issues_resolved: 2
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "admin-dashboard", title: "Admin dashboard", path: "/admin", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-templates-index", title: "Admin templates index", path: "/admin/templates", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-template-show", title: "Admin template detail", path: "/admin/templates/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }

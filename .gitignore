@@ -57,6 +57,9 @@ docs/*/*/areas/TEMPLATE.md
 docs/*/*/pages/TEMPLATE.md
 docs/*/*/*/pages/TEMPLATE.md
 
+# Continuous improvement proposal docs (ephemeral per-discovery)
+docs/continuous_improvement/proposals/
+
 # Playwright and audit artifacts (generated locally)
 /tmp/ui_audit_artifacts/
 /tmp/reference_captures/

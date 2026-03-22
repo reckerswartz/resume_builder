@@ -39,5 +39,25 @@ RSpec.describe Resumes::SummarySuggestionCatalog do
       )
       expect(state.results.first.fetch(:summary)).to include('early-career software engineer')
     end
+
+    it 'returns a nearby curated role when the query contains a verbose headline with extra qualifiers' do
+      resume = build(
+        :resume,
+        headline: 'Senior Product Designer | UX Systems | Advertising',
+        intake_details: {
+          'experience_level' => 'three_to_five_years'
+        }
+      )
+
+      state = described_class.new(resume: resume, query: resume.headline).call
+
+      expect(state.results.first).to include(
+        role_key: 'product_designer',
+        role_title: 'Product Designer'
+      )
+      expect(state.related_roles).to include(
+        include(title: 'UX Designer', query: 'UX Designer')
+      )
+    end
   end
 end

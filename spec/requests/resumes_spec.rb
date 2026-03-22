@@ -220,6 +220,29 @@ RSpec.describe 'Resumes', type: :request do
       expect(hrefs).to include(edit_resume_path(resume, step: 'education', locale: :en))
     end
 
+    it 'shows curated summary suggestions for a verbose headline on first load' do
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        headline: 'Senior Product Designer | UX Systems | Advertising',
+        intake_details: {
+          'experience_level' => 'three_to_five_years'
+        }
+      )
+
+      get edit_resume_path(resume), params: { step: 'summary' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      summary_cards = document.css('[data-summary-suggestions-card]')
+
+      expect(summary_cards).not_to be_empty
+      expect(summary_cards.first.text).to include('Product Designer')
+      expect(response.body).not_to include(I18n.t('resumes.summary_step_state.empty_state_title'))
+    end
+
     it 'hides the extra mobile preview panel on section-based builder steps while collapsing secondary builder actions and repeated section-type cues' do
       resume = create(:resume, user:, template:)
 
@@ -257,7 +280,7 @@ RSpec.describe 'Resumes', type: :request do
       heading_primary_actions = heading_document.css('[data-builder-primary-actions] a').map { |link| link.text.squish }
       expect(response.body).to include(I18n.t('resumes.edit.mobile_preview_panel.title'))
       expect(heading_preview_frame).to be_present
-      expect(heading_preview_frame.ancestors('div').map { |node| node['class'].to_s }).not_to include('hidden xl:block')
+      expect(heading_preview_frame.ancestors('div').map { |node| node['class'].to_s }).to include('hidden xl:block')
       expect(heading_document.at_css('details[data-builder-secondary-actions]')).to be_nil
       expect(heading_primary_actions).to include(
         I18n.t('resume_builder.editor_state.navigation.back_to_workspace'),
@@ -329,7 +352,7 @@ RSpec.describe 'Resumes', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(Nokogiri::HTML.parse(response.body).at_css('details[data-builder-secondary-actions]')).to be_nil
-      expect(response.body).to include(%(id="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
+      expect(response.body).not_to include(%(id="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
       expect(response.body).to include('template-picker-compact')
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_pill'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
@@ -381,7 +404,8 @@ RSpec.describe 'Resumes', type: :request do
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.eyebrow'))
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.badges.early_career'))
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.description_early_career'))
-      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.volunteer_experience'))
+      expect(experience_guidance.css('[data-experience-suggestions-card]')).not_to be_empty
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.insert_button_label'))
       expect(highlights_textarea).to be_present
       expect(highlights_textarea['name']).to include('[highlights_text]')
     end

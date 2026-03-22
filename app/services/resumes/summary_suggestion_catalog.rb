@@ -143,8 +143,14 @@ module Resumes
       return suggestions(experience_level:) if normalized_query.blank?
 
       suggestions(experience_level:)
-        .select { |entry| entry.search_text.include?(normalized_query) }
-        .sort_by { |entry| [ entry_rank(entry, normalized_query), entry.role_label, entry.id ] }
+        .filter_map do |entry|
+          score = entry_rank(entry, normalized_query)
+          next if score == 4
+
+          [ score, entry ]
+        end
+        .sort_by { |score, entry| [ score, entry.role_label, entry.id ] }
+        .map(&:last)
     end
 
     def related_roles(query:, experience_level: nil, limit: 4)

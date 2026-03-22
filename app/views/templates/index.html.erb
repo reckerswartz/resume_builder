@@ -178,6 +178,7 @@
                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60"><%= filter_group.fetch(:label) %></p>
                 <div class="flex flex-wrap gap-2">
                   <% filter_group.fetch(:options).each do |option| %>
+                    <% next if option.fetch(:value) == "all" && option.fetch(:aria_pressed) == "true" %>
                     <% quick_choice_active = option.fetch(:aria_pressed) == "true" %>
                     <button
                       type="button"

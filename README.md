@@ -38,7 +38,8 @@ Resume Builder is a conventional Rails 8, server-rendered application for creati
 - Use `docs/template_audits/README.md` for the reusable Playwright-driven template pixel-perfect audit workflow, diverse seed profile catalog, per-template discrepancy tracking, and iterative fix-and-re-audit artifacts
 - Use `docs/job_monitoring_and_recovery.md` for the Active Job lifecycle logging, persistent `JobLog` monitoring record, Solid Queue runtime inspection, and admin recovery controls
 - Use `docs/github_workflow_integration.md` for the GitHub workflow integration architecture, `gh` CLI bridge scripts, label taxonomy, issue/branch/PR naming conventions, and cross-workflow coordination
-- Use `docs/github_ops/registry.yml` for the central state of GitHub integration across all 19 workflows
+- Use `docs/github_ops/registry.yml` for the central state of GitHub integration across all 20 workflows
+- Use `docs/continuous_improvement/README.md` for the reusable Playwright-driven continuous improvement workflow, user journey simulation, competitive analysis, improvement proposal tracking, and iterative feature discovery
 - Use `docs/ci_cd_pipeline.md` for the autonomous CI/CD pipeline architecture, workflow inventory, self-improvement loop, deployment strategies, and getting-started guide
 
 ## Local setup
@@ -66,7 +67,7 @@ This repository is configured for Windsurf with project guidance and Rails AI sk
 
 - Ask naturally for Rails help and Cascade can auto-invoke matching skills
 - Invoke a skill directly with `@skill-name`, such as `@rails-architecture` or `@rspec-agent`
-- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/responsive-ui-audit`, `/ui-guidelines-audit`, `/behance-template-rollout`, `/behance-template-implementation`, `/resumebuilder-reference-rollout`, `/template-audit`, and `/ux-usability-audit`
+- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/responsive-ui-audit`, `/ui-guidelines-audit`, `/behance-template-rollout`, `/behance-template-implementation`, `/resumebuilder-reference-rollout`, `/template-audit`, `/ux-usability-audit`, and `/continuous-improvement`
 
 ## Notes
 

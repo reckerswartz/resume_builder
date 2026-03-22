@@ -36,6 +36,26 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include('data-controller="disclosure"')
     end
 
+    it 'keeps the default quick-choices rail focused on narrowing options instead of active all chips' do
+      create(:template, name: 'Modern Slate')
+      create(:template, name: 'Classic Ivory', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
+      create(:template, name: 'Sidebar Indigo', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'sidebar-accent'))
+
+      get templates_path
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      quick_choices_panel = document.css('aside').find { |aside| aside.text.include?('Quick choices') }
+      quick_choice_buttons = quick_choices_panel.css('[data-template-gallery-target="filterButton"]').map { |button| button.text.squish }
+
+      expect(quick_choices_panel).to be_present
+      expect(quick_choice_buttons.grep(/\AAll\b/)).to be_empty
+      expect(quick_choice_buttons).to include(a_string_matching(/Modern/))
+      expect(quick_choice_buttons).to include(a_string_matching(/Classic/))
+      expect(quick_choice_buttons).to include(a_string_matching(/Card|Flat/))
+    end
+
     it 'preserves locale query params through marketplace actions and card links' do
       template = create(:template, name: 'Modern Slate')
 

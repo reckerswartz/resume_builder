@@ -1,0 +1,137 @@
+version: 1
+updated_at: "2026-03-22T04:13:00Z"
+workflow:
+  status: ready
+  path: ".windsurf/workflows/continuous-improvement.md"
+  default_mode: explore
+  default_viewports:
+    - "1440x900"
+    - "390x844"
+  default_batch_size: 1
+tracking:
+  overview_path: "docs/continuous_improvement/README.md"
+  run_doc_pattern: "docs/continuous_improvement/runs/<date>-<slug>/00-overview.md"
+  proposal_doc_pattern: "docs/continuous_improvement/proposals/<proposal_id>.md"
+  latest_run: null
+artifacts:
+  cache_root: "tmp/ci_artifacts"
+  competitive_subfolder: "competitive"
+  commit_policy: "metadata_only"
+proposal_categories:
+  - remove_friction
+  - new_feature
+  - simplify_workflow
+  - improve_content
+  - add_delight
+  - competitive_parity
+  - productivity_boost
+impact_levels:
+  - critical
+  - high
+  - medium
+  - low
+effort_levels:
+  - small
+  - medium
+  - large
+proposal_statuses:
+  - discovered
+  - prioritized
+  - in_progress
+  - implemented
+  - validated
+  - closed
+  - deferred
+  - routed
+run_modes:
+  - explore
+  - implement-next
+  - review-proposals
+  - competitive-scan
+  - full-cycle
+user_personas:
+  - new_user
+  - returning_user
+  - power_user
+  - admin
+feature_domains:
+  - resume_creation
+  - template_selection
+  - export
+  - import
+  - editing
+  - navigation
+  - workspace
+  - admin
+  - auth
+proposal_id_format: "CI-<DOMAIN>-<NNN>"
+cross_workflow_routing:
+  usability_issues: "/ux-usability-audit"
+  responsive_issues: "/responsive-ui-audit"
+  compliance_gaps: "/ui-guidelines-audit"
+  code_quality: "/maintainability-audit"
+  bugs: "/smart-fix"
+  security: "/security-audit"
+journey_definitions:
+  new_user:
+    description: "First-time visitor creating their first resume"
+    steps:
+      - "Visit homepage"
+      - "Create account"
+      - "Start new resume (setup step)"
+      - "Choose template"
+      - "Add heading/contact info"
+      - "Add personal details"
+      - "Add experience entries"
+      - "Add education entries"
+      - "Add skills"
+      - "Write summary"
+      - "Finalize and adjust formatting"
+      - "Export PDF"
+    success_criteria: "User completes a presentable resume and downloads a PDF in under 20 minutes"
+  returning_user:
+    description: "Signed-in user editing an existing resume"
+    steps:
+      - "Sign in"
+      - "Open resume workspace"
+      - "Select existing resume"
+      - "Edit experience section"
+      - "Preview changes"
+      - "Export updated PDF"
+    success_criteria: "User makes targeted edits and exports in under 5 minutes"
+  power_user:
+    description: "Managing multiple resumes with advanced features"
+    steps:
+      - "Sign in"
+      - "Browse resume workspace"
+      - "Compare templates in marketplace"
+      - "Switch template on existing resume"
+      - "Use cloud import"
+      - "Fine-tune formatting in finalize"
+      - "Export multiple formats"
+    success_criteria: "User can efficiently manage multiple resumes and leverage advanced features"
+  admin:
+    description: "Managing platform configuration and monitoring"
+    steps:
+      - "Sign in as admin"
+      - "Review admin dashboard"
+      - "Manage templates"
+      - "Configure LLM providers"
+      - "Monitor job logs"
+      - "Review error logs"
+      - "Adjust platform settings"
+    success_criteria: "Admin can monitor and configure the platform efficiently"
+cycle_metrics:
+  cycle_count: 0
+  last_cycle_date: null
+  proposals_discovered: 0
+  proposals_implemented: 0
+  proposals_remaining: 0
+  proposals_routed: 0
+  competitive_scans_completed: 0
+  journeys_simulated: 0
+next_step:
+  recommended_mode: "explore"
+  recommended_persona: "new_user"
+  reason: "No proposals exist yet. Start with the new-user journey simulation to discover the highest-impact improvement opportunities."
+proposals: []

@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T03:35:00Z"
+updated_at: "2026-03-22T04:06:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ui-guidelines-audit.md"
@@ -243,10 +243,10 @@ pages:
     open_issue_keys: []
     closed_issue_keys:
       - "resumes-new-step-circle-token"
-    last_audited_at: "2026-03-21T02:30:00Z"
+    last_audited_at: "2026-03-22T04:06:00Z"
     last_changed_at: "2026-03-21T02:30:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-2-fixes/00-overview.md"
-    next_step: "All issues closed. Re-review after shared shell or component changes."
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-reaudit/00-overview.md"
+    next_step: "Regression re-audit passed. Score held at 95. Re-review after shared shell or component changes."
   - page_key: "resume-show"
     title: "Resume preview"
     path: "/resumes/:id"
@@ -260,10 +260,10 @@ pages:
     open_issue_keys: []
     closed_issue_keys:
       - "resume-show-preview-container-token"
-    last_audited_at: "2026-03-21T02:41:00Z"
+    last_audited_at: "2026-03-22T04:06:00Z"
     last_changed_at: "2026-03-21T02:41:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-3-fixes/00-overview.md"
-    next_step: "All issues closed. Re-review after shared shell or component changes."
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-reaudit/00-overview.md"
+    next_step: "Regression re-audit passed. Score held at 96. Re-review after shared shell or component changes."
   - page_key: "templates-index"
     title: "Template marketplace"
     path: "/templates"
@@ -410,18 +410,20 @@ pages:
     page_family: "builder"
     priority: "medium"
     status: "compliant"
-    compliance_score: 93
+    compliance_score: 94
     page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-builder-summary.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T22:48:42Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-builder-personal-summary-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared builder shell or summary-suggestion patterns change."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T22:48:42Z"
+    last_audited_at: "2026-03-22T04:06:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-reaudit/00-overview.md"
+    next_step: "Regression re-audit passed. Removed redundant StepHeader improved score to 94. Re-review after shared builder shell or summary-suggestion patterns change."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T04:06:00Z"
     compliance_score_history:
       - timestamp: "2026-03-21T22:48:42Z"
         score: 93
+      - timestamp: "2026-03-22T04:06:00Z"
+        score: 94
     issues_found: 0
     issues_resolved: 0
     issues_remaining: 0
@@ -439,10 +441,11 @@ pages:
     open_issue_keys: []
     closed_issue_keys:
       - "finalize-output-settings-raw-classes"
-    last_audited_at: "2026-03-21T02:58:00Z"
-    last_changed_at: "2026-03-21T02:58:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-5-fixes/00-overview.md"
-    next_step: "All issues closed. Re-review after shared builder shell or component changes."
+      - "finalize-choose-later-note-missing-locale"
+    last_audited_at: "2026-03-22T04:06:00Z"
+    last_changed_at: "2026-03-22T04:06:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-reaudit/00-overview.md"
+    next_step: "Regression re-audit passed after locale fix. Score held at 95. Re-review after shared builder shell or component changes."
   - page_key: "admin-dashboard"
     title: "Admin dashboard"
     path: "/admin"
