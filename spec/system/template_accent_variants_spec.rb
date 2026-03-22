@@ -35,7 +35,8 @@ RSpec.describe "Template accent variants", type: :system, js: true do
     visit new_resume_path(step: "setup", template_id: modern_template.id, resume: resume_intake_params)
 
     find("details[data-resume-template-disclosure] summary").click
-    find(%([data-template-picker-target="card"][data-template-id="#{modern_template.id}"]))
+    sleep 0.5
+    find(%([data-template-picker-target="card"][data-template-id="#{modern_template.id}"]), wait: 5)
 
     find(
       %(button[data-template-variant-button="true"][data-template-id="#{modern_template.id}"][data-accent-color="#1D4ED8"]),
