@@ -11,8 +11,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `add_targeted_specs`
-- Last reviewed: `2026-03-21T22:54:00Z`
-- Last changed: `2026-03-21T22:54:00Z`
+- Last reviewed: `2026-03-22T05:50:00Z`
+- Last changed: `2026-03-22T05:50:00Z`
 
 ## Hotspot summary
 
@@ -166,13 +166,24 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 
 - Fixed stale assertion `expect(Resume.last.sections.count).to eq(4)` → `eq(ResumeBuilder::SectionRegistry.starter_sections.size)` since starter sections grew from 4 to 6 (added certifications and languages).
 
+### Slice 31: resumes-pdf-text-extractor-spec
+
+- Added `spec/services/resumes/pdf_text_extractor_spec.rb` (5 examples) covering multi-page text joined by double newlines, single-page without trailing separators, MalformedPDFError recovery, generic StandardError recovery, and StringIO wrapping.
+
+### Slice 32: resumes-docx-text-extractor-spec
+
+- Added `spec/services/resumes/docx_text_extractor_spec.rb` (11 examples) covering paragraph extraction from word/document.xml, multiple text run joining, tab node conversion, break/cr node conversion, header-before-document ordering, footer-after-document ordering, multiple header numeric sorting, blank paragraph skipping, corrupt ZIP recovery, missing document.xml, and empty-paragraph-only documents.
+- Re-verified adjacent consumer coverage in `spec/services/resumes/source_text_resolver_spec.rb` and `spec/services/llm/resume_autofill_service_spec.rb`.
+
 ## Pending
 
 - Remaining coverage gaps are now concentrated in low-priority shared service utilities and UI components.
+- Next verification candidates: `app/services/resumes/export_status_broadcaster.rb`, `app/services/errors/tracker.rb`.
 
 ## Open follow-up keys
 
-- `add-resumes-docx-text-extractor-spec`
+- `add-resumes-export-status-broadcaster-spec`
+- `add-errors-tracker-spec`
 
 ## Closed follow-up keys
 
@@ -191,13 +202,15 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - `add-llm-providers-ollama-client-spec`
 - `add-llm-providers-base-client-spec`
 - `add-resumes-cloud-import-provider-catalog-spec`
+- `add-resumes-pdf-text-extractor-spec`
+- `add-resumes-docx-text-extractor-spec`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/services/resumes/cloud_import_provider_catalog_spec.rb spec/presenters/resumes/source_step_state_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/admin/settings_helper_spec.rb spec/requests/resume_source_imports_spec.rb` (55 examples, 0 failures)
+  - `bundle exec rspec spec/services/resumes/pdf_text_extractor_spec.rb spec/services/resumes/docx_text_extractor_spec.rb spec/services/resumes/source_text_resolver_spec.rb spec/services/llm/resume_autofill_service_spec.rb` (31 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/services/resumes/cloud_import_provider_catalog.rb spec/services/resumes/cloud_import_provider_catalog_spec.rb spec/presenters/resumes/source_step_state_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/admin/settings_helper_spec.rb spec/requests/resume_source_imports_spec.rb` (Syntax OK)
+  - `ruby -c app/services/resumes/pdf_text_extractor.rb app/services/resumes/docx_text_extractor.rb spec/services/resumes/pdf_text_extractor_spec.rb spec/services/resumes/docx_text_extractor_spec.rb` (Syntax OK)
 
 ## Full missing-spec inventory (as of 2026-03-21)
 
@@ -211,8 +224,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 ### Services (4 remaining missing)
 | File | Lines | Priority |
 |------|-------|----------|
-| `Resumes::DocxTextExtractor` | ~40 | low |
-| `Resumes::PdfTextExtractor` | ~30 | low |
+| `Resumes::DocxTextExtractor` | ~60 | ~~low~~ covered |
+| `Resumes::PdfTextExtractor` | ~20 | ~~low~~ covered |
 | `Resumes::ExportStatusBroadcaster` | ~20 | low |
 | `Errors::Tracker` | ~30 | low |
 

@@ -26,7 +26,7 @@ RSpec.describe Resumes::PdfTextExtractor do
     end
 
     it "returns empty string when PDF::Reader raises MalformedPDFError" do
-      allow(PDF::Reader).to receive(:new).and_raise(PDF::MalformedPDFError, "corrupt")
+      allow(PDF::Reader).to receive(:new).and_raise(PDF::Reader::MalformedPDFError, "corrupt")
 
       result = described_class.new(document_data: "corrupt-bytes").call
 
