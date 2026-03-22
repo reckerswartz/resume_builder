@@ -146,8 +146,11 @@ module ResumesHelper
     resume_builder_catalog.fetch(current_resume_builder_step)
   end
 
-  def resume_builder_step_params(step = current_resume_builder_step)
-    { step: step }
+  def resume_builder_step_params(step = current_resume_builder_step, tab: params[:tab].presence)
+    {
+      step: step,
+      tab: tab
+    }.compact
   end
 
   def resume_builder_steps(resume)

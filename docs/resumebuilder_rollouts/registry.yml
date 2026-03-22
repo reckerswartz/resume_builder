@@ -1,5 +1,5 @@
 workflow: .windsurf/workflows/resumebuilder-reference-rollout.md
-last_updated: 2026-03-22T05-30-00Z
+last_updated: 2026-03-22T06:23:00Z
 reference_source_docs:
   - docs/references/resumebuilder/live-flow-comparison-2026-03-20/15-implementation-plan.md
   - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/README.md
@@ -9,7 +9,7 @@ slices:
   - slice_key: finalize-formatting-foundation
     title: Finalize formatting foundation
     page_family: resume-builder-finalize
-    status: verified
+    status: closed
     priority: high
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
@@ -43,14 +43,14 @@ slices:
       - spec/services/resume_templates/catalog_spec.rb
       - spec/services/resume_templates/pdf_rendering_spec.rb
       - spec/requests/resumes_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-21-finalize-formatting-foundation/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
-    next_recommended_slice: experience-guidance
+    next_recommended_slice: ""
   - slice_key: experience-guidance
     title: Experience guidance
     page_family: resume-builder-experience
-    status: verified
+    status: closed
     priority: high
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
@@ -71,14 +71,14 @@ slices:
       - spec/services/resumes/experience_suggestion_catalog_spec.rb
       - spec/presenters/resumes/experience_step_state_spec.rb
       - spec/requests/resumes_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-21-experience-guidance/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
-    next_recommended_slice: skills-guidance
+    next_recommended_slice: ""
   - slice_key: skills-guidance
     title: Skills guidance
     page_family: resume-builder-skills
-    status: verified
+    status: closed
     priority: medium
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
@@ -99,14 +99,14 @@ slices:
       - spec/services/resumes/skill_suggestion_catalog_spec.rb
       - spec/presenters/resumes/skills_step_state_spec.rb
       - spec/requests/resumes_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-skills-guidance/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
-    next_recommended_slice: template-variant-carry-through
+    next_recommended_slice: ""
   - slice_key: template-variant-carry-through
     title: Template variant carry-through
     page_family: resumes-new-and-templates-index
-    status: verified
+    status: closed
     priority: medium
     reference_source_docs:
       - docs/references/resumebuilder/live-flow-comparison-2026-03-20/15-implementation-plan.md
@@ -127,14 +127,14 @@ slices:
       - spec/requests/resumes_spec.rb
       - spec/requests/templates_spec.rb
       - spec/presenters/templates/marketplace_state_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-template-variant-carry-through/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
-    next_recommended_slice: font-family-settings
+    next_recommended_slice: ""
   - slice_key: font-family-settings
     title: Font family settings
     page_family: resume-builder-finalize
-    status: verified
+    status: closed
     priority: medium
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/04-template-flexibility-matrix.md
@@ -158,14 +158,14 @@ slices:
       - spec/presenters/resumes/finalize_workspace_state_spec.rb
       - spec/requests/resumes_spec.rb
       - spec/models/resume_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-font-family-settings/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
-    next_recommended_slice: unified-finalize-workspace
+    next_recommended_slice: ""
   - slice_key: unified-finalize-workspace
     title: Unified finalize workspace
     page_family: resume-builder-finalize
-    status: verified
+    status: closed
     priority: medium
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
@@ -186,14 +186,14 @@ slices:
     verification_specs:
       - spec/requests/resumes_spec.rb
       - spec/presenters/resumes/finalize_workspace_state_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-unified-finalize-workspace/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
-    next_recommended_slice: accent-color-palette
+    next_recommended_slice: ""
   - slice_key: accent-color-palette
     title: Accent color palette
     page_family: resume-builder-finalize
-    status: verified
+    status: closed
     priority: medium
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
@@ -216,7 +216,7 @@ slices:
       - spec/services/resume_templates/catalog_spec.rb
       - spec/presenters/resumes/finalize_workspace_state_spec.rb
       - spec/requests/resumes_spec.rb
-    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-accent-color-palette/00-overview.md
-    cycle_count: 1
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md
+    cycle_count: 2
     regression_detected: false
     next_recommended_slice: ""

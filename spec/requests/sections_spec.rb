@@ -53,7 +53,7 @@ RSpec.describe 'Sections', type: :request do
       first_section = create(:section, resume:, position: 0)
       second_section = create(:section, resume:, position: 1, title: 'Projects', section_type: 'projects')
 
-      patch move_resume_section_path(resume, second_section), params: { position: 0, step: 'finalize' }, as: :turbo_stream
+      patch move_resume_section_path(resume, second_section), params: { position: 0, step: 'finalize', tab: 'sections' }, as: :turbo_stream
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
@@ -62,6 +62,8 @@ RSpec.describe 'Sections', type: :request do
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
       expect(response.body).to include(%(target="#{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}"))
       expect(response.body).to include(I18n.t('resumes.sections_controller.moved'))
+      document = Nokogiri::HTML.parse(response.body)
+      expect(document.at_css('input[name="tab"][value="sections"]')).to be_present
     end
 
     it 'skips the workspace overview replacement on section-step Turbo updates' do

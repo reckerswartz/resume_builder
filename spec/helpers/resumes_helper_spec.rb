@@ -76,9 +76,9 @@ RSpec.describe ResumesHelper, type: :helper do
       expect(template_card.fetch(:accent_variants)).to include(
         include(key: 'slate', label: 'Slate', accent_color: '#0F172A', default: true, custom: false),
         include(key: 'blue', label: 'Blue', accent_color: '#1D4ED8', default: false, custom: false),
-        include(key: 'teal', label: 'Teal', accent_color: '#0F766E', default: false, custom: false)
+        include(key: 'teal', label: 'Teal', accent_color: '#0D6B63', default: false, custom: false)
       )
-      expect(template_card.fetch(:preview_resumes_by_accent_color).keys).to match_array([ '#0F172A', '#1D4ED8', '#0F766E' ])
+      expect(template_card.fetch(:preview_resumes_by_accent_color).keys).to match_array([ '#0F172A', '#1D4ED8', '#0D6B63' ])
     end
 
     it 'uses the render-ready implementation profile for shared builder card metadata' do
@@ -133,7 +133,9 @@ RSpec.describe ResumesHelper, type: :helper do
   describe '#resume_finalize_workspace_state' do
     it 'builds finalize workspace state with section visibility metadata' do
       resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => [ 'projects' ] })
+      experience_section = create(:section, resume: resume, title: 'Experience', section_type: 'experience', position: 0)
       projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 3)
+      create(:entry, section: experience_section, content: { 'title' => 'Lead Engineer' })
       create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
 
       finalize_workspace_state = helper.resume_finalize_workspace_state(resume, step_sections: [ projects_section ])
@@ -146,6 +148,20 @@ RSpec.describe ResumesHelper, type: :helper do
       expect(finalize_workspace_state.section_visibility_states).to include(
         include(section_type: 'projects', hidden: true, badge_label: 'Hidden from output')
       )
+      expect(finalize_workspace_state.section_order_states).to include(
+        include(title: 'Experience', position_label: 'Position 1'),
+        include(title: 'Projects', position_label: 'Position 2', visibility_badge_label: 'Hidden from output')
+      )
+    end
+  end
+
+  describe '#resume_builder_step_params' do
+    it 'preserves the active finalize tab when present' do
+      allow(helper).to receive(:params).and_return(ActionController::Parameters.new(step: 'finalize', tab: 'sections'))
+
+      expect(helper.resume_builder_step_params).to eq(step: 'finalize', tab: 'sections')
+      expect(helper.resume_builder_step_params('finalize')).to eq(step: 'finalize', tab: 'sections')
+      expect(helper.resume_builder_step_params('finalize', tab: 'design')).to eq(step: 'finalize', tab: 'design')
     end
   end
 

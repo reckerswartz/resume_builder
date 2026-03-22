@@ -8,6 +8,45 @@
     <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.sections_workspace.badge") %></span>
   </div>
 
+  <% if finalize_workspace_state.has_section_order_controls? %>
+    <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'space-y-4'].join(' ') %>" data-finalize-section-order>
+      <div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_finalize_step.sections_workspace.order_title") %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.sections_workspace.order_description") %></p>
+        </div>
+
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.sections_workspace.order_badge") %></span>
+      </div>
+
+      <div class="space-y-3" data-controller="sortable">
+        <% finalize_workspace_state.section_order_states.each do |section_state| %>
+          <div
+            id="<%= section_state.fetch(:id) %>"
+            class="rounded-[1.25rem] border border-canvas-200/80 bg-white p-4 shadow-[0_16px_32px_rgba(15,23,42,0.06)]"
+            data-action="dragstart->sortable#dragstart dragover->sortable#dragover drop->sortable#drop dragend->sortable#dragend"
+            data-sortable-target="item"
+            data-sortable-move-url="<%= section_state.fetch(:move_url) %>"
+            draggable="true"
+          >
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="<%= ui_badge_classes(:neutral) %>"><%= section_state.fetch(:position_label) %></span>
+                  <span class="<%= ui_badge_classes(section_state.fetch(:visibility_badge_tone)) %>"><%= section_state.fetch(:visibility_badge_label) %></span>
+                </div>
+                <p class="text-sm font-semibold text-ink-950"><%= section_state.fetch(:title) %></p>
+                <p class="text-sm leading-6 text-ink-700/80"><%= [section_state.fetch(:section_type_label), section_state.fetch(:entry_count_label)].join(" · ") %></p>
+              </div>
+
+              <span class="text-xs font-medium uppercase tracking-[0.18em] text-ink-500/80"><%= t("resumes.editor_finalize_step.sections_workspace.order_drag_hint") %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
     <% if finalize_workspace_state.has_section_visibility_controls? %>
       <%= hidden_field_tag "resume[settings][hidden_sections][]", "", id: nil %>
 

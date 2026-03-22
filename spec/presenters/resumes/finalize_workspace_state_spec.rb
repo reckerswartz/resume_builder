@@ -38,7 +38,7 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
         :resume,
         template: template,
         settings: {
-          'accent_color' => '#0F766E',
+          'accent_color' => '#0D6B63',
           'show_contact_icons' => true,
           'page_size' => 'A4',
           'section_spacing' => 'tight',
@@ -152,6 +152,40 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
         )
       )
       expect(state.has_section_visibility_controls?).to be(true)
+    end
+  end
+
+  describe '#section_order_states' do
+    it 'returns ordered section cards with finalize tab-aware move URLs' do
+      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => [ 'projects' ] })
+      experience_section = create(:section, resume: resume, title: 'Experience', section_type: 'experience', position: 0)
+      projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 1)
+      create(:entry, section: experience_section, content: { 'title' => 'Lead Engineer' })
+      create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
+
+      allow(view_context).to receive(:resume_builder_step_params).with('finalize', tab: 'sections').and_return(step: 'finalize', tab: 'sections')
+      allow(view_context).to receive(:move_resume_section_path).with(experience_section.resume, experience_section, step: 'finalize', tab: 'sections').and_return('/resumes/1/sections/1/move?step=finalize&tab=sections')
+      allow(view_context).to receive(:move_resume_section_path).with(projects_section.resume, projects_section, step: 'finalize', tab: 'sections').and_return('/resumes/1/sections/2/move?step=finalize&tab=sections')
+
+      state = described_class.new(resume: resume, step_sections: [ projects_section ], view_context: view_context)
+
+      expect(state.section_order_states).to match([
+        include(
+          title: 'Experience',
+          position_label: 'Position 1',
+          entry_count_label: '1 entry',
+          move_url: '/resumes/1/sections/1/move?step=finalize&tab=sections',
+          visibility_badge_label: 'Visible'
+        ),
+        include(
+          title: 'Projects',
+          position_label: 'Position 2',
+          entry_count_label: '1 entry',
+          move_url: '/resumes/1/sections/2/move?step=finalize&tab=sections',
+          visibility_badge_label: 'Hidden from output'
+        )
+      ])
+      expect(state.has_section_order_controls?).to be(true)
     end
   end
 end

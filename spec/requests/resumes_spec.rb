@@ -342,6 +342,143 @@ RSpec.describe 'Resumes', type: :request do
     end
   end
 
+  describe 'GET /resumes (sorting)' do
+    it 'renders sort controls and orders resumes by name when requested' do
+      create(:resume, user:, template:, title: 'Zulu Resume')
+      create(:resume, user:, template:, title: 'Alpha Resume')
+      create(:resume, user:, template:, title: 'Beta Resume')
+
+      get resumes_path, params: { sort: 'name_asc' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      titles = document.css('article h2').map { |node| node.text.squish }
+      selected_option = document.at_css('select[name="sort"] option[selected]')
+
+      expect(response.body).to include(I18n.t('resumes.index.search.eyebrow'))
+      expect(response.body).to include(I18n.t('resumes.index.sort.label'))
+      expect(selected_option).to be_present
+      expect(selected_option['value']).to eq('name_asc')
+      expect(titles.first(3)).to eq(['Alpha Resume', 'Beta Resume', 'Zulu Resume'])
+    end
+
+    it 'renders a collapsed mobile workspace controls disclosure that carries the current selection and query' do
+      create(:resume, user:, template:, title: 'Designer Resume', headline: 'Senior Product Designer')
+      create(:resume, user:, template:, title: 'Engineer Resume', headline: 'Backend Engineer')
+
+      get resumes_path, params: { query: 'designer', sort: 'name_asc' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      controls_disclosure = document.at_css('details[data-workspace-controls-disclosure]')
+      mobile_controls_form = controls_disclosure.at_css('form')
+      query_field = mobile_controls_form.at_css('input[name="query"]')
+      selected_mobile_option = mobile_controls_form.at_css('select[name="sort"] option[selected]')
+
+      expect(controls_disclosure).to be_present
+      expect(controls_disclosure['open']).to be_nil
+      expect(controls_disclosure.at_css('summary').text).to include(I18n.t('resumes.index.search.label'))
+      expect(controls_disclosure.at_css('summary').text).to include(I18n.t('resumes.index.sort.options.name_asc'))
+      expect(query_field).to be_present
+      expect(query_field['value']).to eq('designer')
+      expect(selected_mobile_option).to be_present
+      expect(selected_mobile_option['value']).to eq('name_asc')
+    end
+
+    it 'orders resumes by oldest updated first when requested' do
+      newest_resume = create(:resume, user:, template:, title: 'Newest Resume')
+      middle_resume = create(:resume, user:, template:, title: 'Middle Resume')
+      oldest_resume = create(:resume, user:, template:, title: 'Oldest Resume')
+
+      newest_resume.update_columns(created_at: 1.day.ago, updated_at: 1.day.ago)
+      middle_resume.update_columns(created_at: 2.days.ago, updated_at: 2.days.ago)
+      oldest_resume.update_columns(created_at: 3.days.ago, updated_at: 3.days.ago)
+
+      get resumes_path, params: { sort: 'oldest_first' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      titles = document.css('article h2').map { |node| node.text.squish }
+
+      expect(titles.first(3)).to eq(['Oldest Resume', 'Middle Resume', 'Newest Resume'])
+    end
+
+    it 'preserves the selected sort across pagination links' do
+      classic_template = create(:template, name: 'Classic Ivory', slug: 'classic-ivory')
+      modern_template = create(:template, name: 'Modern Slate', slug: 'modern-slate')
+
+      7.times { |i| create(:resume, user:, template: modern_template, title: "Modern #{i}") }
+      7.times { |i| create(:resume, user:, template: classic_template, title: "Classic #{i}") }
+
+      get resumes_path, params: { sort: 'template_asc' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      titles = document.css('article h2').map { |node| node.text.squish }
+      next_link = document.at_css("a[href*='sort=template_asc'][href*='page=2']")
+
+      expect(titles.first(7)).to all(start_with('Classic'))
+      expect(next_link).to be_present
+      expect(next_link['href']).to include('sort=template_asc')
+      expect(next_link['href']).to include('page=2')
+    end
+  end
+
+  describe 'GET /resumes (search)' do
+    it 'filters resumes by title and headline and keeps the submitted query visible' do
+      create(:resume, user:, template:, title: 'Designer Resume', headline: 'Senior Product Designer')
+      create(:resume, user:, template:, title: 'Engineer Resume', headline: 'Backend Platform Engineer')
+      create(:resume, user:, template:, title: 'Operations Resume', headline: 'People Operations Lead')
+
+      get resumes_path, params: { query: 'designer' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      titles = document.css('article h2').map { |node| node.text.squish }
+      search_input = document.at_css('input[name="query"]')
+
+      expect(response.body).to include(I18n.t('resumes.index.search.eyebrow'))
+      expect(search_input).to be_present
+      expect(search_input['value']).to eq('designer')
+      expect(titles).to eq(['Designer Resume'])
+      expect(response.body).not_to include('Engineer Resume')
+    end
+
+    it 'preserves the query and sort across pagination links' do
+      13.times do |i|
+        create(:resume, user:, template:, title: "Designer Resume #{i}", headline: 'Product Designer')
+      end
+      create(:resume, user:, template:, title: 'Engineer Resume', headline: 'Backend Engineer')
+
+      get resumes_path, params: { query: 'designer', sort: 'name_asc' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      next_link = document.at_css("a[href*='query=designer'][href*='sort=name_asc'][href*='page=2']")
+
+      expect(next_link).to be_present
+      expect(next_link['href']).to include('query=designer')
+      expect(next_link['href']).to include('sort=name_asc')
+      expect(next_link['href']).to include('page=2')
+    end
+
+    it 'renders a filtered empty state with a clear-search action when nothing matches' do
+      create(:resume, user:, template:, title: 'Engineer Resume', headline: 'Backend Engineer')
+
+      get resumes_path, params: { query: 'designer', sort: 'name_asc' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      clear_link = document.at_css("a[href='#{resumes_path(sort: 'name_asc')}']")
+
+      expect(document.css('article')).to be_empty
+      expect(response.body).to include(I18n.t('resumes.index.empty_state.filtered_title'))
+      expect(response.body).to include(I18n.t('resumes.index.empty_state.filtered_description'))
+      expect(clear_link).to be_present
+      expect(clear_link.text.squish).to eq(I18n.t('resumes.index.empty_state.clear_search'))
+    end
+  end
+
   describe 'GET /resumes (workspace card actions)' do
     it 'shows Download PDF on cards with an attached export and hides it on draft-only cards' do
       exported_resume = create(:resume, user:, template:, title: 'Exported Resume')
@@ -639,9 +776,17 @@ RSpec.describe 'Resumes', type: :request do
       get edit_resume_path(resume), params: { step: 'summary' }
 
       expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      summary_library = document.at_css('details[data-summary-library-disclosure]')
+      summary_field = document.at_css('textarea[name="resume[summary]"]')
+
       expect(response.body).to include(I18n.t('resumes.editor_summary_step.library.eyebrow'))
       expect(response.body).to include(I18n.t('resumes.editor_summary_step.save_summary'))
       expect(response.body).not_to include(I18n.t('resumes.editor_summary_step.guidance_card.title'))
+      expect(summary_library).to be_present
+      expect(summary_library['open']).to be_nil
+      expect(summary_field).to be_present
+      expect(response.body.index('data-summary-library-disclosure')).to be < response.body.index('name="resume[summary]"')
     end
 
     it 'keeps non-experience section steps focused without a duplicate step header card' do
@@ -702,8 +847,12 @@ RSpec.describe 'Resumes', type: :request do
 
     it 'starts the finalize step with export actions in the preview panel and no duplicate step header' do
       resume = create(:resume, user:, template:)
+      experience_section = create(:section, resume:, section_type: 'experience', title: 'Experience', position: 0)
+      projects_section = create(:section, resume:, section_type: 'projects', title: 'Projects', position: 1)
+      create(:entry, section: experience_section, content: { 'title' => 'Designer' })
+      create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
 
-      get edit_resume_path(resume), params: { step: 'finalize' }
+      get edit_resume_path(resume), params: { step: 'finalize', tab: 'sections' }
 
       expect(response).to have_http_status(:ok)
       document = Nokogiri::HTML.parse(response.body)
@@ -718,15 +867,20 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.browse_all_templates'))
       workspace_tabs = document.at_css('nav[data-finalize-workspace-tabs]')
       expect(workspace_tabs).to be_present
+      expect(workspace_tabs['aria-orientation']).to eq('horizontal')
       tab_buttons = workspace_tabs.css('button[data-tab-key]')
       tab_keys = tab_buttons.map { |btn| btn['data-tab-key'] }
       expect(tab_keys).to eq(%w[template design sections])
+      expect(tab_buttons.map { |btn| btn['data-action'] }).to all(include('keydown->workspace-tabs#navigate'))
       tab_labels = tab_buttons.map { |btn| btn.text.strip }
       expect(tab_labels).to include(
         I18n.t('resumes.editor_finalize_step.workspace_tabs.template'),
         I18n.t('resumes.editor_finalize_step.workspace_tabs.design'),
         I18n.t('resumes.editor_finalize_step.workspace_tabs.sections')
       )
+      expect(document.at_css('button[data-tab-key="sections"][aria-selected="true"][tabindex="0"]')).to be_present
+      expect(document.at_css('button[data-tab-key="template"][aria-selected="false"][tabindex="-1"]')).to be_present
+      expect(document.at_css('button[data-tab-key="design"][aria-selected="false"][tabindex="-1"]')).to be_present
 
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
@@ -737,6 +891,16 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.line_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.footer_note'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
+      expect(document.at_css('input[name="tab"][value="sections"]')).to be_present
+      section_order_panel = document.at_css('[data-finalize-section-order]')
+      expect(section_order_panel).to be_present
+      expect(section_order_panel.text).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.order_title'))
+      expect(section_order_panel.text).to include('Experience')
+      expect(section_order_panel.text).to include('Projects')
+      section_order_items = section_order_panel.css('[data-sortable-target="item"]')
+      expect(section_order_items.size).to eq(2)
+      expect(section_order_items.map { |item| item['data-sortable-move-url'] }).to all(include('step=finalize'))
+      expect(section_order_items.map { |item| item['data-sortable-move-url'] }).to all(include('tab=sections'))
 
       expect(response.body).not_to include('renderer-backed')
       expect(response.body).not_to include('shared renderer')
@@ -746,7 +910,17 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
 
       output_settings = document.at_css('[data-finalize-output-settings]')
+      sections_panels = document.css('[data-workspace-tabs-target="panel"][data-tab-key="sections"]')
+      hidden_template_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="template"][hidden]')
+      hidden_design_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="design"][hidden]')
+      additional_sections_disclosure = document.at_css('details[data-finalize-additional-sections-disclosure]')
       expect(output_settings).to be_present
+      expect(sections_panels.size).to eq(2)
+      expect(hidden_template_panel).to be_present
+      expect(hidden_design_panel).to be_present
+      expect(additional_sections_disclosure).to be_present
+      expect(additional_sections_disclosure.ancestors('[data-tab-key="sections"]')).not_to be_empty
+      expect(additional_sections_disclosure['open']).to be_nil
       expect(document.at_css('select[name="resume[settings][font_family]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present
@@ -791,7 +965,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.eyebrow'))
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.badges.early_career'))
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.description_early_career'))
-      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.volunteer_experience'))
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.insert_button_label'))
       expect(highlights_textarea).to be_present
       expect(highlights_textarea['name']).to include('[highlights_text]')
     end
@@ -973,6 +1147,13 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include('Legacy background removal guidance')
 
       document = Nokogiri::HTML.parse(response.body)
+      photo_library_disclosure = document.at_css('details[data-photo-library-disclosure]')
+
+      expect(photo_library_disclosure).to be_present
+      expect(photo_library_disclosure['open']).to be_nil
+
+      expect(document.at_css("form[action='/photo_profiles/#{photo_profile.id}/photo_assets']")).to be_present
+      expect(document.at_css('input[name="resume[selected_headshot_photo_asset_id]"][value="#{selected_asset.id}"]')).to be_present
       selected_radio = document.at_css("input[name='resume[selected_headshot_photo_asset_id]'][value='#{selected_asset.id}']")
 
       expect(selected_radio).to be_present

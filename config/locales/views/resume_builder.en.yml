@@ -845,6 +845,11 @@ en:
         title: "Decide what stays visible in output"
         description: "Keep editing all sections in the builder, then hide the ones that should stay out of the live preview and exported PDF for this draft."
         badge: "Preview-aware"
+        order_title: "Arrange section order"
+        order_description: "Drag sections into the order you want recruiters to read them in the preview and exported PDF."
+        order_badge: "Late-stage layout"
+        order_drag_hint: "Drag to reorder"
+        order_position: "Position %{position}"
         hide_label: "Hide"
         badges:
           visible: "Visible"

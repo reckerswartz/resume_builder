@@ -166,6 +166,26 @@ module Resumes
       resume.show_contact_icons?
     end
 
+    def section_order_states
+      @section_order_states ||= resume.ordered_sections.map.with_index(1) do |section, index|
+        {
+          id: "finalize-sections-order-#{section.id}",
+          move_url: view_context.move_resume_section_path(section.resume, section, **view_context.resume_builder_step_params("finalize", tab: "sections")),
+          title: section.title,
+          section_type_label: ResumeBuilder::SectionRegistry.title_for(section.section_type),
+          position_label: I18n.t("resumes.editor_finalize_step.sections_workspace.order_position", position: index),
+          entry_count_label: I18n.t("resumes.editor_finalize_step.sections_workspace.entry_count", count: section.ordered_entries.count),
+          hidden: resume.hidden_section_types.include?(section.section_type),
+          visibility_badge_label: I18n.t("resumes.editor_finalize_step.sections_workspace.badges.#{resume.hidden_section_types.include?(section.section_type) ? :hidden : :visible}"),
+          visibility_badge_tone: resume.hidden_section_types.include?(section.section_type) ? :warning : :success
+        }
+      end
+    end
+
+    def has_section_order_controls?
+      section_order_states.any?
+    end
+
     def section_visibility_states
       @section_visibility_states ||= grouped_sections.map do |section_type, sections|
         hidden = resume.hidden_section_types.include?(section_type)
