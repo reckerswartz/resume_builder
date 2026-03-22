@@ -120,6 +120,11 @@ en:
         create_new_resume: "Create new resume"
         browse_templates: "Browse templates"
         open_admin: "Open admin"
+      welcome:
+        pill: "Welcome"
+        title: "Your starter draft is ready"
+        description: "We created a draft so you can jump straight into the guided builder. Add a headline, fill in the sections, and preview the result before exporting."
+        action: "Edit your draft"
       empty_state:
         title: "No resumes yet"
         description: "Create your first resume to start editing and previewing live."
@@ -206,6 +211,7 @@ en:
       template_disclosure_summary: "Review or change the template"
       template_disclosure_description: "Starting with %{template}. Open this only if you want a different look before creating the draft."
       template_disclosure_badge: "Optional"
+      template_disclosure_choose_later: "You can choose later — the default template works for every layout and you can switch any time."
       next_panel_eyebrow: "What happens next"
       next_panel_title_create: "Create the draft and start editing"
       next_panel_title_update: "Keep refining the draft"
@@ -279,6 +285,9 @@ en:
       recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
       preview_selected_badge: "Selected"
       expand_preview_hint: "Preview"
+      accent_carry_through: "%{variant} accent"
+      choose_later_pill: "Choose later"
+      choose_later_description: "Continue without picking a template now. The default template will be used and you can switch any time from the finalize step."
       browse_all_templates: "Browse all templates"
       browse_all_templates_description: "Filter by family, density, columns, theme, or layout"
     template_picker_summaries:

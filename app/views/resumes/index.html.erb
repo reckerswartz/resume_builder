@@ -40,6 +40,22 @@
       density: :compact
     ) %>
 
+    <% if @resumes.size == 1 && current_user.created_at > 1.hour.ago %>
+      <%= render Ui::SurfaceCardComponent.new(tone: :default, padding: :sm, extra_classes: "relative overflow-hidden") do %>
+        <div class="absolute -right-10 top-6 h-28 w-28 rounded-full atelier-glow opacity-55"></div>
+        <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
+        <div class="relative space-y-4 p-1" data-testid="welcome-card">
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+            <%= t("resumes.index.welcome.pill") %>
+          </span>
+          <h2 class="font-serif text-xl font-semibold tracking-[-0.03em] text-ink-950"><%= t("resumes.index.welcome.title") %></h2>
+          <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.index.welcome.description") %></p>
+          <%= link_to t("resumes.index.welcome.action"), edit_resume_path(@resumes.first, step: :heading), class: "#{ui_button_classes(:primary)} inline-flex" %>
+        </div>
+      <% end %>
+    <% end %>
+
     <% if @resumes.any? %>
       <div class="grid gap-5 xl:grid-cols-2">
         <% @resumes.each do |resume| %>

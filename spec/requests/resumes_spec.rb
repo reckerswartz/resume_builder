@@ -214,6 +214,53 @@ RSpec.describe 'Resumes', type: :request do
       expect(card.text).not_to include(resume.slug)
     end
 
+    it 'shows a welcome card for newly registered users with one resume' do
+      user.update_column(:created_at, 30.minutes.ago)
+      create(:resume, user:, template:, title: 'Starter Draft')
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+
+      doc = Nokogiri::HTML(response.body)
+      welcome = doc.at_css('[data-testid="welcome-card"]')
+
+      expect(welcome).to be_present
+      expect(welcome.text).to include(I18n.t('resumes.index.welcome.title'))
+      expect(welcome.text).to include(I18n.t('resumes.index.welcome.description'))
+
+      edit_link = welcome.at_css('a')
+      expect(edit_link).to be_present
+      expect(edit_link.text.strip).to eq(I18n.t('resumes.index.welcome.action'))
+      expect(edit_link['href']).to include('/edit')
+      expect(edit_link['href']).to include('step=heading')
+    end
+
+    it 'hides the welcome card for established users' do
+      user.update_column(:created_at, 2.hours.ago)
+      create(:resume, user:, template:, title: 'Existing Draft')
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+
+      doc = Nokogiri::HTML(response.body)
+      expect(doc.at_css('[data-testid="welcome-card"]')).to be_nil
+    end
+
+    it 'hides the welcome card when the user has multiple resumes' do
+      user.update_column(:created_at, 10.minutes.ago)
+      create(:resume, user:, template:, title: 'Resume One')
+      create(:resume, user:, template:, title: 'Resume Two')
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+
+      doc = Nokogiri::HTML(response.body)
+      expect(doc.at_css('[data-testid="welcome-card"]')).to be_nil
+    end
+
     it 'shows review-ready guidance without a duplicate create action when every resume is ready' do
       create(:resume, user:, template:, title: 'Ready Resume One')
       create(:resume, user:, template:, title: 'Ready Resume Two')
@@ -277,9 +324,12 @@ RSpec.describe 'Resumes', type: :request do
       expect(response).to have_http_status(:ok)
       scratch_document = Nokogiri::HTML.parse(response.body)
       scratch_widget_titles = scratch_document.css('article p').map { |node| node.text.squish }
+      scratch_mode_index = response.body.index(I18n.t('resumes.source_import_fields.modes.scratch.title'))
+      import_status_index = response.body.index(I18n.t('resumes.editor_source_step.import_status.eyebrow'))
 
       expect(scratch_widget_titles).to include(I18n.t('resumes.editor_source_step.import_status.eyebrow'))
       expect(scratch_widget_titles).not_to include(I18n.t('resumes.editor_source_step.supported_formats.eyebrow'))
+      expect(scratch_mode_index).to be < import_status_index
 
       get edit_resume_path(upload_resume), params: { step: 'source' }
 
@@ -379,6 +429,17 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.personal_information.eyebrow'))
       expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.optional_step.skip_for_now'))
       expect(response.body).not_to include(I18n.t('resumes.editor_personal_details_step.optional_step.title'))
+    end
+
+    it 'renders the summary step without a duplicate step header card and starts with the curated library' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'summary' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('resumes.editor_summary_step.library.eyebrow'))
+      expect(response.body).to include(I18n.t('resumes.editor_summary_step.save_summary'))
+      expect(response.body).not_to include(I18n.t('resumes.editor_summary_step.guidance_card.title'))
     end
 
     it 'keeps non-experience section steps focused without a duplicate step header card' do
