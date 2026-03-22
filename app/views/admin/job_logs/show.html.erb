@@ -1,11 +1,13 @@
 <% related_error_state = job_log_related_error_state(@job_log) %>
 <% related_error_reference = related_error_state.reference %>
 <% related_error_log = related_error_state.error_log %>
-<% runtime_label = job_log_runtime_label(@queue_snapshot) %>
-<% runtime_tone = job_log_runtime_tone(@queue_snapshot) %>
-<% runtime_description = job_log_runtime_description(@job_log, @queue_snapshot) %>
+<% runtime_state = job_log_runtime_state(@job_log, @queue_snapshot) %>
+<% runtime_label = runtime_state.label %>
+<% runtime_tone = runtime_state.tone %>
+<% runtime_description = runtime_state.description %>
+<% control_state = job_log_control_state(@job_log, @queue_snapshot) %>
 <% control_actions = [] %>
-<% if retry_job_control_available?(@queue_snapshot) %>
+<% if control_state.retry_available? %>
   <% control_actions << {
        label: t(".actions.retry"),
        path: retry_admin_job_log_path(@job_log),
@@ -14,22 +16,22 @@
        confirm: t(".actions.retry_confirm")
      } %>
 <% end %>
-<% if requeue_job_control_available?(@job_log, @queue_snapshot) %>
+<% if control_state.requeue_available? %>
   <% control_actions << {
-       label: requeue_job_control_label(@job_log, @queue_snapshot),
+       label: control_state.requeue_label,
        path: requeue_admin_job_log_path(@job_log),
        style: :primary,
        method: :post,
-       confirm: requeue_job_control_confirm(@job_log, @queue_snapshot)
+       confirm: control_state.requeue_confirm
      } %>
 <% end %>
-<% if discard_job_control_available?(@queue_snapshot) %>
+<% if control_state.discard_available? %>
   <% control_actions << {
        label: t(".actions.discard"),
        path: discard_admin_job_log_path(@job_log),
        style: :danger,
        method: :post,
-       confirm: discard_job_control_confirm
+       confirm: control_state.discard_confirm
      } %>
 <% end %>
 <% section_links = [
@@ -226,7 +228,7 @@
         <div class="space-y-4">
           <div class="<%= ui_inset_panel_classes(tone: control_actions.any? ? :default : :subtle) %>">
             <p class="text-sm font-medium text-ink-950"><%= t(".follow_up_section.summary.title") %></p>
-            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= job_control_summary(@job_log, @queue_snapshot) %></p>
+            <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= control_state.summary %></p>
             <div class="mt-3 flex flex-wrap gap-2">
               <span class="<%= ui_badge_classes(control_actions.any? ? :warning : :neutral) %>"><%= control_actions.any? ? t(".follow_up_section.summary.safe_action_count", count: control_actions.size) : t(".follow_up_section.summary.no_safe_action") %></span>
               <span class="<%= ui_badge_classes(related_error_reference.present? ? :warning : :neutral) %>"><%= related_error_reference.present? ? t(".follow_up_section.summary.error_reference_recorded") : t(".follow_up_section.summary.no_error_reference") %></span>
@@ -343,7 +345,7 @@
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
                   <p class="text-sm font-medium text-ink-700/80"><%= t(".live_queue_section.details.fields.worker_process") %></p>
-                  <p class="mt-2 text-sm text-ink-950"><%= job_log_worker_label(@queue_snapshot) %></p>
+                  <p class="mt-2 text-sm text-ink-950"><%= runtime_state.worker_label %></p>
                 </div>
 
                 <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
