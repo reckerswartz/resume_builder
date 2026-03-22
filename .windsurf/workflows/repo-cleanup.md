@@ -117,21 +117,29 @@ Continuously audit the repository for unnecessary tracked files, update .gitigno
     yarn build:dev
     ```
 
-## Phase 6 — Commit
+## Git Sync Gate (mandatory — keeps main up-to-date)
 
-12. **Create a cleanup branch, commit, and push:**
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
-    git checkout -b chore/repo-cleanup
+    // turbo
+    git checkout main
+    ```
+    ```bash
+    // turbo
+    git pull origin main
+    ```
+    If there are uncommitted local changes, stash or commit them first.
+
+## Phase 6 — Commit & Push
+
+12. **Commit and push directly to main:**
+    ```bash
     git add .gitignore
     git add -u  # stages all removals
-    git commit -m "chore: remove ephemeral audit run logs and update .gitignore
-
-    - Remove 90+ run log files (ephemeral per-execution chronicles)
-    - Remove 51 one-time initial audit snapshot files
-    - Remove scaffolding TEMPLATE files
-    - Update .gitignore to prevent re-committing run logs, audit artifacts, and tmp/ outputs
-    - No code, dependency, or functionality changes"
-    git push origin chore/repo-cleanup
+    git commit -m "repo-cleanup: <summary of what was removed/ignored>"
+    git push origin main
     ```
 
 ## Phase 7 — Continuous Enforcement

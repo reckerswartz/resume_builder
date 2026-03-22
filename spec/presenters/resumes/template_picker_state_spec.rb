@@ -291,6 +291,35 @@ RSpec.describe Resumes::TemplatePickerState do
       expect(template_picker_state.accent_field_id).to eq('resume_settings_accent_color')
       expect(template_picker_state.selected_accent_color).to eq('#0F172A')
     end
+
+    it 'exposes the selected accent variant label' do
+      expect(template_picker_state.selected_accent_variant_label).to eq('Slate')
+    end
+
+    it 'reports no custom accent when using the default accent color' do
+      expect(template_picker_state.has_custom_accent?).to be false
+    end
+
+    context 'when the resume has a non-default accent color' do
+      let(:resume) { build(:resume, template: classic_template, template_id: classic_template.id, settings: { 'accent_color' => '#334155' }) }
+
+      before do
+        allow(view_context).to receive(:template_cards_for_builder).with(selected_template: classic_template, selected_accent_colors: { classic_template.id => '#334155' }).and_return(
+          template_cards.map do |card|
+            if card[:template] == classic_template
+              card.merge(selected_accent_color: '#334155')
+            else
+              card
+            end
+          end
+        )
+      end
+
+      it 'reports a custom accent when the selected color differs from the template default' do
+        expect(template_picker_state.has_custom_accent?).to be true
+        expect(template_picker_state.selected_accent_variant_label).to eq('Slate')
+      end
+    end
   end
 
   describe '#sort_options' do

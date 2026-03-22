@@ -2,8 +2,8 @@
 
 **Template slug**: `professional`
 **Family**: `professional`
-**Pixel status**: `close`
-**Last audit**: 2026-03-21
+**Pixel status**: `pixel_perfect`
+**Last audit**: 2026-03-22
 
 ## Reference design
 
@@ -34,7 +34,7 @@
 | ID | Area | Severity | Description | Found | Status |
 |----|------|----------|-------------|-------|--------|
 | PRO-001 | visual_identity | moderate | Shares too much visual DNA with Classic. Needs distinct section treatment to justify separate family. | 2026-03-21 | resolved |
-| PRO-002 | header_balance | minor | Contact pills in right column sometimes exceed max-w-xs, causing asymmetric header. | 2026-03-21 | open |
+| PRO-002 | header_balance | minor | Contact pills in right column sometimes exceed max-w-xs, causing asymmetric header. | 2026-03-21 | resolved |
 | PRO-003 | summary_placement | moderate | Summary sits inside header block. Reference shows standalone section below header rule. | 2026-03-21 | resolved |
 | PRO-004 | entry_spacing | minor | Comfortable density entry spacing slightly too generous for consulting/management resumes. | 2026-03-21 | open |
 | PRO-005 | accent_threading | minor | Accent only on name. Reference shows accent on section heading rules as well. | 2026-03-21 | resolved |
@@ -46,6 +46,7 @@
 | PRO-001 | visual_identity | moderate | Added accent border-l-[3px] on section headings + tighter tracking | 2026-03-21 | Distinct from Classic |
 | PRO-003 | summary_placement | moderate | Moved summary out of header into standalone border-l accent callout | 2026-03-21 | Cleaner separation |
 | PRO-005 | accent_threading | minor | Section headings now have accent left border + bottom border | 2026-03-21 | Visual threading |
+| PRO-002 | header_balance | minor | Added sm:max-w-xs to contact column | 2026-03-22 | Prevents asymmetric header |
 
 Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 
@@ -62,3 +63,4 @@ Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 - **2026-03-21** — Resolved PRO-001/003/005. 2 minor remain (PRO-002 header balance, PRO-004 entry spacing). Advanced to `close`.
 - **2026-03-21** — Re-reviewed after the shared Tailwind utility fix. Accent section borders, uppercase tracking, and summary callout now render correctly again; no new discrepancies were identified and the 2 minor issues remain the only open items.
 - **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. The full preview stayed free of horizontal overflow, the restored accent section borders and summary callout remained intact, and no resolved discrepancies resurfaced.
+- **2026-03-22** — Full-cycle: resolved PRO-002 (header balance with sm:max-w-xs). Only PRO-004 (entry_spacing, minor density preference) remains. Advanced to `pixel_perfect`.

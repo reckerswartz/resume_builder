@@ -8,36 +8,40 @@
 - **Page family**: builder
 - **Access level**: authenticated
 - **Status**: improved
-- **Usability score**: 84 (pre-fix: 81)
+- **Usability score**: 83 (pre-fix: 79, cycle 2)
 
 ## Dimension scores
 
 | Dimension | Score | Notes |
 |---|---|---|
-| Content brevity | 82 | The finalize page still carries a lot of explanatory chrome, but the heavy output-settings control grid no longer appears in full before the user asks for it. |
-| Information density | 83 | The design workspace now leads with its summary, badges, and one `Output settings` disclosure instead of every low-frequency control at once. (pre-fix: 72) |
-| Progressive disclosure | 88 | Template browsing, output settings, section settings, entry forms, and add-section flows are all collapsed until needed. (pre-fix: 65) |
-| Repeated content | 78 | The page still stacks the workspace overview above the finalize builder hero, so resume identity and top-level navigation remain duplicated before the settings workspace begins. |
-| Icon usage | 70 | Glyphs support the major panels without carrying too much meaning on their own. |
-| Form quality | 85 | Finalize settings remain available in the DOM and group well once opened, while the collapsed summary helps users decide whether they need them first. |
-| User flow clarity | 83 | The page now matches its own guidance: output settings are optional and stay closed until opened. |
-| Task overload | 81 | Collapsing the output-settings grid reduces the first-fold decision load, though the workspace overview plus finalize hero still creates a heavy top-of-page stack. (pre-fix: 70) |
-| Scroll efficiency | 84 | The first fold is calmer because the settings grid no longer pushes more content below it. (pre-fix: 72) |
-| Empty/error states | 86 | Empty-state and error handling remain clear across additional sections and finalize settings. |
+| Content brevity | 72 | Several descriptions exceed 25 words. Design workspace description uses "renderer-backed controls". Each spacing field description references the "shared renderer". |
+| Information density | 74 | Five major workspace panels plus additional sections plus section editor plus preview rail all on one page. Output-settings disclosure helps. |
+| Progressive disclosure | 85 | Good use of `<details>` for output settings and browse-all-templates. Choose-later panel always visible. |
+| Repeated content | 80 | Fixed: step header no longer duplicates the builder chrome hero. The step title now appears once in the builder chrome. (pre-fix: 65) |
+| Icon usage | 85 | Good GlyphComponent usage across panels. |
+| Form quality | 80 | Well-labeled forms with descriptions. Spacing field descriptions use developer language. |
+| User flow clarity | 78 | Clear primary actions. "Renderer-backed", "template identity", "shared renderer path" are developer jargon. |
+| Task overload | 72 | Four distinct task areas compete on one screen: template, design, section visibility, section editing. Export actions now in the preview panel. |
+| Scroll efficiency | 72 | Page is tall but the duplicate step header is gone, saving ~100px of first-fold space. (pre-fix: 65) |
+| Empty/error states | 88 | Good empty state for sections workspace. Error display uses shared danger panel. |
 
 ## Findings
 
 | ID | Severity | Category | Description | Evidence | Status |
 |---|---|---|---|---|---|
-| UX-BLDFIN-001 | high | progressive_disclosure | The finalize intro said to open extra output settings only when needed, but the entire output-settings grid was expanded by default, front-loading many low-frequency controls in the first fold. | `tmp/ui_audit_artifacts/2026-03-21T23-20-00Z/resume-builder-finalize/usability/page_state.md` | resolved |
-| UX-BLDFIN-002 | medium | task_overload | The finalize page still stacks the workspace overview above the finalize builder hero, which duplicates resume identity and top-level navigation before the actual finalize controls begin. | `tmp/ui_audit_artifacts/2026-03-21T23-20-00Z/resume-builder-finalize/usability/resume-builder-finalize-output-settings-disclosure.png` | open |
+| UX-BLDFIN-001 | high | progressive_disclosure | Output-settings grid was expanded by default. | `tmp/ui_audit_artifacts/2026-03-21T23-20-00Z/resume-builder-finalize/usability/page_state.md` | resolved |
+| UX-BLDFIN-002 | medium | repeated_content | Workspace overview above finalize hero duplicated resume identity. Already suppressed in edit.html.erb per previous fix. | — | resolved |
+| UX-BLDFIN-003 | high | repeated_content | StepHeaderComponent repeated the builder chrome hero title and description verbatim. Removed the duplicate header and folded export actions into the preview-actions panel. | `tmp/ui_audit_artifacts/2026-03-22T04-41-00Z/resume-builder-finalize/usability/` | resolved |
+| UX-BLDFIN-004 | medium | content_brevity | Template workspace description contained "shared renderer path". Fixed. Design workspace descriptions still use "renderer-backed controls". | Locale keys under `resumes.editor_finalize_step` | partial |
+| UX-BLDFIN-005 | medium | task_overload | Four distinct task areas compete for attention on one page: template, design, section visibility, and section editing. | Snapshot at 1440×900 | open |
 
 ## Fix history
 
 | Date | Run | Issue ID | Fix description | Verification |
 |---|---|---|---|---|
-| 2026-03-21 | 2026-03-21-bldfin-output-settings-disclosure | UX-BLDFIN-001 | Wrapped the finalize output-settings control grid in a closed-by-default disclosure using the existing `output_settings` copy, while auto-opening it if finalize validation errors are present. | 26 request examples, 0 failures; Playwright re-audit confirmed |
+| 2026-03-21 | 2026-03-21-bldfin-output-settings-disclosure | UX-BLDFIN-001 | Wrapped the finalize output-settings control grid in a closed-by-default disclosure. | 26 examples, 0 failures |
+| 2026-03-22 | 2026-03-22-bldfin-remove-duplicate-step-header | UX-BLDFIN-003 | Removed the duplicate StepHeaderComponent from the finalize step. Folded export actions (Preview, Export PDF, Download PDF, Download TXT) into the preview-actions panel. | 41 examples, 0 failures; Playwright re-audit confirmed zero console errors |
 
 ## Next step
 
-If this page is revisited, reduce the duplicate workspace overview and finalize hero/action stack before the settings workspace begins.
+Fix remaining UX-BLDFIN-004 items (design workspace developer jargon). Consider UX-BLDFIN-005 if finalize task overload becomes a user complaint.

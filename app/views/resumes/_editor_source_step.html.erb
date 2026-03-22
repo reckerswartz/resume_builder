@@ -2,13 +2,19 @@
 <% autofill_action_ready = resume_source_autofill_action_ready?(resume, autofill_enabled:) %>
 <% autofill_status_label = resume_source_autofill_status_label(resume, autofill_enabled:) %>
 <% autofill_status_message = resume_source_autofill_status_message(resume, autofill_enabled:) %>
+<% show_supported_formats = resume.source_mode == "upload" || resume.source_document.attached? %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
-  <%= render Ui::StepHeaderComponent.new(
-    title: current_step.fetch(:title),
-    description: current_step.fetch(:description),
-    aside_classes: "grid w-full gap-4 lg:max-w-2xl lg:grid-cols-2"
-  ) do %>
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
+    <% if resume.errors.any? %>
+      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
+        <%= resume.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <%= render "resumes/source_import_fields", form: form, resume: resume, autofill_enabled: autofill_enabled %>
+
+    <div class="grid gap-4 <%= 'lg:grid-cols-2' if show_supported_formats %>">
       <%= render Ui::WidgetCardComponent.new(
         eyebrow: t("resumes.editor_source_step.import_status.eyebrow"),
         title: autofill_status_label,
@@ -23,28 +29,21 @@
         </div>
       <% end %>
 
-      <%= render Ui::WidgetCardComponent.new(
-        eyebrow: t("resumes.editor_source_step.supported_formats.eyebrow"),
-        title: Resumes::SourceTextResolver.supported_upload_formats_label,
-        description: t("resumes.editor_source_step.supported_formats.description"),
-        tone: :subtle,
-        padding: :sm
-      ) do %>
-        <div class="flex flex-wrap gap-2">
-          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.supported_formats.original_file_badge") %></span>
-          <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.supported_formats.autofill_badge") %></span>
-        </div>
+      <% if show_supported_formats %>
+        <%= render Ui::WidgetCardComponent.new(
+          eyebrow: t("resumes.editor_source_step.supported_formats.eyebrow"),
+          title: Resumes::SourceTextResolver.supported_upload_formats_label,
+          description: t("resumes.editor_source_step.supported_formats.description"),
+          tone: :subtle,
+          padding: :sm
+        ) do %>
+          <div class="flex flex-wrap gap-2">
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.supported_formats.original_file_badge") %></span>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_source_step.supported_formats.autofill_badge") %></span>
+          </div>
+        <% end %>
       <% end %>
-  <% end %>
-
-  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
-    <% if resume.errors.any? %>
-      <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
-        <%= resume.errors.full_messages.to_sentence %>
-      </div>
-    <% end %>
-
-    <%= render "resumes/source_import_fields", form: form, resume: resume, autofill_enabled: autofill_enabled %>
+    </div>
 
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

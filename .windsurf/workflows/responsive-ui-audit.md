@@ -13,6 +13,7 @@ This workflow operates as a repeating cycle: **Audit → Prioritize → Fix → 
 3. Read `README.md`, `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`, `docs/architecture_overview.md`, `config/routes.rb`, and `lib/resume_builder/step_registry.rb` so the audit reflects the current routed surface, raw Behance baseline, and shared UI rules.
 4. **Regression baseline**: before starting new work, re-audit any pages previously marked `closed` whose source files (views, components, CSS, Stimulus controllers) have changed since the last verification. If regressions are found, reopen the page and prioritize the regression fix before new work.
 5. Confirm audit prerequisites before reviewing pages: a running local app server, seeded non-production accounts or user-provided credentials, and any required sample data for authenticated and admin routes. Check for pending migrations with `bin/rails db:migrate:status` — missing migrations can cause runtime errors during audit.
+6. **Browser session isolation**: follow `.windsurf/workflows/playwright-session-guide.md` for all Playwright interactions. Each audit run must use its own isolated browser context — never reuse sessions from prior workflow runs. Tag the session with `workflowId: responsive-ui-audit` and the target `issueId` (e.g. page key or issue key). Close the session after the audit batch completes.
 
 ### Phase 2: Audit & Discover
 
@@ -30,57 +31,26 @@ This workflow operates as a repeating cycle: **Audit → Prioritize → Fix → 
 9. Compare current findings against the registry to distinguish net-new issues from previously known items. Update severity and priority of existing items if the page has evolved.
 10. Save raw artifacts under `tmp/ui_audit_artifacts/<timestamp>/<page_key>/<viewport>/` and record the durable findings in the page doc and run log instead of overwriting earlier runs.
 
-### GitHub Integration Gate (mandatory before implementation)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the finding being fixed:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "responsive-ui-audit" \
-      --key "<issue_key>" \
-      --title "<description of the responsive issue>" \
-      --severity "<severity>" \
-      --domain "builder" \
-      --type "responsive-issue"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number in `docs/ui_audits/responsive_review/registry.yml` under the page entry as `github_issue_number`.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create a working branch** for the fix:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "responsive-ui-audit" \
-      --key "<issue_key>"
-    ```
-    All implementation work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    responsive-ui-audit: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "responsive-ui-audit" \
-      --key "<issue_key>" \
-      --issue <issue_number> \
-      --title "<description>"
-    ```
-    Record the returned PR number in the registry as `github_pr_number`.
-
-GH-5. **After PR merge**, close the issue:
-    ```bash
-    bin/gh-bridge/close-issue \
-      --issue <issue_number> \
-      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
-      --delete-branch "responsive-ui-audit/<issue_key>"
+    git add -A
+    git commit -m "responsive-ui-audit: <description of the fix>"
+    git push origin main
     ```
 
 ### Phase 3: Implement & Refine Data

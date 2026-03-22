@@ -6,6 +6,14 @@ module Resumes
       @view_context = view_context
     end
 
+    def workspace_tabs
+      @workspace_tabs ||= [
+        { key: "template", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.template"), glyph: :layers },
+        { key: "design", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.design"), glyph: :swatches },
+        { key: "sections", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.sections"), glyph: :preview }
+      ]
+    end
+
     def template_badges
       @template_badges ||= [
         { label: ResumeTemplates::Catalog.family_label(layout_config.fetch("family")), tone: :neutral },

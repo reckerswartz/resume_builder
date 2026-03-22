@@ -61,6 +61,8 @@ docs/*/*/*/pages/TEMPLATE.md
 /tmp/ui_audit_artifacts/
 /tmp/reference_captures/
 /tmp/reference_artifacts/
+/tmp/playwright-sessions/
+/tmp/playwright-audit/
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key

@@ -13,41 +13,26 @@ This workflow is one phase of the repeating TDD cycle: **Red → Green → Refac
 3. Verify a green test baseline before refactoring — run the targeted spec suite first. Check for pending migrations with `bin/rails db:migrate:status`. If the work touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before refactoring.
 4. **Assess current cycle position and regression baseline**: identify which areas were just implemented (Green phase) and which have the most refactoring value. Prioritize recently-implemented code that followed minimal-change conventions. If a previously-clean area has regressed structurally, restore that baseline before widening the refactor.
 
-### GitHub Integration Gate (mandatory before refactoring)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before refactoring**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. If not already on a workflow branch (from an upstream `/implementation-agent` invocation), **create a GitHub issue** for the refactor:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "tdd-refactoring-agent" \
-      --key "<refactor_key>" \
-      --title "<description>" \
-      --severity "medium" \
-      --domain "<domain>" \
-      --type "refactor"
+    // turbo
+    git pull origin main
     ```
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create or switch to a working branch**:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "tdd-refactoring-agent" \
-      --key "<refactor_key>"
-    ```
-    All refactoring work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue and create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "tdd-refactoring-agent" \
-      --key "<refactor_key>" \
-      --issue <issue_number> \
-      --title "<description>"
+    git add -A
+    git commit -m "tdd-refactoring-agent: <description of the refactor>"
+    git push origin main
     ```
 
 ### Phase 2: Refactor

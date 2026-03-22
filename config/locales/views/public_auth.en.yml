@@ -69,13 +69,13 @@ en:
       signed_out: "You are signed out."
     new:
       page_header:
-        eyebrow: "Welcome back"
-        title: "Pick up where you left off."
-        description: "Open your drafts, keep editing, and export when the resume looks right."
+        eyebrow: "Your workspace"
+        title: "Sign in to continue."
+        description: "Open your drafts, keep editing, and export when the content looks right."
         badges:
           saved_drafts: "Saved drafts"
           live_preview: "Live preview"
-      after_sign_in_eyebrow: "After sign in"
+      after_sign_in_eyebrow: "What you get"
       return_to_drafts:
         title: "Return to your drafts"
         description: "Keep your content, preview, and template choices in one place."

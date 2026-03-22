@@ -1,17 +1,12 @@
-<%= render Ui::SurfaceCardComponent.new(padding: :sm, extra_classes: "overflow-hidden") do %>
-  <div class="space-y-5">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-      <div>
-        <span class="atelier-pill">
-          <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-          <%= t("resumes.editor_finalize_step.sections_workspace.eyebrow") %>
-        </span>
-        <h3 class="mt-4 text-xl font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.sections_workspace.title") %></h3>
-        <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.sections_workspace.description") %></p>
-      </div>
-
-      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.sections_workspace.badge") %></span>
+<div class="space-y-5">
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <div>
+      <h3 class="text-lg font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.sections_workspace.title") %></h3>
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.sections_workspace.description") %></p>
     </div>
+
+    <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.sections_workspace.badge") %></span>
+  </div>
 
     <% if finalize_workspace_state.has_section_visibility_controls? %>
       <%= hidden_field_tag "resume[settings][hidden_sections][]", "", id: nil %>
@@ -45,5 +40,4 @@
         align: :left
       ) %>
     <% end %>
-  </div>
-<% end %>
+</div>

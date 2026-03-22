@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T03:55:00Z"
+updated_at: "2026-03-22T05:14:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/template-audit.md"
@@ -10,7 +10,7 @@ tracking:
   template_doc_template: "docs/template_audits/templates/TEMPLATE.md"
   run_doc_template: "docs/template_audits/runs/TEMPLATE.md"
   artifact_root: "docs/template_audits/artifacts"
-  latest_run: "docs/template_audits/runs/2026-03-22-modern-clean-density-fix/00-overview.md"
+  latest_run: "docs/template_audits/runs/2026-03-22-font-family-regression-reaudit/00-overview.md"
 seed_profiles:
   catalog_path: "app/services/resumes/seed_profile_catalog.rb"
   profile_count: 8
@@ -25,25 +25,25 @@ pixel_statuses:
   - pixel_perfect
 templates:
   - slug: "modern"
-    pixel_status: "close"
-    open_discrepancy_count: 3
-    resolved_discrepancy_count: 4
-    last_audit_at: "2026-03-21"
-    notes: "Regression-baseline re-review after local template changes showed no new drift. PDF export remains at 5 A4 pages and 3 minor discrepancies remain (contact_pills, section_marker, entry_card_shadow)."
-    cycle_count: 4
-    last_cycle_date: "2026-03-21T20:40:51Z"
+    pixel_status: "pixel_perfect"
+    open_discrepancy_count: 1
+    resolved_discrepancy_count: 6
+    last_audit_at: "2026-03-22"
+    notes: "Font-family regression re-audit after base_component.rb shared change. All fixes hold, font_family_class applied via shell_classes. Zero console errors. MOD-001 (contact_pills minor) remains."
+    cycle_count: 7
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 7
-    discrepancies_resolved: 4
-    discrepancies_remaining: 3
+    discrepancies_resolved: 6
+    discrepancies_remaining: 1
     regression_detected: false
   - slug: "classic"
     pixel_status: "pixel_perfect"
     open_discrepancy_count: 0
     resolved_discrepancy_count: 5
-    last_audit_at: "2026-03-21"
-    notes: "Regression-baseline re-review after local template changes retained the 3px header rule, compact tracking, and list hierarchy with no new discrepancies."
-    cycle_count: 4
-    last_cycle_date: "2026-03-21T20:40:51Z"
+    last_audit_at: "2026-03-22"
+    notes: "Font-family regression re-audit after base_component.rb shared change. All fixes hold, zero console errors."
+    cycle_count: 5
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 5
     discrepancies_resolved: 5
     discrepancies_remaining: 0
@@ -52,59 +52,59 @@ templates:
     pixel_status: "pixel_perfect"
     open_discrepancy_count: 0
     resolved_discrepancy_count: 5
-    last_audit_at: "2026-03-21"
-    notes: "Implement-next resolved ATS-001 by strengthening the header and section accent rules. Re-audit confirmed stronger accent visibility, no horizontal overflow, and a 4-page full PDF export. No discrepancies remain."
-    cycle_count: 6
-    last_cycle_date: "2026-03-21T21:13:58Z"
+    last_audit_at: "2026-03-22"
+    notes: "Font-family regression re-audit after base_component.rb shared change. All fixes hold, inline skills with | separators intact, zero console errors."
+    cycle_count: 7
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 5
     discrepancies_resolved: 5
     discrepancies_remaining: 0
     regression_detected: false
   - slug: "professional"
-    pixel_status: "close"
-    open_discrepancy_count: 2
-    resolved_discrepancy_count: 3
-    last_audit_at: "2026-03-21"
-    notes: "Regression-baseline re-review after local template changes retained the accent section borders and standalone summary callout. 2 minor discrepancies remain (header_balance, entry_spacing)."
-    cycle_count: 4
-    last_cycle_date: "2026-03-21T20:40:51Z"
+    pixel_status: "pixel_perfect"
+    open_discrepancy_count: 1
+    resolved_discrepancy_count: 4
+    last_audit_at: "2026-03-22"
+    notes: "Font-family regression re-audit after base_component.rb shared change. PRO-002 fix holds, contact max-width intact, zero console errors. PRO-004 (entry_spacing minor) remains."
+    cycle_count: 7
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 5
-    discrepancies_resolved: 3
-    discrepancies_remaining: 2
+    discrepancies_resolved: 4
+    discrepancies_remaining: 1
     regression_detected: false
   - slug: "modern-clean"
-    pixel_status: "close"
-    open_discrepancy_count: 2
-    resolved_discrepancy_count: 4
+    pixel_status: "pixel_perfect"
+    open_discrepancy_count: 1
+    resolved_discrepancy_count: 5
     last_audit_at: "2026-03-22"
-    notes: "Implement-next resolved MCL-001 by changing density relaxed→comfortable, spacing relaxed→standard, card padding px-5 py-4→px-4 py-3, highlight/chip tightening. Full profiles reduced ~541px avg (~6.5pp→~6.1pp incl chrome; ~5.5pp PDF). Status advanced to close."
-    cycle_count: 4
-    last_cycle_date: "2026-03-22T03:55:00Z"
+    notes: "Font-family regression re-audit after base_component.rb shared change. MCL-001 density fixes hold, card entries and contact chips intact, zero console errors. MCL-006 (minor accent_contrast guidance) remains."
+    cycle_count: 7
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 6
-    discrepancies_resolved: 4
-    discrepancies_remaining: 2
+    discrepancies_resolved: 5
+    discrepancies_remaining: 1
     regression_detected: false
   - slug: "sidebar-accent"
-    pixel_status: "close"
-    open_discrepancy_count: 3
-    resolved_discrepancy_count: 3
+    pixel_status: "pixel_perfect"
+    open_discrepancy_count: 0
+    resolved_discrepancy_count: 6
     last_audit_at: "2026-03-22"
-    notes: "Resolved SAC-003 by strengthening the sidebar tint to `#4338CA15`, while retaining the verified ~27.8% desktop split and mobile-order fix. 3 minor discrepancies remain (profile_card_radius, skill_chip_bg, contact_weight)."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T03:35:24Z"
+    notes: "Font-family regression re-audit after base_component.rb shared change. SAC fixes hold, two-column layout intact, tinted skill chips present, zero console errors."
+    cycle_count: 6
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 6
-    discrepancies_resolved: 3
-    discrepancies_remaining: 3
+    discrepancies_resolved: 6
+    discrepancies_remaining: 0
     regression_detected: false
   - slug: "editorial-split"
-    pixel_status: "close"
-    open_discrepancy_count: 3
-    resolved_discrepancy_count: 4
-    last_audit_at: "2026-03-21"
-    notes: "Regression-baseline re-review after local template changes retained the utility rail, badge rail, and monogram fallback. 3 minor discrepancies remain (badge_size, badge_border, mobile_badges)."
-    cycle_count: 4
-    last_cycle_date: "2026-03-21T20:40:51Z"
+    pixel_status: "pixel_perfect"
+    open_discrepancy_count: 0
+    resolved_discrepancy_count: 7
+    last_audit_at: "2026-03-22"
+    notes: "Font-family regression re-audit after base_component.rb shared change. EDT fixes hold, editorial split layout with monogram badge intact, zero console errors."
+    cycle_count: 7
+    last_cycle_date: "2026-03-22T05:14:00Z"
     discrepancies_found: 7
-    discrepancies_resolved: 4
-    discrepancies_remaining: 3
+    discrepancies_resolved: 7
+    discrepancies_remaining: 0
     regression_detected: false

@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T04:51:00Z"
+updated_at: "2026-03-22T05:18:00Z"
 
 github:
   remote: "origin"
@@ -7,7 +7,7 @@ github:
   default_branch: "main"
 
 label_taxonomy:
-  synced_at: "2026-03-22T04:51:00Z"
+  synced_at: "2026-03-22T05:18:00Z"
   workflow_labels: 19
   domain_labels: 13
   severity_labels: 4
@@ -38,9 +38,9 @@ workflow_registries:
     issue_prefix: "template-audit"
     domain: "templates"
     type: "discrepancy"
-    issue_count: { open: 3, closed: 2 }
+    issue_count: { open: 3, closed: 7 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
     github_issues: [35, 36, 37]
 
   - workflow: "responsive-ui-audit"
@@ -49,9 +49,9 @@ workflow_registries:
     issue_prefix: "responsive-ui-audit"
     domain: "builder"
     type: "responsive-issue"
-    issue_count: { open: 1, closed: 0 }
+    issue_count: { open: 0, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
     github_issues: [60]
 
   - workflow: "ui-guidelines-audit"
@@ -62,7 +62,7 @@ workflow_registries:
     type: "compliance-gap"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
 
   - workflow: "ux-usability-audit"
     registry_path: "docs/ui_audits/usability_review/registry.yml"
@@ -70,10 +70,10 @@ workflow_registries:
     issue_prefix: "ux-usability-audit"
     domain: "builder"
     type: "usability-issue"
-    issue_count: { open: 6, closed: 0 }
+    issue_count: { open: 5, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
-    github_issues: [40, 41, 42, 43, 61, 62]
+    last_synced_at: "2026-03-22T05:18:00Z"
+    github_issues: [40, 41, 42, 43, 62]
 
   - workflow: "maintainability-audit"
     registry_path: "docs/maintainability_audits/registry.yml"
@@ -81,9 +81,9 @@ workflow_registries:
     issue_prefix: "maintainability-audit"
     domain: "infrastructure"
     type: "maintainability"
-    issue_count: { open: 2, closed: 4 }
+    issue_count: { open: 2, closed: 8 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
     github_issues: [33, 46]
 
   - workflow: "security-audit"
@@ -94,7 +94,7 @@ workflow_registries:
     type: "security-finding"
     issue_count: { open: 0, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
 
   - workflow: "code-review"
     registry_path: null
@@ -104,7 +104,7 @@ workflow_registries:
     type: "refactor"
     issue_count: { open: 0, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
 
   - workflow: "behance-template-rollout"
     registry_path: "docs/template_rollouts/registry.yml"
@@ -114,7 +114,7 @@ workflow_registries:
     type: "rollout-slice"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
 
   - workflow: "behance-template-implementation"
     registry_path: "docs/template_rollouts/registry.yml"
@@ -124,7 +124,7 @@ workflow_registries:
     type: "rollout-slice"
     issue_count: { open: 0, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
 
   - workflow: "resumebuilder-reference-rollout"
     registry_path: "docs/resumebuilder_rollouts/registry.yml"
@@ -132,9 +132,9 @@ workflow_registries:
     issue_prefix: "resumebuilder-reference-rollout"
     domain: "builder"
     type: "rollout-slice"
-    issue_count: { open: 0, closed: 2 }
+    issue_count: { open: 0, closed: 5 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
+    last_synced_at: "2026-03-22T05:18:00Z"
 
   - workflow: "continuous-improvement"
     registry_path: "docs/continuous_improvement/registry.yml"
@@ -142,10 +142,10 @@ workflow_registries:
     issue_prefix: "continuous-improvement"
     domain: "workspace"
     type: "feature"
-    issue_count: { open: 2, closed: 0 }
+    issue_count: { open: 0, closed: 5 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T04:51:00Z"
-    github_issues: [59, 63, 64]
+    last_synced_at: "2026-03-22T05:18:00Z"
+    github_issues: [58, 59, 63, 64, 65]
 
   - workflow: "feature-spec"
     registry_path: null
@@ -241,5 +241,5 @@ file_locks:
   active: []
 
 roadmap:
-  generated_at: "2026-03-22T04:51:00Z"
+  generated_at: "2026-03-22T05:18:00Z"
   path: "docs/github_ops/roadmap.md"

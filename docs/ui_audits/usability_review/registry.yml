@@ -200,23 +200,23 @@ pages:
     page_family: "templates"
     priority: "medium"
     status: "improved"
-    usability_score: 83
+    usability_score: 86
     page_doc_path: "docs/ui_audits/usability_review/pages/template-show.md"
     open_issue_keys:
-      - "UX-TSHOW-002"
       - "UX-TSHOW-003"
     closed_issue_keys:
       - "UX-TSHOW-001"
+      - "UX-TSHOW-002"
       - "UX-TSHOW-004"
-    last_audited_at: "2026-03-22T05:31:00Z"
-    last_changed_at: "2026-03-22T05:31:00Z"
-    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-trim-quick-take-inset/00-overview.md"
-    next_step: "UX-TSHOW-002 remains the next highest-value open issue. If the page is revisited, consolidate the duplicate header and quick-take CTA clusters before addressing the lower-priority carry-through copy length."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T05:31:00Z"
+    last_audited_at: "2026-03-22T05:24:00Z"
+    last_changed_at: "2026-03-22T05:24:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-tshow-consolidate-cta/00-overview.md"
+    next_step: "UX-TSHOW-003 (verbose carry-through copy) is the only remaining open issue at low priority."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T05:24:00Z"
     issues_found: 4
-    issues_resolved: 2
-    issues_remaining: 2
+    issues_resolved: 3
+    issues_remaining: 1
     regression_detected: false
   - { page_key: "resume-source-import", title: "Resume source import launcher", path: "/resume_source_imports/:provider", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "low", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - page_key: "resume-builder-source"

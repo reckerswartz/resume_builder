@@ -13,41 +13,26 @@ This workflow assesses and improves test coverage as part of the repeating TDD c
 3. Read the source and existing specs before writing new tests. Check for pending migrations — `bin/rails db:migrate:status` — as they are a common cause of false failures. If the target touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before writing coverage.
 4. **Assess current coverage position and regression baseline**: identify which areas have thin or missing coverage by examining spec files relative to implementation files. Prioritize uncovered controllers, services, and presenters. If a previously-covered path is now weak or flaky, address that regression before expanding to brand-new gaps.
 
-### GitHub Integration Gate (mandatory before writing specs)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before writing specs**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. If not already on a workflow branch, **create a GitHub issue** for the coverage gap:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "rspec-agent" \
-      --key "<coverage_key>" \
-      --title "<description>" \
-      --severity "medium" \
-      --domain "testing" \
-      --type "coverage-gap"
+    // turbo
+    git pull origin main
     ```
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create or switch to a working branch**:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "rspec-agent" \
-      --key "<coverage_key>"
-    ```
-    All spec work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue and create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "rspec-agent" \
-      --key "<coverage_key>" \
-      --issue <issue_number> \
-      --title "<description>"
+    git add -A
+    git commit -m "rspec-agent: <description of the coverage improvement>"
+    git push origin main
     ```
 
 ### Phase 2: Identify Gaps & Write Specs

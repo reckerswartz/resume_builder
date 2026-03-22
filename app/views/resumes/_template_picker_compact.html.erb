@@ -20,6 +20,12 @@
     <summary class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
       <div class="flex items-center gap-3">
         <span class="text-sm font-semibold tracking-tight text-ink-950"><%= template_picker_state.selected_card_state&.dig(:template)&.name || t("#{compact_text_scope}.fast_start_pill") %></span>
+        <% if template_picker_state.has_custom_accent? %>
+          <span class="inline-flex items-center gap-1.5">
+            <span class="h-3 w-3 rounded-full border border-black/10" style="background-color: <%= template_picker_state.selected_accent_color %>;"></span>
+            <span class="text-xs font-medium text-ink-700/80"><%= t("#{compact_text_scope}.accent_carry_through", variant: template_picker_state.selected_accent_variant_label) %></span>
+          </span>
+        <% end %>
         <span class="<%= ui_badge_classes(:neutral) %>"><%= t("#{compact_text_scope}.preview_selected_badge") %></span>
       </div>
       <span class="text-xs font-medium uppercase tracking-[0.2em] text-ink-700/70"><%= t("#{compact_text_scope}.expand_preview_hint") %></span>
@@ -58,6 +64,16 @@
       <% end %>
     </div>
   </details>
+
+  <div class="<%= ui_inset_panel_classes(tone: :default) %>">
+    <div class="flex items-start gap-3">
+      <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
+      <div>
+        <p class="text-sm font-semibold tracking-tight text-ink-950"><%= t("#{compact_text_scope}.choose_later_pill") %></p>
+        <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("#{compact_text_scope}.choose_later_description") %></p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <details class="<%= [ui_inset_panel_classes(tone: :default), "group template-picker-disclosure"].join(" ") %>">

@@ -1,5 +1,5 @@
 workflow: .windsurf/workflows/resumebuilder-reference-rollout.md
-last_updated: 2026-03-22T04-50-00Z
+last_updated: 2026-03-22T05-08-00Z
 reference_source_docs:
   - docs/references/resumebuilder/live-flow-comparison-2026-03-20/15-implementation-plan.md
   - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/README.md
@@ -162,3 +162,31 @@ slices:
     cycle_count: 1
     regression_detected: false
     next_recommended_slice: unified-finalize-workspace
+  - slice_key: unified-finalize-workspace
+    title: Unified finalize workspace
+    page_family: resume-builder-finalize
+    status: verified
+    priority: medium
+    reference_source_docs:
+      - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
+      - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/04-template-flexibility-matrix.md
+      - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/05-rails-architecture-translation.md
+    current_app_surfaces:
+      - app/javascript/controllers/workspace_tabs_controller.js
+      - app/presenters/resumes/finalize_workspace_state.rb
+      - app/views/resumes/_editor_finalize_step.html.erb
+      - app/views/resumes/_finalize_workspace_template_panel.html.erb
+      - app/views/resumes/_finalize_workspace_design_panel.html.erb
+      - app/views/resumes/_finalize_workspace_sections_panel.html.erb
+    open_gap_keys: []
+    closed_gap_keys:
+      - unified-finalize-tab-navigation
+      - unified-finalize-design-controls-promotion
+      - unified-finalize-panel-consolidation
+    verification_specs:
+      - spec/requests/resumes_spec.rb
+      - spec/presenters/resumes/finalize_workspace_state_spec.rb
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-unified-finalize-workspace/00-overview.md
+    cycle_count: 1
+    regression_detected: false
+    next_recommended_slice: ""

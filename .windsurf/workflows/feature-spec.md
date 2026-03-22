@@ -14,32 +14,26 @@ This workflow is one phase of the repeating feature lifecycle: **Spec → Review
 4. **Check for existing specs**: read `docs/features/` for any prior spec for this feature. If one exists, treat this invocation as a refinement cycle rather than starting from scratch — incorporate implementation feedback, review findings, and newly discovered requirements.
 5. **Regression baseline**: if the feature has already been partially implemented or reviewed, compare the current spec against implementation feedback, prior review findings, and current app behavior so reopened or newly-discovered gaps are captured before drafting more requirements.
 
-### GitHub Integration Gate (mandatory before drafting)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before drafting a spec**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the feature being specified:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "feature-spec" \
-      --key "<feature_key>" \
-      --title "<feature name>" \
-      --severity "medium" \
-      --domain "<domain>" \
-      --type "feature"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number. This issue will track the feature through the full Spec → Review → Plan → Implement lifecycle.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create or switch to a working branch**:
+GIT-2. **After the spec is drafted/refined**, stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "feature-spec" \
-      --key "<feature_key>"
+    git add -A
+    git commit -m "feature-spec: <feature name>"
+    git push origin main
     ```
 
 ### Phase 2: Interview, Draft & Identify Gaps

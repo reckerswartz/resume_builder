@@ -4,15 +4,14 @@ description: Manage GitHub issues, branches, and pull requests for workflow-dete
 
 ## GitHub Operations Workflow
 
-This workflow bridges the 18 Windsurf continuous-improvement workflows to GitHub Issues, branches, and pull requests via `gh` CLI. Every fix-producing workflow has a mandatory **GitHub Integration Gate** section that enforces issue creation before implementation and PR creation after validation.
+This workflow provides optional GitHub issue/PR management for tracking purposes. All workflows now use a **Git Sync Gate** that commits and pushes directly to `main` — no feature branches, no PRs required. GitHub issues and PRs are available for optional tracking when desired.
 
 ### Prerequisites (portable — works on any system)
 
-- **`gh` CLI** must be installed: `brew install gh` (macOS), `sudo apt install gh` (Linux), or [github.com/cli/cli](https://github.com/cli/cli)
-- **`gh` must be authenticated**: run `gh auth login` once per system
+- **Git** must be configured with push access to the remote `origin main` branch
+- **`gh` CLI** is optional — only needed if you want to create GitHub issues for tracking: `brew install gh` (macOS), `sudo apt install gh` (Linux)
 - **Bridge scripts** are in `bin/gh-bridge/` and tracked in git — they come with the repo on clone
 - **Issue templates** are in `docs/github_ops/issue_templates/` — also tracked in git
-- **No secrets or system-specific paths** are required — scripts auto-detect the repo via `gh repo view`
 
 ### Phase 1: Context & Prerequisites
 
@@ -56,20 +55,15 @@ This workflow bridges the 18 Windsurf continuous-improvement workflows to GitHub
    - **Bug fixes** → use `docs/github_ops/issue_templates/bug.md`
    - Always include: workflow name, tracking key, severity, affected files, verification command, and links to registry/run-log/page-doc
 
-### Phase 4: Branch & PR Lifecycle
+### Phase 4: Commit & Push Lifecycle
 
-9. When a workflow enters its implement phase:
-   a. Call `bin/gh-bridge/create-branch` to create a dedicated branch
-   b. Implement the fix on that branch
-   c. Commit with a message referencing the issue: `<workflow>: <description>\n\nCloses #<issue_number>`
-   d. After verification passes, call `bin/gh-bridge/update-issue` with verification results
-   e. Call `bin/gh-bridge/create-pr` to open a PR linked to the issue
-   f. Write the returned `github_pr_number` back into the workflow's registry
+All workflows commit and push directly to `main`. No feature branches or PRs are required.
 
-10. After PR merge:
-    a. Call `bin/gh-bridge/close-issue` with a completion summary
-    b. Update the registry to mark the item as closed/resolved
-    c. The feature branch is deleted automatically by `close-issue --delete-branch`
+9. When a workflow completes its implement + validate phase:
+   a. Stage all changes: `git add -A`
+   b. Commit with a descriptive message: `<workflow>: <description>`
+   c. Push to main: `git push origin main`
+   d. If a GitHub issue was created for tracking, close it via `bin/gh-bridge/close-issue`
 
 ### Phase 5: Registry Sync
 
@@ -102,14 +96,12 @@ This workflow bridges the 18 Windsurf continuous-improvement workflows to GitHub
 
 ### Integration with Other Workflows
 
-All 18 fix-producing workflows now have a **mandatory `GitHub Integration Gate` section** embedded directly between their discovery/audit phase and their implementation phase. This ensures Cascade creates the GitHub issue and branch before writing any code.
+All workflows now have a **mandatory `Git Sync Gate` section** that ensures work stays on `main`, pulls before starting, and commits + pushes after validation.
 
-| Workflow Phase | GitHub Operation | Enforcement |
+| Workflow Phase | Git Operation | Enforcement |
 |---|---|---|
-| Before implementation | `gh auth status` | **Mandatory** — stops if not authenticated |
-| Before implementation | `bin/gh-bridge/create-issue` | **Mandatory** — creates issue before any fix |
-| Before implementation | `bin/gh-bridge/create-branch` | **Mandatory** — all work on dedicated branch |
-| After validation | `bin/gh-bridge/create-pr` | **Mandatory** — links PR to issue |
-| After merge | `bin/gh-bridge/close-issue` | **Mandatory** — closes issue, deletes branch |
+| Before starting work | `git checkout main` | **Mandatory** — ensures on main branch |
+| Before starting work | `git pull origin main` | **Mandatory** — syncs latest changes |
+| After validation | `git add -A && git commit && git push origin main` | **Mandatory** — commits and pushes to main |
 
-The 3 workflows without the gate are intentionally excluded: `/github-ops` (orchestrator), `/c4-architecture` (docs-only), `/repo-cleanup` (utility).
+GitHub issues and PRs via `bin/gh-bridge/*` scripts are **optional** for tracking purposes. The `/github-ops` workflow orchestrates that tracking when desired.

@@ -37,10 +37,6 @@ end %>
       { label: t(".page_header.columns_badge", columns: template_card.fetch(:column_count_label)), tone: :neutral },
       { label: t(".page_header.theme_badge", theme: template_card.fetch(:theme_tone_label)), tone: :neutral }
     ],
-    actions: [
-      { label: t(".page_header.use_template"), path: use_template_path, style: :primary },
-      { label: t(".page_header.back_to_templates"), path: templates_path_with_context, style: :secondary }
-    ],
     density: :compact
   ) %>
 

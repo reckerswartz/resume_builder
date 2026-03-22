@@ -14,6 +14,7 @@ This workflow operates as a repeating cycle: **Discover → Capture → Compare 
 4. **Regression baseline**: before starting new captures, verify that previously `implemented` candidates still render correctly. If their component files have changed since the last verification, re-run the template spec suite. If regressions are found, prioritize fixing them via `/behance-template-implementation reopen-improvement` before new captures.
 5. Map the current implementation surface through `ResumeTemplates::Catalog`, `Template`, `ResumeTemplates::ComponentResolver`, `ResumeTemplates::PreviewResumeBuilder`, `db/seeds.rb`, and the relevant request/service specs before selecting a candidate. Also check `Resumes::TemplatePickerState`, `Templates::MarketplaceState`, `ResumesHelper`, and `TemplatesHelper` for shared presenter/helper state that must stay in sync with new templates.
 6. Check for pending migrations with `bin/rails db:migrate:status` before running specs. Real template rollouts often depend on photo-library, headshot, or metadata schema changes.
+7. **Browser session isolation**: follow `.windsurf/workflows/playwright-session-guide.md` for all Playwright interactions. Each capture/verification run must use its own isolated browser context — never reuse sessions from prior workflow runs. Tag the session with `workflowId: behance-template-rollout` and the target `issueId` (e.g. reference key). Close the session after the capture or verification batch completes.
 
 ### Phase 2: Discover & Capture
 
@@ -23,57 +24,26 @@ This workflow operates as a repeating cycle: **Discover → Capture → Compare 
 10. Capture any relevant ResumeBuilder.com marketplace, template, or builder interaction patterns that should influence the implementation, then record those notes in the active run log.
 11. Compare the captured reference against the current template catalog to identify net-new design patterns, improvement opportunities for existing templates, and architectural prerequisites.
 
-### GitHub Integration Gate (mandatory before implementation)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before implementing any candidate**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the candidate being implemented:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "behance-template-rollout" \
-      --key "<reference_key>" \
-      --title "<description of the template candidate>" \
-      --severity "<severity>" \
-      --domain "templates" \
-      --type "rollout-slice"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number in `docs/template_rollouts/registry.yml` under the candidate entry as `github_issue_number`.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create a working branch** for the implementation:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "behance-template-rollout" \
-      --key "<reference_key>"
-    ```
-    All implementation work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    behance-template-rollout: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "behance-template-rollout" \
-      --key "<reference_key>" \
-      --issue <issue_number> \
-      --title "<description>"
-    ```
-    Record the returned PR number in the registry as `github_pr_number`.
-
-GH-5. **After PR merge**, close the issue:
-    ```bash
-    bin/gh-bridge/close-issue \
-      --issue <issue_number> \
-      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
-      --delete-branch "behance-template-rollout/<reference_key>"
+    git add -A
+    git commit -m "behance-template-rollout: <description of the fix>"
+    git push origin main
     ```
 
 ### Phase 3: Implement & Refine Data

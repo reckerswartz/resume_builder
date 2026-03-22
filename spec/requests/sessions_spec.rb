@@ -7,7 +7,7 @@ RSpec.describe 'Sessions', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Secure sign in')
-      expect(response.body).to include('Pick up where you left off.')
+      expect(response.body).to include('Sign in to continue.')
       expect(response.body).to include('Return to your drafts')
       expect(response.body).to include('Forgot password?')
       expect(response.body).to include('Need an account?')

@@ -802,6 +802,11 @@ en:
         title: "Keep the last decisions lightweight"
         badge: "Export stays ready"
         description: "Choose a template first, then open extra output settings only if you need them. Export and download actions stay close while you make the last adjustments."
+      workspace_tabs:
+        aria_label: "Finalize workspace"
+        template: "Templates"
+        design: "Design & formatting"
+        sections: "Sections"
       template_workspace:
         eyebrow: "Templates"
         title: "Keep layout choice reversible"

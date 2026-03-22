@@ -2,7 +2,7 @@
   <div class="sidebar-accent-layout grid gap-0">
     <div class="<%= ["px-6 py-6 sm:px-8 sm:py-8 lg:col-span-1", (sidebar_left? ? "lg:order-2" : "lg:order-1")].join(" ") %>">
       <% if resume.summary.present? %>
-        <section class="rounded-[1.75rem] border px-5 py-5" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("05") %>;;">
+        <section class="rounded-2xl border px-5 py-5" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("05") %>;;">
           <div class="flex items-center gap-4">
             <h2 class="<%= [section_title_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>">Profile</h2>
             <span class="h-px flex-1" style="background-color: <%= accent_color_with_alpha("33") %>;"></span>
@@ -90,7 +90,7 @@
           <div class="<%= [section_content_margin_top_class(fallback: "mt-4"), compact_section_stack_classes(fallback: "space-y-3")].join(" ") %>">
             <% contact_items.each do |label, value| %>
               <div>
-                <p class="<%= [meta_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= label %></p>
+                <p class="<%= [meta_text_class, "font-medium text-slate-900"].join(" ") %>"><%= label %></p>
                 <p class="<%= [body_text_class, "text-slate-700"].join(" ") %>"><%= value %></p>
               </div>
             <% end %>
@@ -106,7 +106,7 @@
           <% if section.section_type == "skills" %>
             <div class="<%= [section_content_margin_top_class(fallback: "mt-4"), "flex flex-wrap gap-2"].join(" ") %>">
               <% entries.each do |entry| %>
-                <span class="<%= [chip_text_class, "rounded-full border px-3 py-1.5 text-slate-700"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: white;">
+                <span class="<%= [chip_text_class, "rounded-full border px-3 py-1.5 text-slate-700"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("08") %>;">
                   <span class="font-medium text-slate-900"><%= value_for(entry, "name") %></span>
                   <% if value_for(entry, "level").present? %>
                     <span class="text-slate-500">· <%= value_for(entry, "level") %></span>

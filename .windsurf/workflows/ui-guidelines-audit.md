@@ -14,6 +14,7 @@ This workflow operates as a repeating cycle: **Audit → Score → Fix → Valid
 4. Scan `app/components/ui/` to build the current shared component list, and scan `app/helpers/application_helper.rb` to build the current shared token/helper list. Compare against the `component_inventory` and `token_inventory` in the registry and update them if the code has changed.
 5. **Regression baseline**: before starting new work, re-audit any pages previously marked `compliant` whose source files (views, components, helpers, CSS) have changed since the last verification. If compliance scores have dropped, reopen the page and prioritize the regression fix before new work.
 6. Confirm audit prerequisites before reviewing pages: a running local app server, seeded non-production accounts or user-provided credentials, and any required sample data for authenticated and admin routes.
+7. **Browser session isolation**: follow `.windsurf/workflows/playwright-session-guide.md` for all Playwright interactions. Each audit run must use its own isolated browser context — never reuse sessions from prior workflow runs. Tag the session with `workflowId: ui-guidelines-audit` and the target `issueId` (e.g. page key or issue key). Close the session after the audit batch completes.
 
 ### Phase 2: Audit & Score
 
@@ -30,57 +31,26 @@ This workflow operates as a repeating cycle: **Audit → Score → Fix → Valid
 17. Score each dimension 0-100 and compute an overall compliance score as the average. Compare against previous scores for the same page to track improvement or regression. Record scores in the page doc and registry.
 18. Save raw artifacts under `tmp/ui_audit_artifacts/<timestamp>/<page_key>/guidelines/` and record the durable findings in the page doc and run log instead of overwriting earlier runs.
 
-### GitHub Integration Gate (mandatory before implementation)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the finding being fixed:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "ui-guidelines-audit" \
-      --key "<issue_key>" \
-      --title "<description of the compliance gap>" \
-      --severity "<severity>" \
-      --domain "templates" \
-      --type "compliance-gap"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number in `docs/ui_audits/guidelines_review/registry.yml` under the page entry as `github_issue_number`.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create a working branch** for the fix:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "ui-guidelines-audit" \
-      --key "<issue_key>"
-    ```
-    All implementation work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    ui-guidelines-audit: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "ui-guidelines-audit" \
-      --key "<issue_key>" \
-      --issue <issue_number> \
-      --title "<description>"
-    ```
-    Record the returned PR number in the registry as `github_pr_number`.
-
-GH-5. **After PR merge**, close the issue:
-    ```bash
-    bin/gh-bridge/close-issue \
-      --issue <issue_number> \
-      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
-      --delete-branch "ui-guidelines-audit/<issue_key>"
+    git add -A
+    git commit -m "ui-guidelines-audit: <description of the fix>"
+    git push origin main
     ```
 
 ### Phase 3: Implement & Refine Data

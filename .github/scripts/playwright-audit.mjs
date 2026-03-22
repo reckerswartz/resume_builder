@@ -10,6 +10,10 @@
  * - Broken images
  * - Accessibility snapshot
  *
+ * Each auth group (public, authenticated, admin) runs in its own isolated
+ * browser context via PlaywrightSessionManager for full cookie/storage
+ * isolation and parallel-safe execution.
+ *
  * Usage:
  *   node .github/scripts/playwright-audit.mjs \
  *     --base-url=http://localhost:3000 \
@@ -19,7 +23,7 @@
  *     --pages="/resumes,/templates"
  */
 
-import { chromium } from "playwright";
+import { PlaywrightSessionManager } from "./playwright-session-manager.mjs";
 import fs from "fs";
 import path from "path";
 
@@ -74,37 +78,17 @@ function slugify(url) {
 }
 
 // ── Core audit per page ─────────────────────────────────────────────
-async function auditPage(page, url, config) {
+async function auditPage(session, url, config) {
   const slug = slugify(url);
   const pageDir = path.join(config.outputDir, slug);
   ensureDir(pageDir);
 
-  const consoleMessages = [];
-  const consoleErrors = [];
-  const networkFailures = [];
-
-  page.on("console", (msg) => {
-    const entry = { type: msg.type(), text: msg.text() };
-    consoleMessages.push(entry);
-    if (msg.type() === "error") consoleErrors.push(entry);
-  });
-
-  page.on("requestfailed", (request) => {
-    networkFailures.push({
-      url: request.url(),
-      failure: request.failure()?.errorText || "unknown",
-    });
-  });
-
-  const fullUrl = config.baseUrl + url;
+  const page = session.page;
   let statusCode = 0;
   let loadError = null;
 
   try {
-    const response = await page.goto(fullUrl, {
-      waitUntil: "networkidle",
-      timeout: 30000,
-    });
+    const response = await session.navigateTo(url);
     statusCode = response?.status() || 0;
   } catch (err) {
     loadError = err.message;
@@ -120,29 +104,20 @@ async function auditPage(page, url, config) {
   });
 
   // Check horizontal overflow
-  const overflow = await page.evaluate(() => {
-    return document.documentElement.scrollWidth > document.documentElement.clientWidth;
-  });
+  const overflow = await session.checkOverflow();
 
   // Check for Translation missing
-  const bodyText = await page.evaluate(() => document.body?.innerText || "");
-  const translationMissing = bodyText.includes("Translation missing") || bodyText.includes("translation missing");
+  const translationMissing = await session.checkTranslationMissing();
 
   // Check broken images
-  const brokenImages = await page.evaluate(() => {
-    const imgs = Array.from(document.querySelectorAll("img"));
-    return imgs
-      .filter((img) => !img.complete || img.naturalWidth === 0)
-      .map((img) => img.src);
-  });
+  const brokenImages = await session.checkBrokenImages();
 
   // Accessibility snapshot (text-based)
-  let accessibilitySnapshot = null;
-  try {
-    accessibilitySnapshot = await page.accessibility.snapshot();
-  } catch {
-    // Some pages may not support this
-  }
+  const accessibilitySnapshot = await session.accessibilitySnapshot();
+
+  // Collect session-scoped console errors and network failures
+  const consoleErrors = session.consoleErrors;
+  const networkFailures = session.networkFailures;
 
   // Build result
   const issues = [];
@@ -158,6 +133,7 @@ async function auditPage(page, url, config) {
     url,
     viewport: `${config.width}x${config.height}`,
     viewportName: config.viewportName,
+    sessionId: session.sessionId,
     statusCode,
     loadError,
     overflow,
@@ -186,6 +162,7 @@ async function auditPage(page, url, config) {
   }
 
   // Write console log
+  const consoleMessages = session.consoleMessages;
   if (consoleMessages.length > 0) {
     fs.writeFileSync(
       path.join(pageDir, "console.log"),
@@ -196,26 +173,20 @@ async function auditPage(page, url, config) {
   return result;
 }
 
-// ── Login helper ────────────────────────────────────────────────────
-async function loginAs(page, baseUrl, credentials) {
-  const [email, password] = credentials.split(":");
-  await page.goto(`${baseUrl}/session/new`, { waitUntil: "networkidle" });
-  await page.fill('input[name="email_address"]', email);
-  await page.fill('input[name="password"]', password);
-  await page.click('input[type="submit"], button[type="submit"]');
-  await page.waitForURL("**/resumes**", { timeout: 10000 }).catch(() => {});
-  await page.waitForTimeout(500);
-}
-
 // ── Main ────────────────────────────────────────────────────────────
 async function main() {
   const config = parseArgs();
   ensureDir(config.outputDir);
 
-  const browser = await chromium.launch({ headless: true });
-
   const userCredentials = process.env.AUDIT_CREDENTIALS || "demo@resume-builder.local:password123!";
   const adminCredentials = process.env.ADMIN_CREDENTIALS || "admin@resume-builder.local:password123!";
+
+  // Initialize session manager with isolated contexts per auth group
+  const manager = new PlaywrightSessionManager({
+    baseUrl: config.baseUrl,
+    artifactsBaseDir: config.outputDir,
+  });
+  await manager.launch();
 
   // Determine which pages to audit
   let pagesToAudit;
@@ -231,60 +202,68 @@ async function main() {
 
   const allResults = [];
 
-  // ── Public pages (no auth) ──────────────────────────────────────
+  // ── Public pages (isolated context, no auth) ────────────────────
   if (pagesToAudit.public || pagesToAudit.custom) {
     const pages = pagesToAudit.public || [];
     if (pages.length > 0) {
-      const context = await browser.newContext({
-        viewport: { width: config.width, height: config.height },
+      const session = await manager.createSession({
+        workflowId: "playwright-audit",
+        issueId: `public-${config.viewportName}`,
+        viewportWidth: config.width,
+        viewportHeight: config.height,
       });
-      const page = await context.newPage();
       for (const url of pages) {
         console.log(`[public] Auditing ${url} @ ${config.viewportName}`);
-        const result = await auditPage(page, url, config);
+        const result = await auditPage(session, url, config);
         allResults.push(result);
         console.log(`  → ${result.status} (${result.issues.length} issues)`);
       }
-      await context.close();
+      await session.close();
     }
   }
 
-  // ── Authenticated pages ─────────────────────────────────────────
+  // ── Authenticated pages (isolated context) ──────────────────────
   if (pagesToAudit.auth || pagesToAudit.custom) {
     const pages = pagesToAudit.auth || pagesToAudit.custom || [];
     if (pages.length > 0) {
-      const context = await browser.newContext({
-        viewport: { width: config.width, height: config.height },
+      const session = await manager.createSession({
+        workflowId: "playwright-audit",
+        issueId: `auth-${config.viewportName}`,
+        viewportWidth: config.width,
+        viewportHeight: config.height,
       });
-      const page = await context.newPage();
-      await loginAs(page, config.baseUrl, userCredentials);
+      const [email, password] = userCredentials.split(":");
+      await session.loginAs(email, password);
       for (const url of pages) {
         console.log(`[auth] Auditing ${url} @ ${config.viewportName}`);
-        const result = await auditPage(page, url, config);
+        const result = await auditPage(session, url, config);
         allResults.push(result);
         console.log(`  → ${result.status} (${result.issues.length} issues)`);
       }
-      await context.close();
+      await session.close();
     }
   }
 
-  // ── Admin pages ─────────────────────────────────────────────────
+  // ── Admin pages (isolated context) ──────────────────────────────
   if (pagesToAudit.admin) {
-    const context = await browser.newContext({
-      viewport: { width: config.width, height: config.height },
+    const session = await manager.createSession({
+      workflowId: "playwright-audit",
+      issueId: `admin-${config.viewportName}`,
+      viewportWidth: config.width,
+      viewportHeight: config.height,
     });
-    const page = await context.newPage();
-    await loginAs(page, config.baseUrl, adminCredentials);
+    const [email, password] = adminCredentials.split(":");
+    await session.loginAs(email, password);
     for (const url of pagesToAudit.admin) {
       console.log(`[admin] Auditing ${url} @ ${config.viewportName}`);
-      const result = await auditPage(page, url, config);
+      const result = await auditPage(session, url, config);
       allResults.push(result);
       console.log(`  → ${result.status} (${result.issues.length} issues)`);
     }
-    await context.close();
+    await session.close();
   }
 
-  await browser.close();
+  await manager.shutdown();
 
   // Write consolidated results
   const summary = {

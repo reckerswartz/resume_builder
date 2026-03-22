@@ -1,33 +1,27 @@
-<%= render Ui::SurfaceCardComponent.new(padding: :sm, extra_classes: "overflow-hidden") do %>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-      <div>
-        <span class="atelier-pill">
-          <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-          <%= t("resumes.editor_finalize_step.template_workspace.eyebrow") %>
-        </span>
-        <h3 class="mt-4 text-xl font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.template_workspace.title") %></h3>
-        <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.template_workspace.description") %></p>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <% finalize_workspace_state.template_badges.each do |badge| %>
-          <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
-        <% end %>
-      </div>
+<div class="space-y-4">
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <div>
+      <h3 class="text-lg font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.template_workspace.title") %></h3>
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.template_workspace.description") %></p>
     </div>
 
-    <%= render "resumes/template_picker",
-      form: form,
-      resume: resume,
-      compact_text_scope: "resumes.editor_finalize_step.template_picker",
-      render_accent_field: false,
-      template_picker_state: resume_template_picker_state(
-        resume: resume,
-        form_object_name: form.object_name,
-        field_label: t("resumes.editor_finalize_step.template_field_label"),
-        description: t("resumes.editor_finalize_step.template_picker_description"),
-        mode: :compact
-      ) %>
+    <div class="flex flex-wrap gap-2">
+      <% finalize_workspace_state.template_badges.each do |badge| %>
+        <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+      <% end %>
+    </div>
   </div>
-<% end %>
+
+  <%= render "resumes/template_picker",
+    form: form,
+    resume: resume,
+    compact_text_scope: "resumes.editor_finalize_step.template_picker",
+    render_accent_field: false,
+    template_picker_state: resume_template_picker_state(
+      resume: resume,
+      form_object_name: form.object_name,
+      field_label: t("resumes.editor_finalize_step.template_field_label"),
+      description: t("resumes.editor_finalize_step.template_picker_description"),
+      mode: :compact
+    ) %>
+</div>

@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T03:45:00Z"
+updated_at: "2026-03-22T05:25:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/responsive_review/README.md"
   page_doc_template: "docs/ui_audits/responsive_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/responsive_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-summary-admin-detail/00-overview.md"
+  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-template-show-close-page/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   commit_policy: "metadata_only"
@@ -64,9 +64,8 @@ inventory_notes:
     - "docs/ui_audits/2026-03-20/resumebuilder-saas-ux-audit/README.md"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope:
-    - "resume-builder-summary"
-  reason: "resume-builder-summary has a minor 2px mobile overflow at 390x844. Recommend implement-next to fix the builder chrome overflow, then re-review."
+  recommended_scope: []
+  reason: "All improved responsive backlog closed. No open issue keys remain on any tracked page. Next honest entry point is review-only discovery sweep after future shared UI changes, or re-review of reviewed pages that have accumulated source file drift."
 pages:
   - page_key: "home"
     title: "Home"
@@ -79,9 +78,15 @@ pages:
     page_doc_path: "docs/ui_audits/responsive_review/pages/home.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T02:33:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-home-review/00-overview.md"
-    next_step: "No issues found. Re-review after major landing page changes."
+    last_audited_at: "2026-03-22T05:10:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-template-show-overflow-fix/00-overview.md"
+    next_step: "No issues found after home view changes. Re-review after major landing page changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:10:00Z"
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    regression_detected: false
   - page_key: "sign-in"
     title: "Sign in"
     path: "/session/new"
@@ -191,7 +196,28 @@ pages:
     issues_resolved: 1
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "template-show", title: "Template detail", path: "/templates/:id", access_level: "authenticated", auth_context: "authenticated_user", page_family: "templates", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:54:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-mixed-pages-batch/00-overview.md", open_issue_keys: [] }
+  - page_key: "template-show"
+    title: "Template detail"
+    path: "/templates/:id"
+    access_level: "authenticated"
+    auth_context: "authenticated_user"
+    page_family: "templates"
+    priority: "medium"
+    status: "closed"
+    page_doc_path: "docs/ui_audits/responsive_review/pages/template-show.md"
+    last_audited_at: "2026-03-22T05:25:00Z"
+    last_changed_at: "2026-03-22T05:25:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-template-show-close-page/00-overview.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "template-show-mobile-sidebar-overflow"
+    next_step: "Closed. Re-review after future template detail layout, preview surface, or shared sidebar changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T05:25:00Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - page_key: "resume-source-import"
     title: "Resume source import launcher"
     path: "/resume_source_imports/:provider"
@@ -272,18 +298,20 @@ pages:
     auth_context: "authenticated_user_with_resume"
     page_family: "builder"
     priority: "medium"
-    status: "in_progress"
-    last_audited_at: "2026-03-22T03:40:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-summary-admin-detail/00-overview.md"
-    open_issue_keys:
+    status: "closed"
+    page_doc_path: "docs/ui_audits/responsive_review/pages/resume-builder-summary.md"
+    last_audited_at: "2026-03-22T04:55:00Z"
+    last_changed_at: "2026-03-22T04:55:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-summary-step-close/00-overview.md"
+    open_issue_keys: []
+    closed_issue_keys:
       - "summary-step-mobile-2px-overflow"
-    closed_issue_keys: []
-    next_step: "implement-next to fix 2px horizontal overflow at 390x844 caused by builder chrome container leaking past viewport."
-    cycle_count: 1
-    last_cycle_date: "2026-03-22T03:40:00Z"
+    next_step: "Closed. Original 2px overflow not reproducible at 390x844, 768x1024, or 1280x800. Re-review after major builder chrome or summary step changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T04:55:00Z"
     issues_found: 1
-    issues_resolved: 0
-    issues_remaining: 1
+    issues_resolved: 1
+    issues_remaining: 0
     regression_detected: false
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"

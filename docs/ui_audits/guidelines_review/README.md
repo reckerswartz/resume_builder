@@ -15,8 +15,8 @@ This workflow audits each routed page of the application against the documented 
 - Reusable Markdown templates exist for per-page tracking and per-run reporting.
 - The guidelines changelog tracks refinements made to `docs/ui_guidelines.md` and `docs/behance_product_ui_system.md` through this workflow.
 - The page inventory is seeded from `config/routes.rb`, `lib/resume_builder/step_registry.rb`, and the existing responsive-review registry.
-- Thirty-five routed pages have now been Playwright-reviewed through the workflow.
-- Thirty-five routed pages are currently marked `compliant`.
+- All 37 routed pages have now been reviewed through the workflow.
+- All 37 routed pages are currently marked `compliant`.
 - The Batch 8 admin models/job-logs cluster is now closed and tracked as compliant.
 - The adjacent admin observability trio is now closed and tracked as compliant after the operator-copy cleanup and final close-page verification.
 - The remaining medium-priority unaudited builder steps, `resume-builder-personal-details` and `resume-builder-summary`, now have first-pass page docs and are tracked as compliant.
@@ -25,10 +25,13 @@ This workflow audits each routed page of the application against the documented 
 - The admin model form routes, `admin-llm-model-new` and `admin-llm-model-edit`, are now audited and compliant after an orchestration copy fix across the full model surface family (form, show, table, index summary, and locale keys).
 - Timestamped page docs, run logs, and raw accessibility artifacts now exist for real audit cycles under `docs/ui_audits/guidelines_review/` and `tmp/ui_audit_artifacts/`.
 
+- The final two low-priority pages, `password-reset-edit` and `resume-source-import`, are now audited and compliant.
+- The full page inventory is complete with no remaining unaudited pages.
+
 ### Pending
 
-- All admin form pages are now compliant.
-- The next recommended slice is `review-only` for the remaining 2 low-priority unaudited pages: `password-reset-edit` and `resume-source-import`.
+- No unaudited pages remain.
+- The next recommended entry point is `review-only` after significant shared UI changes to catch regression drift, or `refine-guidelines` if cross-page patterns have accumulated.
 
 ## Installed workflow
 

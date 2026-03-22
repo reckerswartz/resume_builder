@@ -30,56 +30,26 @@ This workflow operates as a repeating cycle: **Review → Prioritize findings �
     - **Shared rendering**: template component changes affect both preview and PDF — verify both paths
 7. Classify each finding by severity (`critical`, `high`, `medium`, `low`) and category (correctness, architecture, security, performance, testing, maintainability).
 
-### GitHub Integration Gate (mandatory before implementation)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the finding being fixed:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "code-review" \
-      --key "<finding_key>" \
-      --title "<description of the code quality finding>" \
-      --severity "<severity>" \
-      --domain "infrastructure" \
-      --type "refactor"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create a working branch** for the fix:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "code-review" \
-      --key "<finding_key>"
-    ```
-    All implementation work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    code-review: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "code-review" \
-      --key "<finding_key>" \
-      --issue <issue_number> \
-      --title "<description>"
-    ```
-
-GH-5. **After PR merge**, close the issue:
-    ```bash
-    bin/gh-bridge/close-issue \
-      --issue <issue_number> \
-      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
-      --delete-branch "code-review/<finding_key>"
+    git add -A
+    git commit -m "code-review: <description of the fix>"
+    git push origin main
     ```
 
 ### Phase 3: Remediate & Refine Data

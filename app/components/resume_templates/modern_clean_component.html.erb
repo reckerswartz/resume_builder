@@ -1,9 +1,9 @@
 <div class="<%= shell_classes %>">
   <header class="<%= header_padding_class %>">
-    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
       <div>
         <span class="inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em]" style="border-color: <%= accent_color_with_alpha("22") %>; color: <%= accent_color %>; background-color: <%= accent_color_with_alpha("08") %>;"><%= template.name %></span>
-        <h1 class="<%= ["mt-4", name_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>"><%= full_name %></h1>
+        <h1 class="<%= ["mt-3", name_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>"><%= full_name %></h1>
         <% if resume.headline.present? %>
           <p class="<%= ["mt-2", headline_text_class, "text-slate-600"].join(" ") %>"><%= resume.headline %></p>
         <% end %>
@@ -12,7 +12,7 @@
       <% if contact_items.any? %>
         <div class="flex flex-wrap gap-2 lg:justify-end">
           <% contact_items.each do |_label, value| %>
-            <span class="<%= [chip_text_class, "rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600"].join(" ") %>"><%= value %></span>
+            <span class="<%= [chip_text_class, "rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-600"].join(" ") %>"><%= value %></span>
           <% end %>
         </div>
       <% end %>
@@ -52,7 +52,7 @@
               <% highlights = entry_highlights(entry) %>
               <% url = entry_url(entry) %>
               <article class="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm shadow-slate-200/60">
-                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
                     <% if subtitle.present? %>

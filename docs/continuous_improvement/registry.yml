@@ -122,14 +122,14 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 4
-  last_cycle_date: "2026-03-22T05:20:00Z"
-  proposals_discovered: 5
+  cycle_count: 5
+  last_cycle_date: "2026-03-22T05:30:00Z"
+  proposals_discovered: 10
   proposals_implemented: 5
-  proposals_remaining: 0
+  proposals_remaining: 5
   proposals_routed: 0
   competitive_scans_completed: 0
-  journeys_simulated: 1
+  journeys_simulated: 2
   journey_log:
     - persona: new_user
       date: "2026-03-22T04:30:00Z"
@@ -152,10 +152,30 @@ cycle_metrics:
         - "/templates redirects guests to sign-in — no public template browsing"
         - "Resume creation requires experience level selection before setup form"
         - "After resume creation, user lands on source step (import/paste)"
+    - persona: returning_user
+      date: "2026-03-22T05:30:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Sign in (auto-redirected to workspace — session already active)"
+        - "View workspace with 2 existing resumes"
+        - "Click Edit on first resume → lands on heading step"
+        - "Navigate to experience step (5 collapsed entries)"
+        - "Navigate to preview page (full resume with export actions)"
+        - "Navigate to templates marketplace (7 templates with live previews)"
+        - "Navigate to finalize step (template picker, design tabs, sections)"
+        - "Navigate to new resume flow (experience level selector)"
+        - "Return to workspace"
+      console_errors: 0
+      observations:
+        - "Edit always lands on heading step even when all 5/5 steps are complete — forced detour for returning users"
+        - "No duplicate resume action on workspace cards — only Edit, Preview, Delete"
+        - "Marketplace Use template always creates new resume — no apply-to-existing flow"
+        - "No quick export/download action on workspace cards — must navigate to preview or finalize"
+        - "Preview Edit resume link hardcodes step=heading — ignores user context"
 next_step:
-  recommended_mode: "explore"
+  recommended_mode: "implement-next"
   recommended_persona: "returning_user"
-  reason: "All 5 proposals from cycle 1 are now implemented and validated. Run explore mode with returning_user or power_user persona to discover new improvement opportunities."
+  reason: "5 new returning_user proposals discovered in cycle 5. CI-EDIT-001 (smart edit landing) and CI-WORKSPACE-002 (duplicate resume) have the highest impact/effort ratio. Start with implement-next."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -278,6 +298,179 @@ proposals:
       - "app/views/resumes/index.html.erb"
       - "app/helpers/resumes_helper.rb"
       - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-EDIT-001"
+    category: remove_friction
+    impact: high
+    effort: small
+    status: discovered
+    user_personas:
+      - returning_user
+      - power_user
+    journey_step: "Click Edit on workspace card → always lands on heading step"
+    problem: >
+      When a returning user clicks Edit on a workspace resume card, the builder
+      always defaults to the heading step because StepRegistry.fetch falls back
+      to 'heading' when no step param is provided. For a resume with 100%
+      completion (5/5 tracked steps done), this is a forced detour — the user
+      likely wants to fine-tune a specific section or go straight to finalize
+      and export. Landing on heading every time wastes a click and breaks the
+      returning-user mental model of 'pick up where I left off'.
+    proposed_improvement: >
+      Add a smart default step method to the controller or Flow presenter.
+      When all tracked steps are complete, default to finalize. Otherwise,
+      default to the first incomplete tracked step. The workspace Edit link
+      can remain as /resumes/:id/edit (no step param) — the controller or
+      presenter resolves the smart default server-side.
+    evidence:
+      page_url: "/resumes"
+      edit_link: "/resumes/14/edit"
+      landing_step: "heading (always)"
+      interaction_count: "1 extra click to navigate away from heading to desired step"
+    affected_files:
+      - "app/presenters/resume_builder/flow.rb"
+      - "app/presenters/resume_builder/step_catalog.rb"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+      - "spec/presenters/resume_builder/editor_state_spec.rb"
+
+  - id: "CI-WORKSPACE-002"
+    category: new_feature
+    impact: high
+    effort: medium
+    status: discovered
+    user_personas:
+      - returning_user
+      - power_user
+    journey_step: "View workspace cards — no duplicate action available"
+    problem: >
+      The workspace resume card actions are Edit, Preview, and Delete.
+      There is no way to duplicate an existing resume. A returning user
+      who wants to create a tailored version for a different job application
+      must start from scratch via /resumes/new and re-enter all content
+      manually. This is a significant productivity gap for users with
+      multiple job targets.
+    proposed_improvement: >
+      Add a 'Duplicate' action to the workspace resume card alongside
+      Edit/Preview/Delete. The action should POST to a new
+      ResumesController#duplicate endpoint that deep-copies the resume
+      (title with 'Copy of' prefix, same template, sections, entries,
+      settings, contact details, and summary) and redirects to the
+      new resume's edit page. Section/entry positions should be preserved.
+    evidence:
+      page_url: "/resumes"
+      available_actions: "Edit, Preview, Delete"
+      missing_action: "Duplicate"
+    affected_files:
+      - "app/controllers/resumes_controller.rb"
+      - "app/views/resumes/_resume_card.html.erb"
+      - "app/services/resumes/duplicator.rb"
+      - "config/routes.rb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-WORKSPACE-003"
+    category: remove_friction
+    impact: medium
+    effort: small
+    status: discovered
+    user_personas:
+      - returning_user
+      - power_user
+    journey_step: "View workspace cards — no quick export action"
+    problem: >
+      To export or download a resume, a returning user must navigate
+      through the builder to the finalize step or the preview page.
+      There is no quick export or download action on the workspace
+      resume card. For a resume that is already 100% complete and
+      'ready to review', this adds 2-3 unnecessary clicks to the
+      most common returning-user task: re-downloading an updated PDF.
+    proposed_improvement: >
+      Add a 'Download' quick action to the workspace resume card
+      that links directly to /resumes/:id/download_text or triggers
+      export. For resumes with an existing PDF export, show
+      'Download PDF' linking to /resumes/:id/download. For resumes
+      without an export, show 'Export PDF' as a form button that
+      POSTs to /resumes/:id/export.
+    evidence:
+      page_url: "/resumes"
+      available_actions: "Edit, Preview, Delete"
+      missing_action: "Quick export/download"
+      extra_clicks: "2-3 clicks to reach export from workspace"
+    affected_files:
+      - "app/views/resumes/_resume_card.html.erb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-TEMPLATE-002"
+    category: new_feature
+    impact: medium
+    effort: medium
+    status: discovered
+    user_personas:
+      - returning_user
+      - power_user
+    journey_step: "Browse templates marketplace — Use template always creates new resume"
+    problem: >
+      The templates marketplace 'Use template' CTA links to
+      /resumes/new?template_id=N, which always creates a new resume.
+      A returning user who wants to switch their existing resume's
+      template must navigate to the builder finalize step and use the
+      inline template picker. There is no way to apply a marketplace
+      template to an existing resume directly from the marketplace,
+      even though the finalize step already supports template switching.
+    proposed_improvement: >
+      When a signed-in user is browsing the marketplace and has existing
+      resumes, show an 'Apply to existing resume' option alongside the
+      current 'Use template' CTA. This could be a dropdown or secondary
+      link that lists the user's existing resumes and redirects to
+      /resumes/:id/edit?step=finalize&template_id=N, triggering the
+      existing template-switch autosave flow.
+    evidence:
+      page_url: "/templates"
+      use_template_url: "/resumes/new?template_id=3"
+      missing_flow: "Apply template to existing resume from marketplace"
+    affected_files:
+      - "app/views/templates/index.html.erb"
+      - "app/views/templates/_template_card.html.erb"
+      - "app/views/templates/show.html.erb"
+      - "app/presenters/templates/marketplace_state.rb"
+    estimated_spec_paths:
+      - "spec/requests/templates_spec.rb"
+      - "spec/presenters/templates/marketplace_state_spec.rb"
+
+  - id: "CI-PREVIEW-001"
+    category: remove_friction
+    impact: medium
+    effort: small
+    status: discovered
+    user_personas:
+      - returning_user
+    journey_step: "View preview page — Edit resume always links to heading step"
+    problem: >
+      From the preview page, the 'Edit resume' link always points to
+      /resumes/:id/edit?step=heading regardless of context. A returning
+      user who spots a typo in their experience section while reviewing
+      the preview must click 'Edit resume', land on heading, then
+      navigate to experience — adding 2 unnecessary clicks. The preview
+      page already renders all resume sections with clear headings.
+    proposed_improvement: >
+      Change the preview page 'Edit resume' link to use the smart
+      default step (same logic as CI-EDIT-001). Additionally, consider
+      making section headings in the preview clickable, linking directly
+      to the corresponding builder step (e.g., clicking 'Experience'
+      heading → /resumes/:id/edit?step=experience). This would make
+      the preview page a true review-and-edit hub.
+    evidence:
+      page_url: "/resumes/14"
+      edit_link: "/resumes/14/edit?step=heading"
+      expected_link: "/resumes/14/edit?step=finalize (when all steps complete)"
+    affected_files:
+      - "app/views/resumes/show.html.erb"
     estimated_spec_paths:
       - "spec/requests/resumes_spec.rb"
 

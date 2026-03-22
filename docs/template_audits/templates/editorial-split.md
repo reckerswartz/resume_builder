@@ -2,8 +2,8 @@
 
 **Template slug**: `editorial-split`
 **Family**: `editorial-split`
-**Pixel status**: `close`
-**Last audit**: 2026-03-21
+**Pixel status**: `pixel_perfect`
+**Last audit**: 2026-03-22
 
 ## Reference design
 
@@ -37,12 +37,12 @@
 | ID | Area | Severity | Description | Found | Status |
 |----|------|----------|-------------|-------|--------|
 | EDT-001 | photo_overlay | moderate | Headshot photo overlay uses flat bg-slate-950/30. Reference shows gradient from transparent to dark. | 2026-03-21 | resolved |
-| EDT-002 | utility_badge_size | minor | Badges are h-16 w-16 with text-base. Reference shows slightly larger (h-18 w-18) with bolder type. | 2026-03-21 | open |
+| EDT-002 | utility_badge_size | minor | Badges are h-16 w-16 with text-base. Reference shows slightly larger (h-18 w-18) with bolder type. | 2026-03-21 | resolved |
 | EDT-003 | name_tracking | minor | Accent name uses tracking-[0.45em]. Reference appears closer to tracking-[0.35em]. | 2026-03-21 | resolved |
 | EDT-004 | sidebar_heading_contrast | moderate | Section headings use accent_color (#D7F038 lime). On light sidebar, lime-on-white has low contrast. | 2026-03-21 | resolved |
 | EDT-005 | entry_divider | minor | Uses border-t border-slate-100. Reference shows thicker accent-colored rule (2px) between entries. | 2026-03-21 | resolved |
-| EDT-006 | contact_badge_border | minor | Rail contact badges use border-slate-300. Reference uses slightly darker border. | 2026-03-21 | open |
-| EDT-007 | mobile_badge_layout | minor | Mobile badges wrap as flex-wrap. Reference shows horizontal scroll rail. | 2026-03-21 | open |
+| EDT-006 | contact_badge_border | minor | Rail contact badges use border-slate-300. Reference uses slightly darker border. | 2026-03-21 | resolved |
+| EDT-007 | mobile_badge_layout | minor | Mobile badges wrap as flex-wrap. Reference shows horizontal scroll rail. | 2026-03-21 | resolved |
 
 ### Resolved
 
@@ -52,6 +52,9 @@
 | EDT-003 | name_tracking | minor | tracking-[0.45em] → tracking-[0.35em] | 2026-03-21 | Tighter editorial feel |
 | EDT-004 | sidebar_heading_contrast | moderate | accent_color lime → text-slate-800 | 2026-03-21 | Strong contrast on white |
 | EDT-005 | entry_divider | minor | border-t border-slate-100 → border-t-2 accent 33% alpha | 2026-03-21 | Thicker accent dividers |
+| EDT-002 | utility_badge_size | minor | h-16 w-16 text-base → h-[4.5rem] w-[4.5rem] text-lg | 2026-03-22 | Bolder badge presence |
+| EDT-006 | contact_badge_border | minor | border-slate-300 → border-slate-400 | 2026-03-22 | Stronger definition |
+| EDT-007 | mobile_badge_layout | minor | flex-wrap → overflow-x-auto + shrink-0 | 2026-03-22 | Horizontal scroll rail |
 
 Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 
@@ -68,3 +71,4 @@ Inherits shared MOD-005, MOD-007, ATS-005, MCL-005 fixes.
 - **2026-03-21** — Resolved EDT-001/003/004/005. 3 minor remain (EDT-002 badge size, EDT-006 border, EDT-007 mobile badges). Advanced to `close`.
 - **2026-03-21** — Re-reviewed after the shared Tailwind utility fix. Utility rail writing mode, tightened editorial tracking, and accent divider styling render correctly again; no new discrepancies were identified and the 3 minor issues remain open.
 - **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. The full preview stayed free of horizontal overflow, the utility rail and badge rail remained intact, and no resolved discrepancies resurfaced.
+- **2026-03-22** — Full-cycle: resolved EDT-002 (badge size), EDT-006 (badge border), EDT-007 (mobile scroll rail). 0 discrepancies remain. Advanced to `pixel_perfect`.

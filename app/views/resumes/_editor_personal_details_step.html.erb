@@ -31,6 +31,36 @@
       </div>
     </div>
 
+    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
+      <div class="space-y-1">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.personal_information.eyebrow") %></p>
+        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.personal_information.title") %></h3>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.personal_information.description") %></p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div>
+          <%= label_tag "resume_personal_details_date_of_birth", t("resumes.editor_personal_details_step.labels.date_of_birth"), class: ui_label_classes %>
+          <%= date_field_tag "resume[personal_details][date_of_birth]", resume.personal_detail_field("date_of_birth"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_personal_details_nationality", t("resumes.editor_personal_details_step.labels.nationality"), class: ui_label_classes %>
+          <%= text_field_tag "resume[personal_details][nationality]", resume.personal_detail_field("nationality"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_personal_details_marital_status", t("resumes.editor_personal_details_step.labels.marital_status"), class: ui_label_classes %>
+          <%= text_field_tag "resume[personal_details][marital_status]", resume.personal_detail_field("marital_status"), class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_personal_details_visa_status", t("resumes.editor_personal_details_step.labels.visa_status"), class: ui_label_classes %>
+          <%= text_field_tag "resume[personal_details][visa_status]", resume.personal_detail_field("visa_status"), class: ui_input_classes %>
+        </div>
+      </div>
+    </div>
+
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>" data-autosave-ignore="true">
       <div class="space-y-1">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.headshot.eyebrow") %></p>
@@ -72,36 +102,6 @@
             </div>
           </div>
         <% end %>
-      </div>
-    </div>
-
-    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
-      <div class="space-y-1">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.personal_information.eyebrow") %></p>
-        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.personal_information.title") %></h3>
-        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.personal_information.description") %></p>
-      </div>
-
-      <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <div>
-          <%= label_tag "resume_personal_details_date_of_birth", t("resumes.editor_personal_details_step.labels.date_of_birth"), class: ui_label_classes %>
-          <%= date_field_tag "resume[personal_details][date_of_birth]", resume.personal_detail_field("date_of_birth"), class: ui_input_classes %>
-        </div>
-
-        <div>
-          <%= label_tag "resume_personal_details_nationality", t("resumes.editor_personal_details_step.labels.nationality"), class: ui_label_classes %>
-          <%= text_field_tag "resume[personal_details][nationality]", resume.personal_detail_field("nationality"), class: ui_input_classes %>
-        </div>
-
-        <div>
-          <%= label_tag "resume_personal_details_marital_status", t("resumes.editor_personal_details_step.labels.marital_status"), class: ui_label_classes %>
-          <%= text_field_tag "resume[personal_details][marital_status]", resume.personal_detail_field("marital_status"), class: ui_input_classes %>
-        </div>
-
-        <div>
-          <%= label_tag "resume_personal_details_visa_status", t("resumes.editor_personal_details_step.labels.visa_status"), class: ui_label_classes %>
-          <%= text_field_tag "resume[personal_details][visa_status]", resume.personal_detail_field("visa_status"), class: ui_input_classes %>
-        </div>
       </div>
     </div>
 

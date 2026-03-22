@@ -1,47 +1,45 @@
 <% finalize_workspace_state = resume_finalize_workspace_state(resume, step_sections: step_sections) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
-  <%= render Ui::StepHeaderComponent.new(
-    title: current_step.fetch(:title),
-    description: current_step.fetch(:description),
-    aside_classes: "flex flex-wrap gap-2"
-  ) do %>
+  <div class="flex flex-wrap items-center gap-3 px-6 py-4">
     <%= link_to t("resumes.editor_finalize_step.preview_action"), resume_path(resume, **resume_builder_step_params("finalize")), data: { turbo_frame: "_top" }, class: ui_button_classes(:secondary, size: :sm) %>
     <%= render "resumes/export_actions", resume: resume, context: :finalize, export_actions_state: resume_export_actions_state(resume, context: :finalize) %>
-  <% end %>
+  </div>
 
-  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-6 px-6 py-6" do |form| %>
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave workspace-tabs", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "px-6 py-6" do |form| %>
     <% if resume.errors.any? %>
       <div class="<%= [ ui_inset_panel_classes(tone: :danger), 'text-sm text-rose-700' ].join(' ') %>">
         <%= resume.errors.full_messages.to_sentence %>
       </div>
     <% end %>
 
-    <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <span class="atelier-pill">
-            <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
-            <%= t("resumes.editor_finalize_step.preview_actions.pill") %>
-          </span>
-          <h4 class="mt-4 text-sm font-semibold text-ink-950"><%= t("resumes.editor_finalize_step.preview_actions.title") %></h4>
-        </div>
+    <nav class="flex gap-1 border-b border-canvas-200/80" role="tablist" aria-label="<%= t("resumes.editor_finalize_step.workspace_tabs.aria_label") %>" data-finalize-workspace-tabs>
+      <% finalize_workspace_state.workspace_tabs.each do |tab| %>
+        <button type="button"
+                role="tab"
+                class="inline-flex items-center gap-2 px-4 py-3 text-sm transition-colors"
+                data-tab-key="<%= tab.fetch(:key) %>"
+                data-workspace-tabs-target="tab"
+                data-action="click->workspace-tabs#select">
+          <%= render Ui::GlyphComponent.new(name: tab.fetch(:glyph), size: :xs, tone: :minimal) %>
+          <%= tab.fetch(:label) %>
+        </button>
+      <% end %>
+    </nav>
 
-        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.preview_actions.badge") %></span>
-      </div>
-
-      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.preview_actions.description") %></p>
+    <div class="py-5" data-tab-key="template" data-workspace-tabs-target="panel">
+      <%= render "resumes/finalize_workspace_template_panel", resume: resume, form: form, finalize_workspace_state: finalize_workspace_state %>
     </div>
 
-    <div class="space-y-5">
-      <%= render "resumes/finalize_workspace_template_panel", resume: resume, form: form, finalize_workspace_state: finalize_workspace_state %>
-
+    <div class="py-5" data-tab-key="design" data-workspace-tabs-target="panel" hidden>
       <%= render "resumes/finalize_workspace_design_panel", form: form, finalize_workspace_state: finalize_workspace_state %>
+    </div>
 
+    <div class="py-5" data-tab-key="sections" data-workspace-tabs-target="panel" hidden>
       <%= render "resumes/finalize_workspace_sections_panel", finalize_workspace_state: finalize_workspace_state %>
     </div>
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 border-t border-canvas-200/80 pt-5 sm:flex-row sm:items-center sm:justify-between">
       <p class="text-sm text-ink-700/70"><%= t("resumes.editor_finalize_step.footer_note") %></p>
       <%= form.submit t("resumes.editor_finalize_step.save_finalize_settings"), class: ui_button_classes(:primary) %>
     </div>

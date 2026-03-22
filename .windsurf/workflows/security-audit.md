@@ -30,56 +30,26 @@ This workflow operates as a repeating cycle: **Audit → Prioritize → Remediat
 8. Compare current findings against any prior security audit docs to distinguish net-new from known items. Update severity of existing items if the codebase has evolved.
 9. Use this project's `.windsurfrules` and existing authentication and Pundit conventions as the baseline.
 
-### GitHub Integration Gate (mandatory before implementation)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before implementing any remediation**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the security finding being remediated:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "security-audit" \
-      --key "<finding_id>" \
-      --title "<description of the security finding>" \
-      --severity "<severity>" \
-      --domain "security" \
-      --type "security-finding"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create a working branch** for the remediation:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "security-audit" \
-      --key "<finding_id>"
-    ```
-    All implementation work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    security-audit: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "security-audit" \
-      --key "<finding_id>" \
-      --issue <issue_number> \
-      --title "<description>"
-    ```
-
-GH-5. **After PR merge**, close the issue:
-    ```bash
-    bin/gh-bridge/close-issue \
-      --issue <issue_number> \
-      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
-      --delete-branch "security-audit/<finding_id>"
+    git add -A
+    git commit -m "security-audit: <description of the fix>"
+    git push origin main
     ```
 
 ### Phase 3: Implement & Refine Data

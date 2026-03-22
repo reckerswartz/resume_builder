@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T03:35:00Z"
+updated_at: "2026-03-22T05:13:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ui-guidelines-audit.md"
@@ -10,7 +10,7 @@ tracking:
   guidelines_changelog_path: "docs/ui_audits/guidelines_review/guidelines_changelog.md"
   page_doc_template: "docs/ui_audits/guidelines_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/guidelines_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-admin-model-form-review/00-overview.md"
+  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-check-workspace-finalize-personal/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "guidelines"
@@ -135,11 +135,9 @@ inventory_notes:
     - "docs/ui_audits/responsive_review/registry.yml"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope:
-    - "password-reset-edit"
-    - "resume-source-import"
-  reason: "All admin form pages are now compliant. The remaining 2 unaudited pages are low-priority public/authenticated stragglers."
-  recommended_implementation: "Run review-only for password-reset-edit and resume-source-import to complete the full page inventory."
+  recommended_scope: []
+  reason: "All 37 tracked pages are now compliant. Full page inventory is complete."
+  recommended_implementation: "Run review-only after significant shared UI changes (shell, components, tokens, helpers) to catch regression drift, or refine-guidelines if cross-page patterns have accumulated."
 pages:
   - page_key: "home"
     title: "Home"
@@ -149,16 +147,23 @@ pages:
     page_family: "public_auth"
     priority: "medium"
     status: "compliant"
-    compliance_score: 96
+    compliance_score: 97
     page_doc_path: "docs/ui_audits/guidelines_review/pages/home.md"
     open_issue_keys: []
     closed_issue_keys:
       - "home-glyph-inset-card-extraction"
       - "home-dark-preview-card-token"
-    last_audited_at: "2026-03-21T02:14:00Z"
-    last_changed_at: "2026-03-21T02:14:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-close-all-issues/00-overview.md"
-    next_step: "All issues closed. Re-review after shared shell or component changes."
+    last_audited_at: "2026-03-22T05:10:00Z"
+    last_changed_at: "2026-03-22T05:10:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-home-ci-nav-001-regression-check/00-overview.md"
+    next_step: "All issues closed. CI-NAV-001 clickable cards verified. Re-review after shared shell or component changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:10:00Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T02:14:00Z"
+        score: 96
+      - timestamp: "2026-03-22T05:10:00Z"
+        score: 97
   - page_key: "sign-in"
     title: "Sign in"
     path: "/session/new"
@@ -210,7 +215,30 @@ pages:
     last_audited_at: "2026-03-21T02:30:00Z"
     latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-2-fixes/00-overview.md"
     next_step: "All issues closed. Re-review after shared shell or component changes."
-  - { page_key: "password-reset-edit", title: "Password reset edit", path: "/passwords/:token/edit", access_level: "public", auth_context: "guest", page_family: "public_auth", priority: "low", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "password-reset-edit"
+    title: "Password reset edit"
+    path: "/passwords/:token/edit"
+    access_level: "public"
+    auth_context: "guest"
+    page_family: "public_auth"
+    priority: "low"
+    status: "compliant"
+    compliance_score: 96
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/password-reset-edit.md"
+    open_issue_keys: []
+    closed_issue_keys: []
+    last_audited_at: "2026-03-22T04:30:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-final-two-review/00-overview.md"
+    next_step: "All dimensions compliant. Re-review after shared auth shell or password-field patterns change."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T04:30:00Z"
+    compliance_score_history:
+      - timestamp: "2026-03-22T04:30:00Z"
+        score: 96
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "resumes-index"
     title: "Resume workspace"
     path: "/resumes"
@@ -226,10 +254,17 @@ pages:
       - "resumes-index-action-duplication"
       - "resumes-index-card-copy-clarity"
       - "resumes-index-avatar-token"
-    last_audited_at: "2026-03-21T02:14:00Z"
-    last_changed_at: "2026-03-21T02:14:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-close-all-issues/00-overview.md"
-    next_step: "All issues closed. Re-review after shared shell or component changes."
+    last_audited_at: "2026-03-22T05:13:00Z"
+    last_changed_at: "2026-03-22T05:13:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-check-workspace-finalize-personal/00-overview.md"
+    next_step: "CI-WORKSPACE-001 welcome card regression verified. No new issues. Re-review after shared shell or component changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:13:00Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T02:14:00Z"
+        score: 93
+      - timestamp: "2026-03-22T05:13:00Z"
+        score: 93
   - page_key: "resumes-new"
     title: "New resume"
     path: "/resumes/new"
@@ -300,7 +335,30 @@ pages:
     last_changed_at: "2026-03-21T02:41:00Z"
     latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-3-fixes/00-overview.md"
     next_step: "All issues closed. Re-review after shared shell or component changes."
-  - { page_key: "resume-source-import", title: "Resume source import launcher", path: "/resume_source_imports/:provider", access_level: "authenticated", auth_context: "authenticated_user", page_family: "workspace", priority: "low", status: "new", compliance_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-source-import"
+    title: "Resume source import launcher"
+    path: "/resume_source_imports/:provider"
+    access_level: "authenticated"
+    auth_context: "authenticated_user"
+    page_family: "workspace"
+    priority: "low"
+    status: "compliant"
+    compliance_score: 96
+    page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-source-import.md"
+    open_issue_keys: []
+    closed_issue_keys: []
+    last_audited_at: "2026-03-22T04:30:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-final-two-review/00-overview.md"
+    next_step: "All dimensions compliant. Re-review after shared workspace shell or cloud import patterns change."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T04:30:00Z"
+    compliance_score_history:
+      - timestamp: "2026-03-22T04:30:00Z"
+        score: 96
+    issues_found: 0
+    issues_resolved: 0
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "resume-builder-source"
     title: "Resume builder source step"
     path: "/resumes/:id/edit?step=source"
@@ -343,13 +401,15 @@ pages:
     page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-builder-personal-details.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T22:48:42Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-builder-personal-summary-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared builder shell, photo-library, or non-section step patterns change."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T22:48:42Z"
+    last_audited_at: "2026-03-22T05:13:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-check-workspace-finalize-personal/00-overview.md"
+    next_step: "Glyph inset card regression verified. No new issues. Re-review after shared builder shell, photo-library, or non-section step patterns change."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:13:00Z"
     compliance_score_history:
       - timestamp: "2026-03-21T22:48:42Z"
+        score: 94
+      - timestamp: "2026-03-22T05:13:00Z"
         score: 94
     issues_found: 0
     issues_resolved: 0
@@ -439,10 +499,17 @@ pages:
     open_issue_keys: []
     closed_issue_keys:
       - "finalize-output-settings-raw-classes"
-    last_audited_at: "2026-03-21T02:58:00Z"
-    last_changed_at: "2026-03-21T02:58:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-5-fixes/00-overview.md"
-    next_step: "All issues closed. Re-review after shared builder shell or component changes."
+    last_audited_at: "2026-03-22T05:13:00Z"
+    last_changed_at: "2026-03-22T05:13:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-check-workspace-finalize-personal/00-overview.md"
+    next_step: "Font family settings regression verified. No new issues. Re-review after shared builder shell or component changes."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T05:13:00Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T02:58:00Z"
+        score: 95
+      - timestamp: "2026-03-22T05:13:00Z"
+        score: 95
   - page_key: "admin-dashboard"
     title: "Admin dashboard"
     path: "/admin"

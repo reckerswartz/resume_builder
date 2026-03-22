@@ -13,6 +13,28 @@ This workflow operates as a repeating cycle: **Map → Document → Validate →
 3. Start by reading existing documentation: `docs/architecture_overview.md`, `docs/application_documentation_guidelines.md`, `.windsurfrules`, and any prior `C4-Documentation/` output. If prior docs exist, treat this invocation as an update cycle — identify what has changed since the last documentation pass.
 4. **Regression baseline**: before documenting new areas, compare the most recent architecture outputs against the live code to identify stale diagrams, renamed modules, missing data flows, or outdated boundaries. Correct previously-documented drift first so new work builds on a truthful baseline.
 
+### Git Sync Gate (mandatory — keeps main up-to-date)
+
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
+    ```bash
+    // turbo
+    git checkout main
+    ```
+    ```bash
+    // turbo
+    git pull origin main
+    ```
+    If there are uncommitted local changes, stash or commit them first.
+
+GIT-2. **After documentation is complete** (Phase 4), stage, commit, and push:
+    ```bash
+    git add -A
+    git commit -m "c4-architecture: <description of the documentation update>"
+    git push origin main
+    ```
+
 ### Phase 2: Map, Discover & Identify Drift
 
 5. Map the full application layer stack including:

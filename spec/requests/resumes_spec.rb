@@ -535,12 +535,15 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.browse_all_templates'))
       workspace_tabs = document.at_css('nav[data-finalize-workspace-tabs]')
       expect(workspace_tabs).to be_present
-      tab_keys = workspace_tabs.css('button[data-tab-key]').map { |btn| btn['data-tab-key'] }
+      tab_buttons = workspace_tabs.css('button[data-tab-key]')
+      tab_keys = tab_buttons.map { |btn| btn['data-tab-key'] }
       expect(tab_keys).to eq(%w[template design sections])
-
-      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.workspace_tabs.template'))
-      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.workspace_tabs.design'))
-      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.workspace_tabs.sections'))
+      tab_labels = tab_buttons.map { |btn| btn.text.strip }
+      expect(tab_labels).to include(
+        I18n.t('resumes.editor_finalize_step.workspace_tabs.template'),
+        I18n.t('resumes.editor_finalize_step.workspace_tabs.design'),
+        I18n.t('resumes.editor_finalize_step.workspace_tabs.sections')
+      )
 
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))

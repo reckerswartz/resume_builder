@@ -31,6 +31,17 @@ module Resumes
       selected_card_state&.fetch(:selected_accent_color) || resume.accent_color
     end
 
+    def selected_accent_variant_label
+      selected_card_state&.fetch(:selected_accent_variant_label)
+    end
+
+    def has_custom_accent?
+      return false if selected_card_state.blank?
+
+      default_accent = selected_card_state.dig(:template_card, :accent_color)
+      selected_card_state.fetch(:selected_accent_color) != default_accent
+    end
+
     def selected_card_state
       @selected_card_state ||= card_states.find { |card_state| card_state.fetch(:selected) } || card_states.first
     end

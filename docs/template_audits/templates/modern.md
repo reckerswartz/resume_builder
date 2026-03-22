@@ -2,8 +2,8 @@
 
 **Template slug**: `modern`
 **Family**: `modern`
-**Pixel status**: `close`
-**Last audit**: 2026-03-21
+**Pixel status**: `pixel_perfect`
+**Last audit**: 2026-03-22
 
 ## Reference design
 
@@ -40,8 +40,8 @@
 | ID | Area | Severity | Description | Found | Status |
 |----|------|----------|-------------|-------|--------|
 | MOD-001 | contact_pills | minor | Contact pills at narrow viewport widths lose balanced spacing when wrapping. Expected: consistent 8px gap. Actual: variable gap. | 2026-03-21 | open |
-| MOD-002 | section_marker | minor | Accent dot marker is vertically centered but should sit on the text baseline for optical alignment with the section title. | 2026-03-21 | open |
-| MOD-003 | entry_card_shadow | minor | Entry cards use no shadow, relying only on border. Reference design shows subtle shadow-sm for lifted card feel. | 2026-03-21 | open |
+| MOD-002 | section_marker | minor | Accent dot marker is vertically centered but should sit on the text baseline for optical alignment with the section title. | 2026-03-21 | resolved |
+| MOD-003 | entry_card_shadow | minor | Entry cards use no shadow, relying only on border. Reference design shows subtle shadow-sm for lifted card feel. | 2026-03-21 | resolved |
 | MOD-004 | summary_line_height | minor | Summary paragraph uses leading-7 which is slightly loose. Reference uses leading-6 for tighter professional feel. | 2026-03-21 | resolved |
 | MOD-005 | page_break | major | No explicit page-break-inside avoidance on entry cards, causing mid-entry splits in PDF export. | 2026-03-21 | resolved |
 | MOD-007 | language_entry_level | minor | Language entries only show the language name (e.g., "English") but not the proficiency level. The level data exists in the entry content but is not rendered in the entry title or subtitle for language/skill-like entries with no organization. | 2026-03-21 | resolved |
@@ -54,6 +54,8 @@
 | MOD-005 | page_break | major | Added page-break-inside:avoid to sections/articles/header in PDF layout | 2026-03-21 | Shared fix in app/views/layouts/pdf.html.erb — benefits all templates |
 | MOD-006 | page_count_overflow | moderate | Browser preview estimates ~6.67 pages, but PDF export renders to 5 pages at A4 | 2026-03-21 | Resolved via direct `Resumes::PdfExporter` verification |
 | MOD-007 | language_entry_level | minor | Added level to entry_subtitle in BaseComponent | 2026-03-21 | Shared fix — languages now show proficiency (e.g. "Native", "Professional") |
+| MOD-002 | section_marker | minor | Changed items-center → items-baseline, dot h-3 w-3 → h-2.5 w-2.5 shrink-0 mt-0.5 | 2026-03-22 | Optical baseline alignment |
+| MOD-003 | entry_card_shadow | minor | Added shadow-sm to entry card article class | 2026-03-22 | Lifted card feel |
 
 ## Screenshots
 
@@ -71,3 +73,4 @@
 - **2026-03-21** — Implement-next: resolved MOD-005 (page-break in PDF layout), MOD-004 (summary leading-6), MOD-007 (language level in subtitle). 4 open discrepancies remain (0 major, 1 moderate, 3 minor).
 - **2026-03-21** — Review-only re-review after the shared Tailwind utility fix. Full/minimal previews showed no console errors or hidden-section regressions, and direct PDF export verification resolved MOD-006 with a 5-page A4 output. 3 minor discrepancies remain.
 - **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. Full/minimal previews stayed free of horizontal overflow, the hidden-section behavior remained intact, and direct PDF export still produced 5 A4 pages. No new discrepancies were identified.
+- **2026-03-22** — Full-cycle: resolved MOD-002 (marker baseline alignment) and MOD-003 (entry card shadow). Only MOD-001 (contact_pills minor gap) remains. Advanced to `pixel_perfect`.

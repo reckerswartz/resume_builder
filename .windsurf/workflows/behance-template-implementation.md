@@ -15,6 +15,7 @@ This workflow operates as a repeating cycle: **Resolve candidate → Implement s
 5. Read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`, and the current implementation surfaces that shape the work: `docs/template_rendering.md`, `docs/resume_editing_flow.md`, `docs/admin_operations.md`, `app/services/resume_templates/catalog.rb`, `app/services/resume_templates/component_resolver.rb`, `app/components/resume_templates/base_component.rb`, `app/components/resume_templates/*`, `app/services/resume_templates/preview_resume_builder.rb`, `app/models/template.rb`, `app/models/resume.rb`, `app/views/templates/*`, `app/views/admin/templates/*`, `app/views/resumes/*`, and `db/seeds.rb`.
 6. **Regression baseline**: before starting new implementation work, run the verification suite for any previously-implemented candidates whose component files have changed since last verification. If regressions are found, prioritize the regression fix before new work.
 7. Check for pending migrations with `bin/rails db:migrate:status` before running specs. Run `bin/rails db:migrate` if any are pending — real template implementations often depend on schema changes from photo-library, headshot, or metadata migrations.
+8. **Browser session isolation**: follow `.windsurf/workflows/playwright-session-guide.md` for all Playwright interactions. Each verification or live-audit run must use its own isolated browser context — never reuse sessions from prior workflow runs. Tag the session with `workflowId: behance-template-implementation` and the target `issueId` (e.g. reference key or improvement key). Close the session after the verification batch completes.
 
 ### Phase 2: Assess & Plan Slice
 
@@ -24,57 +25,26 @@ This workflow operates as a repeating cycle: **Resolve candidate → Implement s
 11. Do not expose a capability publicly until it is honest across stored data, editor behavior, shared preview rendering, and PDF/export behavior. Keep internal-only planning flags internal until the full path is real.
 12. Implement only one candidate or one open improvement slice by default unless the user explicitly asks for a batch.
 
-### GitHub Integration Gate (mandatory before implementation)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before implementing any fix**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. **Create a GitHub issue** for the slice or improvement being implemented:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "behance-template-implementation" \
-      --key "<improvement_key>" \
-      --title "<description of the implementation slice>" \
-      --severity "<severity>" \
-      --domain "templates" \
-      --type "rollout-slice"
+    // turbo
+    git pull origin main
     ```
-    Record the returned issue number in `docs/template_rollouts/registry.yml` under the candidate entry as `github_issue_number`.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create a working branch** for the implementation:
+GIT-2. **After validation passes** (Phase 4), stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "behance-template-implementation" \
-      --key "<improvement_key>"
-    ```
-    All implementation work happens on this branch.
-
-GH-4. **After validation passes** (Phase 4), commit referencing the issue:
-    ```
-    behance-template-implementation: <description>
-
-    Closes #<issue_number>
-    ```
-    Then create a PR:
-    ```bash
-    bin/gh-bridge/create-pr \
-      --workflow "behance-template-implementation" \
-      --key "<improvement_key>" \
-      --issue <issue_number> \
-      --title "<description>"
-    ```
-    Record the returned PR number in the registry as `github_pr_number`.
-
-GH-5. **After PR merge**, close the issue:
-    ```bash
-    bin/gh-bridge/close-issue \
-      --issue <issue_number> \
-      --comment "Resolved in PR #<pr_number>. Verified with <verification_command>." \
-      --delete-branch "behance-template-implementation/<improvement_key>"
+    git add -A
+    git commit -m "behance-template-implementation: <description of the fix>"
+    git push origin main
     ```
 
 ### Phase 3: Implement & Refine Data

@@ -14,32 +14,26 @@ This workflow is one phase of the repeating feature lifecycle: **Spec → Review
 4. **Check for existing plans**: if this feature already has an implementation plan (in the spec doc or a separate plan file), treat this invocation as a plan update — incorporate completed PRs, implementation learnings, and newly discovered requirements rather than starting from scratch.
 5. **Regression baseline**: if implementation has already started, compare the current plan against completed work, validated behavior, and any reopened issues so the next PR queue reflects the live state rather than the original draft assumptions.
 
-### GitHub Integration Gate (mandatory before planning)
+### Git Sync Gate (mandatory — keeps main up-to-date)
 
-GH-1. **Before planning**, verify GitHub CLI is authenticated:
+All work happens directly on the `main` branch. No feature branches.
+
+GIT-1. **Before starting any work**, sync with remote:
     ```bash
     // turbo
-    gh auth status
+    git checkout main
     ```
-    If not authenticated, stop and ask the user to run `gh auth login`.
-
-GH-2. If no GitHub issue exists for this feature yet, **create one**:
     ```bash
-    bin/gh-bridge/create-issue \
-      --workflow "feature-plan" \
-      --key "<feature_key>" \
-      --title "<feature name>" \
-      --severity "medium" \
-      --domain "<domain>" \
-      --type "feature"
+    // turbo
+    git pull origin main
     ```
-    If an issue already exists from `/feature-spec`, reuse that issue number.
+    If there are uncommitted local changes, stash or commit them first.
 
-GH-3. **Create or switch to a working branch**:
+GIT-2. **After the plan is drafted/updated**, stage, commit, and push:
     ```bash
-    bin/gh-bridge/create-branch \
-      --workflow "feature-plan" \
-      --key "<feature_key>"
+    git add -A
+    git commit -m "feature-plan: <feature name>"
+    git push origin main
     ```
 
 ### Phase 2: Plan & Prioritize PRs

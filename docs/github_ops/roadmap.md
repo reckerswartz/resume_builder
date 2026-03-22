@@ -1,16 +1,16 @@
 # Resume Builder Roadmap
 
-> Auto-generated from GitHub issues on 2026-03-22T04:51:00Z
+> Auto-generated from GitHub issues on 2026-03-22T05:18:00Z
 > Repository: reckerswartz/resume_builder
 
 ## Summary
 
 | Metric | Count |
 |---|---|
-| **Open issues** | 14 |
-| **Closed issues** | 26 |
-| **Closed this session** | 9 (#38, #39, #44, #45, #47, #50, #54, #56, #65) |
-| **Created this session** | 5 (#60, #61, #62, #63, #64) |
+| **Open issues** | 10 |
+| **Closed issues** | 30 |
+| **Closed this sync** | 4 (#60, #61, #63, #64) |
+| **Updated this sync** | 3 (#35, #36, #37 — title refresh) |
 
 ## By Severity
 
@@ -18,8 +18,8 @@
 |---|---|---|
 | critical | 0 | 0 |
 | high | 0 | 0 |
-| medium | 8 | — |
-| low | 5 | — |
+| medium | 5 | — |
+| low | 4 | — |
 | deferred | 1 | — |
 
 ## Open Issues by Workflow
@@ -30,9 +30,9 @@
 |---|---|---|---|
 | #35 | Modern: 1 remaining discrepancy (MOD-001 contact_pills) | low | pixel_perfect |
 | #36 | Professional: 1 remaining discrepancy (PRO-004 entry_spacing) | low | pixel_perfect |
-| #37 | Modern Clean: 2 discrepancies (MCL-001 density_overflow, MCL-006 accent_contrast) | medium | close |
+| #37 | Modern Clean: 1 remaining discrepancy (MCL-006 accent_contrast) | low | pixel_perfect |
 
-### `/ux-usability-audit` (6 open)
+### `/ux-usability-audit` (5 open)
 
 | # | Title | Severity | Page |
 |---|---|---|---|
@@ -40,14 +40,7 @@
 | #41 | FAQ answers inline reduce scroll efficiency (UX-HOME-003) | medium | home |
 | #42 | Hero badges lack icons for scanability (UX-HOME-004) | low | home |
 | #43 | Overlapping readiness cues on workspace cards (UX-RIDX-002) | low | resumes-index |
-| #61 | Technical WidgetCards above primary source-mode cards (UX-BLDSRC-002) | medium | resume-builder-source |
 | #62 | Duplicate header/quick-take CTA cluster (UX-TSHOW-002) | medium | template-show |
-
-### `/responsive-ui-audit` (1 open)
-
-| # | Title | Severity | Page |
-|---|---|---|---|
-| #60 | 2px horizontal overflow on summary step at 390px | low | resume-builder-summary |
 
 ### `/maintainability-audit` (2 open)
 
@@ -56,22 +49,23 @@
 | #33 | ResumeTemplates::Catalog 619 lines mixed responsibilities | medium | deferred |
 | #46 | LlmProvider sync-state extraction and localized errors | medium | improved |
 
-### `/continuous-improvement` (2 open)
+### `/responsive-ui-audit` (0 open)
 
-| # | Title | Impact | Effort |
-|---|---|---|---|
-| #63 | Allow guest access to template gallery (CI-TEMPLATE-001) | medium | medium |
-| #64 | Make homepage Start here cards clickable (CI-NAV-001) | medium | small |
+All responsive issues resolved.
+
+### `/continuous-improvement` (0 open)
+
+All 5 proposals implemented and validated.
 
 ## By Domain
 
 | Domain | Open |
 |---|---|
 | templates | 3 |
-| builder | 5 |
-| marketplace | 2 |
-| workspace | 2 |
-| llm | 1 |
+| builder | 2 |
+| workspace | 1 |
+| home | 3 |
+| infrastructure | 1 |
 
 ## Template Status Overview
 
@@ -81,30 +75,36 @@
 | Classic | pixel_perfect | 0 | 5 |
 | ATS Minimal | pixel_perfect | 0 | 5 |
 | Professional | pixel_perfect | 1 | 4 |
-| Modern Clean | close | 2 | 4 |
+| Modern Clean | pixel_perfect | 1 | 5 |
 | Sidebar Accent | pixel_perfect | 0 | 6 |
 | Editorial Split | pixel_perfect | 0 | 7 |
 
+## Audit Coverage Summary
+
+| Workflow | Pages Tracked | Compliant/Closed | Open Issues |
+|---|---|---|---|
+| ui-guidelines-audit | 37 | 37 compliant | 0 |
+| responsive-ui-audit | 35 | 10 closed, 25 reviewed | 0 |
+| ux-usability-audit | 35 | 0 clean, 12 improved | 5 |
+| template-audit | 7 | 7 pixel_perfect | 3 (all minor) |
+| continuous-improvement | 5 proposals | 5 validated | 0 |
+| resumebuilder-reference-rollout | 5 slices | 5 verified | 0 |
+
 ## Recommended Next Actions
 
-1. **`/responsive-ui-audit implement-next resume-builder-summary`** — Fix 2px overflow (#60)
-2. **`/ux-usability-audit implement-next resume-builder-source`** — Reorder WidgetCards (#61)
-3. **`/continuous-improvement implement-next CI-NAV-001`** — Homepage conversion paths (#64)
-4. **`/maintainability-audit implement-next llm-provider-credential`** — LlmProvider sync-state (#46)
+1. **`/ux-usability-audit implement-next template-show`** — Consolidate duplicate CTA clusters (#62)
+2. **`/maintainability-audit implement-next llm-provider-credential`** — LlmProvider sync-state (#46)
+3. **`/ux-usability-audit implement-next home`** — Home page copy refinements (#40, #41)
+4. **`/continuous-improvement explore returning_user`** — Discover new improvement opportunities
 
-## Recently Closed (this session)
+## Recently Closed (this sync)
 
 | # | Title | Reason |
 |---|---|---|
-| #38 | Sidebar Accent: 4 discrepancies | All resolved, pixel_perfect |
-| #39 | Editorial Split: 3 discrepancies | All resolved, pixel_perfect |
-| #44 | Admin::JobLogsHelper runtime/control state | All follow-ups closed (dup of #56) |
-| #45 | DocxTextExtractor spec coverage | Completed (dup of #54) |
-| #47 | Template variant carry-through | Verified (dup of #50) |
-| #50 | Template variant carry-through accent | Verified (dup of #47) |
-| #54 | PdfTextExtractor + DocxTextExtractor specs | Completed |
-| #56 | Job log runtime + control state presenters | All 3 presenters extracted |
-| #65 | Guest template gallery access | Duplicate of #63 |
+| #60 | Summary step 2px overflow | Not reproducible, closed |
+| #61 | UX-BLDSRC-002 source-mode WidgetCards | Fixed: import-status demoted below source chooser |
+| #63 | CI-TEMPLATE-001 guest template gallery | Validated: guest access enabled |
+| #64 | CI-NAV-001 clickable homepage cards | Validated: cards now link to registration |
 
 ---
-_Generated by `/github-ops full-sync` at 2026-03-22T04:51:00Z_
+_Generated by `/github-ops full-sync` at 2026-03-22T05:18:00Z_
