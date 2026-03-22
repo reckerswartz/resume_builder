@@ -112,6 +112,30 @@ RSpec.describe ResumeTemplates::Catalog do
     end
   end
 
+  describe '.accent_color_palette' do
+    it 'returns a curated array of professional color swatches with key, hex, and label' do
+      palette = described_class.accent_color_palette
+      expect(palette).to be_an(Array)
+      expect(palette.size).to be >= 15
+
+      palette.each do |swatch|
+        expect(swatch).to include(:key, :hex, :label)
+        expect(swatch.fetch(:hex)).to match(/\A#\h{6}\z/)
+      end
+
+      hex_values = palette.map { |s| s.fetch(:hex) }
+      expect(hex_values).to include('#334155', '#1D4ED8', '#0F766E', '#4338CA', '#DC2626')
+    end
+  end
+
+  describe '.default_accent_color_for' do
+    it 'returns the template default accent color for a given family' do
+      expect(described_class.default_accent_color_for('classic')).to eq('#1D4ED8')
+      expect(described_class.default_accent_color_for('modern')).to eq('#0F172A')
+      expect(described_class.default_accent_color_for('sidebar-accent')).to eq('#4338CA')
+    end
+  end
+
   describe '.accent_variants' do
     it 'returns the template default accent plus curated related swatches and appends a custom fallback when needed' do
       classic_layout = described_class.default_layout_config(family: 'classic')

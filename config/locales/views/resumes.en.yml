@@ -168,6 +168,8 @@ en:
       actions:
         edit: "Edit"
         preview: "Preview"
+        export_pdf: "Export PDF"
+        download_pdf: "Download PDF"
         delete: "Delete"
     start_flow_experience_step:
       step_badge: "Step 1"

@@ -4,7 +4,7 @@ class ResumesController < ApplicationController
   before_action :set_resume, only: %i[ show edit update destroy export download download_text ]
 
   def index
-    @resumes = policy_scope(Resume).includes(:template).order(updated_at: :desc)
+    @resumes = policy_scope(Resume).includes(:template).with_attached_pdf_export.order(updated_at: :desc)
   end
 
   def show

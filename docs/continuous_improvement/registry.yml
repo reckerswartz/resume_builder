@@ -122,11 +122,11 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 6
-  last_cycle_date: "2026-03-22T05:35:00Z"
+  cycle_count: 7
+  last_cycle_date: "2026-03-22T05:40:00Z"
   proposals_discovered: 10
-  proposals_implemented: 7
-  proposals_remaining: 3
+  proposals_implemented: 8
+  proposals_remaining: 2
   proposals_routed: 0
   competitive_scans_completed: 0
   journeys_simulated: 2
@@ -175,7 +175,7 @@ cycle_metrics:
 next_step:
   recommended_mode: "implement-next"
   recommended_persona: "returning_user"
-  reason: "CI-EDIT-001 and CI-PREVIEW-001 implemented in cycle 6. 3 proposals remain: CI-WORKSPACE-002 (duplicate resume, high/medium), CI-WORKSPACE-003 (quick export, medium/small), CI-TEMPLATE-002 (apply template to existing, medium/medium). Next: CI-WORKSPACE-003 (medium impact, small effort)."
+  reason: "CI-WORKSPACE-003 implemented in cycle 7. 2 proposals remain: CI-WORKSPACE-002 (duplicate resume, high/medium) and CI-TEMPLATE-002 (apply template to existing, medium/medium). Next: CI-WORKSPACE-002 (highest remaining impact)."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -377,7 +377,8 @@ proposals:
     category: remove_friction
     impact: medium
     effort: small
-    status: discovered
+    status: implemented
+    implemented_at: "2026-03-22T05:40:00Z"
     user_personas:
       - returning_user
       - power_user

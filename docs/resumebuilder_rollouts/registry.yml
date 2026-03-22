@@ -1,5 +1,5 @@
 workflow: .windsurf/workflows/resumebuilder-reference-rollout.md
-last_updated: 2026-03-22T05-08-00Z
+last_updated: 2026-03-22T05-30-00Z
 reference_source_docs:
   - docs/references/resumebuilder/live-flow-comparison-2026-03-20/15-implementation-plan.md
   - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/README.md
@@ -187,6 +187,36 @@ slices:
       - spec/requests/resumes_spec.rb
       - spec/presenters/resumes/finalize_workspace_state_spec.rb
     latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-unified-finalize-workspace/00-overview.md
+    cycle_count: 1
+    regression_detected: false
+    next_recommended_slice: accent-color-palette
+  - slice_key: accent-color-palette
+    title: Accent color palette
+    page_family: resume-builder-finalize
+    status: verified
+    priority: medium
+    reference_source_docs:
+      - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
+      - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/04-template-flexibility-matrix.md
+      - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/05-rails-architecture-translation.md
+    current_app_surfaces:
+      - app/services/resume_templates/catalog.rb
+      - app/presenters/resumes/finalize_workspace_state.rb
+      - app/views/resumes/_finalize_workspace_design_panel.html.erb
+      - app/javascript/controllers/accent_palette_controller.js
+      - config/locales/views/resume_builder.en.yml
+    open_gap_keys: []
+    closed_gap_keys:
+      - accent-color-curated-palette
+      - accent-color-presenter-state
+      - accent-color-finalize-ui
+      - accent-palette-stimulus-controller
+      - accent-color-locale-keys
+    verification_specs:
+      - spec/services/resume_templates/catalog_spec.rb
+      - spec/presenters/resumes/finalize_workspace_state_spec.rb
+      - spec/requests/resumes_spec.rb
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-accent-color-palette/00-overview.md
     cycle_count: 1
     regression_detected: false
     next_recommended_slice: ""

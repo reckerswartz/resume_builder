@@ -55,6 +55,72 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
     end
   end
 
+  describe '#accent_color_palette and accent color state' do
+    it 'returns curated palette swatches with selection state matching the resume accent color' do
+      template = create(
+        :template,
+        name: 'Modern',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      resume = create(:resume, template: template, settings: { 'accent_color' => '#1D4ED8', 'show_contact_icons' => true, 'page_size' => 'A4' })
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      palette = state.accent_color_palette
+      expect(palette).to be_an(Array)
+      expect(palette.size).to eq(ResumeTemplates::Catalog::ACCENT_COLOR_PALETTE.size)
+
+      selected = palette.select { |s| s.fetch(:selected) }
+      expect(selected.size).to eq(1)
+      expect(selected.first.fetch(:hex)).to eq('#1D4ED8')
+      expect(selected.first.fetch(:label)).to eq('Blue')
+
+      unselected = palette.reject { |s| s.fetch(:selected) }
+      expect(unselected).to all(include(selected: false))
+    end
+
+    it 'reports accent_color_is_default? true when accent matches template default' do
+      template = create(
+        :template,
+        name: 'Classic',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+      resume = create(:resume, template: template, settings: { 'accent_color' => '#1D4ED8', 'show_contact_icons' => true, 'page_size' => 'A4' })
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      expect(state.accent_color_is_default?).to be(true)
+      expect(state.default_accent_color).to eq('#1D4ED8')
+    end
+
+    it 'reports accent_color_is_default? false when accent differs from template default' do
+      template = create(
+        :template,
+        name: 'Classic',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+      resume = create(:resume, template: template, settings: { 'accent_color' => '#DC2626', 'show_contact_icons' => true, 'page_size' => 'A4' })
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      expect(state.accent_color_is_default?).to be(false)
+    end
+
+    it 'reports accent_color_is_custom? true when accent is not in the curated palette' do
+      template = create(
+        :template,
+        name: 'Modern',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern')
+      )
+      resume = create(:resume, template: template, settings: { 'accent_color' => '#ABCDEF', 'show_contact_icons' => true, 'page_size' => 'A4' })
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      expect(state.accent_color_is_custom?).to be(true)
+      expect(state.accent_color_palette.none? { |s| s.fetch(:selected) }).to be(true)
+    end
+  end
+
   describe '#section_visibility_states' do
     it 'groups sections by section type and marks hidden types from resume settings' do
       resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4', 'hidden_sections' => [ 'projects' ] })

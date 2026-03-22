@@ -816,7 +816,7 @@ en:
       design_workspace:
         eyebrow: "Design & formatting"
         title: "Adjust the output without changing the template"
-        description: "Use renderer-backed controls only: page size, accent color, font scale, density, spacing, and contact display. Leave a field on template default when you want the selected layout to decide."
+        description: "Fine-tune page size, accent color, fonts, density, spacing, and contact display. Leave any field on its default to let the template decide."
         badges:
           page_size: "Page: %{page_size}"
           font_family: "Font: %{font_family}"
@@ -831,15 +831,15 @@ en:
         font_family: "Font family"
         font_family_description: "Switch between sans-serif, serif, and monospace typefaces. The change applies to both preview and exported PDF."
         font_scale: "Font scale"
-        font_scale_description: "Choose a shared text scale that the preview and PDF can both reflect truthfully."
+        font_scale_description: "Adjust text size across headings and body copy. The change applies to both preview and PDF."
         density: "Density"
-        density_description: "Control spacing through the shared density presets instead of freeform layout tweaks."
+        density_description: "Make the layout tighter or more spacious with a single setting."
         section_spacing: "Section spacing"
-        section_spacing_description: "Adjust the vertical rhythm between major sections without changing template identity."
+        section_spacing_description: "Add or reduce space between sections like Experience, Education, and Skills."
         paragraph_spacing: "Paragraph spacing"
-        paragraph_spacing_description: "Tune the space above summaries, entry paragraphs, highlights, and supporting links through the shared renderer."
+        paragraph_spacing_description: "Control the gap between paragraphs, bullet lists, and supporting details within each section."
         line_spacing: "Line spacing"
-        line_spacing_description: "Control line height for summary and entry body copy in both preview and exported PDF output."
+        line_spacing_description: "Set how much space appears between lines of text in summaries and descriptions."
       sections_workspace:
         eyebrow: "Sections"
         title: "Decide what stays visible in output"
@@ -888,7 +888,7 @@ en:
         accent_color_reset: "Reset to template default"
         show_contact_icons: "Show contact icons"
         show_contact_icons_description: "Keep contact info compact in the preview and exported PDF."
-      footer_note: "Changes save in place here, so you can export from the builder once the shared preview looks right."
+      footer_note: "Changes save automatically. Export or download once the preview looks right."
       save_finalize_settings: "Save finalize settings"
       additional_sections:
         pill: "Additional sections"

@@ -301,6 +301,34 @@ RSpec.describe 'Resumes', type: :request do
     end
   end
 
+  describe 'GET /resumes (workspace card actions)' do
+    it 'shows Download PDF on cards with an attached export and hides it on draft-only cards' do
+      exported_resume = create(:resume, user:, template:, title: 'Exported Resume')
+      exported_resume.pdf_export.attach(
+        io: StringIO.new('%PDF-1.4 test'),
+        filename: 'exported.pdf',
+        content_type: 'application/pdf'
+      )
+      draft_resume = create(:resume, user:, template:, title: 'Draft Resume')
+
+      get resumes_path
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      cards = document.css('article')
+
+      exported_card = cards.find { |card| card.text.include?('Exported Resume') }
+      draft_card = cards.find { |card| card.text.include?('Draft Resume') }
+
+      expect(exported_card).to be_present
+      expect(exported_card.css('a').map { |a| a.text.squish }).to include(I18n.t('resumes.resume_card.actions.download_pdf'))
+      expect(exported_card.css("a[href='#{download_resume_path(exported_resume)}']")).to be_present
+
+      expect(draft_card).to be_present
+      expect(draft_card.css('a').map { |a| a.text.squish }).not_to include(I18n.t('resumes.resume_card.actions.download_pdf'))
+    end
+  end
+
   describe 'GET /resumes/:id' do
     it 'renders the preview page with export actions and without the redundant explainer block' do
       resume = create(:resume, user:, template:)
@@ -593,11 +621,19 @@ RSpec.describe 'Resumes', type: :request do
 
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.description'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.font_family'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.section_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.paragraph_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.line_spacing'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.footer_note'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
+
+      expect(response.body).not_to include('renderer-backed')
+      expect(response.body).not_to include('shared renderer')
+      expect(response.body).not_to include('template identity')
+      expect(response.body).not_to include('vertical rhythm')
+      expect(response.body).not_to include('shared preview')
       expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
 
       output_settings = document.at_css('[data-finalize-output-settings]')
