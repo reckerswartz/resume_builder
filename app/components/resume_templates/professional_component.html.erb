@@ -2,7 +2,7 @@
   <header class="border-b <%= header_padding_class %>" style="border-color: <%= accent_color_with_alpha("22") %>;">
     <div class="h-1.5 w-20 rounded-full" style="background-color: <%= accent_color %>;"></div>
 
-    <div class="mt-5 grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+    <div class="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
       <div>
         <h1 class="<%= [name_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>"><%= full_name %></h1>
         <% if resume.headline.present? %>
@@ -52,8 +52,8 @@
               <% location = entry_location(entry) %>
               <% highlights = entry_highlights(entry) %>
               <% url = entry_url(entry) %>
-              <article class="border-l-2 pl-4" style="border-color: <%= accent_color_with_alpha("44") %>;">
-                <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_11rem] sm:items-start">
+              <article class="border-l-2 pl-3" style="border-color: <%= accent_color_with_alpha("44") %>;">
+                <div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem] sm:items-start">
                   <div>
                     <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
                     <% if subtitle.present? %>
