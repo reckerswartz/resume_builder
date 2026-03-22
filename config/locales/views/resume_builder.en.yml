@@ -805,7 +805,7 @@ en:
       template_workspace:
         eyebrow: "Templates"
         title: "Keep layout choice reversible"
-        description: "Switch the structural template here without rebuilding the resume. The live preview and exported PDF keep using the same shared renderer path."
+        description: "Switch the layout here without rebuilding the resume. The live preview and exported PDF update automatically."
         badges:
           switch_anytime: "Switch anytime"
       design_workspace:
@@ -814,13 +814,17 @@ en:
         description: "Use renderer-backed controls only: page size, accent color, font scale, density, spacing, and contact display. Leave a field on template default when you want the selected layout to decide."
         badges:
           page_size: "Page: %{page_size}"
+          font_family: "Font: %{font_family}"
           font_scale: "Type: %{font_scale}"
           density: "Density: %{density}"
+        template_default_font_family: "Template default (%{font_family})"
         template_default_font_scale: "Template default (%{font_scale})"
         template_default_density: "Template default (%{density})"
         template_default_section_spacing: "Template default (%{section_spacing})"
         template_default_paragraph_spacing: "Template default (%{paragraph_spacing})"
         template_default_line_spacing: "Template default (%{line_spacing})"
+        font_family: "Font family"
+        font_family_description: "Switch between sans-serif, serif, and monospace typefaces. The change applies to both preview and exported PDF."
         font_scale: "Font scale"
         font_scale_description: "Choose a shared text scale that the preview and PDF can both reflect truthfully."
         density: "Density"
@@ -860,6 +864,9 @@ en:
         recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
         preview_selected_badge: "Selected"
         expand_preview_hint: "Preview"
+        accent_carry_through: "%{variant} accent"
+        choose_later_pill: "Choose later"
+        choose_later_description: "Keep the current template for now. You can switch any time from this finalize step without losing content."
         browse_all_templates: "Browse all templates"
         browse_all_templates_description: "Filter by family, density, columns, theme, or layout"
       output_settings:

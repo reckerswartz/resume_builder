@@ -76,6 +76,10 @@ en:
           modern-clean: "Modern Clean"
           sidebar-accent: "Sidebar Accent"
           editorial-split: "Editorial Split"
+        font_family:
+          sans: "Sans-serif"
+          serif: "Serif"
+          mono: "Monospace"
         font_scale:
           sm: "Small"
           base: "Base"

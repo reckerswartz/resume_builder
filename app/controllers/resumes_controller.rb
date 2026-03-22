@@ -37,7 +37,7 @@ class ResumesController < ApplicationController
     return render_unavailable_template_selection_on_create unless template.present?
 
     @resume = Resumes::Bootstrapper.new(user: current_user).call(create_resume_params(template: template))
-    redirect_to edit_resume_path(@resume, step: "source"), notice: controller_message(:resume_created)
+    redirect_to edit_resume_path(@resume, step: post_create_step), notice: controller_message(:resume_created)
   rescue ActiveRecord::RecordInvalid
     @resume = build_new_resume_from_params
     authorize @resume
@@ -201,6 +201,7 @@ class ResumesController < ApplicationController
           :accent_color,
           :page_size,
           :show_contact_icons,
+          :font_family,
           :font_scale,
           :density,
           :section_spacing,
@@ -309,6 +310,10 @@ class ResumesController < ApplicationController
         .to_h
         .deep_stringify_keys
         .slice("accent_color")
+    end
+
+    def post_create_step
+      @resume.source_mode == "scratch" ? "heading" : "source"
     end
 
     def render_unavailable_template_selection_on_create

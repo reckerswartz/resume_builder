@@ -16,9 +16,27 @@ module Resumes
     def design_badges
       @design_badges ||= [
         { label: I18n.t("resumes.editor_finalize_step.design_workspace.badges.page_size", page_size: resume.page_size), tone: :neutral },
+        { label: I18n.t("resumes.editor_finalize_step.design_workspace.badges.font_family", font_family: ResumeTemplates::Catalog.font_family_label(resume.font_family)), tone: :neutral },
         { label: I18n.t("resumes.editor_finalize_step.design_workspace.badges.font_scale", font_scale: ResumeTemplates::Catalog.font_scale_label(resume.font_scale)), tone: :neutral },
         { label: I18n.t("resumes.editor_finalize_step.design_workspace.badges.density", density: ResumeTemplates::Catalog.density_label(resume.density)), tone: :neutral }
       ]
+    end
+
+    def font_family_options
+      [
+        [
+          I18n.t(
+            "resumes.editor_finalize_step.design_workspace.template_default_font_family",
+            font_family: ResumeTemplates::Catalog.font_family_label(default_font_family)
+          ),
+          ""
+        ],
+        *ResumeTemplates::Catalog.font_family_options
+      ]
+    end
+
+    def selected_font_family
+      (resume.settings || {})["font_family"].to_s
     end
 
     def font_scale_options
@@ -155,6 +173,10 @@ module Resumes
 
       def layout_config
         @layout_config ||= resume.template.render_layout_config
+      end
+
+      def default_font_family
+        layout_config.fetch("font_family")
       end
 
       def default_font_scale

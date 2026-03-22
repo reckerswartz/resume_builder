@@ -3,6 +3,18 @@ module ResumeTemplates
     ACCENT_COLOR_PATTERN = /\A#(?:\h{3}|\h{6})\z/
     BOOLEAN_TYPE = ActiveModel::Type::Boolean.new
     PHOTO_SLOT_NAMES = %w[headshot].freeze
+    FONT_FAMILY_OPTIONS = {
+      "sans" => "Sans-serif",
+      "serif" => "Serif",
+      "mono" => "Monospace"
+    }.freeze
+
+    FONT_FAMILY_CLASSES = {
+      "sans" => "font-sans",
+      "serif" => "font-serif",
+      "mono" => "font-mono"
+    }.freeze
+
     FONT_SCALE_OPTIONS = {
       "sm" => "Small",
       "base" => "Base",
@@ -168,6 +180,7 @@ module ResumeTemplates
           "family" => "modern",
           "variant" => "modern",
           "accent_color" => "#0F172A",
+          "font_family" => "sans",
           "font_scale" => "base",
           "density" => "comfortable",
           "section_spacing" => "standard",
@@ -190,6 +203,7 @@ module ResumeTemplates
           "family" => "classic",
           "variant" => "classic",
           "accent_color" => "#1D4ED8",
+          "font_family" => "serif",
           "font_scale" => "sm",
           "density" => "compact",
           "section_spacing" => "tight",
@@ -212,6 +226,7 @@ module ResumeTemplates
           "family" => "ats-minimal",
           "variant" => "ats-minimal",
           "accent_color" => "#334155",
+          "font_family" => "sans",
           "font_scale" => "sm",
           "density" => "compact",
           "section_spacing" => "tight",
@@ -234,6 +249,7 @@ module ResumeTemplates
           "family" => "professional",
           "variant" => "professional",
           "accent_color" => "#0F4C81",
+          "font_family" => "serif",
           "font_scale" => "base",
           "density" => "comfortable",
           "section_spacing" => "standard",
@@ -256,11 +272,12 @@ module ResumeTemplates
           "family" => "modern-clean",
           "variant" => "modern-clean",
           "accent_color" => "#0F766E",
+          "font_family" => "sans",
           "font_scale" => "base",
-          "density" => "comfortable",
-          "section_spacing" => "standard",
-          "paragraph_spacing" => "standard",
-          "line_spacing" => "standard",
+          "density" => "compact",
+          "section_spacing" => "tight",
+          "paragraph_spacing" => "tight",
+          "line_spacing" => "tight",
           "column_count" => "single_column",
           "theme_tone" => "teal",
           "supports_headshot" => false,
@@ -278,6 +295,7 @@ module ResumeTemplates
           "family" => "sidebar-accent",
           "variant" => "sidebar-accent",
           "accent_color" => "#4338CA",
+          "font_family" => "sans",
           "font_scale" => "base",
           "density" => "comfortable",
           "section_spacing" => "standard",
@@ -302,6 +320,7 @@ module ResumeTemplates
           "family" => "editorial-split",
           "variant" => "editorial-split",
           "accent_color" => "#D7F038",
+          "font_family" => "sans",
           "font_scale" => "sm",
           "density" => "compact",
           "section_spacing" => "standard",
@@ -346,6 +365,20 @@ module ResumeTemplates
 
       def family_options
         FAMILY_DEFINITIONS.keys.map { |key| [ family_label(key), key ] }
+      end
+
+      def font_family_options
+        FONT_FAMILY_OPTIONS.map { |value, label| [ label, value ] }
+      end
+
+      def font_family_label(font_family)
+        font_family_key = font_family.to_s
+
+        I18n.t("resume_templates.catalog.labels.font_family.#{font_family_key}", default: FONT_FAMILY_OPTIONS.fetch(font_family_key, font_family_key.humanize))
+      end
+
+      def font_family_class(font_family)
+        FONT_FAMILY_CLASSES.fetch(normalized_font_family(font_family), FONT_FAMILY_CLASSES.fetch("sans"))
       end
 
       def font_scale_options
@@ -451,6 +484,7 @@ module ResumeTemplates
         normalized["family"] = family
         normalized["variant"] = family
         normalized["accent_color"] = normalize_accent_color(config["accent_color"], defaults.fetch("accent_color"))
+        normalized["font_family"] = normalize_option(config["font_family"], FONT_FAMILY_OPTIONS.keys, defaults.fetch("font_family"))
         normalized["font_scale"] = normalize_option(config["font_scale"], FONT_SCALES.keys, defaults.fetch("font_scale"))
         normalized["density"] = normalize_option(config["density"], DENSITY_SCALES.keys, defaults.fetch("density"))
         normalized["section_spacing"] = normalize_option(config["section_spacing"], SECTION_SPACING_SCALES.keys, defaults.fetch("section_spacing"))
@@ -475,6 +509,10 @@ module ResumeTemplates
 
       def normalized_accent_color(value, fallback: default_layout_config.fetch("accent_color"))
         normalize_accent_color(value, fallback)
+      end
+
+      def normalized_font_family(value, fallback: default_layout_config.fetch("font_family"))
+        normalize_option(value, FONT_FAMILY_OPTIONS.keys, fallback)
       end
 
       def normalized_font_scale(value, fallback: default_layout_config.fetch("font_scale"))

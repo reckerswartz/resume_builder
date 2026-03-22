@@ -47,9 +47,14 @@ module ResumeTemplates
       layout_config.fetch("entry_style") == "cards"
     end
 
+    def font_family_class
+      @font_family_class ||= ResumeTemplates::Catalog.font_family_class(resume.font_family)
+    end
+
     def shell_classes
       [
         "mx-auto w-full max-w-3xl bg-white text-slate-900",
+        font_family_class,
         density_scale.fetch(:container_padding),
         ("rounded-[2rem] shadow-sm" if card_shell?)
       ].compact.join(" ")

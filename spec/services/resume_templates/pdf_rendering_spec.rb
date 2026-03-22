@@ -100,6 +100,29 @@ RSpec.describe 'Resume template PDF rendering' do
     end
   end
 
+  it 'applies the template default font family class and allows user override' do
+    resume = build_resume_for(family: 'classic', accent_color: '#1D4ED8')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    expect(html).to include('font-serif')
+
+    resume.update!(settings: resume.settings.merge('font_family' => 'mono'))
+
+    overridden_html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume.reload }
+    )
+
+    expect(overridden_html).to include('font-mono')
+    expect(overridden_html).not_to include('font-serif')
+  end
+
   it 'applies font scale, density, and spacing overrides through the shared rendered HTML path' do
     resume = build_resume_for(family: 'modern', accent_color: '#0F172A')
     resume.update!(settings: resume.settings.merge('font_scale' => 'lg', 'density' => 'relaxed', 'section_spacing' => 'tight', 'paragraph_spacing' => 'tight', 'line_spacing' => 'tight'))
@@ -124,7 +147,7 @@ RSpec.describe 'Resume template PDF rendering' do
     expect(summary_paragraph['class'].to_s.split).to include('mt-4', 'leading-5')
   end
 
-  it 'renders Modern Clean at comfortable density with tighter card padding' do
+  it 'renders Modern Clean at compact density with tight spacing and card padding' do
     resume = build_resume_for(family: 'modern-clean', accent_color: '#0F766E')
 
     html = ApplicationController.render(
@@ -135,21 +158,25 @@ RSpec.describe 'Resume template PDF rendering' do
 
     document = Nokogiri::HTML.parse(html)
 
-    # Comfortable density container
-    expect(html).to include('p-8 sm:p-10')
+    # Compact density container
+    expect(html).to include('p-6 sm:p-8')
 
-    # Tighter card padding (px-4 py-3 instead of px-5 py-4)
+    # Card padding (px-4 py-3)
     entry_card = document.at_css('article.rounded-xl')
     expect(entry_card).to be_present
     card_classes = entry_card['class'].to_s.split
     expect(card_classes).to include('px-4', 'py-3')
-    expect(card_classes).not_to include('px-5', 'py-4')
+
+    # Tighter contact chip padding
+    contact_chip = document.at_css('span.rounded-full.border-slate-200')
+    expect(contact_chip).to be_present
+    chip_classes = contact_chip['class'].to_s.split
+    expect(chip_classes).to include('px-2.5', 'py-1')
 
     # Tighter highlight bullet spacing
     highlight_list = document.at_css('ul')
     expect(highlight_list).to be_present
     expect(highlight_list['class']).to include('space-y-1.5')
-    expect(highlight_list['class']).not_to include('space-y-2')
   end
 
   it 'renders ATS Minimal section headings with stronger hierarchy than entry titles' do
@@ -277,6 +304,87 @@ RSpec.describe 'Resume template PDF rendering' do
 
     expect(html).to include('Jordan Rivera headshot')
     expect(html).to include('data:image/png;base64')
+  end
+
+  it 'renders Modern with baseline-aligned marker dots and shadowed entry cards' do
+    resume = build_resume_for(family: 'modern', accent_color: '#0F172A')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+
+    marker_container = document.css('div').find { |n| n['class'].to_s.include?('items-baseline') }
+    expect(marker_container).to be_present
+
+    marker_dot = marker_container&.at_css('span.rounded-full')
+    expect(marker_dot).to be_present
+    expect(marker_dot['class']).to include('shrink-0')
+
+    entry_card = document.at_css('article.rounded-2xl')
+    expect(entry_card).to be_present
+    expect(entry_card['class']).to include('shadow-sm')
+  end
+
+  it 'renders Professional with a max-width constraint on the contact column' do
+    resume = build_resume_for(family: 'professional', accent_color: '#0F4C81')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+    contact_column = document.css('div').find { |n| n['class'].to_s.include?('sm:max-w-xs') && n['class'].to_s.include?('sm:text-right') }
+    expect(contact_column).to be_present
+  end
+
+  it 'renders Sidebar Accent with consistent card radius, blended skill chips, and medium-weight contact labels' do
+    resume = build_resume_for(family: 'sidebar-accent', accent_color: '#4338CA')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+
+    profile_card = document.at_css('section.rounded-2xl')
+    expect(profile_card).to be_present
+
+    skill_chip = document.css('span.rounded-full').find { |n| n['style'].to_s.include?('#4338CA08') }
+    expect(skill_chip).to be_present
+
+    contact_label = document.css('aside p.font-medium.text-slate-900').first
+    expect(contact_label).to be_present
+  end
+
+  it 'renders Editorial Split with larger badges, darker contact border, and scroll rail on mobile' do
+    resume = build_resume_for(family: 'editorial-split', accent_color: '#D7F038')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+
+    desktop_badge = document.css('aside div.rounded-full.bg-slate-950').first
+    expect(desktop_badge).to be_present
+    expect(desktop_badge['class']).to include('h-[4.5rem]', 'w-[4.5rem]')
+    expect(desktop_badge.at_css('span')['class']).to include('text-lg')
+
+    contact_badge = document.css('div.rounded-full.border-slate-400').first
+    expect(contact_badge).to be_present
+
+    mobile_rail = document.css('aside').find { |n| n['class'].to_s.include?('overflow-x-auto') && n['class'].to_s.include?('lg:hidden') }
+    expect(mobile_rail).to be_present
   end
 
   it 'respects hidden_sections setting and excludes hidden section content from rendered HTML' do

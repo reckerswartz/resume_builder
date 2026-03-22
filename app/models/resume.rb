@@ -69,6 +69,10 @@ class Resume < ApplicationRecord
     ResumeTemplates::Catalog.normalized_accent_color((settings || {})["accent_color"], fallback: render_layout_config.fetch("accent_color"))
   end
 
+  def font_family
+    ResumeTemplates::Catalog.normalized_font_family((settings || {})["font_family"], fallback: render_layout_config.fetch("font_family"))
+  end
+
   def font_scale
     ResumeTemplates::Catalog.normalized_font_scale((settings || {})["font_scale"], fallback: render_layout_config.fetch("font_scale"))
   end
@@ -167,6 +171,7 @@ class Resume < ApplicationRecord
     self.settings = (settings || {}).deep_stringify_keys
     settings["show_contact_icons"] = BOOLEAN_TYPE.cast(settings["show_contact_icons"]) if settings.key?("show_contact_icons")
     settings["page_size"] = page_size if settings.key?("page_size")
+    normalized_font_family_setting if settings.key?("font_family")
     normalized_font_scale_setting if settings.key?("font_scale")
     normalized_density_setting if settings.key?("density")
     normalized_section_spacing_setting if settings.key?("section_spacing")
@@ -280,6 +285,13 @@ class Resume < ApplicationRecord
 
   def normalize_hidden_sections(value)
     Array(value).map(&:to_s).select { |section_type| ResumeBuilder::SectionRegistry.types.include?(section_type) }.uniq
+  end
+
+  def normalized_font_family_setting
+    candidate = settings["font_family"].to_s
+    return settings.delete("font_family") if candidate.blank?
+
+    settings["font_family"] = ResumeTemplates::Catalog.normalized_font_family(candidate, fallback: render_layout_config.fetch("font_family"))
   end
 
   def normalized_font_scale_setting

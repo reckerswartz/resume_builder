@@ -39,6 +39,12 @@
         </div>
 
         <div>
+          <%= label_tag "resume_settings_font_family", t("resumes.editor_finalize_step.design_workspace.font_family"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][font_family]", options_for_select(finalize_workspace_state.font_family_options, finalize_workspace_state.selected_font_family), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.font_family_description") %></p>
+        </div>
+
+        <div>
           <%= label_tag "resume_settings_font_scale", t("resumes.editor_finalize_step.design_workspace.font_scale"), class: ui_label_classes %>
           <%= select_tag "resume[settings][font_scale]", options_for_select(finalize_workspace_state.font_scale_options, finalize_workspace_state.selected_font_scale), class: ui_input_classes %>
           <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.font_scale_description") %></p>

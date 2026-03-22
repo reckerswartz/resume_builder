@@ -54,10 +54,43 @@ RSpec.describe ResumeTemplates::Catalog do
     end
   end
 
+  describe '.font_family_class' do
+    it 'maps valid font family keys to Tailwind font classes' do
+      expect(described_class.font_family_class('sans')).to eq('font-sans')
+      expect(described_class.font_family_class('serif')).to eq('font-serif')
+      expect(described_class.font_family_class('mono')).to eq('font-mono')
+    end
+
+    it 'falls back to font-sans for unknown values' do
+      expect(described_class.font_family_class('comic')).to eq('font-sans')
+    end
+  end
+
+  describe '.normalized_font_family' do
+    it 'normalizes valid font family keys and falls back for unknown values' do
+      expect(described_class.normalized_font_family('serif')).to eq('serif')
+      expect(described_class.normalized_font_family('invalid', fallback: 'mono')).to eq('mono')
+      expect(described_class.normalized_font_family(nil)).to eq('sans')
+    end
+  end
+
+  describe '.font_family_options' do
+    it 'returns label-value pairs for all font families' do
+      expect(described_class.font_family_options).to include(
+        ['Sans-serif', 'sans'],
+        ['Serif', 'serif'],
+        ['Monospace', 'mono']
+      )
+    end
+  end
+
   describe 'shared metadata labels' do
     it 'returns locale-backed labels for shared template metadata and readable fallbacks for unknown values' do
       expect(described_class.family_label('sidebar-accent')).to eq('Sidebar Accent')
       expect(described_class.family_label('legacy')).to eq('Legacy')
+      expect(described_class.font_family_label('sans')).to eq('Sans-serif')
+      expect(described_class.font_family_label('serif')).to eq('Serif')
+      expect(described_class.font_family_label('mono')).to eq('Monospace')
       expect(described_class.font_scale_label('base')).to eq('Base')
       expect(described_class.density_label('comfortable')).to eq('Comfortable')
       expect(described_class.section_spacing_label('tight')).to eq('Tight')

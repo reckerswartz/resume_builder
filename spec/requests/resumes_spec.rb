@@ -98,8 +98,11 @@ RSpec.describe 'Resumes', type: :request do
       expect(template_disclosure['open']).to be_nil
       expect(template_disclosure.at_css('summary').text).to include(I18n.t('resumes.form.template_disclosure_summary'))
       expect(template_disclosure.at_css('summary').text).to include(I18n.t('resumes.form.template_disclosure_badge'))
+      expect(template_disclosure.at_css('summary').text).to include(I18n.t('resumes.form.template_disclosure_choose_later'))
       expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.fast_start_pill'))
       expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
+      expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.choose_later_pill'))
+      expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.choose_later_description'))
       expect(template_disclosure.text).to include(I18n.t('resumes.form.template_disclosure_description', template: template.name))
       expect(template_disclosure.at_css('.template-picker-compact')).to be_present
       expect(response.body).not_to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
@@ -130,6 +133,51 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include('name="resume[settings][accent_color]"')
       expect(response.body).to include('value="#334155"')
       expect(response.body).to include('Slate accent')
+
+      document = Nokogiri::HTML.parse(response.body)
+      compact_summary = document.at_css('.template-picker-compact-summary')
+      expect(compact_summary).to be_present
+      expect(compact_summary.text).to include(classic_template.name)
+      expect(compact_summary.text).to include(I18n.t('resumes.template_picker_compact.accent_carry_through', variant: 'Slate'))
+      expect(compact_summary.at_css('span[style*="#334155"]')).to be_present
+    end
+  end
+
+  describe 'POST /resumes' do
+    it 'redirects scratch-mode resumes to the heading step instead of the source step' do
+      template
+
+      post resumes_path, params: {
+        resume: {
+          title: 'Scratch Resume',
+          headline: 'Engineer',
+          template_id: template.id
+        }
+      }
+
+      created_resume = user.resumes.order(created_at: :desc).first
+      expect(created_resume.source_mode).to eq('scratch')
+      expect(response).to redirect_to(edit_resume_path(created_resume, step: 'heading'))
+      expect(flash[:notice]).to eq(I18n.t('resumes.controller.resume_created'))
+    end
+
+    it 'redirects paste-mode resumes to the source step so content can be reviewed' do
+      template
+
+      post resumes_path, params: {
+        resume: {
+          title: 'Pasted Resume',
+          headline: 'Designer',
+          source_mode: 'paste',
+          source_text: 'Existing resume content here',
+          template_id: template.id
+        }
+      }
+
+      created_resume = user.resumes.order(created_at: :desc).first
+      expect(created_resume.source_mode).to eq('paste')
+      expect(response).to redirect_to(edit_resume_path(created_resume, step: 'source'))
+      expect(flash[:notice]).to eq(I18n.t('resumes.controller.resume_created'))
     end
   end
 
@@ -220,6 +268,30 @@ RSpec.describe 'Resumes', type: :request do
       expect(hrefs).to include(edit_resume_path(resume, step: 'education', locale: :en))
     end
 
+    it 'only shows supported upload formats when the upload path is active on the source step' do
+      scratch_resume = create(:resume, user:, template:, source_mode: 'scratch')
+      upload_resume = create(:resume, user:, template:, source_mode: 'upload')
+
+      get edit_resume_path(scratch_resume), params: { step: 'source' }
+
+      expect(response).to have_http_status(:ok)
+      scratch_document = Nokogiri::HTML.parse(response.body)
+      scratch_widget_titles = scratch_document.css('article p').map { |node| node.text.squish }
+
+      expect(scratch_widget_titles).to include(I18n.t('resumes.editor_source_step.import_status.eyebrow'))
+      expect(scratch_widget_titles).not_to include(I18n.t('resumes.editor_source_step.supported_formats.eyebrow'))
+
+      get edit_resume_path(upload_resume), params: { step: 'source' }
+
+      expect(response).to have_http_status(:ok)
+      upload_document = Nokogiri::HTML.parse(response.body)
+      upload_widget_titles = upload_document.css('article p').map { |node| node.text.squish }
+
+      expect(upload_widget_titles).to include(I18n.t('resumes.editor_source_step.supported_formats.eyebrow'))
+      expect(response.body).to include(Resumes::SourceTextResolver.supported_upload_formats_label)
+      expect(response.body).to include(I18n.t('resumes.editor_source_step.supported_formats.autofill_badge'))
+    end
+
     it 'hides the extra mobile preview panel on section-based builder steps while collapsing secondary builder actions and repeated section-type cues' do
       resume = create(:resume, user:, template:)
 
@@ -264,6 +336,49 @@ RSpec.describe 'Resumes', type: :request do
         I18n.t('resume_builder.editor_state.navigation.preview'),
         I18n.t('resume_builder.editor_state.navigation.go_back')
       )
+    end
+
+    it 'renders the source step without a duplicate step title' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'source' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body.scan(I18n.t('resume_builder.step_registry.steps.source.title')).size).to eq(1)
+      expect(response.body).to include(I18n.t('resumes.editor_source_step.import_status.eyebrow'))
+      expect(response.body).not_to include(I18n.t('resumes.editor_source_step.supported_formats.eyebrow'))
+    end
+
+    it 'renders the heading step without a duplicate step title while keeping the personal details widget' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'heading' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body.scan(I18n.t('resume_builder.step_registry.steps.heading.title')).size).to eq(1)
+      document = Nokogiri::HTML.parse(response.body)
+      optional_next_step_heading = document.css('article p').find do |node|
+        node.text.squish == I18n.t('resumes.editor_heading_step.optional_next_step.eyebrow')
+      end
+      personal_details_links = document.css('a').select do |link|
+        link.text.squish == I18n.t('resumes.editor_heading_step.optional_next_step.open_personal_details')
+      end
+
+      expect(optional_next_step_heading).to be_nil
+      expect(personal_details_links.size).to eq(1)
+      expect(response.body).to include(I18n.t('resumes.editor_heading_step.footer_note'))
+    end
+
+    it 'renders the personal details step without a duplicate step title and starts with the profile links panel' do
+      resume = create(:resume, user:, template:)
+
+      get edit_resume_path(resume), params: { step: 'personal_details' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.profile_links.eyebrow'))
+      expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.personal_information.eyebrow'))
+      expect(response.body).to include(I18n.t('resumes.editor_personal_details_step.optional_step.skip_for_now'))
+      expect(response.body).not_to include(I18n.t('resumes.editor_personal_details_step.optional_step.title'))
     end
 
     it 'keeps non-experience section steps focused without a duplicate step header card' do
@@ -322,32 +437,36 @@ RSpec.describe 'Resumes', type: :request do
       expect(next_move_card.text).to include(I18n.t('resume_builder.editor_state.next_step_card.finalize_description'))
     end
 
-    it 'uses compact finalize picker copy without reusing fast-start wording' do
+    it 'starts the finalize step with export actions in the preview panel and no duplicate step header' do
       resume = create(:resume, user:, template:)
 
       get edit_resume_path(resume), params: { step: 'finalize' }
 
       expect(response).to have_http_status(:ok)
-      expect(Nokogiri::HTML.parse(response.body).at_css('details[data-builder-secondary-actions]')).to be_nil
-      expect(response.body).to include(%(id="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
+      document = Nokogiri::HTML.parse(response.body)
+
+      expect(document.at_css('details[data-builder-secondary-actions]')).to be_nil
+      expect(response.body).not_to include(%(id="#{ActionView::RecordIdentifier.dom_id(resume, :workspace_overview)}"))
+
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.preview_action'))
+
       expect(response.body).to include('template-picker-compact')
-      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_pill'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_picker.browse_all_templates'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.font_family'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.section_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.paragraph_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.line_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
       expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
 
-      document = Nokogiri::HTML.parse(response.body)
       output_settings = document.at_css('details[data-finalize-output-settings]')
-
       expect(output_settings).to be_present
       expect(output_settings.attribute('open')).to be_nil
       expect(output_settings.text).to include(I18n.t('resumes.editor_finalize_step.output_settings.eyebrow'))
+      expect(document.at_css('select[name="resume[settings][font_family]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][line_spacing]"]')).to be_present
@@ -651,6 +770,7 @@ RSpec.describe 'Resumes', type: :request do
         resume: {
           settings: {
             page_size: 'Letter',
+            font_family: 'serif',
             font_scale: 'lg',
             density: 'relaxed',
             accent_color: '#123456',
@@ -664,6 +784,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
       expect(resume.reload.settings).to include(
         'page_size' => 'Letter',
+        'font_family' => 'serif',
         'font_scale' => 'lg',
         'density' => 'relaxed',
         'accent_color' => '#123456',
