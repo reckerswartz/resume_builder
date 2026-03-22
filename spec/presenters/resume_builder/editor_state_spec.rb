@@ -93,6 +93,36 @@ RSpec.describe ResumeBuilder::EditorState do
     end
   end
 
+  context 'when no step is explicitly requested on an incomplete resume' do
+    let(:requested_step) { nil }
+    let!(:experience_section) { create(:section, resume:, section_type: 'experience', title: 'Experience') }
+
+    it 'defaults to the first incomplete tracked step' do
+      expect(editor_state.current_step).to include(key: 'experience', current: true)
+      expect(editor_state.step_partial).to eq('editor_section_step')
+    end
+  end
+
+  context 'when no step is explicitly requested on a fully complete resume' do
+    let(:requested_step) { nil }
+    let!(:experience_section) { create(:section, resume:, section_type: 'experience', title: 'Experience') }
+    let!(:education_section) { create(:section, resume:, section_type: 'education', title: 'Education') }
+    let!(:skills_section) { create(:section, resume:, section_type: 'skills', title: 'Skills') }
+
+    before do
+      resume.update!(summary: 'Short summary')
+      create(:entry, section: experience_section, content: { 'title' => 'Designer' })
+      create(:entry, section: education_section, content: { 'degree' => 'B.Des' })
+      create(:entry, section: skills_section, content: { 'name' => 'Figma' })
+    end
+
+    it 'defaults to finalize when all tracked steps are complete' do
+      expect(editor_state.completion_percentage).to eq(100)
+      expect(editor_state.current_step).to include(key: 'finalize', current: true)
+      expect(editor_state.step_partial).to eq('editor_finalize_step')
+    end
+  end
+
   context 'when a section-backed step is visited after the tracked builder flow is already complete' do
     let(:requested_step) { 'education' }
     let!(:experience_section) { create(:section, resume:, section_type: 'experience', title: 'Experience') }

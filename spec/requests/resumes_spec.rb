@@ -320,6 +320,43 @@ RSpec.describe 'Resumes', type: :request do
   end
 
   describe 'GET /resumes/:id/edit' do
+    it 'defaults to finalize step when all tracked steps are complete and no step param is given' do
+      resume = create(:resume, user:, template:,
+        title: 'Complete Resume',
+        contact_details: { 'full_name' => 'Pat Kumar', 'email' => 'pat@example.com' },
+        summary: 'A strong summary.')
+      experience = create(:section, resume:, section_type: 'experience', title: 'Experience')
+      education = create(:section, resume:, section_type: 'education', title: 'Education')
+      skills = create(:section, resume:, section_type: 'skills', title: 'Skills')
+      create(:entry, section: experience, content: { 'title' => 'Designer' })
+      create(:entry, section: education, content: { 'degree' => 'B.Des' })
+      create(:entry, section: skills, content: { 'name' => 'Figma' })
+
+      get edit_resume_path(resume)
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      current_tab = document.css('nav a').find { |link| link.text.include?('Current') }
+
+      expect(current_tab.text).to include('Finalize')
+    end
+
+    it 'defaults to the first incomplete tracked step when no step param is given' do
+      resume = create(:resume, user:, template:,
+        title: 'Incomplete Resume',
+        contact_details: { 'full_name' => 'Pat Kumar', 'email' => 'pat@example.com' },
+        summary: 'A summary.')
+      create(:section, resume:, section_type: 'experience', title: 'Experience')
+
+      get edit_resume_path(resume)
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      current_tab = document.css('nav a').find { |link| link.text.include?('Current') }
+
+      expect(current_tab.text).to include('Experience')
+    end
+
     it 'preserves locale query params in builder navigation and preview handoff links' do
       resume = create(:resume, user:, template:)
 
@@ -569,6 +606,16 @@ RSpec.describe 'Resumes', type: :request do
       expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][line_spacing]"]')).to be_present
+
+      accent_palette = document.at_css('[data-controller="accent-palette"]')
+      expect(accent_palette).to be_present
+      accent_swatches = accent_palette.css('button[data-accent-palette-target="swatch"]')
+      expect(accent_swatches.size).to eq(ResumeTemplates::Catalog::ACCENT_COLOR_PALETTE.size)
+      expect(accent_palette.at_css('input[name="resume[settings][accent_color]"]')).to be_present
+      expect(accent_palette.at_css('button[data-accent-palette-target="resetButton"]')).to be_present
+      expect(accent_palette.at_css('input[data-accent-palette-target="customInput"]')).to be_present
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.output_settings.accent_color_palette_label'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.output_settings.accent_color_reset'))
     end
 
     it 'collapses the shared add-section form on populated section steps' do
