@@ -11,8 +11,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `add_targeted_specs`
-- Last reviewed: `2026-03-22T05:50:00Z`
-- Last changed: `2026-03-22T05:50:00Z`
+- Last reviewed: `2026-03-22T06:10:00Z`
+- Last changed: `2026-03-22T06:10:00Z`
 
 ## Hotspot summary
 
@@ -175,15 +175,23 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Added `spec/services/resumes/docx_text_extractor_spec.rb` (11 examples) covering paragraph extraction from word/document.xml, multiple text run joining, tab node conversion, break/cr node conversion, header-before-document ordering, footer-after-document ordering, multiple header numeric sorting, blank paragraph skipping, corrupt ZIP recovery, missing document.xml, and empty-paragraph-only documents.
 - Re-verified adjacent consumer coverage in `spec/services/resumes/source_text_resolver_spec.rb` and `spec/services/llm/resume_autofill_service_spec.rb`.
 
+### Slice 33: resumes-export-status-broadcaster-spec
+
+- Added `spec/services/resumes/export_status_broadcaster_spec.rb` (3 examples) covering status broadcasts for editor/preview/show contexts, action broadcasts for show/finalize contexts, and resume-scoped export stream verification (5 total broadcasts).
+
+### Slice 34: errors-tracker-spec
+
+- Added `spec/services/errors/tracker_spec.rb` (8 examples) covering ErrorLog creation with error details, backtrace truncation to 25 lines, context normalization with string keys, occurred_at and duration_ms recording, log message with reference_id and context details, request_id/active_job_id inclusion in log, nil return with fallback log on creation failure, and nil context handling.
+- Re-verified adjacent consumer coverage in `spec/jobs/application_job_spec.rb`.
+
 ## Pending
 
-- Remaining coverage gaps are now concentrated in low-priority shared service utilities and UI components.
-- Next verification candidates: `app/services/resumes/export_status_broadcaster.rb`, `app/services/errors/tracker.rb`.
+- All inventoried service coverage gaps are now closed.
+- Remaining coverage gaps are concentrated in low-priority UI components (25 missing) and skip-tier models.
 
 ## Open follow-up keys
 
-- `add-resumes-export-status-broadcaster-spec`
-- `add-errors-tracker-spec`
+(none)
 
 ## Closed follow-up keys
 
@@ -204,13 +212,15 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - `add-resumes-cloud-import-provider-catalog-spec`
 - `add-resumes-pdf-text-extractor-spec`
 - `add-resumes-docx-text-extractor-spec`
+- `add-resumes-export-status-broadcaster-spec`
+- `add-errors-tracker-spec`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/services/resumes/pdf_text_extractor_spec.rb spec/services/resumes/docx_text_extractor_spec.rb spec/services/resumes/source_text_resolver_spec.rb spec/services/llm/resume_autofill_service_spec.rb` (31 examples, 0 failures)
+  - `bundle exec rspec spec/services/resumes/export_status_broadcaster_spec.rb spec/services/errors/tracker_spec.rb spec/jobs/application_job_spec.rb` (17 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/services/resumes/pdf_text_extractor.rb app/services/resumes/docx_text_extractor.rb spec/services/resumes/pdf_text_extractor_spec.rb spec/services/resumes/docx_text_extractor_spec.rb` (Syntax OK)
+  - `ruby -c spec/services/resumes/export_status_broadcaster_spec.rb spec/services/errors/tracker_spec.rb` (Syntax OK)
 
 ## Full missing-spec inventory (as of 2026-03-21)
 
@@ -226,8 +236,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 |------|-------|----------|
 | `Resumes::DocxTextExtractor` | ~60 | ~~low~~ covered |
 | `Resumes::PdfTextExtractor` | ~20 | ~~low~~ covered |
-| `Resumes::ExportStatusBroadcaster` | ~20 | low |
-| `Errors::Tracker` | ~30 | low |
+| `Resumes::ExportStatusBroadcaster` | ~39 | ~~low~~ covered |
+| `Errors::Tracker` | ~56 | ~~low~~ covered |
 
 ### Jobs (0 remaining)
 | File | Lines | Priority |

@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:00:00Z"
+updated_at: "2026-03-22T06:10:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-22-job-logs-helper-runtime-control-state/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-22-broadcaster-tracker-coverage/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -42,13 +42,11 @@ categories:
 round_robin:
   overview_doc: "docs/maintainability_audits/README.md"
   audit_scope: "whole_codebase"
-  last_completed_lane: "structural"
-  next_preferred_lane: "verification"
+  last_completed_lane: "verification"
+  next_preferred_lane: "structural"
   max_consecutive_lane_runs: 1
   structural_candidate_paths: []
-  verification_candidate_paths:
-    - "app/services/resumes/export_status_broadcaster.rb"
-    - "app/services/errors/tracker.rb"
+  verification_candidate_paths: []
 areas:
   - area_key: "resumes-controller-draft-building"
     title: "Resumes controller builder flow cleanup"
@@ -276,12 +274,12 @@ areas:
       - "ApplicationJob (91 lines, shared base for all background jobs) had zero dedicated coverage."
     recommended_refactor_shape: "add_targeted_specs"
     area_doc_path: "docs/maintainability_audits/areas/broad-codebase-coverage-scan.md"
-    open_follow_up_keys:
-      - "add-resumes-export-status-broadcaster-spec"
-      - "add-errors-tracker-spec"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "add-resumes-docx-text-extractor-spec"
       - "add-resumes-pdf-text-extractor-spec"
+      - "add-resumes-export-status-broadcaster-spec"
+      - "add-errors-tracker-spec"
       - "add-application-job-spec"
       - "add-job-log-policy-spec"
       - "add-llm-provider-policy-spec"
@@ -297,14 +295,14 @@ areas:
       - "add-llm-providers-ollama-client-spec"
       - "add-llm-providers-base-client-spec"
       - "add-resumes-cloud-import-provider-catalog-spec"
-    last_reviewed_at: "2026-03-22T05:50:00Z"
-    last_changed_at: "2026-03-22T05:50:00Z"
-    next_step: "Add dedicated spec coverage for Resumes::ExportStatusBroadcaster and Errors::Tracker, then re-evaluate the remaining low-priority service coverage gaps."
-    cycle_count: 21
-    last_cycle_date: "2026-03-22T05:50:00Z"
+    last_reviewed_at: "2026-03-22T06:10:00Z"
+    last_changed_at: "2026-03-22T06:10:00Z"
+    next_step: "All inventoried service coverage gaps are closed. Remaining gaps are in low-priority UI components and skip-tier models."
+    cycle_count: 23
+    last_cycle_date: "2026-03-22T06:10:00Z"
     issues_found: 61
-    issues_resolved: 33
-    issues_remaining: 28
+    issues_resolved: 35
+    issues_remaining: 26
     regression_detected: false
   - area_key: "llm-provider-credential-management"
     title: "LlmProvider credential management extraction"

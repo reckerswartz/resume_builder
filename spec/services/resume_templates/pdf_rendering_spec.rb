@@ -321,10 +321,11 @@ RSpec.describe 'Resume template PDF rendering' do
 
     document = Nokogiri::HTML.parse(html)
 
-    contact_container = document.css('div').find { |n| n['class'].to_s.include?('flex-wrap') && n['class'].to_s.include?('gap-x-2') }
+    contact_container = document.css('div').find { |n| n['class'].to_s.include?('flex-wrap') && n['class'].to_s.include?('gap-2') && n['class'].to_s.include?('items-start') }
     expect(contact_container).to be_present
-    expect(contact_container['class']).to include('gap-y-1.5')
-    expect(contact_container['class']).to include('items-start')
+    expect(contact_container['class']).to include('gap-2')
+    expect(contact_container['class']).not_to include('gap-x-2')
+    expect(contact_container['class']).not_to include('gap-y-1.5')
   end
 
   it 'renders Modern with baseline-aligned marker dots and shadowed entry cards' do
@@ -362,6 +363,20 @@ RSpec.describe 'Resume template PDF rendering' do
     document = Nokogiri::HTML.parse(html)
     contact_column = document.css('div').find { |n| n['class'].to_s.include?('sm:max-w-xs') && n['class'].to_s.include?('sm:text-right') }
     expect(contact_column).to be_present
+  end
+
+  it 'renders Professional with tighter entry spacing than the shared density default' do
+    resume = build_resume_for(family: 'professional', accent_color: '#0F4C81')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+    entry_container = document.css('div').find { |n| n['class'].to_s.include?('space-y-4') && n['class'].to_s.include?('mt-4') }
+    expect(entry_container).to be_present
   end
 
   it 'renders Sidebar Accent with consistent card radius, blended skill chips, and medium-weight contact labels' do

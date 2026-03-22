@@ -405,6 +405,40 @@ RSpec.describe 'Resumes', type: :request do
       expect(current_tab.text).to include('Finalize')
     end
 
+    it 'auto-switches the template when visiting finalize with a marketplace template_id param' do
+      original_template = template
+      new_template = create(:template, name: 'Sidebar Accent', slug: 'sidebar-accent',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'sidebar-accent'))
+      resume = create(:resume, user:, template: original_template, title: 'Existing Resume')
+
+      get edit_resume_path(resume, step: :finalize, template_id: new_template.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(resume.reload.template).to eq(new_template)
+      expect(response.body).to include(I18n.t('resumes.controller.template_applied'))
+    end
+
+    it 'does not switch template when template_id matches the current template' do
+      resume = create(:resume, user:, template:, title: 'Same Template Resume')
+
+      get edit_resume_path(resume, step: :finalize, template_id: template.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(resume.reload.template).to eq(template)
+      expect(response.body).not_to include(I18n.t('resumes.controller.template_applied'))
+    end
+
+    it 'ignores template_id param on non-finalize steps' do
+      new_template = create(:template, name: 'Classic Ivory', slug: 'classic-ivory',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
+      resume = create(:resume, user:, template:, title: 'Heading Step Resume')
+
+      get edit_resume_path(resume, step: :heading, template_id: new_template.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(resume.reload.template).to eq(template)
+    end
+
     it 'defaults to the first incomplete tracked step when no step param is given' do
       resume = create(:resume, user:, template:,
         title: 'Incomplete Resume',

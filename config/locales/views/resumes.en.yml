@@ -8,6 +8,7 @@ en:
       unable_to_create: "Unable to create resume."
       resume_updated: "Resume updated successfully."
       resume_duplicated: "Resume duplicated successfully."
+      template_applied: "Template applied to this resume."
       resume_deleted: "Resume deleted successfully."
       review_highlighted_errors: "Review the highlighted fields and try again."
       source_applied: "Source content applied to the resume draft."
