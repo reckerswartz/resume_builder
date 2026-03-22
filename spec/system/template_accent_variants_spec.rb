@@ -34,7 +34,7 @@ RSpec.describe "Template accent variants", type: :system, js: true do
   it "updates the selected picker card preview state when an accent swatch is chosen" do
     visit new_resume_path(step: "setup", template_id: modern_template.id, resume: resume_intake_params)
 
-    find("details.template-picker-disclosure summary").click
+    find("details[data-resume-template-disclosure] summary").click
     find(%([data-template-picker-target="card"][data-template-id="#{modern_template.id}"]))
 
     find(
