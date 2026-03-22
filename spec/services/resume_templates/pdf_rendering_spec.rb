@@ -12,7 +12,7 @@ RSpec.describe 'Resume template PDF rendering' do
     template = create(
       :template,
       name: ResumeTemplates::Catalog.family_label(family),
-      slug: family,
+      slug: "#{family}-#{SecureRandom.hex(4)}",
       layout_config: ResumeTemplates::Catalog.default_layout_config(family: family)
     )
 
