@@ -50,7 +50,8 @@ This workflow operates as a repeating cycle: **Audit → Prioritize → Fix → 
 14. **Open a PR**: `bin/gh-bridge/create-pr --workflow responsive-ui-audit --key <key> --issue <N> --title "Fix: <description>"`
 15. Cross-page regression check if shared components were changed.
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-16. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "responsive-ui-audit/<key>"`
-17. Check `bin/gh-bridge/fetch-issues --workflow responsive-ui-audit` for remaining issues. Recommend the next entry point.
+16. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+17. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "responsive-ui-audit/<key>"`
+18. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

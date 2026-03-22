@@ -39,7 +39,8 @@ This workflow operates as a repeating cycle: **Resolve candidate → Implement s
     ```
 14. **Open a PR**: `bin/gh-bridge/create-pr --workflow behance-template-implementation --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-15. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "behance-template-implementation/<key>"`
-16. Check remaining issues. If open improvement keys remain, recommend `reopen-improvement`. If fully implemented, recommend returning to `/behance-template-rollout`. If architecture prerequisites were built, recommend `/template-audit`.
+15. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+16. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "behance-template-implementation/<key>"`
+17. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

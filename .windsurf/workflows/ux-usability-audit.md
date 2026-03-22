@@ -48,7 +48,8 @@ This workflow operates as a repeating cycle: **Audit → Score → Fix → Valid
 14. **Update GitHub issue**: `bin/gh-bridge/update-issue --issue <N> --status verified --comment "<results and new scores>"`
 15. **Open a PR**: `bin/gh-bridge/create-pr --workflow ux-usability-audit --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-16. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "ux-usability-audit/<key>"`
-17. Check `bin/gh-bridge/fetch-issues --workflow ux-usability-audit` for remaining issues. Recommend the next entry point.
+16. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+17. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "ux-usability-audit/<key>"`
+18. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

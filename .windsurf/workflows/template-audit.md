@@ -74,11 +74,15 @@ This workflow operates as a repeating cycle: **Audit → Capture discrepancies �
       --title "Fix: <description>"
     ```
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-17. After PR merge, close the issue:
+17. Enable auto-merge on the PR:
+    ```bash
+    bin/gh-bridge/auto-merge --pr <M>
+    ```
+18. After merge, close the issue and clean up:
     ```bash
     bin/gh-bridge/close-issue --issue <N> --reason completed \
       --comment "Resolved in PR #<M>." --delete-branch "template-audit/<key>"
     ```
-18. **Always recommend the next cycle entry point**: check `bin/gh-bridge/fetch-issues --workflow template-audit` for remaining open issues. If none remain, recommend `review-only` on templates that haven't been audited recently.
+19. **Return to the autonomous loop** — this workflow is one step in the `/github-ops` continuous processing engine. After closing, the engine picks the next issue from the queue automatically.

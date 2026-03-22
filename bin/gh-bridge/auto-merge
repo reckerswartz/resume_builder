@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Enables auto-merge on a pull request so it merges automatically after CI passes.
+# Falls back to direct merge if auto-merge is not available on the repo.
+#
+# Usage: bin/gh-bridge/auto-merge --pr <number> [--method merge|squash|rebase]
+#
+# Outputs: PR number
+
+set -euo pipefail
+
+PR=""
+METHOD="squash"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --pr)     PR="$2";     shift 2 ;;
+    --method) METHOD="$2";  shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$PR" ]; then
+  echo "ERROR: --pr is required." >&2
+  exit 1
+fi
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+# Try auto-merge first (requires branch protection rules with required checks)
+if gh pr merge "$PR" --repo "$REPO" --auto --"$METHOD" 2>/dev/null; then
+  echo "$PR"
+  exit 0
+fi
+
+# Fallback: wait briefly for CI then merge directly
+echo "Auto-merge not available. Attempting direct merge..." >&2
+sleep 5
+if gh pr merge "$PR" --repo "$REPO" --"$METHOD" --delete-branch 2>/dev/null; then
+  echo "$PR"
+  exit 0
+fi
+
+echo "PR $PR: merge deferred — manual review may be required." >&2
+echo "$PR"

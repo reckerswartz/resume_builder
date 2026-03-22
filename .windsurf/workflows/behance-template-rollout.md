@@ -43,7 +43,8 @@ This workflow operates as a repeating cycle: **Discover → Capture → Compare 
 14. **Update GitHub issue** with verification results and screenshots.
 15. **Open a PR** linked to the issue.
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-16. After PR merge: close the issue via `bin/gh-bridge/close-issue`.
-17. Check `bin/gh-bridge/fetch-issues --workflow behance-template-rollout` for remaining candidates. Recommend the next entry point.
+16. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+17. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "behance-template-rollout/<key>"`
+18. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

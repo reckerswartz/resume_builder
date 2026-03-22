@@ -44,7 +44,8 @@ This workflow operates as a repeating cycle: **Audit → Prioritize → Remediat
 11. **Update GitHub issue**: `bin/gh-bridge/update-issue --issue <N> --status verified --comment "<results>"`
 12. **Open a PR**: `bin/gh-bridge/create-pr --workflow security-audit --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-13. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "security-audit/<key>"`
-14. Check `bin/gh-bridge/fetch-issues --workflow security-audit` for remaining issues. Recommend `/smart-fix` for critical issues, `/code-review` for architectural concerns.
+13. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+14. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "security-audit/<key>"`
+15. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

@@ -49,7 +49,8 @@ This workflow operates as a repeating cycle: **Audit → Score → Fix → Valid
 15. **Update GitHub issue**: `bin/gh-bridge/update-issue --issue <N> --status verified --comment "<results and new scores>"`
 16. **Open a PR**: `bin/gh-bridge/create-pr --workflow ui-guidelines-audit --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-17. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "ui-guidelines-audit/<key>"`
-18. Check `bin/gh-bridge/fetch-issues --workflow ui-guidelines-audit` for remaining issues. Recommend the next entry point.
+17. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+18. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "ui-guidelines-audit/<key>"`
+19. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

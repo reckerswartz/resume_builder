@@ -45,7 +45,8 @@ This workflow operates as a repeating cycle: **Review hosted behavior → implem
 14. **Open a PR**: `bin/gh-bridge/create-pr --workflow resumebuilder-reference-rollout --key <key> --issue <N> --title "Fix: <description>"`
 15. If the slice materially changes UI, recommend follow-on `/ui-guidelines-audit`, `/responsive-ui-audit`, or `/ux-usability-audit`.
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-16. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "resumebuilder-reference-rollout/<key>"`
-17. Check `bin/gh-bridge/fetch-issues --workflow resumebuilder-reference-rollout` for remaining slices. Recommend the next entry point.
+16. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+17. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "resumebuilder-reference-rollout/<key>"`
+18. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.

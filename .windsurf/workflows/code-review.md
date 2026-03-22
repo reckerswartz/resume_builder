@@ -42,7 +42,8 @@ This workflow operates as a repeating cycle: **Review → Prioritize → Remedia
 10. **Update GitHub issue**: `bin/gh-bridge/update-issue --issue <N> --status verified --comment "<results>"`
 11. **Open a PR**: `bin/gh-bridge/create-pr --workflow code-review --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Close & Cycle Forward
+### Phase 5: Auto-Merge, Close & Continue
 
-12. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "code-review/<key>"`
-13. Recommend next entry point: `/security-audit` for security findings, `/maintainability-audit` for architectural concerns, `/rspec-agent` for testing gaps, `/ux-usability-audit` for UI/copy issues.
+12. Enable auto-merge: `bin/gh-bridge/auto-merge --pr <M>`
+13. After merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "code-review/<key>"`
+14. **Return to the autonomous loop** — the `/github-ops` engine picks the next issue automatically.
