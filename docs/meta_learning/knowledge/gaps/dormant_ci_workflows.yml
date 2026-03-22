@@ -1,13 +1,16 @@
 id: "ML-GAP-020"
 title: "Dormant CI/CD workflows"
 category: automation_gap
-status: automated
+status: validated
 severity: high
 confidence: high
 discovered_at: "2026-03-22T23:13:43Z"
 source_analysis: "tmp/meta_learning/2026-03-22T23-13-15Z-analysis.json"
 automated_at: "2026-03-22T23:32:00Z"
 automated_by: "ML-GEN-002"
+validated_at: "2026-03-22T23:46:30Z"
+validated_by: "ML-GEN-002"
+github_issue_number: 81
 evidence:
   dormant_workflows:
     - auto-fix

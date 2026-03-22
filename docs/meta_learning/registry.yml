@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:32:00Z"
+updated_at: "2026-03-22T23:46:30Z"
 workflow:
   status: active
   path: ".windsurf/workflows/meta-learning.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/meta_learning/README.md"
   knowledge_path: "docs/meta_learning/knowledge"
   run_doc_pattern: "docs/meta_learning/runs/<date>-<slug>/00-overview.md"
-  latest_run: "docs/meta_learning/runs/2026-03-22-workflow-health-generate/00-overview.md"
+  latest_run: "docs/meta_learning/runs/2026-03-22-workflow-health-validate/00-overview.md"
 artifacts:
   cache_root: "tmp/meta_learning"
   collection_subfolder: "collections"
@@ -85,13 +85,13 @@ cross_workflow_routing:
   feature_gaps: "/continuous-improvement"
   ci_cd_gaps: ".github/workflows/"
 cycle_metrics:
-  cycle_count: 3
-  last_cycle_date: "2026-03-22T23:32:00Z"
+  cycle_count: 4
+  last_cycle_date: "2026-03-22T23:46:30Z"
   patterns_discovered: 22
   knowledge_entries: 6
   automations_generated: 2
-  automations_validated: 1
-  automations_active: 1
+  automations_validated: 2
+  automations_active: 2
   effectiveness_score: null
   collection_log:
     - collected_at: "2026-03-22T23:13:16Z"
@@ -140,8 +140,9 @@ automation_inventory:
       - "Missing-registry warning path works for smart-fix."
   - id: "ML-GEN-002"
     title: "Dormant workflow health monitor for auto-fix and continuous-audit"
-    status: generated
+    status: validated
     generated_at: "2026-03-22T23:32:00Z"
+    validated_at: "2026-03-22T23:46:30Z"
     outputs:
       - ".github/scripts/workflow-health-check.mjs"
       - ".github/workflows/workflow-health.yml"
@@ -151,7 +152,8 @@ automation_inventory:
     validation_notes:
       - "Local syntax validation passed for workflow-health-check.mjs."
       - "Workflow YAML parsing passed for workflow-health.yml."
-      - "Live GitHub run validation is still required."
+      - "Live GitHub workflow run 23415403621 completed successfully."
+      - "Dormant workflow alert issue #81 was created with the expected report content."
 findings:
   - id: "ML-PATTERN-002"
     category: recurring_issue
@@ -185,7 +187,7 @@ findings:
     category: automation_gap
     severity: high
     confidence: high
-    status: automated
+    status: validated
     actionability: automate
     title: "2 CI/CD workflows have no recent runs"
   - id: "ML-SOLUTION-018"
@@ -196,5 +198,5 @@ findings:
     actionability: inform
     title: "Small, focused PRs are the dominant merge pattern"
 next_step:
-  recommended_mode: "validate"
-  reason: "The workflow health monitor is implemented and locally syntax-checked. The next step is a live GitHub validation run to confirm dormant-workflow issue creation and closure behavior against real Actions history."
+  recommended_mode: "generate"
+  reason: "The dormant-workflow monitor is now live and validated. The strongest next automation slice is ML-PATTERN-002: codify maintainability verification coverage for infrastructure-heavy changes."
