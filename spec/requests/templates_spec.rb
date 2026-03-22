@@ -282,7 +282,7 @@ RSpec.describe 'Templates', type: :request do
 
       expect(apply_links).to be_present
       expect(apply_links.first.text).to include('My Active Resume')
-      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize))
+      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize, template_id: template.id))
     end
 
     it 'shows Apply to resume link on the template detail page' do
@@ -297,7 +297,7 @@ RSpec.describe 'Templates', type: :request do
 
       expect(apply_links).to be_present
       expect(apply_links.first.text).to include('My Active Resume')
-      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize))
+      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize, template_id: template.id))
     end
 
     it 'hides Apply to resume link for guests with no resumes' do
