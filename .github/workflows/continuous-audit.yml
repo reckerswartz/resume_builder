@@ -70,7 +70,7 @@ jobs:
     if: needs.determine_scope.outputs.run_tests == 'true' || needs.determine_scope.outputs.run_security == 'true'
     steps:
       - name: Dispatch CI workflow
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({
@@ -89,7 +89,7 @@ jobs:
     if: needs.determine_scope.outputs.run_ui == 'true'
     steps:
       - name: Dispatch Playwright audit
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({
@@ -108,7 +108,7 @@ jobs:
     if: always()
     steps:
       - name: Generate cycle report
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             // Count open issues by category
