@@ -39,7 +39,7 @@
 
 | ID | Area | Severity | Description | Found | Status |
 |----|------|----------|-------------|-------|--------|
-| MOD-001 | contact_pills | minor | Contact pills at narrow viewport widths lose balanced spacing when wrapping. Expected: consistent 8px gap. Actual: variable gap. | 2026-03-21 | open |
+| MOD-001 | contact_pills | minor | Contact pills at narrow viewport widths lose balanced spacing when wrapping. Expected: consistent 8px gap. Actual: variable gap. | 2026-03-21 | resolved |
 | MOD-002 | section_marker | minor | Accent dot marker is vertically centered but should sit on the text baseline for optical alignment with the section title. | 2026-03-21 | resolved |
 | MOD-003 | entry_card_shadow | minor | Entry cards use no shadow, relying only on border. Reference design shows subtle shadow-sm for lifted card feel. | 2026-03-21 | resolved |
 | MOD-004 | summary_line_height | minor | Summary paragraph uses leading-7 which is slightly loose. Reference uses leading-6 for tighter professional feel. | 2026-03-21 | resolved |
@@ -56,6 +56,7 @@
 | MOD-007 | language_entry_level | minor | Added level to entry_subtitle in BaseComponent | 2026-03-21 | Shared fix — languages now show proficiency (e.g. "Native", "Professional") |
 | MOD-002 | section_marker | minor | Changed items-center → items-baseline, dot h-3 w-3 → h-2.5 w-2.5 shrink-0 mt-0.5 | 2026-03-22 | Optical baseline alignment |
 | MOD-003 | entry_card_shadow | minor | Added shadow-sm to entry card article class | 2026-03-22 | Lifted card feel |
+| MOD-001 | contact_pills | minor | Changed gap-2 → gap-x-2 gap-y-1.5, added items-start | 2026-03-22 | Consistent wrapping gaps |
 
 ## Screenshots
 
@@ -74,3 +75,4 @@
 - **2026-03-21** — Review-only re-review after the shared Tailwind utility fix. Full/minimal previews showed no console errors or hidden-section regressions, and direct PDF export verification resolved MOD-006 with a 5-page A4 output. 3 minor discrepancies remain.
 - **2026-03-21** — Regression-baseline re-review after local template/shared rendering changes. Full/minimal previews stayed free of horizontal overflow, the hidden-section behavior remained intact, and direct PDF export still produced 5 A4 pages. No new discrepancies were identified.
 - **2026-03-22** — Full-cycle: resolved MOD-002 (marker baseline alignment) and MOD-003 (entry card shadow). Only MOD-001 (contact_pills minor gap) remains. Advanced to `pixel_perfect`.
+- **2026-03-22** — Implement-next: resolved MOD-001 (contact pills wrapping gap) by changing gap-2 → gap-x-2 gap-y-1.5 and adding items-start for consistent top-alignment of wrapped pill rows. 0 open discrepancies remain.

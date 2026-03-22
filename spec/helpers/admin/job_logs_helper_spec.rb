@@ -39,7 +39,7 @@ RSpec.describe Admin::JobLogsHelper, type: :helper do
   describe '#job_log_runtime_state' do
     it 'builds a RuntimeState presenter from the job log and queue snapshot' do
       job_log = build(:job_log)
-      snapshot = instance_double(Admin::QueueSnapshot, unavailable?: true, found?: false, orphaned_claimed?: false, state: nil, state_label: nil, process: nil)
+      snapshot = double("QueueSnapshot", unavailable?: true, found?: false, orphaned_claimed?: false, state: nil, state_label: nil, process: nil)
 
       state = helper.job_log_runtime_state(job_log, snapshot)
 
@@ -51,7 +51,7 @@ RSpec.describe Admin::JobLogsHelper, type: :helper do
   describe '#job_log_control_state' do
     it 'builds a ControlState presenter from the job log and queue snapshot' do
       job_log = build(:job_log, :failed)
-      snapshot = instance_double(Admin::QueueSnapshot, retryable?: false, discardable?: false, orphaned_claimed?: false)
+      snapshot = double("QueueSnapshot", retryable?: false, discardable?: false, orphaned_claimed?: false)
 
       state = helper.job_log_control_state(job_log, snapshot)
 

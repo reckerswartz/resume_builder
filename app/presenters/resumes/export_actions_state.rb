@@ -22,13 +22,13 @@ module Resumes
               label: I18n.t("resumes.export_actions_state.actions.download_pdf"),
               path: view_context.download_resume_path(resume),
               style: :secondary,
-              options: { data: { turbo_frame: "_top" } }
+              options: { data: { turbo: false } }
             },
             {
               label: I18n.t("resumes.export_actions_state.actions.download_text"),
               path: view_context.download_text_resume_path(resume),
               style: :secondary,
-              options: { data: { turbo_frame: "_top" } }
+              options: { data: { turbo: false } }
             }
           ]
         else
@@ -43,7 +43,7 @@ module Resumes
               label: I18n.t("resumes.export_actions_state.actions.download_text"),
               path: view_context.download_text_resume_path(resume),
               style: :secondary,
-              options: { data: { turbo_frame: "_top" } }
+              options: { data: { turbo: false } }
             }
           ]
         end
@@ -64,7 +64,7 @@ module Resumes
             label: I18n.t("resumes.export_actions_state.actions.download_pdf"),
             path: view_context.download_resume_path(resume),
             style: :primary,
-            options: { data: { turbo_frame: "_top" } }
+            options: { data: { turbo: false } }
           }
         end
 
@@ -72,7 +72,7 @@ module Resumes
           label: I18n.t("resumes.export_actions_state.actions.download_text"),
           path: view_context.download_text_resume_path(resume),
           style: :secondary,
-          options: { data: { turbo_frame: "_top" } }
+          options: { data: { turbo: false } }
         }
 
         actions
