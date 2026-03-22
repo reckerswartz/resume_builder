@@ -148,6 +148,9 @@ end %>
     <div class="mt-6 flex flex-wrap gap-3">
       <%= link_to t(".preview_template"), preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center", data: { template_variant_preview_link: true, template_id: template.id } %>
       <%= link_to t(".use_template"), use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center", data: { template_variant_use_link: true, template_id: template.id } %>
+      <% if card_state.present? && card_state[:apply_to_resume_path].present? %>
+        <%= link_to card_state[:apply_to_resume_label], card_state[:apply_to_resume_path], class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
+      <% end %>
     </div>
   </div>
 <% end %>

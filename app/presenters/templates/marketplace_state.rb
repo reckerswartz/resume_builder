@@ -53,7 +53,7 @@ module Templates
     def apply_to_resume_path_for(template)
       return unless latest_user_resume.present?
 
-      view_context.edit_resume_path(latest_user_resume, step: :finalize)
+      view_context.edit_resume_path(latest_user_resume, step: :finalize, template_id: template.id)
     end
 
     def apply_to_resume_label
@@ -199,7 +199,9 @@ module Templates
           preview_template_path: preview_template_path_for(template, accent_color: selected_accent_color),
           preview_template_paths_by_accent_color: preview_template_paths_by_accent_color(template, template_card),
           use_template_path: use_template_path_for(template, accent_color: selected_accent_color),
-          use_template_paths_by_accent_color: use_template_paths_by_accent_color(template, template_card)
+          use_template_paths_by_accent_color: use_template_paths_by_accent_color(template, template_card),
+          apply_to_resume_path: apply_to_resume_path_for(template),
+          apply_to_resume_label: apply_to_resume_label
         }
       end
     end

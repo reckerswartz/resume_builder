@@ -23,7 +23,7 @@
           <% if badges.any? %>
             <div class="<%= badges_classes %>">
               <% badges.each do |badge| %>
-                <span class="<%= helpers.ui_badge_classes(badge.fetch(:tone, :hero)) %>"><%= badge.fetch(:label) %></span>
+                <span class="<%= helpers.ui_badge_classes(badge.fetch(:tone, :hero)) %>"><% if badge[:glyph] %><%= render Ui::GlyphComponent.new(name: badge[:glyph], size: :xs, tone: :hero) %> <% end %><%= badge.fetch(:label) %></span>
               <% end %>
             </div>
           <% end %>

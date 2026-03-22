@@ -10,7 +10,7 @@
         </div>
 
         <% if contact_items.any? %>
-          <div class="flex flex-wrap items-start gap-x-2 gap-y-1.5 <%= meta_text_class %> text-slate-600 sm:max-w-xs sm:justify-end">
+          <div class="flex flex-wrap items-start gap-2 <%= meta_text_class %> text-slate-600 sm:max-w-xs sm:justify-end">
             <% contact_items.each do |label, value| %>
               <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"><span class="font-medium text-slate-900"><%= label %>:</span> <%= value %></span>
             <% end %>
@@ -26,7 +26,7 @@
       </div>
 
       <% if contact_items.any? %>
-        <div class="mt-4 flex flex-wrap items-start gap-x-2 gap-y-1.5 <%= meta_text_class %> text-slate-600">
+        <div class="mt-4 flex flex-wrap items-start gap-2 <%= meta_text_class %> text-slate-600">
           <% contact_items.each do |label, value| %>
             <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"><span class="font-medium text-slate-900"><%= label %>:</span> <%= value %></span>
           <% end %>

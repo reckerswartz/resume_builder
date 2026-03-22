@@ -31,14 +31,17 @@
       </div>
     </div>
 
-    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
-      <div class="space-y-1">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.personal_information.eyebrow") %></p>
-        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.personal_information.title") %></h3>
-        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.personal_information.description") %></p>
-      </div>
+    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>">
+      <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
+        <div class="flex-1 space-y-1">
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.personal_information.eyebrow") %></p>
+          <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.personal_information.title") %></h3>
+          <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.personal_information.description") %></p>
+        </div>
+        <span class="text-ink-400 transition-transform group-open:rotate-180">▾</span>
+      </summary>
 
-      <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <div>
           <%= label_tag "resume_personal_details_date_of_birth", t("resumes.editor_personal_details_step.labels.date_of_birth"), class: ui_label_classes %>
           <%= date_field_tag "resume[personal_details][date_of_birth]", resume.personal_detail_field("date_of_birth"), class: ui_input_classes %>
@@ -59,16 +62,19 @@
           <%= text_field_tag "resume[personal_details][visa_status]", resume.personal_detail_field("visa_status"), class: ui_input_classes %>
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>" data-autosave-ignore="true">
-      <div class="space-y-1">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.headshot.eyebrow") %></p>
-        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.headshot.title") %></h3>
-        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.headshot.description") %></p>
-      </div>
+    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>" data-autosave-ignore="true">
+      <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
+        <div class="flex-1 space-y-1">
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.headshot.eyebrow") %></p>
+          <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.headshot.title") %></h3>
+          <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.headshot.description") %></p>
+        </div>
+        <span class="text-ink-400 transition-transform group-open:rotate-180">▾</span>
+      </summary>
 
-      <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
+      <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
         <div>
           <%= form.label :headshot, t("resumes.editor_personal_details_step.headshot.label"), class: ui_label_classes %>
           <%= form.file_field :headshot,

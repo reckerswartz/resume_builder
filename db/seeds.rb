@@ -100,7 +100,7 @@ seed_templates = [
     layout_config: {
       "family" => "modern-clean",
       "variant" => "modern-clean",
-      "accent_color" => "#0F766E",
+      "accent_color" => "#0D6B63",
       "font_family" => "sans",
       "font_scale" => "base",
       "density" => "comfortable",

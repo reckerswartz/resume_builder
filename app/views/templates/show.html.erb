@@ -12,6 +12,8 @@
 else
   new_registration_path
 end %>
+<% apply_resume = current_user&.resumes&.order(updated_at: :desc)&.first %>
+<% apply_to_resume_path = apply_resume.present? ? edit_resume_path(apply_resume, step: :finalize, template_id: @template.id) : nil %>
 <% templates_path_with_context = if resume_context_params.present?
   templates_path(resume: resume_context_params)
 else
@@ -91,6 +93,9 @@ end %>
 
           <div class="flex flex-col gap-2 text-sm">
             <%= link_to t(".quick_take.use_template"), use_template_path, class: "#{ui_button_classes(:hero_primary)} w-full justify-center" %>
+            <% if apply_to_resume_path.present? %>
+              <%= link_to t(".quick_take.apply_to_resume", title: apply_resume.title.truncate(30)), apply_to_resume_path, class: "#{ui_button_classes(:hero_secondary)} w-full justify-center" %>
+            <% end %>
             <%= link_to t(".quick_take.browse_all_templates"), templates_path_with_context, class: "#{ui_button_classes(:hero_secondary)} w-full justify-center" %>
           </div>
         </div>

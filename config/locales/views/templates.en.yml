@@ -41,6 +41,7 @@ en:
         header: "Header: %{header}"
         entries: "Entries: %{entries}"
         sidebar: "Sidebar: %{sections}"
+      apply_to_resume: "Apply to %{title}"
       layout_focus:
         balanced: "Balanced single-column flow"
         sidebar: "Sidebar: %{sections}"
@@ -126,6 +127,7 @@ en:
         try_in_builder_title: "Try it in the builder"
         try_in_builder_description: "Use this layout now, then keep refining copy, sections, and accent decisions inside the live editor."
         use_template: "Use this template"
+        apply_to_resume: "Apply to %{title}"
         browse_all_templates: "Browse all templates"
       carry_through:
         pill: "Builder carry-through"

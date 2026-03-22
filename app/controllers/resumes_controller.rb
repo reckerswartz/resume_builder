@@ -28,6 +28,7 @@ class ResumesController < ApplicationController
 
   def edit
     authorize @resume
+    apply_marketplace_template
   end
 
   def create
@@ -127,6 +128,17 @@ class ResumesController < ApplicationController
       @resume = policy_scope(Resume)
         .includes(:photo_profile, { resume_photo_selections: :photo_asset }, { sections: :entries })
         .find(params[:id])
+    end
+
+    def apply_marketplace_template
+      return unless params[:template_id].present? && params[:step].to_s == "finalize"
+
+      new_template = Template.active.find_by(id: params[:template_id])
+      return unless new_template.present?
+      return if new_template.id == @resume.template_id
+
+      @resume.update(template: new_template)
+      flash.now[:notice] = controller_message(:template_applied)
     end
 
     def respond_to_autofill

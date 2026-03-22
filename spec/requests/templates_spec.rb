@@ -270,6 +270,47 @@ RSpec.describe 'Templates', type: :request do
       end
     end
 
+    it 'shows Apply to resume link when the user has existing resumes' do
+      template = create(:template, name: 'Modern Slate')
+      resume = create(:resume, user:, template:, title: 'My Active Resume')
+
+      get templates_path
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      apply_links = document.css('a').select { |a| a.text.include?('Apply to') }
+
+      expect(apply_links).to be_present
+      expect(apply_links.first.text).to include('My Active Resume')
+      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize))
+    end
+
+    it 'shows Apply to resume link on the template detail page' do
+      template = create(:template, name: 'Modern Slate')
+      resume = create(:resume, user:, template:, title: 'My Active Resume')
+
+      get template_path(id: template)
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      apply_links = document.css('a').select { |a| a.text.include?('Apply to') }
+
+      expect(apply_links).to be_present
+      expect(apply_links.first.text).to include('My Active Resume')
+      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize))
+    end
+
+    it 'hides Apply to resume link for guests with no resumes' do
+      reset!
+      integration_session.__send__(:default_url_options).clear
+      template = create(:template, name: 'Modern Slate')
+
+      get template_path(id: template)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('Apply to')
+    end
+
     it 'redirects back to the marketplace when the template is not available' do
       create(:template, name: 'Modern Slate')
       hidden_template = create(:template, name: 'Legacy Hidden', active: false)
