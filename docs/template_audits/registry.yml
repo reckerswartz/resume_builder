@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T22:04:19Z"
+updated_at: "2026-03-22T03:55:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/template-audit.md"
@@ -10,7 +10,7 @@ tracking:
   template_doc_template: "docs/template_audits/templates/TEMPLATE.md"
   run_doc_template: "docs/template_audits/runs/TEMPLATE.md"
   artifact_root: "docs/template_audits/artifacts"
-  latest_run: "docs/template_audits/runs/2026-03-21-sidebar-accent-sidebar-width/00-overview.md"
+  latest_run: "docs/template_audits/runs/2026-03-22-modern-clean-density-fix/00-overview.md"
 seed_profiles:
   catalog_path: "app/services/resumes/seed_profile_catalog.rb"
   profile_count: 8
@@ -73,22 +73,28 @@ templates:
     discrepancies_remaining: 2
     regression_detected: false
   - slug: "modern-clean"
-    pixel_status: "in_progress"
+    pixel_status: "close"
     open_discrepancy_count: 2
     resolved_discrepancy_count: 4
-    last_audit_at: "2026-03-21"
-    notes: "MCL-001 density improved (192px reduction, still over target). MCL-006 accent contrast remains."
+    last_audit_at: "2026-03-22"
+    notes: "Implement-next resolved MCL-001 by changing density relaxed→comfortable, spacing relaxed→standard, card padding px-5 py-4→px-4 py-3, highlight/chip tightening. Full profiles reduced ~541px avg (~6.5pp→~6.1pp incl chrome; ~5.5pp PDF). Status advanced to close."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T03:55:00Z"
+    discrepancies_found: 6
+    discrepancies_resolved: 4
+    discrepancies_remaining: 2
+    regression_detected: false
   - slug: "sidebar-accent"
     pixel_status: "close"
-    open_discrepancy_count: 4
-    resolved_discrepancy_count: 2
-    last_audit_at: "2026-03-21"
-    notes: "Resolved SAC-001 desktop sidebar width (~27.8%) and retained the mobile-order fix. 4 minor discrepancies remain (sidebar_tint, profile_card_radius, skill_chip_bg, contact_weight)."
-    cycle_count: 2
-    last_cycle_date: "2026-03-21T22:04:19Z"
+    open_discrepancy_count: 3
+    resolved_discrepancy_count: 3
+    last_audit_at: "2026-03-22"
+    notes: "Resolved SAC-003 by strengthening the sidebar tint to `#4338CA15`, while retaining the verified ~27.8% desktop split and mobile-order fix. 3 minor discrepancies remain (profile_card_radius, skill_chip_bg, contact_weight)."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T03:35:24Z"
     discrepancies_found: 6
-    discrepancies_resolved: 2
-    discrepancies_remaining: 4
+    discrepancies_resolved: 3
+    discrepancies_remaining: 3
     regression_detected: false
   - slug: "editorial-split"
     pixel_status: "close"

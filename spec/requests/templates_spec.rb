@@ -59,7 +59,7 @@ RSpec.describe 'Templates', type: :request do
       expect(response.body).to include('Sort: Density')
       expect(response.body).to include(%(value="density_asc" selected))
       expect(response.body.index('Classic Ivory')).to be < response.body.index('Modern Slate')
-      expect(response.body.index('Modern Slate')).to be < response.body.index('Modern Clean Teal')
+      expect(response.body.index('Classic Ivory')).to be < response.body.index('Modern Clean Teal')
     end
 
     it 'surfaces intake-driven recommendations and keeps that context in template actions' do

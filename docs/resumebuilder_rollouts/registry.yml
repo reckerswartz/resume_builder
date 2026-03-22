@@ -1,5 +1,5 @@
 workflow: .windsurf/workflows/resumebuilder-reference-rollout.md
-last_updated: 2026-03-21
+last_updated: 2026-03-22
 reference_source_docs:
   - docs/references/resumebuilder/live-flow-comparison-2026-03-20/15-implementation-plan.md
   - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/README.md
@@ -78,7 +78,7 @@ slices:
   - slice_key: skills-guidance
     title: Skills guidance
     page_family: resume-builder-skills
-    status: not_started
+    status: verified
     priority: medium
     reference_source_docs:
       - docs/references/resumebuilder/e2e-template-flex-audit-2026-03-21/02-template-led-builder-flow.md
@@ -86,15 +86,21 @@ slices:
     current_app_surfaces:
       - app/views/resumes/_editor_section_step.html.erb
       - app/views/resumes/_entry_form.html.erb
+      - app/views/resumes/_skills_entry_guidance.html.erb
       - app/helpers/resumes_helper.rb
-    open_gap_keys:
+      - app/presenters/resumes/skills_step_state.rb
+      - app/services/resumes/skill_suggestion_catalog.rb
+      - app/javascript/controllers/skills_suggestions_controller.js
+    open_gap_keys: []
+    closed_gap_keys:
       - skills-guidance-role-aware-curation
       - skills-guidance-strength-ordering
-    closed_gap_keys: []
     verification_specs:
+      - spec/services/resumes/skill_suggestion_catalog_spec.rb
+      - spec/presenters/resumes/skills_step_state_spec.rb
       - spec/requests/resumes_spec.rb
-    latest_run: ""
-    cycle_count: 0
+    latest_run: docs/resumebuilder_rollouts/runs/2026-03-22-skills-guidance/00-overview.md
+    cycle_count: 1
     regression_detected: false
     next_recommended_slice: template-variant-carry-through
   - slice_key: template-variant-carry-through

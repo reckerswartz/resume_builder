@@ -2,8 +2,9 @@
 <% disclosure_storage_key = persisted ? "resume-builder:entry:#{entry.id}" : "resume-builder:section:#{section.id}:new-entry" %>
 <% disclosure_default_open = !persisted && section.ordered_entries.none? %>
 <% experience_entry = section.section_type == "experience" %>
+<% skills_entry = section.section_type == "skills" %>
 <% form_data = persisted ? { controller: "autosave", autosave_delay_value: 350, action: "input->autosave#queue change->autosave#queue" } : {} %>
-<% form_data[:controller] = [form_data[:controller], ("experience-suggestions" if experience_entry)].compact.join(" ") if experience_entry %>
+<% form_data[:controller] = [form_data[:controller], ("experience-suggestions" if experience_entry), ("skills-suggestions" if skills_entry)].compact.join(" ") if experience_entry || skills_entry %>
 <% form_options = form_data.any? ? { data: form_data } : {} %>
 <% entry_url = persisted ? resume_section_entry_path(resume, section, entry, **resume_builder_step_params) : resume_section_entries_path(resume, section, **resume_builder_step_params) %>
 <% section_type_label = ResumeBuilder::SectionRegistry.title_for(section.section_type) %>
@@ -57,7 +58,14 @@
           <p class="mt-1 break-words text-sm text-ink-700/80"><%= entry_editor_metadata(entry, section) %></p>
         <% end %>
 
-        <p class="mt-2 break-words text-sm leading-6 text-ink-700/80"><%= persisted ? entry_editor_supporting_text(entry, section).presence || t("resumes.entry_form.supporting_text.persisted_fallback", section: section_type_label) : (section.ordered_entries.any? ? t("resumes.entry_form.supporting_text.new_with_existing") : t("resumes.entry_form.supporting_text.new_without_existing")) %></p>
+        <% if persisted %>
+          <% persisted_supporting = entry_editor_supporting_text(entry, section).presence %>
+          <% if persisted_supporting %>
+            <p class="mt-2 break-words text-sm leading-6 text-ink-700/80"><%= persisted_supporting %></p>
+          <% end %>
+        <% else %>
+          <p class="mt-2 break-words text-sm leading-6 text-ink-700/80"><%= section.ordered_entries.any? ? t("resumes.entry_form.supporting_text.new_with_existing") : t("resumes.entry_form.supporting_text.new_without_existing") %></p>
+        <% end %>
       </div>
 
       <span class="rounded-full border border-canvas-200/80 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= persisted ? t("resumes.entry_form.disclosure_labels.expand_to_edit") : t("resumes.entry_form.disclosure_labels.open_form") %></span>
@@ -83,6 +91,12 @@
         </div>
       <% end %>
 
+      <% if skills_entry && !persisted %>
+        <div class="sm:col-span-2">
+          <%= render "resumes/skills_entry_guidance", resume: resume %>
+        </div>
+      <% end %>
+
       <% entry_fields_for(section).each do |field| %>
         <div class="<%= entry_field_text_area?(field) || entry_field_checkbox?(field) ? 'sm:col-span-2' : '' %>">
           <%= label_tag "#{form.object_name}_content_#{field[:key]}", field[:label], class: ui_label_classes %>
@@ -101,7 +115,11 @@
               </label>
             </div>
           <% else %>
-            <%= text_field_tag "#{form.object_name}[content][#{field[:key]}]", entry_field_value(entry, field[:key]), id: "#{form.object_name}_content_#{field[:key]}", class: ui_input_classes %>
+            <% text_field_options = { id: "#{form.object_name}_content_#{field[:key]}", class: ui_input_classes } %>
+            <% if skills_entry && field[:key] == "name" %>
+              <% text_field_options[:data] = { skills_suggestions_target: "nameInput" } %>
+            <% end %>
+            <%= text_field_tag "#{form.object_name}[content][#{field[:key]}]", entry_field_value(entry, field[:key]), **text_field_options %>
           <% end %>
         </div>
       <% end %>

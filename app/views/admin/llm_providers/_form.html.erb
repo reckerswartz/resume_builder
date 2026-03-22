@@ -71,7 +71,7 @@
       title: "Provider identity",
       anchor: "provider-identity",
       eyebrow: "Core details",
-      description: "Register the provider name, slug, and adapter used across the orchestration layer.",
+      description: "Register the provider name, slug, and adapter that determine how models are discovered and routed.",
       badges: [
         { label: llm_provider_adapter_label(llm_provider), tone: :neutral },
         { label: llm_provider.persisted? ? "Saved record" : "New record", tone: llm_provider.persisted? ? :success : :neutral }
@@ -140,8 +140,8 @@
     <%= render Ui::SettingsSectionComponent.new(
       title: "Activation",
       anchor: "activation",
-      eyebrow: "Live orchestration",
-      description: "Control whether this provider can participate in ready-model resolution and background catalog sync flows.",
+      eyebrow: "Request eligibility",
+      description: "Control whether this provider is eligible for live model requests and automatic catalog sync.",
       badges: [
         { label: llm_provider.active? ? "Active" : "Inactive", tone: llm_provider.active? ? :success : :neutral },
         { label: llm_provider_request_badge_label(llm_provider), tone: llm_provider_request_status_tone(llm_provider) }
@@ -152,7 +152,7 @@
           <label class="flex items-start justify-between gap-4">
             <span>
               <span class="block text-sm font-medium text-ink-950">Active provider</span>
-              <span class="mt-1 block text-sm leading-6 text-ink-700/80">Inactive providers stay registered but their models are not selected for live orchestration.</span>
+              <span class="mt-1 block text-sm leading-6 text-ink-700/80">Inactive providers stay registered but their models are not selected for live requests.</span>
             </span>
             <%= form.check_box :active, class: ui_checkbox_classes %>
           </label>

@@ -430,6 +430,194 @@ en:
         early_career: "Early career"
         mid_to_senior: "Mid to senior"
         growth_stage: "Growth stage"
+    skills_step_state:
+      eyebrow: "Role-aware skill help"
+      title_with_query: "Skill ideas for %{query}"
+      title_without_query: "Skills that strengthen a resume"
+      description_with_query: "Start from curated suggestions for %{query}, then keep only the skills you can honestly demonstrate in an interview."
+      description_without_query: "Pick skills from a nearby role category, then reorder so the strongest ones appear first."
+      description_early_career: "Focus on tools, techniques, and transferable skills you have used in coursework, projects, internships, or volunteer work."
+      add_button_label: "Add this skill"
+      expert_badge_label: "Expert Recommended"
+      results_label:
+        one: "1 skill set"
+        other: "%{count} skill sets"
+      badges:
+        early_career: "Early-career friendly"
+        role_aware: "Role-aware"
+      audience_badges:
+        early_career: "Early career"
+        growth_stage: "Growth stage"
+    skill_suggestion_catalog:
+      role_labels:
+        software_engineer: "Software Engineer"
+        product_manager: "Product Manager"
+        product_designer: "Product Designer"
+        data_analyst: "Data Analyst"
+        marketing_strategist: "Marketing Strategist"
+        customer_success_manager: "Customer Success Manager"
+        project_manager: "Project Manager"
+        healthcare_administrator: "Healthcare Administrator"
+        finance_analyst: "Finance Analyst"
+      roles:
+        software_engineer:
+          variants:
+            early_career:
+              skills:
+                - "Python"
+                - "JavaScript"
+                - "HTML & CSS"
+                - "Git"
+                - "SQL"
+                - "REST APIs"
+                - "Unit Testing"
+                - "Problem Solving"
+            growth_stage:
+              skills:
+                - "Ruby on Rails"
+                - "PostgreSQL"
+                - "System Design"
+                - "CI/CD Pipelines"
+                - "Cloud Infrastructure"
+                - "Code Review"
+                - "Technical Leadership"
+                - "Performance Optimization"
+        product_manager:
+          variants:
+            early_career:
+              skills:
+                - "User Research"
+                - "Roadmap Planning"
+                - "Stakeholder Communication"
+                - "Data Analysis"
+                - "Wireframing"
+                - "A/B Testing"
+                - "JIRA"
+                - "Cross-Functional Collaboration"
+            growth_stage:
+              skills:
+                - "Product Strategy"
+                - "OKR Setting"
+                - "Market Analysis"
+                - "Revenue Optimization"
+                - "Platform Thinking"
+                - "Executive Communication"
+                - "Go-to-Market Planning"
+                - "Team Leadership"
+        product_designer:
+          variants:
+            early_career:
+              skills:
+                - "Figma"
+                - "Wireframing"
+                - "Prototyping"
+                - "User Testing"
+                - "Visual Design"
+                - "Design Systems"
+                - "Responsive Design"
+                - "Accessibility Basics"
+            growth_stage:
+              skills:
+                - "Design Strategy"
+                - "Design Systems"
+                - "User Research"
+                - "Interaction Design"
+                - "Information Architecture"
+                - "Cross-Functional Leadership"
+                - "Usability Testing"
+                - "Design Mentorship"
+        data_analyst:
+          variants:
+            early_career:
+              skills:
+                - "SQL"
+                - "Excel"
+                - "Python"
+                - "Data Visualization"
+                - "Statistical Analysis"
+                - "Google Sheets"
+                - "Tableau"
+                - "Report Writing"
+            growth_stage:
+              skills:
+                - "Advanced SQL"
+                - "Python"
+                - "Tableau"
+                - "Power BI"
+                - "ETL Pipelines"
+                - "Statistical Modeling"
+                - "Data Governance"
+                - "Stakeholder Reporting"
+        marketing_strategist:
+          variants:
+            growth_stage:
+              skills:
+                - "Content Strategy"
+                - "SEO"
+                - "Google Analytics"
+                - "Social Media Marketing"
+                - "Email Marketing"
+                - "Campaign Management"
+                - "Brand Positioning"
+                - "Marketing Automation"
+        customer_success_manager:
+          variants:
+            early_career:
+              skills:
+                - "Client Onboarding"
+                - "CRM Tools"
+                - "Account Management"
+                - "Customer Communication"
+                - "Issue Resolution"
+                - "Retention Strategy"
+                - "Cross-Functional Coordination"
+                - "Reporting"
+        project_manager:
+          variants:
+            growth_stage:
+              skills:
+                - "Project Planning"
+                - "Agile Methodology"
+                - "Risk Management"
+                - "Stakeholder Management"
+                - "Budget Tracking"
+                - "JIRA"
+                - "Confluence"
+                - "Team Coordination"
+        healthcare_administrator:
+          variants:
+            growth_stage:
+              skills:
+                - "Healthcare Compliance"
+                - "HIPAA"
+                - "Electronic Health Records"
+                - "Operations Management"
+                - "Staff Scheduling"
+                - "Quality Improvement"
+                - "Budget Administration"
+                - "Patient Relations"
+        finance_analyst:
+          variants:
+            early_career:
+              skills:
+                - "Financial Modeling"
+                - "Excel"
+                - "Accounting Principles"
+                - "Data Analysis"
+                - "Report Preparation"
+                - "Budget Tracking"
+                - "QuickBooks"
+                - "Attention to Detail"
+            growth_stage:
+              skills:
+                - "Financial Modeling"
+                - "Forecasting"
+                - "Variance Analysis"
+                - "Risk Assessment"
+                - "Bloomberg Terminal"
+                - "SAP"
+                - "Regulatory Compliance"
+                - "Executive Reporting"
     experience_step_state:
       eyebrow: "Role-aware bullet help"
       title_with_query: "Bullet ideas for %{query}"
@@ -711,6 +899,16 @@ en:
         volunteering: "Volunteering"
         teaching_assistant: "Teaching assistant"
         tutor: "Tutor"
+      skills_guidance:
+        pill: "Skills guidance"
+        title: "Curated skill suggestions"
+        description: "Explore role-aware skill recommendations to help fill out and prioritize the strongest skills for this resume."
+        badge: "Role-aware"
+        helper_text: "Click a skill to populate the name field, then save it. Use nearby role categories when the default suggestions feel too narrow."
+        technical: "Technical"
+        analytical: "Analytical"
+        leadership: "Leadership"
+        communication: "Communication"
       empty_state:
         title: "No %{step} entries yet"
         description: "Create the first section for this step and then add your entries below it."

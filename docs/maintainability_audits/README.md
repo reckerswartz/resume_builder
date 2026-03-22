@@ -16,12 +16,13 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next post-correction verification slice is complete: `Llm::Providers::BaseClient` now has direct shared-contract coverage.
 - The next post-correction structural slice is complete: `ApplicationHelper` now delegates table/query behavior to `TableHelper`.
 - The next post-correction verification slice is complete: `Resumes::CloudImportProviderCatalog` now has dedicated shared-service coverage.
+- The next structural slice is complete: `LlmProvider` credential management extracted to `LlmProvider::CredentialManagement` concern with 15 focused examples.
 
 ### Pending
 
-- The next `implement-next` maintainability slice should come from the structural lane, because the last completed lane was verification.
-- The next structural candidate should start with `app/models/llm_provider.rb` before returning to the remaining verification queue.
-- The remaining verification backlog now starts with `app/services/resumes/docx_text_extractor.rb`, while `Admin::JobLogsHelper` still has lower-priority open structural follow-ups.
+- The next `implement-next` maintainability slice should come from the verification lane, because the last completed lane was structural.
+- The next verification candidate should start with `app/services/resumes/docx_text_extractor.rb`.
+- The remaining structural backlog includes `app/models/llm_provider.rb` (sync-state follow-up) and `Admin::JobLogsHelper` lower-priority open follow-ups.
 
 ## Installed workflow
 
@@ -92,14 +93,14 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ## Current round-robin state
 
-- Last completed lane: `verification`
-- Next preferred lane: `structural`
+- Last completed lane: `structural`
+- Next preferred lane: `verification`
 - Audit scope: `whole_codebase`
 - Max consecutive runs per lane: `1`
 
 ### Current structural candidates
 
-- `app/models/llm_provider.rb`
+- `app/models/llm_provider.rb` (sync-state follow-up)
 
 ### Current verification candidates
 
@@ -140,6 +141,9 @@ If this overview is stale, the workflow is considered incomplete even if code an
 - `app/controllers/admin/llm_models_controller.rb`, `app/controllers/admin/templates_controller.rb`
   - area: `admin-controller-hardcoded-notices`
   - status: `closed`
+- `app/models/llm_provider.rb`
+  - area: `llm-provider-credential-management`
+  - status: `improved`
 
 ## Audited and completed verification hotspots
 

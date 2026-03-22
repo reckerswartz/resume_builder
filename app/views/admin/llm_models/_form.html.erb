@@ -1,13 +1,13 @@
 <% model_sections = [
      { id: "model-identity", label: "Model identity", caption: "Provider, name, and identifier" },
      { id: "runtime-defaults", label: "Runtime defaults", caption: "Capabilities, temperature, and token limits" },
-     { id: "activation-orchestration", label: "Activation & orchestration", caption: "Readiness and role-assignment follow-up" }
+     { id: "activation-readiness", label: "Activation & readiness", caption: "Readiness and role-assignment follow-up" }
    ] %>
 <% save_message = llm_model.persisted? ? "Saving changes keeps the model registry aligned so assignments from the settings hub can use the updated runtime profile." : "Creating the model registers it for future assignment from the settings hub once provider readiness is complete." %>
 <% provider_guidance = if llm_model.llm_provider.present?
      llm_model_provider_status_description(llm_model)
    else
-     "Choose a provider first so runtime defaults and orchestration readiness stay anchored to a live endpoint."
+     "Choose a provider first so runtime defaults and request readiness stay anchored to a live endpoint."
    end %>
 
 <%= form_with model: [:admin, llm_model], class: "grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]" do |form| %>
@@ -78,7 +78,7 @@
       title: "Model identity",
       anchor: "model-identity",
       eyebrow: "Core details",
-      description: "Register the provider, model name, and identifier used across orchestration and provider catalog sync.",
+      description: "Register the provider, model name, and identifier used for catalog sync and live requests.",
       badges: [
         { label: llm_model.persisted? ? "Saved record" : "New record", tone: llm_model.persisted? ? :success : :neutral },
         { label: llm_model_provider_status_label(llm_model), tone: llm_model_provider_status_tone(llm_model) }
@@ -107,7 +107,7 @@
       title: "Runtime defaults",
       anchor: "runtime-defaults",
       eyebrow: "Capabilities & limits",
-      description: "Define the capabilities and runtime defaults that guide how the orchestration layer uses this model.",
+      description: "Define the capabilities and runtime defaults that guide how the platform uses this model.",
       badges: [
         { label: llm_model_catalog_label(llm_model), tone: llm_model.provider_synced? ? :success : :neutral },
         { label: llm_model_capability_summary(llm_model), tone: :neutral }
@@ -163,8 +163,8 @@
     <% end %>
 
     <%= render Ui::SettingsSectionComponent.new(
-      title: "Activation & orchestration",
-      anchor: "activation-orchestration",
+      title: "Activation & readiness",
+      anchor: "activation-readiness",
       eyebrow: "Live workflow eligibility",
       description: "Control whether this model can participate in ready-model selection and review what still needs follow-up before assignment-driven workflows use it.",
       badges: [
@@ -177,7 +177,7 @@
           <label class="flex items-start justify-between gap-4">
             <span>
               <span class="block text-sm font-medium text-ink-950">Active model</span>
-              <span class="mt-1 block text-sm leading-6 text-ink-700/80">Inactive models stay in the catalog but are ignored by the orchestration layer.</span>
+              <span class="mt-1 block text-sm leading-6 text-ink-700/80">Inactive models stay in the catalog but are not selected for live requests.</span>
             </span>
             <%= form.check_box :active, class: ui_checkbox_classes %>
           </label>

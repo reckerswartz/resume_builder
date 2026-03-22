@@ -1,7 +1,8 @@
 class LlmProvider < ApplicationRecord
+  include LlmProvider::CredentialManagement
+
   OLLAMA_BASE_URL = "http://127.0.0.1:11434".freeze
   NVIDIA_BUILD_BASE_URL = "https://integrate.api.nvidia.com".freeze
-  API_KEY_ENV_VAR_PATTERN = /\A[A-Z_][A-Z0-9_]*\z/.freeze
   ADMIN_SORTS = {
     "name" => ->(direction) { { name: direction, slug: :asc } },
     "adapter" => ->(direction) { { adapter: direction, name: :asc } },
@@ -58,35 +59,6 @@ class LlmProvider < ApplicationRecord
   def request_timeout_seconds
     timeout = settings.fetch("request_timeout_seconds", 30).to_i
     timeout.positive? ? timeout : 30
-  end
-
-  def api_key_reference
-    api_key_env_var.to_s.strip.presence
-  end
-
-  def api_key
-    return if api_key_reference.blank?
-    return ENV[api_key_reference].presence if env_var_reference?(api_key_reference)
-
-    api_key_reference
-  end
-
-  def api_key_reference_type
-    return if api_key_reference.blank?
-
-    env_var_reference?(api_key_reference) ? "env_var" : "direct_token"
-  end
-
-  def api_key_reference_field_value
-    api_key_reference if api_key_reference_type == "env_var"
-  end
-
-  def masked_api_key_reference
-    return if api_key_reference.blank?
-    return api_key_reference if api_key_reference_type == "env_var"
-    return "••••••••" if api_key_reference.length <= 10
-
-    "#{api_key_reference.first(6)}••••#{api_key_reference.last(4)}"
   end
 
   def syncable?
@@ -165,10 +137,6 @@ class LlmProvider < ApplicationRecord
       when "nvidia_build"
         NVIDIA_BUILD_BASE_URL
       end
-    end
-
-    def env_var_reference?(value)
-      value.to_s.match?(API_KEY_ENV_VAR_PATTERN)
     end
 
     def parse_settings_time(key)

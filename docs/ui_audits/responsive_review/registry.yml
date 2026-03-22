@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-21T21:23:26Z"
+updated_at: "2026-03-22T03:45:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/responsive_review/README.md"
   page_doc_template: "docs/ui_audits/responsive_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/responsive_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-review-only-remaining-improved-pages/00-overview.md"
+  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-summary-admin-detail/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   commit_policy: "metadata_only"
@@ -64,8 +64,9 @@ inventory_notes:
     - "docs/ui_audits/2026-03-20/resumebuilder-saas-ux-audit/README.md"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope: []
-  reason: "No improved responsive backlog remains. Return to /responsive-ui-audit review-only after future shared UI changes or when you want a fresh discovery sweep across recently changed surfaces."
+  recommended_scope:
+    - "resume-builder-summary"
+  reason: "resume-builder-summary has a minor 2px mobile overflow at 390x844. Recommend implement-next to fix the builder chrome overflow, then re-review."
 pages:
   - page_key: "home"
     title: "Home"
@@ -240,9 +241,50 @@ pages:
     issues_resolved: 3
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "resume-builder-education", title: "Resume builder education step", path: "/resumes/:id/edit?step=education", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T20:44:49Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-experience-step-mobile-preview-rail/00-overview.md", open_issue_keys: [] }
-  - { page_key: "resume-builder-skills", title: "Resume builder skills step", path: "/resumes/:id/edit?step=skills", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:47:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:51:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-builder-steps-batch-2/00-overview.md", open_issue_keys: [] }
+  - page_key: "resume-builder-education"
+    title: "Resume builder education step"
+    path: "/resumes/:id/edit?step=education"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "high"
+    status: "reviewed"
+    last_audited_at: "2026-03-22T03:28:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-builder-admin/00-overview.md"
+    open_issue_keys: []
+    next_step: "No issues found at 390x844, 768x1024, 1280x800. Re-review after major section-step or preview-rail changes."
+  - page_key: "resume-builder-skills"
+    title: "Resume builder skills step"
+    path: "/resumes/:id/edit?step=skills"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "high"
+    status: "reviewed"
+    last_audited_at: "2026-03-22T03:30:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-builder-admin/00-overview.md"
+    open_issue_keys: []
+    next_step: "No issues found at 390x844, 768x1024, 1280x800. Transient dev-mode autoload crash observed once but not reproducible. Re-review after major skills-step or guidance-partial changes."
+  - page_key: "resume-builder-summary"
+    title: "Resume builder summary step"
+    path: "/resumes/:id/edit?step=summary"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "in_progress"
+    last_audited_at: "2026-03-22T03:40:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-summary-admin-detail/00-overview.md"
+    open_issue_keys:
+      - "summary-step-mobile-2px-overflow"
+    closed_issue_keys: []
+    next_step: "implement-next to fix 2px horizontal overflow at 390x844 caused by builder chrome container leaking past viewport."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T03:40:00Z"
+    issues_found: 1
+    issues_resolved: 0
+    issues_remaining: 1
+    regression_detected: false
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"
     path: "/resumes/:id/edit?step=finalize"
@@ -326,7 +368,18 @@ pages:
     issues_remaining: 0
     regression_detected: false
   - { page_key: "admin-llm-providers-index", title: "Admin LLM providers index", path: "/admin/llm_providers", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:56:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-index-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "admin-llm-provider-show", title: "Admin LLM provider detail", path: "/admin/llm_providers/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:54:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-mixed-pages-batch/00-overview.md", open_issue_keys: [] }
+  - page_key: "admin-llm-provider-show"
+    title: "Admin LLM provider detail"
+    path: "/admin/llm_providers/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "reviewed"
+    last_audited_at: "2026-03-22T03:44:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-summary-admin-detail/00-overview.md"
+    open_issue_keys: []
+    next_step: "No issues found at 390x844, 768x1024, 1280x800. Re-review after major provider detail or triage panel changes."
   - { page_key: "admin-llm-provider-new", title: "Admin LLM provider new", path: "/admin/llm_providers/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-llm-provider-edit", title: "Admin LLM provider edit", path: "/admin/llm_providers/:id/edit", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T03:00:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-final-pages-batch/00-overview.md", open_issue_keys: [] }
   - { page_key: "admin-llm-models-index", title: "Admin LLM models index", path: "/admin/llm_models", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:56:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-index-batch/00-overview.md", open_issue_keys: [] }
@@ -359,6 +412,28 @@ pages:
     issues_remaining: 0
     regression_detected: false
   - { page_key: "admin-job-logs-index", title: "Admin job logs index", path: "/admin/job_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:56:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-admin-index-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "admin-job-log-show", title: "Admin job log detail", path: "/admin/job_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:58:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-observability-batch/00-overview.md", open_issue_keys: [] }
+  - page_key: "admin-job-log-show"
+    title: "Admin job log detail"
+    path: "/admin/job_logs/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "reviewed"
+    last_audited_at: "2026-03-22T03:33:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-builder-admin/00-overview.md"
+    open_issue_keys: []
+    next_step: "No issues found at 390x844, 768x1024, 1280x800. Re-review after major job-log detail or triage panel changes."
   - { page_key: "admin-error-logs-index", title: "Admin error logs index", path: "/admin/error_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "reviewed", last_audited_at: "2026-03-21T02:58:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-observability-batch/00-overview.md", open_issue_keys: [] }
-  - { page_key: "admin-error-log-show", title: "Admin error log detail", path: "/admin/error_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "reviewed", last_audited_at: "2026-03-21T02:58:00Z", latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-observability-batch/00-overview.md", open_issue_keys: [] }
+  - page_key: "admin-error-log-show"
+    title: "Admin error log detail"
+    path: "/admin/error_logs/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "reviewed"
+    last_audited_at: "2026-03-22T03:42:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-discovery-sweep-summary-admin-detail/00-overview.md"
+    open_issue_keys: []
+    next_step: "No issues found at 390x844, 768x1024, 1280x800. Re-review after major error-log detail or incident panel changes."

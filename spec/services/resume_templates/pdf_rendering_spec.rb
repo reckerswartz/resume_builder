@@ -124,6 +124,34 @@ RSpec.describe 'Resume template PDF rendering' do
     expect(summary_paragraph['class'].to_s.split).to include('mt-4', 'leading-5')
   end
 
+  it 'renders Modern Clean at comfortable density with tighter card padding' do
+    resume = build_resume_for(family: 'modern-clean', accent_color: '#0F766E')
+
+    html = ApplicationController.render(
+      template: 'resumes/pdf',
+      layout: 'pdf',
+      assigns: { resume: resume }
+    )
+
+    document = Nokogiri::HTML.parse(html)
+
+    # Comfortable density container
+    expect(html).to include('p-8 sm:p-10')
+
+    # Tighter card padding (px-4 py-3 instead of px-5 py-4)
+    entry_card = document.at_css('article.rounded-xl')
+    expect(entry_card).to be_present
+    card_classes = entry_card['class'].to_s.split
+    expect(card_classes).to include('px-4', 'py-3')
+    expect(card_classes).not_to include('px-5', 'py-4')
+
+    # Tighter highlight bullet spacing
+    highlight_list = document.at_css('ul')
+    expect(highlight_list).to be_present
+    expect(highlight_list['class']).to include('space-y-1.5')
+    expect(highlight_list['class']).not_to include('space-y-2')
+  end
+
   it 'renders ATS Minimal section headings with stronger hierarchy than entry titles' do
     resume = build_resume_for(family: 'ats-minimal', accent_color: '#334155')
 

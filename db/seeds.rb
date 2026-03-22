@@ -98,9 +98,9 @@ seed_templates = [
       "variant" => "modern-clean",
       "accent_color" => "#0F766E",
       "font_scale" => "base",
-      "density" => "relaxed",
-      "section_spacing" => "relaxed",
-      "paragraph_spacing" => "relaxed",
+      "density" => "comfortable",
+      "section_spacing" => "standard",
+      "paragraph_spacing" => "standard",
       "line_spacing" => "standard",
       "column_count" => "single_column",
       "theme_tone" => "teal",
@@ -978,19 +978,19 @@ ApplicationRecord.transaction do
             artifact_type: "discrepancy_report",
             name: "Modern Clean template audit – initial",
             description: "Discrepancies identified for the Modern Clean template.",
-            content: "## Modern Clean Template Discrepancy Report\n\nAudit date: 2026-03-21\n\n### Summary\nModern Clean has the most generous spacing but risks excessive whitespace with sparse content. Rich content fills well.\n\n### Discrepancies\n\n1. **Relaxed density page overflow** – With 5+ experience entries and projects, relaxed density pushes content to 4+ pages. Need intelligent density auto-adjustment or explicit page-count guidance.\n\n2. **Card entry border radius** – Uses rounded-2xl (1rem). Reference shows rounded-xl (0.75rem) for slightly tighter card feel at relaxed density.\n\n3. **Skill chip padding** – Chips at relaxed density have px-4 py-2 which is generous. Reference shows px-3 py-1.5 even at relaxed density.\n\n4. **Section heading rule color** – Uses accent_color with 33% alpha. Reference shows 20% alpha for more subtle separation.\n\n5. **Empty section handling** – Sections with zero entries still render the heading. Should suppress empty sections entirely.\n\n6. **Teal accent contrast** – #0F766E teal on white meets WCAG AA but barely. Consider darkening to #0D6B63 for stronger contrast.",
+            content: "## Modern Clean Template Discrepancy Report\n\nAudit date: 2026-03-22\n\n### Summary\nModern Clean now uses comfortable density with standard spacing and tighter card padding (px-4 py-3). Full profiles reduced from ~6.5 to ~5.5 estimated PDF pages.\n\n### Open discrepancies\n\n1. **MCL-001 Density overflow (improved)** – Full profiles at comfortable density produce ~5.5 PDF pages. Further reduction requires switching from cards to list style.\n\n2. **MCL-006 Accent contrast (minor)** – #0F766E teal on white has 5.47:1 contrast ratio, passing WCAG AA. Guidance-only.\n\n### Resolved discrepancies\n\n1. **MCL-002 Card border radius** – rounded-[1.75rem] → rounded-xl for tighter card feel.\n2. **MCL-003 Chip padding** – px-4 py-2 → px-3 py-1.5 for reduced skill chip size.\n3. **MCL-004 Heading rule alpha** – 33% → 20% alpha for subtler separation.\n4. **MCL-005 Empty sections** – Shared empty_section? filter in BaseComponent.",
             metadata: {
-              "pixel_status" => "in_progress",
+              "pixel_status" => "close",
               "discrepancies" => [
-                { "id" => "MCL-001", "area" => "density_overflow", "severity" => "major", "status" => "open" },
-                { "id" => "MCL-002", "area" => "card_border_radius", "severity" => "minor", "status" => "open" },
-                { "id" => "MCL-003", "area" => "chip_padding", "severity" => "minor", "status" => "open" },
-                { "id" => "MCL-004", "area" => "heading_rule_alpha", "severity" => "minor", "status" => "open" },
-                { "id" => "MCL-005", "area" => "empty_sections", "severity" => "moderate", "status" => "open" },
-                { "id" => "MCL-006", "area" => "accent_contrast", "severity" => "moderate", "status" => "open" }
+                { "id" => "MCL-001", "area" => "density_overflow", "severity" => "moderate", "status" => "improved" },
+                { "id" => "MCL-002", "area" => "card_border_radius", "severity" => "minor", "status" => "resolved" },
+                { "id" => "MCL-003", "area" => "chip_padding", "severity" => "minor", "status" => "resolved" },
+                { "id" => "MCL-004", "area" => "heading_rule_alpha", "severity" => "minor", "status" => "resolved" },
+                { "id" => "MCL-005", "area" => "empty_sections", "severity" => "moderate", "status" => "resolved" },
+                { "id" => "MCL-006", "area" => "accent_contrast", "severity" => "minor", "status" => "open" }
               ],
-              "open_count" => 6,
-              "resolved_count" => 0
+              "open_count" => 2,
+              "resolved_count" => 4
             },
             version_label: "v1.0"
           }
@@ -1015,19 +1015,19 @@ ApplicationRecord.transaction do
             artifact_type: "discrepancy_report",
             name: "Sidebar Accent template audit – initial",
             description: "Discrepancies identified for the Sidebar Accent template.",
-            content: "## Sidebar Accent Template Discrepancy Report\n\nAudit date: 2026-03-21\n\n### Summary\nThe Sidebar Accent template now matches the intended desktop column balance and mobile reading order. The main content keeps priority on mobile and the desktop sidebar renders at ~27.8% width, leaving more room for experience content. Four minor polish discrepancies remain in the sidebar surface styling.\n\n### Open discrepancies\n\n1. **Sidebar tint opacity** – Uses accent_color with 10% alpha. On lighter indigo accents this is barely visible. Consider 15% minimum.\n\n2. **Profile section card treatment** – Profile/summary has a distinct card with border and tinted background. This card has inconsistent border-radius when compared to entry cards.\n\n3. **Sidebar skill chips white background** – Skill chips in sidebar use white background which creates high contrast against the tinted sidebar. Reference shows transparent/matching background.\n\n4. **Contact section in sidebar** – Contact labels use font-semibold which is heavier than needed for the sidebar context. Reference shows font-medium.\n\n### Resolved discrepancies\n\n1. **Sidebar width ratio** – Desktop layout now uses a dedicated `sidebar-accent-layout` split with `minmax(0, 1fr) minmax(0, 2.6fr)`, which lands the sidebar at ~27.8% width and gives the main column more room.\n\n2. **Mobile column collapse** – Main content stays first in the DOM while the sidebar reorders back to the left on desktop, preserving the intended mobile reading order.",
+            content: "## Sidebar Accent Template Discrepancy Report\n\nAudit date: 2026-03-22\n\n### Summary\nThe Sidebar Accent template now matches the intended desktop column balance, mobile reading order, and stronger sidebar tint treatment. The main content keeps priority on mobile, the desktop sidebar renders at ~27.8% width, and the tinted rail now reads more clearly with the stronger indigo aside. Three minor sidebar polish discrepancies remain.\n\n### Open discrepancies\n\n1. **Profile section card treatment** – Profile/summary has a distinct card with border and tinted background. This card has inconsistent border-radius when compared to entry cards.\n\n2. **Sidebar skill chips white background** – Skill chips in sidebar use white background which creates high contrast against the tinted sidebar. Reference shows transparent/matching background.\n\n3. **Contact section in sidebar** – Contact labels use font-semibold which is heavier than needed for the sidebar context. Reference shows font-medium.\n\n### Resolved discrepancies\n\n1. **Sidebar width ratio** – Desktop layout now uses a dedicated `sidebar-accent-layout` split with `minmax(0, 1fr) minmax(0, 2.6fr)`, which lands the sidebar at ~27.8% width and gives the main column more room.\n\n2. **Mobile column collapse** – Main content stays first in the DOM while the sidebar reorders back to the left on desktop, preserving the intended mobile reading order.\n\n3. **Sidebar tint opacity** – The sidebar aside now uses `accent_color_with_alpha(\"15\")`, rendering as `#4338CA15` / `rgba(67, 56, 202, 0.082)` on both seeded previews and reading more clearly than the previous lighter tint.",
             metadata: {
               "pixel_status" => "close",
               "discrepancies" => [
                 { "id" => "SAC-001", "area" => "sidebar_width", "severity" => "moderate", "status" => "resolved" },
                 { "id" => "SAC-002", "area" => "mobile_order", "severity" => "major", "status" => "resolved" },
-                { "id" => "SAC-003", "area" => "sidebar_tint", "severity" => "minor", "status" => "open" },
+                { "id" => "SAC-003", "area" => "sidebar_tint", "severity" => "minor", "status" => "resolved" },
                 { "id" => "SAC-004", "area" => "profile_card_radius", "severity" => "minor", "status" => "open" },
                 { "id" => "SAC-005", "area" => "skill_chip_bg", "severity" => "minor", "status" => "open" },
                 { "id" => "SAC-006", "area" => "contact_weight", "severity" => "minor", "status" => "open" }
               ],
-              "open_count" => 4,
-              "resolved_count" => 2
+              "open_count" => 3,
+              "resolved_count" => 3
             },
             version_label: "v1.0"
           }

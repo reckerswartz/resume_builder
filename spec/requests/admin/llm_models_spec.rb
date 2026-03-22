@@ -18,10 +18,10 @@ RSpec.describe 'Admin::LlmModels', type: :request do
       expect(response.body).to include('Manage providers')
       expect(response.body).to include('Model index snapshot')
       expect(response.body).to include('Filter models')
-      expect(response.body).to include('Ready for orchestration')
+      expect(response.body).to include('Ready for workflows')
       expect(response.body).to include('Assigned roles')
       expect(response.body).to include('Needs attention')
-      expect(response.body).to include('Orchestration')
+      expect(response.body).to include('Readiness')
       expect(response.body).to include('page-header-compact')
     end
 
@@ -54,7 +54,7 @@ RSpec.describe 'Admin::LlmModels', type: :request do
 
       document = Nokogiri::HTML.parse(response.body)
       matches_card = document.xpath("//article[.//p[normalize-space()='Matches']]").first
-      ready_card = document.xpath("//article[.//p[normalize-space()='Ready for orchestration']]").first
+      ready_card = document.xpath("//article[.//p[normalize-space()='Ready for workflows']]").first
       assigned_card = document.xpath("//article[.//p[normalize-space()='Assigned roles']]").first
       attention_card = document.xpath("//article[.//p[normalize-space()='Needs attention']]").first
 
@@ -128,7 +128,7 @@ RSpec.describe 'Admin::LlmModels', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to include('Review this model')
       expect(response_body).to include('Catalog & runtime')
-      expect(response_body).to include('Orchestration readiness')
+      expect(response_body).to include('Operational readiness')
       expect(response_body).to include('Assigned roles')
       expect(response_body).to include('Provider readiness')
       expect(response_body).to include('Assignment order and workflow coverage')
@@ -148,7 +148,7 @@ RSpec.describe 'Admin::LlmModels', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to include('Model identity')
       expect(response_body).to include('Runtime defaults')
-      expect(response_body).to include('Activation & orchestration')
+      expect(response_body).to include('Activation & readiness')
       expect(response_body).to include('Model setup')
       expect(response_body).to include('Provider readiness')
       expect(response_body).to include('Assignment follow-up')

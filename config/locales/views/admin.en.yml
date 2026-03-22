@@ -24,13 +24,13 @@ en:
           label: "Cloud import connectors"
           caption: "Provider readiness and environment checks"
         llm_orchestration:
-          label: "LLM orchestration"
+          label: "LLM workflows"
           caption: "Generation and verification workflows"
     settings_helper:
       feature_flags:
         llm_access:
           label: "LLM access"
-          description: "Allow provider-backed model orchestration for suggestion, autofill, and verification flows."
+          description: "Allow provider-backed model selection for suggestion, autofill, and verification flows."
         resume_suggestions:
           label: "Resume suggestions"
           description: "Enable text suggestion workflows that rely on configured text generation and verification models."
@@ -96,7 +96,7 @@ en:
               safe_scaffold: "Safe scaffold"
             required_env_vars: "Required environment variables"
           llm_orchestration:
-            title: "LLM orchestration"
+            title: "LLM workflows"
             eyebrow: "Model roles"
             description: "Choose the primary generation models and the verification models that run in parallel for text and vision workflows."
             badges:
@@ -255,14 +255,14 @@ en:
               description: "Models currently returned by the active filter set."
               badge: "%{count} on this page"
             ready:
-              eyebrow: "Ready for orchestration"
+              eyebrow: "Ready for workflows"
               description: "Models in the active filter set with an active record and a request-ready provider."
               badges:
                 ready: "Ready"
                 empty: "None ready"
             assigned:
               eyebrow: "Assigned roles"
-              description: "Models in the active filter set already connected to one or more orchestration roles."
+              description: "Models in the active filter set already connected to one or more workflow roles."
               badges:
                 assigned: "In use"
                 unassigned: "Unassigned"
@@ -301,14 +301,14 @@ en:
               detail: "Inactive models remain in the registry, but ready-model selection ignores them until they are activated again."
             choose_capability:
               label: "Choose at least one capability"
-              detail: "Select text, vision, or both so this model can participate in orchestration roles from the settings hub."
+              detail: "Select text, vision, or both so this model can be assigned to workflow roles from the settings hub."
             finish_provider_setup:
               label: "Finish provider setup"
             assign_workflow:
               label: "Assign this model to a workflow"
               detail: "Use Platform settings to connect this model to text generation, verification, or future vision flows."
             ready_for_orchestration:
-              label: "Ready for orchestration"
+              label: "Ready for live requests"
               detail: "This model is active, its provider is request-ready, and it has the coverage needed for assignment-driven workflows."
         navigation:
           eyebrow: "Model sections"
@@ -320,7 +320,7 @@ en:
               label: "Catalog & runtime"
               caption: "Provider, identifier, capabilities, and defaults"
             orchestration_readiness:
-              label: "Orchestration readiness"
+              label: "Operational readiness"
               caption: "Provider setup and role assignment follow-up"
             assigned_roles:
               label: "Assigned roles"
@@ -352,7 +352,7 @@ en:
                 quantization: "Quantization"
                 modalities: "Modalities"
           orchestration_readiness:
-            title: "Orchestration readiness"
+            title: "Operational readiness"
             eyebrow: "Operational status"
             description: "Surface the follow-ups required before this model can reliably participate in assignment-driven workflows."
             actions:
@@ -362,7 +362,7 @@ en:
           assigned_roles:
             title: "Assigned roles"
             eyebrow: "Workflow coverage"
-            description: "Inspect the orchestration roles currently using this model and jump to the settings hub when assignments need to change."
+            description: "Inspect the workflow roles currently using this model and jump to the settings hub when assignments need to change."
             badges:
               role_count:
                 one: "%{count} role"
@@ -374,7 +374,7 @@ en:
               execution_order: "Execution order %{position} · %{capabilities}"
               settings_hub: "Settings hub"
             empty_state:
-              description: "This model is not assigned to any orchestration role yet."
+              description: "This model is not assigned to any workflow role yet."
     llm_models_controller:
       model_created: "LLM model created."
       model_updated: "LLM model updated."

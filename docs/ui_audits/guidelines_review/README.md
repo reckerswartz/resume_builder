@@ -15,20 +15,20 @@ This workflow audits each routed page of the application against the documented 
 - Reusable Markdown templates exist for per-page tracking and per-run reporting.
 - The guidelines changelog tracks refinements made to `docs/ui_guidelines.md` and `docs/behance_product_ui_system.md` through this workflow.
 - The page inventory is seeded from `config/routes.rb`, `lib/resume_builder/step_registry.rb`, and the existing responsive-review registry.
-- Thirty-one routed pages have now been Playwright-reviewed through the workflow.
-- Thirty-one routed pages are currently marked `compliant`.
+- Thirty-five routed pages have now been Playwright-reviewed through the workflow.
+- Thirty-five routed pages are currently marked `compliant`.
 - The Batch 8 admin models/job-logs cluster is now closed and tracked as compliant.
 - The adjacent admin observability trio is now closed and tracked as compliant after the operator-copy cleanup and final close-page verification.
 - The remaining medium-priority unaudited builder steps, `resume-builder-personal-details` and `resume-builder-summary`, now have first-pass page docs and are tracked as compliant.
 - The admin template form routes, `admin-template-new` and `admin-template-edit`, now have first-pass page docs and are tracked as compliant.
+- The admin provider form routes, `admin-llm-provider-new` and `admin-llm-provider-edit`, are now audited and compliant after an orchestration copy fix across the full provider surface family (form, show, index summary).
+- The admin model form routes, `admin-llm-model-new` and `admin-llm-model-edit`, are now audited and compliant after an orchestration copy fix across the full model surface family (form, show, table, index summary, and locale keys).
 - Timestamped page docs, run logs, and raw accessibility artifacts now exist for real audit cycles under `docs/ui_audits/guidelines_review/` and `tmp/ui_audit_artifacts/`.
 
 ### Pending
 
-- The next recommended slice is `review-only` for `admin-llm-provider-new` and `admin-llm-provider-edit`.
-- The highest-value remaining follow-up is medium-priority coverage on the remaining unaudited admin provider/model form pages before moving on to the lower-priority public/authenticated stragglers.
-- The recently closed Batch 8 admin pages should now only be re-reviewed if shared admin shell, helper, or copy patterns change.
-- The remaining unaudited routed pages should continue through the normal cycle of review, implement-next when needed, and close-page verification.
+- All admin form pages are now compliant.
+- The next recommended slice is `review-only` for the remaining 2 low-priority unaudited pages: `password-reset-edit` and `resume-source-import`.
 
 ## Installed workflow
 

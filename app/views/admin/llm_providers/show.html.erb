@@ -1,14 +1,14 @@
 <% llm_models = @llm_provider.llm_models.order(:name, :identifier) %>
 <% section_links = [
      { id: "connection-runtime", label: "Connection & runtime", caption: "Endpoint, timeout, and credential reference" },
-     { id: "request-readiness", label: "Request readiness", caption: "Live orchestration and sync blockers" },
+     { id: "request-readiness", label: "Request readiness", caption: "Eligibility status and sync blockers" },
      { id: "registered-models", label: "Registered models", caption: "Current provider catalog" }
    ] %>
 <% readiness_items = [] %>
 <% unless @llm_provider.active? %>
   <% readiness_items << {
        label: "Activate this provider",
-       detail: "Inactive providers stay registered, but their models are not selected for live orchestration or ready-model resolution.",
+       detail: "Inactive providers stay registered, but their models are not selected for live requests.",
        tone: :neutral
      } %>
 <% end %>
@@ -40,14 +40,14 @@
 <% elsif @llm_provider.last_synced_at.blank? %>
   <% readiness_items << {
        label: "Run the first catalog sync",
-       detail: "Sync models after saving connection details so admins can assign orchestration roles from the settings hub.",
+       detail: "Sync models after saving connection details so admins can assign model roles from the settings hub.",
        tone: :neutral
      } %>
 <% end %>
 <% if readiness_items.empty? %>
   <% readiness_items << {
        label: "Ready for live requests",
-       detail: "This provider is active, authenticated, and has the minimum configuration required for sync and orchestration.",
+       detail: "This provider is active, authenticated, and has the minimum configuration required for sync and live requests.",
        tone: :success
      } %>
 <% end %>
@@ -169,7 +169,7 @@
         title: "Connection & runtime",
         anchor: "connection-runtime",
         eyebrow: "Provider configuration",
-        description: "Review the endpoint, adapter, timeout, and credential reference used when the orchestration layer contacts this provider.",
+        description: "Review the endpoint, adapter, timeout, and credential reference used when the platform contacts this provider.",
         badges: [
           { label: llm_provider_adapter_label(@llm_provider), tone: :neutral },
           { label: @llm_provider.active? ? "Active" : "Inactive", tone: @llm_provider.active? ? :success : :neutral }
@@ -221,7 +221,7 @@
         title: "Request readiness",
         anchor: "request-readiness",
         eyebrow: "Operational status",
-        description: "Surface the follow-ups required before this provider is reliable for live orchestration and catalog sync.",
+        description: "Surface the follow-ups required before this provider is reliable for live requests and catalog sync.",
         badges: [
           { label: llm_provider_request_badge_label(@llm_provider), tone: llm_provider_request_status_tone(@llm_provider) },
           { label: llm_provider_credential_status_label(@llm_provider), tone: llm_provider_credential_status_tone(@llm_provider) }

@@ -43,7 +43,7 @@
     <%= render Ui::WidgetCardComponent.new(
       eyebrow: "Ready for requests",
       title: visible_ready_count.to_s,
-      description: "Visible providers already configured for live orchestration.",
+      description: "Visible providers already configured for live requests.",
       tone: visible_ready_count.positive? ? :success : :subtle,
       badge: visible_ready_count.positive? ? "Healthy" : "None visible",
       badge_classes: ui_badge_classes(visible_ready_count.positive? ? :success : :neutral),

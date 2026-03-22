@@ -205,6 +205,11 @@ module ResumesHelper
     @resume_experience_step_states[resume.object_id] ||= Resumes::ExperienceStepState.new(resume: resume)
   end
 
+  def resume_skills_step_state(resume)
+    @resume_skills_step_states ||= {}
+    @resume_skills_step_states[resume.object_id] ||= Resumes::SkillsStepState.new(resume: resume)
+  end
+
   def resume_show_state(resume)
     @resume_show_states ||= {}
     @resume_show_states[resume.object_id] ||= Resumes::ShowState.new(

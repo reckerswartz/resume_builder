@@ -343,7 +343,11 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
 
       document = Nokogiri::HTML.parse(response.body)
+      output_settings = document.at_css('details[data-finalize-output-settings]')
 
+      expect(output_settings).to be_present
+      expect(output_settings.attribute('open')).to be_nil
+      expect(output_settings.text).to include(I18n.t('resumes.editor_finalize_step.output_settings.eyebrow'))
       expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][line_spacing]"]')).to be_present
@@ -376,10 +380,53 @@ RSpec.describe 'Resumes', type: :request do
       expect(experience_guidance).to be_present
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.eyebrow'))
       expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.badges.early_career'))
-      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.teaching_assistant'))
-      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.tutor'))
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_step_state.description_early_career'))
+      expect(experience_guidance.text).to include(I18n.t('resumes.experience_suggestion_catalog.role_labels.volunteer_experience'))
       expect(highlights_textarea).to be_present
       expect(highlights_textarea['name']).to include('[highlights_text]')
+    end
+
+    it 'renders role-aware skill suggestions on the skills step with clickable skill buttons' do
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        headline: 'Software Engineer',
+        intake_details: {
+          'experience_level' => 'three_to_five_years'
+        }
+      )
+      skills_section = create(:section, resume:, title: 'Skills', section_type: 'skills')
+      create(:entry, section: skills_section, content: { 'name' => 'Ruby on Rails', 'level' => 'Expert' })
+
+      get edit_resume_path(resume), params: { step: 'skills' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      skills_tips = document.at_css('details#skills-step-tips')
+      skills_guidance_blocks = document.css('[data-skills-entry-guidance]')
+      skills_guidance = skills_guidance_blocks.first
+      name_input = document.at_css('input[data-skills-suggestions-target="nameInput"]')
+
+      expect(skills_tips).to be_present
+      expect(skills_tips.text).to include(I18n.t('resumes.editor_section_step.skills_guidance.title'))
+      expect(skills_guidance_blocks.count).to eq(1)
+      expect(skills_guidance).to be_present
+      expect(skills_guidance.text).to include(I18n.t('resumes.skills_step_state.eyebrow'))
+      expect(skills_guidance.text).to include(I18n.t('resumes.skills_step_state.badges.role_aware'))
+      expect(skills_guidance.text).to include(I18n.t('resumes.skill_suggestion_catalog.role_labels.software_engineer'))
+      expect(name_input).to be_present
+      expect(name_input['name']).to include('[name]')
+
+      persisted_entry_card = document.at_css("details##{ActionView::RecordIdentifier.dom_id(skills_section.entries.first, :sortable_item)}")
+      new_entry_card = document.at_css("details##{ActionView::RecordIdentifier.dom_id(skills_section, :new_entry)}")
+      fallback_text = I18n.t('resumes.entry_form.supporting_text.persisted_fallback', section: 'Skills')
+
+      expect(persisted_entry_card).to be_present
+      expect(persisted_entry_card.at_css('summary').text).not_to include(fallback_text)
+      expect(new_entry_card).to be_present
+      expect(new_entry_card.at_css('summary').text).to include(I18n.t('resumes.entry_form.supporting_text.new_with_existing'))
     end
 
     it 'collapses section header actions on section-step pages while keeping finalize inline' do

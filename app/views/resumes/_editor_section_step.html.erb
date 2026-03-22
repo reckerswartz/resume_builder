@@ -37,6 +37,32 @@
   <% end %>
 <% end %>
 
+<% if current_step[:key] == "skills" %>
+  <%= render Ui::SurfaceCardComponent.new(
+    tag: :details,
+    padding: :none,
+    extra_classes: "overflow-hidden",
+    html_options: { id: "skills-step-tips" }
+  ) do %>
+    <summary class="flex cursor-pointer list-none items-center justify-between gap-3 border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-3 [&::-webkit-details-marker]:hidden">
+      <span class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_section_step.skills_guidance.title") %></span>
+      <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_section_step.skills_guidance.badge") %></span>
+    </summary>
+
+    <div class="px-6 py-6">
+      <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-4' ].join(' ') %>">
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_section_step.skills_guidance.helper_text") %></p>
+        <div class="flex flex-wrap gap-2">
+          <%= link_to t("resumes.editor_section_step.skills_guidance.technical"), "#skills-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
+          <%= link_to t("resumes.editor_section_step.skills_guidance.analytical"), "#skills-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
+          <%= link_to t("resumes.editor_section_step.skills_guidance.leadership"), "#skills-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
+          <%= link_to t("resumes.editor_section_step.skills_guidance.communication"), "#skills-step-tips", class: ui_button_classes(:secondary, size: :sm) %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
 <section id="<%= dom_id(resume, :step_sections) %>" class="space-y-4">
   <% if step_sections.any? %>
     <div class="space-y-4" data-controller="sortable">

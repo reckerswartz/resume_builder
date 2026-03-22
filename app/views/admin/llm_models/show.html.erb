@@ -1,6 +1,6 @@
 <% section_links = [
      { id: "catalog-runtime", label: "Catalog & runtime", caption: "Provider, identifier, capabilities, and defaults" },
-     { id: "orchestration-readiness", label: "Orchestration readiness", caption: "Provider setup and role assignment follow-up" },
+     { id: "operational-readiness", label: "Operational readiness", caption: "Provider setup and role assignment follow-up" },
      { id: "assigned-roles", label: "Assigned roles", caption: "Current workflow coverage from the settings hub" }
    ] %>
 <% readiness_items = [] %>
@@ -14,7 +14,7 @@
 <% unless @llm_model.supports_text? || @llm_model.supports_vision? %>
   <% readiness_items << {
        label: "Choose at least one capability",
-       detail: "Select text, vision, or both so this model can participate in orchestration roles from the settings hub.",
+       detail: "Select text, vision, or both so this model can be assigned to workflow roles from the settings hub.",
        tone: :warning
      } %>
 <% end %>
@@ -34,7 +34,7 @@
 <% end %>
 <% if readiness_items.empty? %>
   <% readiness_items << {
-       label: "Ready for orchestration",
+       label: "Ready for live requests",
        detail: "This model is active, its provider is request-ready, and it has the coverage needed for assignment-driven workflows.",
        tone: :success
      } %>
@@ -264,8 +264,8 @@
       <% end %>
 
       <%= render Ui::SettingsSectionComponent.new(
-        title: "Orchestration readiness",
-        anchor: "orchestration-readiness",
+        title: "Operational readiness",
+        anchor: "operational-readiness",
         eyebrow: "Operational status",
         description: "Surface the follow-ups required before this model can reliably participate in assignment-driven workflows.",
         badges: [
@@ -301,7 +301,7 @@
         title: "Assigned roles",
         anchor: "assigned-roles",
         eyebrow: "Workflow coverage",
-        description: "Inspect the orchestration roles currently using this model and jump to the settings hub when assignments need to change.",
+        description: "Inspect the workflow roles currently using this model and jump to the settings hub when assignments need to change.",
         badges: [
           { label: pluralize(@llm_model.llm_model_assignments.size, "role"), tone: @llm_model.llm_model_assignments.any? ? :success : :neutral },
           { label: llm_model_provider_status_label(@llm_model), tone: llm_model_provider_status_tone(@llm_model) }
@@ -329,7 +329,7 @@
         <% else %>
           <div class="mt-4">
             <%= render Ui::EmptyStateComponent.new(
-              description: "This model is not assigned to any orchestration role yet.",
+              description: "This model is not assigned to any workflow role yet.",
               padding: :sm,
               tone: :subtle,
               align: :left

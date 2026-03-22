@@ -33,7 +33,7 @@
         </div>
 
         <% if section.section_type == "skills" %>
-          <div class="flex flex-wrap gap-2.5">
+          <div class="flex flex-wrap gap-2">
             <% entries.each do |entry| %>
               <span class="<%= [chip_text_class, "rounded-full border px-3 py-1.5 text-slate-700"].join(" ") %>" style="border-color: <%= accent_color_with_alpha("22") %>; background-color: <%= accent_color_with_alpha("08") %>;;">
                 <span class="font-medium text-slate-900"><%= value_for(entry, "name") %></span>
@@ -51,7 +51,7 @@
               <% location = entry_location(entry) %>
               <% highlights = entry_highlights(entry) %>
               <% url = entry_url(entry) %>
-              <article class="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm shadow-slate-200/60">
+              <article class="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm shadow-slate-200/60">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h3 class="<%= [entry_title_text_class, "font-semibold text-slate-900"].join(" ") %>"><%= entry_title(entry) %></h3>
@@ -77,9 +77,9 @@
                 <% end %>
 
                 <% if highlights.any? %>
-                  <ul class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "space-y-2 text-slate-700"].join(" ") %>">
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "space-y-1.5 text-slate-700"].join(" ") %>">
                     <% highlights.each do |highlight| %>
-                      <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
+                      <li class="flex gap-2.5"><span class="mt-1.5 h-1 w-1 shrink-0 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
                     <% end %>
                   </ul>
                 <% end %>
