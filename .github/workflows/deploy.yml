@@ -94,7 +94,7 @@ jobs:
       image_tag: ${{ needs.pre_deploy.outputs.image_tag || steps.fallback_tag.outputs.image_tag }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Fallback image tag
         id: fallback_tag
@@ -136,7 +136,7 @@ jobs:
       url: ${{ vars.STAGING_URL || 'https://staging.resume-builder.local' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Deploy to staging
         run: |
@@ -165,7 +165,7 @@ jobs:
       url: ${{ vars.PRODUCTION_URL || 'https://resume-builder.local' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Deploy to production
         run: |
@@ -213,7 +213,7 @@ jobs:
     if: failure()
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Trigger rollback
         run: |

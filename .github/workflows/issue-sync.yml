@@ -29,7 +29,7 @@ jobs:
       || github.event.workflow_run.conclusion == 'failure'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download CI artifacts
         uses: actions/download-artifact@v8
