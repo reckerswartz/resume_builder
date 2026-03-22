@@ -17,12 +17,14 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next post-correction structural slice is complete: `ApplicationHelper` now delegates table/query behavior to `TableHelper`.
 - The next post-correction verification slice is complete: `Resumes::CloudImportProviderCatalog` now has dedicated shared-service coverage.
 - The next structural slice is complete: `LlmProvider` credential management extracted to `LlmProvider::CredentialManagement` concern with 15 focused examples.
+- The next structural slice is complete: `LlmProvider` sync-state extracted to `LlmProvider::SyncState` concern (20 focused examples) and syncability errors localized via I18n. Model reduced from 151 to 98 lines. Area `llm-provider-credential-management` is now closed.
+- The next verification slice is complete: `Resumes::PdfTextExtractor` (6 examples) and `Resumes::DocxTextExtractor` (11 examples) now have dedicated spec coverage under `broad-codebase-coverage-scan`.
 
 ### Pending
 
-- The next `implement-next` maintainability slice should come from the verification lane, because the last completed lane was structural.
-- The next verification candidate should start with `app/services/resumes/docx_text_extractor.rb`.
-- The remaining structural backlog includes `app/models/llm_provider.rb` (sync-state follow-up) and `Admin::JobLogsHelper` lower-priority open follow-ups.
+- The next `implement-next` maintainability slice should come from the structural lane, because the last completed lane was verification.
+- The next structural candidate is `app/helpers/admin/job_logs_helper.rb` (runtime-state / control-state follow-ups).
+- The remaining verification backlog includes `app/services/resumes/export_status_broadcaster.rb` and `app/services/errors/tracker.rb`.
 
 ## Installed workflow
 
@@ -93,19 +95,17 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ## Current round-robin state
 
-- Last completed lane: `structural`
-- Next preferred lane: `verification`
+- Last completed lane: `verification`
+- Next preferred lane: `structural`
 - Audit scope: `whole_codebase`
 - Max consecutive runs per lane: `1`
 
 ### Current structural candidates
 
-- `app/models/llm_provider.rb` (sync-state follow-up)
+- `app/helpers/admin/job_logs_helper.rb` (runtime-state / control-state follow-ups)
 
 ### Current verification candidates
 
-- `app/services/resumes/docx_text_extractor.rb`
-- `app/services/resumes/pdf_text_extractor.rb`
 - `app/services/resumes/export_status_broadcaster.rb`
 - `app/services/errors/tracker.rb`
 

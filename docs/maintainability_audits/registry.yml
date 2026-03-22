@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T03:30:00Z"
+updated_at: "2026-03-22T04:30:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-22-llm-provider-credential-management/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-22-broad-codebase-pdf-docx-extractors/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -42,14 +42,12 @@ categories:
 round_robin:
   overview_doc: "docs/maintainability_audits/README.md"
   audit_scope: "whole_codebase"
-  last_completed_lane: "structural"
-  next_preferred_lane: "verification"
+  last_completed_lane: "verification"
+  next_preferred_lane: "structural"
   max_consecutive_lane_runs: 1
   structural_candidate_paths:
-    - "app/models/llm_provider.rb (sync-state follow-up)"
+    - "app/helpers/admin/job_logs_helper.rb (runtime-state / control-state follow-ups)"
   verification_candidate_paths:
-    - "app/services/resumes/docx_text_extractor.rb"
-    - "app/services/resumes/pdf_text_extractor.rb"
     - "app/services/resumes/export_status_broadcaster.rb"
     - "app/services/errors/tracker.rb"
 areas:
@@ -279,8 +277,7 @@ areas:
       - "ApplicationJob (91 lines, shared base for all background jobs) had zero dedicated coverage."
     recommended_refactor_shape: "add_targeted_specs"
     area_doc_path: "docs/maintainability_audits/areas/broad-codebase-coverage-scan.md"
-    open_follow_up_keys:
-      - "add-resumes-docx-text-extractor-spec"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "add-application-job-spec"
       - "add-job-log-policy-spec"
@@ -297,14 +294,18 @@ areas:
       - "add-llm-providers-ollama-client-spec"
       - "add-llm-providers-base-client-spec"
       - "add-resumes-cloud-import-provider-catalog-spec"
-    last_reviewed_at: "2026-03-21T22:54:00Z"
-    last_changed_at: "2026-03-21T22:54:00Z"
-    next_step: "Add dedicated spec coverage for Resumes::DocxTextExtractor, then re-evaluate the remaining low-priority service coverage gaps."
-    cycle_count: 19
-    last_cycle_date: "2026-03-21T22:54:00Z"
+      - "add-resumes-pdf-text-extractor-spec"
+      - "add-resumes-docx-text-extractor-spec"
+    last_reviewed_at: "2026-03-22T04:30:00Z"
+    last_changed_at: "2026-03-22T04:30:00Z"
+    next_step: "Remaining low-priority service coverage gaps: ExportStatusBroadcaster, Errors::Tracker. Rotate to structural lane next."
+    github_issue_number: 54
+    github_pr_number: 55
+    cycle_count: 20
+    last_cycle_date: "2026-03-22T04:30:00Z"
     issues_found: 61
-    issues_resolved: 31
-    issues_remaining: 30
+    issues_resolved: 33
+    issues_remaining: 28
     regression_detected: false
   - area_key: "llm-provider-credential-management"
     title: "LlmProvider credential management extraction"
