@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldhdg-trim-duplicate-personal-details-cta/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsum-remove-duplicate-step-header/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -75,9 +75,9 @@ inventory_notes:
 next_step:
   recommended_scope:
     - "resume-show"
-    - "resume-builder-personal-details"
-    - "resume-show"
-  reason: "resume-builder-heading improved to 87 after trimming the duplicate personal-details CTA card, and it now has only one low-priority footer-note copy follow-up. resume-show is the next preview/workspace surface if the audit returns from the builder flow, while resume-builder-personal-details is the next identity-details step if the builder sequence continues forward."
+    - "sign-in"
+    - "create-account"
+  reason: "resume-builder-summary improved to 81 after removing duplicate step header. All builder steps are now audited. resume-show is the next unaudited workspace surface, and sign-in/create-account are the next unaudited public pages."
 pages:
   - page_key: "home"
     title: "Home"
@@ -350,7 +350,31 @@ pages:
     issues_resolved: 2
     issues_remaining: 0
     regression_detected: false
-  - { page_key: "resume-builder-summary", title: "Resume builder summary step", path: "/resumes/:id/edit?step=summary", access_level: "authenticated", auth_context: "authenticated_user_with_resume", page_family: "builder", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "resume-builder-summary"
+    title: "Resume builder summary step"
+    path: "/resumes/:id/edit?step=summary"
+    access_level: "authenticated"
+    auth_context: "authenticated_user_with_resume"
+    page_family: "builder"
+    priority: "medium"
+    status: "improved"
+    usability_score: 81
+    page_doc_path: "docs/ui_audits/usability_review/pages/resume-builder-summary.md"
+    open_issue_keys:
+      - "UX-BLDSUM-002"
+    closed_issue_keys:
+      - "UX-BLDSUM-001"
+      - "UX-BLDSUM-003"
+    last_audited_at: "2026-03-22T06:05:00Z"
+    last_changed_at: "2026-03-22T06:05:00Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-22-bldsum-remove-duplicate-step-header/00-overview.md"
+    next_step: "UX-BLDSUM-002 (scroll_efficiency) is the only open issue — curated library pushes textarea below fold. Consider collapsing the library behind a disclosure."
+    cycle_count: 1
+    last_cycle_date: "2026-03-22T06:05:00Z"
+    issues_found: 3
+    issues_resolved: 2
+    issues_remaining: 1
+    regression_detected: false
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"
     path: "/resumes/:id/edit?step=finalize"

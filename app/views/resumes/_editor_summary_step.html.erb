@@ -1,18 +1,6 @@
 <% summary_step_state = resume_summary_step_state(resume) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
-  <%= render Ui::StepHeaderComponent.new(
-    title: current_step.fetch(:title),
-    description: current_step.fetch(:description)
-  ) do %>
-    <%= render Ui::WidgetCardComponent.new(
-      eyebrow: t("resumes.editor_summary_step.guidance_card.eyebrow"),
-      title: t("resumes.editor_summary_step.guidance_card.title"),
-      description: t("resumes.editor_summary_step.guidance_card.description"),
-      padding: :sm
-    ) %>
-  <% end %>
-
   <div class="space-y-6 px-6 py-6" data-controller="summary-suggestions">
     <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-4' ].join(' ') %>">
       <div class="space-y-1">
