@@ -11,8 +11,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `add_targeted_specs`
-- Last reviewed: `2026-03-21T22:54:00Z`
-- Last changed: `2026-03-21T22:54:00Z`
+- Last reviewed: `2026-03-22T04:30:00Z`
+- Last changed: `2026-03-22T04:30:00Z`
 
 ## Hotspot summary
 
@@ -162,6 +162,31 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Added `spec/services/resumes/cloud_import_provider_catalog_spec.rb` (6 examples) covering hydrated provider metadata from `.all`, known and unknown provider lookup via `.fetch`, and the `provider_unavailable`, `configured`, and `setup_required` feedback branches from `.launch_feedback`.
 - Re-verified adjacent consumer coverage in `spec/presenters/resumes/source_step_state_spec.rb`, `spec/helpers/resumes_helper_spec.rb`, `spec/helpers/admin/settings_helper_spec.rb`, and `spec/requests/resume_source_imports_spec.rb`.
 
+### Slice 31: resumes-pdf-text-extractor-spec
+
+- Added `spec/services/resumes/pdf_text_extractor_spec.rb` (6 examples) covering:
+  - Multi-page text extraction joined by double newlines
+  - Single-page document without trailing separators
+  - Empty pages returning empty string
+  - MalformedPDFError recovery returning empty string
+  - Generic StandardError recovery returning empty string
+  - StringIO wrapping of raw document_data bytes
+
+### Slice 32: resumes-docx-text-extractor-spec
+
+- Added `spec/services/resumes/docx_text_extractor_spec.rb` (11 examples) covering:
+  - Basic paragraph text extraction from word/document.xml
+  - Multiple text runs joined within a single paragraph
+  - Tab node conversion to tab characters
+  - Break and carriage-return node conversion to newlines
+  - Header content ordered before document content
+  - Footer content ordered after document content
+  - Multiple headers ordered numerically by filename
+  - Blank paragraph skipping
+  - Corrupt ZIP file recovery returning empty string
+  - Missing word/document.xml returning empty string
+  - Document with only empty paragraphs returning empty string
+
 ### Spec fix: registrations_spec.rb
 
 - Fixed stale assertion `expect(Resume.last.sections.count).to eq(4)` → `eq(ResumeBuilder::SectionRegistry.starter_sections.size)` since starter sections grew from 4 to 6 (added certifications and languages).
@@ -172,7 +197,7 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 
 ## Open follow-up keys
 
-- `add-resumes-docx-text-extractor-spec`
+(none)
 
 ## Closed follow-up keys
 
@@ -191,13 +216,15 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - `add-llm-providers-ollama-client-spec`
 - `add-llm-providers-base-client-spec`
 - `add-resumes-cloud-import-provider-catalog-spec`
+- `add-resumes-pdf-text-extractor-spec`
+- `add-resumes-docx-text-extractor-spec`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/services/resumes/cloud_import_provider_catalog_spec.rb spec/presenters/resumes/source_step_state_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/admin/settings_helper_spec.rb spec/requests/resume_source_imports_spec.rb` (55 examples, 0 failures)
+  - `bundle exec rspec spec/services/resumes/pdf_text_extractor_spec.rb spec/services/resumes/docx_text_extractor_spec.rb spec/services/resumes/source_text_resolver_spec.rb spec/services/llm/resume_autofill_service_spec.rb` (32 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/services/resumes/cloud_import_provider_catalog.rb spec/services/resumes/cloud_import_provider_catalog_spec.rb spec/presenters/resumes/source_step_state_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/admin/settings_helper_spec.rb spec/requests/resume_source_imports_spec.rb` (Syntax OK)
+  - `ruby -c app/services/resumes/pdf_text_extractor.rb app/services/resumes/docx_text_extractor.rb spec/services/resumes/pdf_text_extractor_spec.rb spec/services/resumes/docx_text_extractor_spec.rb` (Syntax OK)
 
 ## Full missing-spec inventory (as of 2026-03-21)
 
@@ -211,8 +238,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 ### Services (4 remaining missing)
 | File | Lines | Priority |
 |------|-------|----------|
-| `Resumes::DocxTextExtractor` | ~40 | low |
-| `Resumes::PdfTextExtractor` | ~30 | low |
+| `Resumes::DocxTextExtractor` | ~40 | ~~low~~ covered |
+| `Resumes::PdfTextExtractor` | ~30 | ~~low~~ covered |
 | `Resumes::ExportStatusBroadcaster` | ~20 | low |
 | `Errors::Tracker` | ~30 | low |
 
