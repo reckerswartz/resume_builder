@@ -9,9 +9,13 @@ This workflow is one phase of the repeating TDD cycle: **Red → Green → Refac
 ### Phase 1: Context & Regression-Aware Baseline
 
 1. Treat any text supplied after `/implementation-agent` as the active feature scope, failing spec target, or green-phase context.
-2. Invoke `@implementation-agent`.
-3. Check for pending migrations before running specs — `bin/rails db:migrate:status`. Pending migrations are a common cause of false failures.
-4. **Assess current cycle position and regression baseline**: confirm which specs are currently failing and verify they fail for the right reason (missing implementation, not setup issues). If specs fail for setup reasons, fix those first. If a previously-green behavior regressed, restore that baseline before expanding scope. If the work touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before implementing.
+2. **Read current state from GitHub** to check for related open issues:
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow implementation-agent
+   ```
+3. Invoke `@implementation-agent`. Check for pending migrations — `bin/rails db:migrate:status`.
+4. **Assess current cycle position**: confirm which specs are failing and verify they fail for the right reason. If the work touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
 
 ### Phase 2: Implement Minimum Code
 

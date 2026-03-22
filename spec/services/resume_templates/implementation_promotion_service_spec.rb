@@ -34,10 +34,13 @@ RSpec.describe ResumeTemplates::ImplementationPromotionService do
 
       expect(result).to be_success
       expect(result).to be_promoted
+      expect(result.target_status).to eq("validated")
       expect(result.template_implementation.reload.status).to eq("validated")
       expect(result.template_implementation.validated_at).to eq(validation_run.validated_at)
       expect(result.template_implementation.metadata).to include(
-        "promotion_mode" => "admin_validation_promotion",
+        "promotion_mode" => "admin_lifecycle_promotion",
+        "promotion_source_status" => "draft",
+        "promotion_target_status" => "validated",
         "promotion_validation_run_identifier" => validation_run.identifier,
         "promoted_by_user_id" => user.id
       )
@@ -45,7 +48,81 @@ RSpec.describe ResumeTemplates::ImplementationPromotionService do
       expect(result.promotion_artifact.artifact_type).to eq("version_snapshot")
       expect(result.promotion_artifact.metadata).to include(
         "artifact_role" => "validated_implementation_snapshot",
+        "promotion_target_status" => "validated",
         "promotion_validation_run_identifier" => validation_run.identifier
+      )
+    end
+
+    it "promotes a validated implementation to stable and records a stable version snapshot" do
+      template = create(:template, name: "Editorial Split", slug: "editorial-split")
+      user = create(:user, :admin)
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: "reference_design",
+        lineage_kind: "source",
+        name: "Behance capture"
+      )
+      validated_implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: "validated",
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 18, 15)
+      )
+
+      result = described_class.new(template: template, template_implementation: validated_implementation, user: user).call
+
+      expect(result).to be_success
+      expect(result).to be_promoted
+      expect(result.target_status).to eq("stable")
+      expect(result.template_implementation.reload.status).to eq("stable")
+      expect(result.template_implementation.validated_at).to eq(Time.zone.local(2026, 3, 21, 18, 15))
+      expect(result.promotion_artifact).to be_persisted
+      expect(result.promotion_artifact.artifact_type).to eq("version_snapshot")
+      expect(result.promotion_artifact.metadata).to include(
+        "artifact_role" => "stable_implementation_snapshot",
+        "promotion_source_status" => "validated",
+        "promotion_target_status" => "stable"
+      )
+    end
+
+    it "promotes a stable implementation to seeded and records a seed snapshot" do
+      template = create(:template, name: "Editorial Split", slug: "editorial-split")
+      user = create(:user, :admin)
+      source_artifact = create(
+        :template_artifact,
+        template: template,
+        artifact_type: "reference_design",
+        lineage_kind: "source",
+        name: "Behance capture"
+      )
+      stable_implementation = create(
+        :template_implementation,
+        template: template,
+        source_artifact: source_artifact,
+        status: "stable",
+        renderer_family: template.layout_family,
+        render_profile: template.render_layout_config,
+        validated_at: Time.zone.local(2026, 3, 21, 18, 15),
+        seeded_at: nil
+      )
+
+      result = described_class.new(template: template, template_implementation: stable_implementation, user: user).call
+
+      expect(result).to be_success
+      expect(result).to be_promoted
+      expect(result.target_status).to eq("seeded")
+      expect(result.template_implementation.reload.status).to eq("seeded")
+      expect(result.template_implementation.seeded_at).to be_present
+      expect(result.promotion_artifact).to be_persisted
+      expect(result.promotion_artifact.artifact_type).to eq("seed_snapshot")
+      expect(result.promotion_artifact.metadata).to include(
+        "artifact_role" => "seeded_implementation_snapshot",
+        "promotion_source_status" => "stable",
+        "promotion_target_status" => "seeded"
       )
     end
 

@@ -22,7 +22,13 @@ class TemplateImplementation < ApplicationRecord
   validates :name, :renderer_family, :status, presence: true
 
   scope :render_ready, -> { where(status: %w[validated stable seeded]) }
-  scope :most_recent_first, -> { order(Arel.sql("COALESCE(seeded_at, validated_at, created_at) DESC")) }
+  scope :most_recent_first, -> {
+    order(
+      Arel.sql(
+        "CASE status WHEN 'seeded' THEN 3 WHEN 'stable' THEN 2 WHEN 'validated' THEN 1 WHEN 'draft' THEN 0 ELSE -1 END DESC, COALESCE(seeded_at, validated_at, created_at) DESC"
+      )
+    )
+  }
 
   def effective_render_profile
     ResumeTemplates::Catalog.normalize_layout_config(

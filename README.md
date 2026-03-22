@@ -22,20 +22,23 @@ Resume Builder is a conventional Rails 8, server-rendered application for creati
 - Use `docs/architecture_overview.md` for the current system boundaries, request flow, rendering model, and extension points
 - Use `docs/ui_guidelines.md` as the authoritative implementation contract for shared UI tokens, components, page-family rules, and UI definition of done
 - Use `docs/behance_product_ui_system.md` as the Behance-to-Resume-Builder translation layer and rationale for the shared `ink`/`canvas`/`mist`/`aqua` + `atelier-*` system
-- Use `docs/ui_audits/2026-03-20/resumebuilder-saas-ux-audit/README.md` for the SaaS cleanup audit, ResumeBuilder.com comparison synthesis, page-by-page usability recommendations, and multilingual support requirements
-- Use `docs/ui_audits/responsive_review/README.md` for the reusable Playwright-driven multi-resolution UI audit workflow, page inventory, and rerun-safe tracking artifacts
-- Use `docs/ui_audits/guidelines_review/README.md` for the reusable Playwright-driven UI guidelines compliance audit workflow, design-system compliance scoring, componentization tracking, and guidelines refinement history
-- Use `docs/ui_audits/usability_review/README.md` for the reusable Playwright-driven UX usability audit workflow, content quality scoring, information density checks, user-flow clarity evaluation, and iterative fix-and-retest tracking
 - Use `docs/references/behance/ai_voice_generator_reference.md` as the immutable external reference capture for source evidence, safe-reuse rules, and source asset URLs
 - Use `docs/resume_editing_flow.md` for the guided builder steps, autosave behavior, nested section and entry editing, and preview synchronization
 - Use `docs/template_rendering.md` for the template record model, component resolution path, preview/PDF rendering, and current render-time config usage
 - Use `docs/pdf_export_flow.md` for the export trigger flow, job pipeline, status broadcasting, attachment handling, and current export-time settings behavior
 - Use `docs/ai_suggestions.md` for the AI-assisted entry improvement flow, feature gating, model/provider orchestration, and interaction logging behavior
 - Use `docs/admin_operations.md` for the admin namespace entry points, dashboard responsibilities, queue/error observability, and operational configuration workflows
-- Use `docs/template_rollouts/README.md` for the reusable Behance capture and implementation workflows, no-duplicate registry rules, and rollout tracking artifacts
-- Use `docs/maintainability_audits/README.md` for the reusable maintainability audit workflow, hotspot registry rules, and timestamped refactor tracking artifacts
-- Use `docs/template_audits/README.md` for the reusable Playwright-driven template pixel-perfect audit workflow, diverse seed profile catalog, per-template discrepancy tracking, and iterative fix-and-re-audit artifacts
 - Use `docs/job_monitoring_and_recovery.md` for the Active Job lifecycle logging, persistent `JobLog` monitoring record, Solid Queue runtime inspection, and admin recovery controls
+
+### GitHub-based tracking
+
+All workflow state — issues, progress, screenshots, verification results — is tracked on **GitHub Issues, branches, and PRs**. No local registries, run logs, or page docs are maintained. Use `bin/gh-bridge/` scripts to interact with GitHub:
+
+- `bin/gh-bridge/fetch-issues` — query open/closed issues by workflow, domain, severity
+- `bin/gh-bridge/process-queue` — pick the next highest-priority open issue for processing
+- `bin/gh-bridge/create-issue` — create issues with structured bodies and screenshots
+- `bin/gh-bridge/create-branch` / `create-pr` / `close-issue` — full issue→branch→PR→close lifecycle
+- `bin/gh-bridge/upload-screenshot` — push Playwright screenshots to the `screenshots` branch for GitHub embedding
 
 ## Local setup
 
@@ -54,12 +57,15 @@ This repository is configured for Windsurf with project guidance and Rails AI sk
 - `.windsurfrules` keeps the existing project rules active in the workspace
 - `.windsurf/skills/` includes the main `rails_ai_agents` skill pack from `ThibautBaissac/rails_ai_agents`
 - `.windsurf/workflows/` provides Windsurf-native slash commands for the core feature-spec, TDD, review, security, RSpec, maintainability audit, responsive UI audit, UI guidelines audit, and Behance template rollout/implementation flows
+- `.windsurf/workflows/` also includes the ResumeBuilder.com reference rollout workflow for capability-first hosted-reference implementation slices
+- `.windsurf/workflows/github-ops.md` provides the GitHub integration workflow for continuous issue queue processing, branch management, PR lifecycle, and screenshot capture via `gh` CLI
+- `bin/gh-bridge/` contains idempotent shell scripts: `ensure-labels`, `fetch-issues`, `process-queue`, `create-issue`, `create-branch`, `create-pr`, `update-issue`, `close-issue`, `upload-screenshot`
 
 ## Using the installed Windsurf skills
 
 - Ask naturally for Rails help and Cascade can auto-invoke matching skills
 - Invoke a skill directly with `@skill-name`, such as `@rails-architecture` or `@rspec-agent`
-- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/responsive-ui-audit`, `/ui-guidelines-audit`, `/behance-template-rollout`, `/behance-template-implementation`, `/template-audit`, and `/ux-usability-audit`
+- Use the installed workflows with commands like `/feature-spec`, `/feature-review`, `/feature-plan`, `/tdd-red-agent`, `/implementation-agent`, `/tdd-refactoring-agent`, `/code-review`, `/security-audit`, `/rspec-agent`, `/maintainability-audit`, `/responsive-ui-audit`, `/ui-guidelines-audit`, `/behance-template-rollout`, `/behance-template-implementation`, `/resumebuilder-reference-rollout`, `/template-audit`, and `/ux-usability-audit`
 
 ## Notes
 

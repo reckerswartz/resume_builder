@@ -4,66 +4,47 @@ description: Continuously audit the Rails app for security issues, authorization
 
 ## Continuous Improvement Cycle
 
-This workflow operates as a repeating cycle: **Audit → Prioritize → Remediate → Validate → Re-audit**. Each invocation advances the cycle from its current position. Findings are tracked so work resumes cleanly across sessions.
+This workflow operates as a repeating cycle: **Audit → Prioritize → Remediate → Validate → Re-audit**. All state is tracked on GitHub Issues — no local tracking files.
 
 ### Phase 1: Context & Regression Baseline
 
-1. Treat any text supplied after `/security-audit` as the file path, feature area, mode (`review-only`, `implement-next`, `re-review`, or `full-cycle`), or scope to audit.
-2. Invoke `@security-audit`.
-3. Review the requested scope and, when appropriate, run the recommended security tooling (`bin/brakeman`, `bin/bundler-audit`). Also read `.windsurfrules` and `docs/architecture_overview.md` for baseline context. If the scope touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before auditing or remediating UI-facing issues.
-4. **Regression baseline**: before starting new work, re-run `bin/brakeman` and `bin/bundler-audit` to verify that previously remediated findings have not regressed. If new warnings appear on previously-fixed files, prioritize those regressions before new work.
-5. Check for pending migrations with `bin/rails db:migrate:status` — missing migrations can affect authorization and model-level validations.
+1. Treat any text supplied after `/security-audit` as file path, feature area, mode (`review-only`, `implement-next`, `re-review`, or `full-cycle`), or scope.
+2. **Read current state from GitHub:**
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow security-audit
+   ```
+3. Invoke `@security-audit`. Read `.windsurfrules`, `docs/architecture_overview.md`. If scope touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+4. **Regression baseline**: re-run `bin/brakeman` and `bin/bundler-audit`. If new warnings appear on previously-fixed files, create or reopen GitHub issues.
+5. Check for pending migrations.
 
 ### Phase 2: Audit & Discover
 
-6. Check authorization, input handling, output escaping, dependency risks, and configuration concerns.
-7. Apply project-specific security checks:
-    - **API key storage**: `LlmProvider#api_key_env_var` must contain an environment variable *name*, never a raw key. Verify `LlmProvider#api_key` resolves through `ENV[]`. Watch for admin UI patterns that could accidentally expose raw credentials — token fields should be masked.
-    - **Cloud import connectors**: `Resumes::CloudImportProviderCatalog` checks for `GOOGLE_DRIVE_CLIENT_ID`, `GOOGLE_DRIVE_CLIENT_SECRET`, `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET` via environment. Verify no secrets are hardcoded or logged.
-    - **Photo processing pipeline**: `Photos::*` services handle user uploads and external LLM API calls — verify file type/size validation, temporary file cleanup, and that processing errors don't leak internal paths or API details.
-    - **LLM interaction data**: `LlmInteraction` stores prompt/response payloads — verify no PII leakage in logged payloads, and that admin-only access is enforced via `AdminPolicy`.
-    - **Authorization boundaries**: resume editing authorizes through parent resume ownership (`ResumePolicy`). Verify nested resources (sections, entries, photo assets) respect the ownership boundary. Admin namespace requires `AdminPolicy#access?`.
-    - **Feature flag bypass**: AI and photo-processing features gate through `PlatformSetting.current` — verify controllers and services check flags and don't expose incomplete features.
-    - **Active Storage**: verify content-type and file-size validations on `Resume#headshot`, `Resume#source_document`, `PhotoAsset` attachments. Check that direct upload URLs are scoped to authenticated users.
-    - **Rate limiting**: verify authentication-sensitive actions (session create, password reset) have rate limits.
-    - **Session handling**: verify password reset invalidates existing sessions, and session cookies are signed and secure.
-8. Compare current findings against any prior security audit docs to distinguish net-new from known items. Update severity of existing items if the codebase has evolved.
-9. Use this project's `.windsurfrules` and existing authentication and Pundit conventions as the baseline.
+6. Check authorization, input handling, output escaping, dependency risks, configuration concerns, and project-specific security checks (API key storage, cloud import connectors, photo processing, LLM interaction data, authorization boundaries, feature flag bypass, Active Storage, rate limiting, session handling).
+7. **Create a GitHub issue for each finding:**
+   ```bash
+   bin/gh-bridge/create-issue --workflow security-audit --key "SEC-<NNN>" \
+     --title "<description>" --severity "<level>" --domain security --type security-finding \
+     --body "<structured markdown with finding, affected files, remediation guidance>"
+   ```
 
 ### Phase 3: Implement & Refine Data
 
-10. In `review-only`, stop after findings, severity rankings, and remediation recommendations — but still record cycle metrics.
-11. In `implement-next`, pick only one highest-severity finding and implement the smallest complete remediation:
-    - **Refine underlying data** alongside security fixes:
-      - Update `db/seeds.rb` when fixes change authentication patterns, demo credentials, or feature flag defaults
-      - Update specs to cover the fixed authorization/validation path
-      - Update locale files when improving user-facing error messages for security-related failures
-      - Update `docs/architecture_overview.md` when security boundaries change
-    - **UI baseline**: if the remediation changes a user-facing surface such as auth forms, admin settings, or upload flows, preserve shared `Ui::*` components, `ui_*` helper APIs, page-family rules, and `atelier-*` tokens instead of introducing a one-off secure-looking wrapper
+8. In `review-only` mode: stop after creating GitHub issues.
+9. In `implement-next` mode:
+   a. Pick the highest-severity open issue (or use `bin/gh-bridge/process-queue --workflow security-audit`)
+   b. Mark in-progress: `bin/gh-bridge/update-issue --issue <N> --status in-progress`
+   c. Create branch: `bin/gh-bridge/create-branch --workflow security-audit --key <key>`
+   d. Implement the smallest complete remediation
+   e. Update seeds, specs, locale files, `docs/architecture_overview.md` as needed
 
 ### Phase 4: Validate
 
-12. Verify remediations with targeted specs and security tooling:
-    ```
-    bin/brakeman --no-pager
-    bin/bundler-audit check --update
-    bundle exec rspec <affected_spec_files>
-    ```
-13. **Cross-area regression check**: after fixing an authorization or validation rule, run request specs for adjacent controllers that share the same policy or concern.
+10. Verify: `bin/brakeman --no-pager`, `bin/bundler-audit check --update`, `bundle exec rspec <affected_spec_files>`.
+11. **Update GitHub issue**: `bin/gh-bridge/update-issue --issue <N> --status verified --comment "<results>"`
+12. **Open a PR**: `bin/gh-bridge/create-pr --workflow security-audit --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Re-audit & Cycle Forward
+### Phase 5: Close & Cycle Forward
 
-14. In `re-review`, re-run the full security tooling suite and verify only the targeted findings, closing resolved items explicitly.
-15. In `full-cycle` mode, repeat Phase 2–4 in a loop until all `critical` and `high` severity findings are remediated, then summarize with aggregate metrics.
-16. Update cycle metrics:
-    - `cycle_count`: increment
-    - `last_cycle_date`: current timestamp
-    - `findings_found` / `findings_remediated` / `findings_remaining`: running totals
-    - `brakeman_warning_count`: current count from latest scan
-    - `bundler_audit_advisory_count`: current count from latest scan
-    - `regression_detected`: boolean flag if a previously fixed finding resurfaced
-
-### Cycle Completion
-
-17. Report findings with risk severity, affected files, and practical remediation guidance. Recommend `/smart-fix` for critical issues and `/code-review` for architectural concerns.
-18. **Always recommend the next cycle entry point**: if open findings remain, recommend `implement-next` for the highest-severity item. If all findings are remediated, recommend `re-review` to catch new vulnerabilities from recent development or dependency updates. The workflow never truly ends — it feeds back into itself.
+13. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "security-audit/<key>"`
+14. Check `bin/gh-bridge/fetch-issues --workflow security-audit` for remaining issues. Recommend `/smart-fix` for critical issues, `/code-review` for architectural concerns.

@@ -23,6 +23,9 @@ seed_templates = [
       "accent_color" => "#0F172A",
       "font_scale" => "base",
       "density" => "comfortable",
+      "section_spacing" => "standard",
+      "paragraph_spacing" => "standard",
+      "line_spacing" => "standard",
       "column_count" => "single_column",
       "theme_tone" => "slate",
       "supports_headshot" => false
@@ -39,6 +42,9 @@ seed_templates = [
       "accent_color" => "#1D4ED8",
       "font_scale" => "sm",
       "density" => "compact",
+      "section_spacing" => "tight",
+      "paragraph_spacing" => "tight",
+      "line_spacing" => "standard",
       "column_count" => "single_column",
       "theme_tone" => "blue",
       "supports_headshot" => false
@@ -55,6 +61,9 @@ seed_templates = [
       "accent_color" => "#334155",
       "font_scale" => "sm",
       "density" => "compact",
+      "section_spacing" => "tight",
+      "paragraph_spacing" => "tight",
+      "line_spacing" => "standard",
       "column_count" => "single_column",
       "theme_tone" => "slate",
       "supports_headshot" => false
@@ -71,6 +80,9 @@ seed_templates = [
       "accent_color" => "#0F4C81",
       "font_scale" => "base",
       "density" => "comfortable",
+      "section_spacing" => "standard",
+      "paragraph_spacing" => "standard",
+      "line_spacing" => "standard",
       "column_count" => "single_column",
       "theme_tone" => "blue",
       "supports_headshot" => false
@@ -87,6 +99,9 @@ seed_templates = [
       "accent_color" => "#0F766E",
       "font_scale" => "base",
       "density" => "relaxed",
+      "section_spacing" => "relaxed",
+      "paragraph_spacing" => "relaxed",
+      "line_spacing" => "standard",
       "column_count" => "single_column",
       "theme_tone" => "teal",
       "supports_headshot" => false
@@ -103,6 +118,9 @@ seed_templates = [
       "accent_color" => "#4338CA",
       "font_scale" => "base",
       "density" => "comfortable",
+      "section_spacing" => "standard",
+      "paragraph_spacing" => "standard",
+      "line_spacing" => "standard",
       "column_count" => "two_column",
       "theme_tone" => "indigo",
       "supports_headshot" => false,
@@ -121,6 +139,9 @@ seed_templates = [
       "accent_color" => "#D7F038",
       "font_scale" => "sm",
       "density" => "compact",
+      "section_spacing" => "standard",
+      "paragraph_spacing" => "standard",
+      "line_spacing" => "standard",
       "column_count" => "two_column",
       "theme_tone" => "lime",
       "supports_headshot" => true,
@@ -885,18 +906,18 @@ ApplicationRecord.transaction do
             artifact_type: "discrepancy_report",
             name: "ATS Minimal template audit – initial",
             description: "Discrepancies identified for the ATS Minimal template.",
-            content: "## ATS Minimal Template Discrepancy Report\n\nAudit date: 2026-03-21\n\n### Summary\nThe ATS Minimal template is functionally correct but could be tighter in several areas.\n\n### Discrepancies\n\n1. **Accent color visibility** – #334155 slate accent is very subtle against white backgrounds. Section rule borders are nearly invisible at small sizes.\n\n2. **Heading hierarchy contrast** – Section titles and entry titles have similar visual weight, reducing scannability.\n\n3. **Inline skill separator** – Uses ' • ' which may not parse cleanly in all ATS systems. Consider ' | ' or ', ' alternatives.\n\n4. **Date range alignment** – Date ranges in the right column sometimes wrap at tablet widths, breaking the two-column alignment.\n\n5. **PDF character encoding** – Bullet characters (•) occasionally render as replacement characters in some PDF viewers. Use safer Unicode alternatives.",
+            content: "## ATS Minimal Template Discrepancy Report\n\nAudit date: 2026-03-21\n\n### Summary\nThe ATS Minimal template is now pixel perfect. It renders hidden sections correctly, exports to a 4-page PDF within the target range, uses stronger section-heading hierarchy, keeps date ranges aligned in a stable trailing column at tablet-like widths, and now has clearly visible accent rules on the white page surface.\n\n### Open discrepancies\n\nNo open discrepancies remain.\n\n### Resolved discrepancies\n\n1. **Accent color visibility** – Header and section rules now use stronger line weight and opacity, restoring visible accent structure on white surfaces.\n\n2. **Heading hierarchy contrast** – Section headings now render larger and darker than entry titles, restoring clearer scan order.\n\n3. **Date range alignment** – Entry headers now reserve a dedicated trailing date column and keep the date range on one line, preventing wrap at tablet-like widths.\n\n4. **Inline skill separator** – ATS-safe `|` separators already render in the current template, so the earlier open report is now stale.\n\n5. **PDF character encoding** – Bullet characters were replaced with safer `|` separators in inline skill rendering.",
             metadata: {
-              "pixel_status" => "close",
+              "pixel_status" => "pixel_perfect",
               "discrepancies" => [
-                { "id" => "ATS-001", "area" => "accent_visibility", "severity" => "minor", "status" => "open" },
-                { "id" => "ATS-002", "area" => "heading_hierarchy", "severity" => "moderate", "status" => "open" },
-                { "id" => "ATS-003", "area" => "skill_separator", "severity" => "minor", "status" => "open" },
-                { "id" => "ATS-004", "area" => "date_alignment", "severity" => "moderate", "status" => "open" },
-                { "id" => "ATS-005", "area" => "pdf_encoding", "severity" => "major", "status" => "open" }
+                { "id" => "ATS-001", "area" => "accent_visibility", "severity" => "minor", "status" => "resolved" },
+                { "id" => "ATS-002", "area" => "heading_hierarchy", "severity" => "moderate", "status" => "resolved" },
+                { "id" => "ATS-003", "area" => "skill_separator", "severity" => "minor", "status" => "resolved" },
+                { "id" => "ATS-004", "area" => "date_alignment", "severity" => "moderate", "status" => "resolved" },
+                { "id" => "ATS-005", "area" => "pdf_encoding", "severity" => "major", "status" => "resolved" }
               ],
-              "open_count" => 5,
-              "resolved_count" => 0
+              "open_count" => 0,
+              "resolved_count" => 5
             },
             version_label: "v1.0"
           }
@@ -994,19 +1015,19 @@ ApplicationRecord.transaction do
             artifact_type: "discrepancy_report",
             name: "Sidebar Accent template audit – initial",
             description: "Discrepancies identified for the Sidebar Accent template.",
-            content: "## Sidebar Accent Template Discrepancy Report\n\nAudit date: 2026-03-21\n\n### Summary\nThe Sidebar Accent template is the first two-column layout and works well, but sidebar sizing and mobile fallback need attention.\n\n### Discrepancies\n\n1. **Sidebar width ratio** – Uses lg:grid-cols-3 giving 33% sidebar. Reference shows ~28% sidebar (narrower) to give more room to main experience content.\n\n2. **Mobile column collapse** – On mobile, sidebar stacks above main content. Reference shows sidebar content below main content on mobile since experience is the primary section.\n\n3. **Sidebar tint opacity** – Uses accent_color with 10% alpha. On lighter indigo accents this is barely visible. Consider 15% minimum.\n\n4. **Profile section card treatment** – Profile/summary has a distinct card with border and tinted background. This card has inconsistent border-radius when compared to entry cards.\n\n5. **Sidebar skill chips white background** – Skill chips in sidebar use white background which creates high contrast against the tinted sidebar. Reference shows transparent/matching background.\n\n6. **Contact section in sidebar** – Contact labels use font-semibold which is heavier than needed for the sidebar context. Reference shows font-medium.",
+            content: "## Sidebar Accent Template Discrepancy Report\n\nAudit date: 2026-03-21\n\n### Summary\nThe Sidebar Accent template now matches the intended desktop column balance and mobile reading order. The main content keeps priority on mobile and the desktop sidebar renders at ~27.8% width, leaving more room for experience content. Four minor polish discrepancies remain in the sidebar surface styling.\n\n### Open discrepancies\n\n1. **Sidebar tint opacity** – Uses accent_color with 10% alpha. On lighter indigo accents this is barely visible. Consider 15% minimum.\n\n2. **Profile section card treatment** – Profile/summary has a distinct card with border and tinted background. This card has inconsistent border-radius when compared to entry cards.\n\n3. **Sidebar skill chips white background** – Skill chips in sidebar use white background which creates high contrast against the tinted sidebar. Reference shows transparent/matching background.\n\n4. **Contact section in sidebar** – Contact labels use font-semibold which is heavier than needed for the sidebar context. Reference shows font-medium.\n\n### Resolved discrepancies\n\n1. **Sidebar width ratio** – Desktop layout now uses a dedicated `sidebar-accent-layout` split with `minmax(0, 1fr) minmax(0, 2.6fr)`, which lands the sidebar at ~27.8% width and gives the main column more room.\n\n2. **Mobile column collapse** – Main content stays first in the DOM while the sidebar reorders back to the left on desktop, preserving the intended mobile reading order.",
             metadata: {
               "pixel_status" => "close",
               "discrepancies" => [
-                { "id" => "SAC-001", "area" => "sidebar_width", "severity" => "moderate", "status" => "open" },
-                { "id" => "SAC-002", "area" => "mobile_order", "severity" => "major", "status" => "open" },
+                { "id" => "SAC-001", "area" => "sidebar_width", "severity" => "moderate", "status" => "resolved" },
+                { "id" => "SAC-002", "area" => "mobile_order", "severity" => "major", "status" => "resolved" },
                 { "id" => "SAC-003", "area" => "sidebar_tint", "severity" => "minor", "status" => "open" },
                 { "id" => "SAC-004", "area" => "profile_card_radius", "severity" => "minor", "status" => "open" },
                 { "id" => "SAC-005", "area" => "skill_chip_bg", "severity" => "minor", "status" => "open" },
                 { "id" => "SAC-006", "area" => "contact_weight", "severity" => "minor", "status" => "open" }
               ],
-              "open_count" => 6,
-              "resolved_count" => 0
+              "open_count" => 4,
+              "resolved_count" => 2
             },
             version_label: "v1.0"
           }
@@ -1133,6 +1154,34 @@ ApplicationRecord.transaction do
         seeded_at: (implementation_status == "seeded" ? Time.current : nil)
       )
       implementation.save!
+
+      seed_snapshot = template.template_artifacts.find_or_initialize_by(
+        artifact_type: "seed_snapshot",
+        version_label: "#{implementation.identifier}-seeded"
+      )
+
+      if implementation.seeded?
+        seed_snapshot.assign_attributes(
+          name: implementation.name,
+          description: "Seeded implementation snapshot.",
+          content: JSON.pretty_generate(implementation.effective_render_profile),
+          metadata: {
+            "artifact_role" => "seeded_implementation_snapshot",
+            "seed_mode" => "db_seed_baseline",
+            "template_implementation_id" => implementation.id,
+            "template_implementation_identifier" => implementation.identifier,
+            "source_artifact_identifier" => reference_artifact&.identifier,
+            "status" => implementation.status,
+            "seeded_at" => implementation.seeded_at&.iso8601,
+            "created_at" => Time.current.iso8601
+          }.compact,
+          status: "active",
+          parent_artifact: reference_artifact
+        )
+        seed_snapshot.save!
+      elsif seed_snapshot.persisted?
+        seed_snapshot.update!(status: "superseded")
+      end
 
       validation_run = template.template_validation_runs.find_or_initialize_by(identifier: "#{template.slug}-baseline-manual-review")
       validation_run.assign_attributes(

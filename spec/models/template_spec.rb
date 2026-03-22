@@ -68,6 +68,22 @@ RSpec.describe Template, type: :model do
       expect(template.current_implementation).to eq(newer)
       expect(template.current_implementation).not_to eq(older)
     end
+
+    it 'prefers higher lifecycle stages over newer lower-stage render-ready records' do
+      template = create(:template, slug: 'modern')
+      seeded = create(:template_implementation, template: template, status: 'seeded', seeded_at: 2.days.ago, validated_at: 4.days.ago)
+      create(:template_implementation, template: template, status: 'validated', validated_at: 1.hour.ago)
+
+      expect(template.current_implementation).to eq(seeded)
+    end
+
+    it 'ignores archived implementations when resolving the current implementation' do
+      template = create(:template, slug: 'modern')
+      create(:template_implementation, template: template, status: 'archived', metadata: { 'archived_at' => Time.current.iso8601, 'archived_from_status' => 'seeded' }, seeded_at: 2.hours.ago, validated_at: 1.day.ago)
+      validated = create(:template_implementation, template: template, status: 'validated', validated_at: 1.hour.ago)
+
+      expect(template.current_implementation).to eq(validated)
+    end
   end
 
   describe '#render_layout_config' do

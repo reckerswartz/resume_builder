@@ -17,6 +17,7 @@ class Admin::LlmModelsController < Admin::BaseController
       .with_capability_filter(@capability_filter)
 
     @total_count = scope.count
+    @llm_model_summary = build_llm_model_summary(scope)
     @total_pages = table_total_pages(total_count: @total_count, per_page: PAGE_SIZE)
     @current_page = table_current_page(total_pages: @total_pages)
     @llm_models = scope.sorted_for_admin(@sort, @direction).offset((@current_page - 1) * PAGE_SIZE).limit(PAGE_SIZE)
@@ -78,6 +79,17 @@ class Admin::LlmModelsController < Admin::BaseController
 
     def load_llm_providers
       @llm_providers = policy_scope(LlmProvider).order(:name)
+    end
+
+    def build_llm_model_summary(scope)
+      summary_models = scope.includes(:llm_provider, :llm_model_assignments).to_a
+
+      {
+        ready_count: summary_models.count { |llm_model| llm_model.active? && llm_model.llm_provider.configured_for_requests? },
+        assigned_count: summary_models.count { |llm_model| llm_model.llm_model_assignments.any? },
+        attention_count: summary_models.count { |llm_model| !llm_model.active? || !llm_model.llm_provider.configured_for_requests? },
+        synced_count: summary_models.count(&:provider_synced?)
+      }
     end
 
     def llm_model_params

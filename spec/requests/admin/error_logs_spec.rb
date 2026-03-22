@@ -18,8 +18,10 @@ RSpec.describe 'Admin::ErrorLogs', type: :request do
       expect(response.body).to include('Errors in scope')
       expect(response.body).to include('Backtrace coverage')
       expect(response.body).to include('Correlation guide')
-      expect(response.body).to include('Search by reference or runtime IDs')
-      expect(response.body).to include('Request and job signals')
+      expect(response.body).to include('Search by error or job reference')
+      expect(response.body).to include('Page and job signals')
+      expect(response.body).not_to include('Search by reference or runtime IDs')
+      expect(response.body).not_to include('request-cycle')
       expect(response.body).to include('page-header-compact')
     end
 
@@ -54,10 +56,10 @@ RSpec.describe 'Admin::ErrorLogs', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to include('req-123')
       expect(response_body).to include('GET /resumes · User 1')
-      expect(response_body).to include('Captured from the HTTP request cycle with request-safe controller, path, and user context.')
+      expect(response_body).to include('Captured during a page request with safe path and signed-in user details when available.')
       expect(response_body).to include('job-123')
       expect(response_body).to include('ResumeExportJob · Queue: default')
-      expect(response_body).to include('Captured from a background job execution and enriched with queue/job context when available.')
+      expect(response_body).to include('Captured during background processing with related job details when available.')
       expect(response_body).to include('0.21 seconds')
       expect(response_body).to include('N/A')
     end
@@ -106,9 +108,12 @@ RSpec.describe 'Admin::ErrorLogs', type: :request do
       expect(response_body).to include('Incident summary')
       expect(response_body).to include('Captured context')
       expect(response_body).to include('Backtrace')
-      expect(response_body).to include('Captured failure')
-      expect(response_body).to include('Structured metadata')
+      expect(response_body).to include('Captured issue')
+      expect(response_body).to include('Structured details')
+      expect(response_body).to include('Job reference')
       expect(response_body).to include('Open related job log')
+      expect(response_body).not_to include('Request-cycle failure')
+      expect(response_body).not_to include('Active job ID')
     end
 
     it 'renders request-sourced logs without a backtrace' do
@@ -130,8 +135,10 @@ RSpec.describe 'Admin::ErrorLogs', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response_body).to include(error_log.reference_id)
-      expect(response_body).to include('Request context')
+      expect(response_body).to include('Page request')
+      expect(response_body).to include('Request reference')
       expect(response_body).to include('No backtrace')
+      expect(response_body).not_to include('Request ID')
     end
   end
 end

@@ -47,6 +47,45 @@ module Resumes
       ]
     end
 
+    def section_spacing_options
+      [
+        [
+          I18n.t(
+            "resumes.editor_finalize_step.design_workspace.template_default_section_spacing",
+            section_spacing: ResumeTemplates::Catalog.section_spacing_label(default_section_spacing)
+          ),
+          ""
+        ],
+        *ResumeTemplates::Catalog.section_spacing_options
+      ]
+    end
+
+    def paragraph_spacing_options
+      [
+        [
+          I18n.t(
+            "resumes.editor_finalize_step.design_workspace.template_default_paragraph_spacing",
+            paragraph_spacing: ResumeTemplates::Catalog.paragraph_spacing_label(default_paragraph_spacing)
+          ),
+          ""
+        ],
+        *ResumeTemplates::Catalog.paragraph_spacing_options
+      ]
+    end
+
+    def line_spacing_options
+      [
+        [
+          I18n.t(
+            "resumes.editor_finalize_step.design_workspace.template_default_line_spacing",
+            line_spacing: ResumeTemplates::Catalog.line_spacing_label(default_line_spacing)
+          ),
+          ""
+        ],
+        *ResumeTemplates::Catalog.line_spacing_options
+      ]
+    end
+
     def page_size_options
       Resume::PAGE_SIZES.map { |page_size| [ page_size, page_size ] }
     end
@@ -57,6 +96,18 @@ module Resumes
 
     def selected_density
       (resume.settings || {})["density"].to_s
+    end
+
+    def selected_section_spacing
+      (resume.settings || {})["section_spacing"].to_s
+    end
+
+    def selected_paragraph_spacing
+      (resume.settings || {})["paragraph_spacing"].to_s
+    end
+
+    def selected_line_spacing
+      (resume.settings || {})["line_spacing"].to_s
     end
 
     def selected_page_size
@@ -112,6 +163,18 @@ module Resumes
 
       def default_density
         layout_config.fetch("density")
+      end
+
+      def default_section_spacing
+        layout_config.fetch("section_spacing")
+      end
+
+      def default_paragraph_spacing
+        layout_config.fetch("paragraph_spacing")
+      end
+
+      def default_line_spacing
+        layout_config.fetch("line_spacing")
       end
 
       def grouped_sections

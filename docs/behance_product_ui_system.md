@@ -8,7 +8,7 @@ Use this document with:
 
 - `docs/ui_guidelines.md`
 - `docs/references/behance/ai_voice_generator_reference.md`
-- `docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md`
+- GitHub Issues labeled `workflow:ui-guidelines-audit` for active audit findings
 
 ## Source-of-truth role
 

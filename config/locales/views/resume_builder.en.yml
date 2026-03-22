@@ -1,5 +1,7 @@
 en:
   resume_builder:
+    editorial_split_component:
+      profile_heading: "Profile"
     step_registry:
       steps:
         source:
@@ -113,6 +115,7 @@ en:
         preview: "Preview"
         go_back: "Go back"
         next: "Next: %{step}"
+        more_actions: "More actions"
     editor_personal_details_step:
       optional_step:
         eyebrow: "Optional step"
@@ -427,6 +430,177 @@ en:
         early_career: "Early career"
         mid_to_senior: "Mid to senior"
         growth_stage: "Growth stage"
+    skills_step_state:
+      section_guidance:
+        early_career:
+          title: "Start with what you know"
+          description: "List tools, languages, and soft skills you've used in coursework, projects, or part-time roles. Employers want to see honest familiarity, not expertise claims."
+          badge: "Early-career friendly"
+          helper_text: "Order your strongest skills first. Hiring managers scan the first 5–8 items before reading further."
+        experienced:
+          title: "Lead with your strongest skills"
+          description: "Prioritize the skills that have driven results in your most impactful roles. Group technical and leadership skills to show breadth and depth."
+          badge: "Role-aware"
+          helper_text: "Match skills to the target role. Remove outdated or generic entries that don't differentiate you."
+      audience_badges:
+        early_career: "Early career"
+        growth_stage: "Growth stage"
+    skills_suggestion_catalog:
+      category_labels:
+        software_engineering: "Software Engineering"
+        product_management: "Product Management"
+        design: "Design"
+        data_analytics: "Data & Analytics"
+        marketing: "Marketing"
+        general: "General & Operations"
+    experience_step_state:
+      section_guidance:
+        early_career:
+          title: "Every role counts"
+          description: "Internships, campus work, tutoring, volunteering, and freelance projects all demonstrate real skills. Focus on responsibilities, collaboration, and measurable contributions."
+          badge: "Early-career friendly"
+          helper_text: "Use nearby examples when the category feels too narrow. The goal is to show credible work, not to force one job-title pattern."
+          role_chips:
+            - "Internships"
+            - "Volunteering"
+            - "Teaching assistant"
+            - "Tutor"
+            - "Campus work"
+            - "Freelance"
+        experienced:
+          title: "Lead with impact"
+          description: "Highlight leadership, ownership, and measurable outcomes. Show how you drove projects, mentored others, and delivered business results."
+          badge: "Role-aware"
+          helper_text: "Quantify achievements where possible. Employers scan for scope, scale, and outcomes before reading details."
+          role_chips:
+            - "Leadership"
+            - "Strategy"
+            - "Cross-functional"
+            - "Revenue impact"
+            - "Team growth"
+            - "Process improvement"
+      eyebrow: "Role-aware bullet help"
+      title_with_query: "Bullet ideas for %{query}"
+      title_without_query: "Bullet ideas that still count"
+      description_with_query: "Start from nearby examples for %{query}, then replace the tools, scope, and outcomes with work you actually did."
+      description_without_query: "Start from a close-fit example, then tailor the bullets until they match your own responsibilities and results."
+      description_early_career: "Internships, teaching help, tutoring, volunteering, and adjacent campus or community work all count when they show responsibility, collaboration, and measurable contribution."
+      insert_button_label: "Add example bullets"
+      expert_badge_label: "Expert Recommended"
+      results_label:
+        one: "1 bullet set"
+        other: "%{count} bullet sets"
+      badges:
+        early_career: "Early-career friendly"
+        role_aware: "Role-aware"
+      audience_badges:
+        early_career: "Early career"
+        growth_stage: "Growth stage"
+        student_friendly: "Student-friendly"
+        community: "Community work"
+    experience_suggestion_catalog:
+      role_labels:
+        software_engineer: "Software Engineer"
+        product_manager: "Product Manager"
+        product_designer: "Product Designer"
+        data_analyst: "Data Analyst"
+        customer_success_manager: "Customer Success Manager"
+        project_manager: "Project Manager"
+        internship: "Internship Experience"
+        teaching_assistant: "Teaching Assistant"
+        tutor: "Tutor"
+        volunteer_experience: "Volunteer Experience"
+      roles:
+        software_engineer:
+          variants:
+            early_career:
+              highlights:
+                - "Built and shipped product or internal tools with close guidance from senior engineers, documenting decisions and testing changes before release."
+                - "Debugged issues across Rails, JavaScript, or API workflows and partnered with teammates to unblock customers or internal users quickly."
+                - "Contributed code reviews, implementation notes, or QA support that helped the team deliver reliable features on schedule."
+            growth_stage:
+              highlights:
+                - "Led end-to-end delivery for product or platform work, coordinating requirements, implementation, release readiness, and follow-up improvements."
+                - "Improved reliability, developer experience, or team velocity by refining architecture, test coverage, and operational workflows."
+                - "Partnered across product, design, and support to scope technical tradeoffs and deliver customer-facing work with measurable impact."
+        product_manager:
+          variants:
+            early_career:
+              highlights:
+                - "Supported roadmap planning by gathering customer and stakeholder feedback, clarifying requirements, and keeping delivery details organized across teams."
+                - "Turned ambiguous requests into tickets, briefs, or experiment plans that helped design and engineering move forward with clearer priorities."
+                - "Tracked launches or iteration work after release, capturing outcomes and feeding the next set of product decisions back into planning."
+            growth_stage:
+              highlights:
+                - "Owned roadmap priorities for a defined product area, balancing customer insight, business goals, and delivery constraints across cross-functional teams."
+                - "Led discovery, launch planning, and post-release follow-through for initiatives that improved adoption, retention, or operational efficiency."
+                - "Aligned stakeholders around product tradeoffs by using clear metrics, documented decisions, and structured communication across design and engineering."
+        product_designer:
+          variants:
+            early_career:
+              highlights:
+                - "Created flows, wireframes, or polished UI states that translated user feedback into clearer product decisions and implementation-ready assets."
+                - "Worked with product and engineering to refine usability issues, document edge cases, and keep shipped experiences consistent across screens."
+                - "Supported research synthesis, design QA, or systems cleanup that improved clarity and reduced avoidable UX friction."
+            growth_stage:
+              highlights:
+                - "Shaped end-to-end product experiences from discovery through shipped UI, balancing customer insight, visual clarity, and technical constraints."
+                - "Improved consistency across workflows by strengthening design system usage, reusable patterns, and handoff quality with engineering partners."
+                - "Used research findings, prototype testing, or post-launch feedback to prioritize improvements and strengthen core user journeys."
+        data_analyst:
+          variants:
+            early_career:
+              highlights:
+                - "Built recurring reports or dashboards that turned raw operational data into clear weekly insights for cross-functional stakeholders."
+                - "Cleaned, validated, or joined data from multiple sources so teams could make decisions with more confidence and less manual effort."
+                - "Helped explain trends, anomalies, or experiment results in plain language that supported planning and follow-up action."
+            growth_stage:
+              highlights:
+                - "Owned trusted reporting layers and dashboards that gave teams faster visibility into performance, pipeline health, or customer behavior."
+                - "Partnered with stakeholders to define useful metrics, investigate operational questions, and turn data findings into prioritized action."
+                - "Improved analysis quality by tightening SQL logic, documentation, and data validation practices across recurring reporting workflows."
+        customer_success_manager:
+          variants:
+            early_career:
+              highlights:
+                - "Managed onboarding or renewal workflows by coordinating customer needs, internal follow-up, and timely communication across teams."
+                - "Resolved account issues quickly by triaging blockers, clarifying next steps, and keeping customers informed until handoff or resolution."
+                - "Captured feedback from calls, tickets, or account reviews and turned it into actionable product or process follow-up for internal partners."
+        project_manager:
+          variants:
+            growth_stage:
+              highlights:
+                - "Coordinated cross-functional timelines, owners, and dependencies so projects moved forward with clearer accountability and fewer surprises."
+                - "Improved reporting and planning rhythms by tightening meeting structure, status updates, and escalation paths for delivery risks."
+                - "Kept stakeholders aligned through organized documentation, milestone tracking, and proactive follow-through on open decisions."
+        internship:
+          variants:
+            early_career:
+              highlights:
+                - "Supported day-to-day team execution through research, coordination, documentation, or production work that contributed to real deliverables."
+                - "Learned new tools quickly and applied feedback from supervisors to improve work quality, turnaround time, and handoff clarity."
+                - "Took ownership of scoped tasks or mini-projects that helped the team move work forward while building practical professional experience."
+        teaching_assistant:
+          variants:
+            student_support:
+              highlights:
+                - "Led review sessions, office hours, or small-group support that helped students understand course material and stay on track."
+                - "Clarified assignments, graded work consistently, or coordinated with instructors to keep course operations organized and responsive."
+                - "Explained complex topics in approachable language and adapted support based on recurring questions or student needs."
+        tutor:
+          variants:
+            student_support:
+              highlights:
+                - "Provided one-on-one or small-group tutoring that improved student confidence, comprehension, and follow-through on assignments."
+                - "Planned lessons or practice sessions around specific gaps so learners could make measurable progress over time."
+                - "Built trust with students and families through reliable communication, preparation, and tailored academic support."
+        volunteer_experience:
+          variants:
+            community:
+              highlights:
+                - "Coordinated volunteer, event, or outreach work that improved service delivery and kept community-facing activities running smoothly."
+                - "Took ownership of scheduling, communication, or logistics that helped a nonprofit, campus group, or community program serve people more effectively."
+                - "Worked with staff or peers to solve day-to-day problems, represent the organization well, and keep commitments dependable."
     editor_source_step:
       import_status:
         eyebrow: "Import status"
@@ -497,17 +671,26 @@ en:
       design_workspace:
         eyebrow: "Design & formatting"
         title: "Adjust the output without changing the template"
-        description: "Use renderer-backed controls only: page size, accent color, font scale, density, and contact display. Leave a field on template default when you want the selected layout to decide."
+        description: "Use renderer-backed controls only: page size, accent color, font scale, density, spacing, and contact display. Leave a field on template default when you want the selected layout to decide."
         badges:
           page_size: "Page: %{page_size}"
           font_scale: "Type: %{font_scale}"
           density: "Density: %{density}"
         template_default_font_scale: "Template default (%{font_scale})"
         template_default_density: "Template default (%{density})"
+        template_default_section_spacing: "Template default (%{section_spacing})"
+        template_default_paragraph_spacing: "Template default (%{paragraph_spacing})"
+        template_default_line_spacing: "Template default (%{line_spacing})"
         font_scale: "Font scale"
         font_scale_description: "Choose a shared text scale that the preview and PDF can both reflect truthfully."
         density: "Density"
         density_description: "Control spacing through the shared density presets instead of freeform layout tweaks."
+        section_spacing: "Section spacing"
+        section_spacing_description: "Adjust the vertical rhythm between major sections without changing template identity."
+        paragraph_spacing: "Paragraph spacing"
+        paragraph_spacing_description: "Tune the space above summaries, entry paragraphs, highlights, and supporting links through the shared renderer."
+        line_spacing: "Line spacing"
+        line_spacing_description: "Control line height for summary and entry body copy in both preview and exported PDF output."
       sections_workspace:
         eyebrow: "Sections"
         title: "Decide what stays visible in output"
@@ -599,6 +782,7 @@ en:
         live_preview_enabled: "Preview updates live"
         drag_to_reorder: "Reorder"
       actions:
+        summary: "Section actions"
         up: "Up"
         down: "Down"
         remove: "Remove"

@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Picks the next open GitHub issue from the queue and outputs its details
+# for the /github-ops workflow to dispatch to the appropriate workflow.
+#
+# Queue priority: severity:critical > severity:high > severity:medium > severity:low
+# Within same severity: oldest first (FIFO).
+#
+# Usage:
+#   bin/gh-bridge/process-queue                          # next issue from any workflow
+#   bin/gh-bridge/process-queue --workflow template-audit # next issue from specific workflow
+#
+# Outputs: JSON with issue number, title, workflow, key, severity, and body
+
+set -euo pipefail
+
+WORKFLOW=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --workflow) WORKFLOW="$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+REPO="${GH_REPO:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)}"
+
+# Try severities in priority order
+for sev in critical high medium low; do
+  LABEL_FILTER="severity:${sev},status:open"
+  [ -n "$WORKFLOW" ] && LABEL_FILTER="${LABEL_FILTER},workflow:${WORKFLOW}"
+
+  RESULT=$(gh issue list --repo "$REPO" --state open \
+    --label "$LABEL_FILTER" \
+    --limit 1 \
+    --json number,title,labels,createdAt,body \
+    --jq 'sort_by(.createdAt) | .[0]' 2>/dev/null || true)
+
+  if [ -n "$RESULT" ] && [ "$RESULT" != "null" ]; then
+    # Extract workflow and key from title: [workflow] Title (key)
+    ISSUE_TITLE=$(echo "$RESULT" | jq -r '.title')
+    ISSUE_NUM=$(echo "$RESULT" | jq -r '.number')
+    PARSED_WORKFLOW=$(echo "$ISSUE_TITLE" | sed -n 's/^\[\([^]]*\)\].*/\1/p')
+    PARSED_KEY=$(echo "$ISSUE_TITLE" | sed -n 's/.*(\([^)]*\))$/\1/p')
+
+    echo "$RESULT" | jq --arg wf "$PARSED_WORKFLOW" --arg key "$PARSED_KEY" --arg sev "$sev" \
+      '. + {workflow: $wf, key: $key, severity: $sev}'
+    exit 0
+  fi
+done
+
+# No issues with severity labels — try any open issue with status:open
+LABEL_FILTER="status:open"
+[ -n "$WORKFLOW" ] && LABEL_FILTER="${LABEL_FILTER},workflow:${WORKFLOW}"
+
+RESULT=$(gh issue list --repo "$REPO" --state open \
+  --label "$LABEL_FILTER" \
+  --limit 1 \
+  --json number,title,labels,createdAt,body \
+  --jq 'sort_by(.createdAt) | .[0]' 2>/dev/null || true)
+
+if [ -n "$RESULT" ] && [ "$RESULT" != "null" ]; then
+  ISSUE_TITLE=$(echo "$RESULT" | jq -r '.title')
+  PARSED_WORKFLOW=$(echo "$ISSUE_TITLE" | sed -n 's/^\[\([^]]*\)\].*/\1/p')
+  PARSED_KEY=$(echo "$ISSUE_TITLE" | sed -n 's/.*(\([^)]*\))$/\1/p')
+
+  echo "$RESULT" | jq --arg wf "$PARSED_WORKFLOW" --arg key "$PARSED_KEY" --arg sev "unclassified" \
+    '. + {workflow: $wf, key: $key, severity: $sev}'
+  exit 0
+fi
+
+echo '{"queue":"empty","message":"No open issues to process."}'

@@ -9,10 +9,14 @@ This workflow is one phase of the repeating TDD cycle: **Red → Green → Refac
 ### Phase 1: Context & Regression-Aware Baseline
 
 1. Treat any text supplied after `/tdd-red-agent` as the feature scope, failing behavior, or spec target.
-2. Invoke `@tdd-red-agent`.
-3. Check for pending migrations with `bin/rails db:migrate:status` before writing specs — pending schema changes cause misleading failures.
-4. Read the source and any existing related specs before writing new tests. Understand the current project test patterns. If the behavior touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before drafting specs.
-5. **Assess current cycle position and regression baseline**: check whether prior red/green/refactor cycles have left any failing specs, open coverage gaps, or stale test patterns. Address those before writing new specs. If a previously-covered behavior has regressed, write or update the failing spec for that regression before expanding to brand-new scope.
+2. **Read current state from GitHub** to check for related open issues:
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow tdd-red-agent
+   ```
+3. Invoke `@tdd-red-agent`. Check for pending migrations with `bin/rails db:migrate:status`.
+4. Read the source and any existing related specs. If the behavior touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+5. **Regression baseline**: check whether prior cycles have left failing specs or coverage gaps. Address those first.
 
 ### Phase 2: Write Failing Specs
 

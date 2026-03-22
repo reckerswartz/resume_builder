@@ -1,8 +1,8 @@
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Admin",
-    title: "Error logs",
-    description: "Review captured application errors, reference IDs, and linked request or job context.",
+    eyebrow: t(".page_header.eyebrow"),
+    title: t(".page_header.title"),
+    description: t(".page_header.description"),
     density: :compact,
     badges: [
       { label: pluralize(@total_count, "error log"), tone: :neutral }

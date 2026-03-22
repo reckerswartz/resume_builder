@@ -45,6 +45,8 @@ RSpec.describe ResumeBuilder::EditorState do
       expect(editor_state.progress_card_attributes).to include(eyebrow: 'Progress', tone: :default, padding: :sm)
       expect(editor_state.next_step_card_attributes).to include(title: 'Heading', eyebrow: 'Next move', tone: :subtle)
       expect(editor_state.navigation_actions.map { |action| action[:label] }).to eq([ 'Back to workspace', 'Preview', 'Go back', 'Next: Heading' ])
+      expect(editor_state.primary_navigation_actions.map { |action| action[:label] }).to eq([ 'Back to workspace', 'Preview', 'Go back', 'Next: Heading' ])
+      expect(editor_state.secondary_navigation_actions).to eq([])
       expect(editor_state.navigation_actions.second).to include(path: "/resumes/#{resume.id}?step=source")
       expect(editor_state.builder_tab_items.first).to include(label: 'Source', current: true, badge: 1, status: 'Current')
     end
@@ -62,7 +64,7 @@ RSpec.describe ResumeBuilder::EditorState do
     end
   end
 
-  context 'when a section-backed step is active' do
+  context 'when the section-backed step is active' do
     let(:requested_step) { 'experience' }
     let!(:experience_section) { create(:section, resume:, section_type: 'experience', title: 'Experience') }
     let!(:project_section) { create(:section, resume:, section_type: 'projects', title: 'Projects') }
@@ -78,8 +80,43 @@ RSpec.describe ResumeBuilder::EditorState do
       expect(editor_state.next_step_card_attributes).to include(title: 'Education')
       expect(editor_state.navigation_actions.second).to include(path: "/resumes/#{resume.id}?step=experience")
       expect(editor_state.navigation_actions.last).to include(label: 'Next: Education', path: "/resumes/#{resume.id}/edit?step=education")
+      expect(editor_state.primary_navigation_actions).to eq([
+        { label: 'Go back', path: "/resumes/#{resume.id}/edit?step=personal_details", style: :secondary, options: {} },
+        { label: 'Next: Education', path: "/resumes/#{resume.id}/edit?step=education", style: :primary, options: {} }
+      ])
+      expect(editor_state.secondary_navigation_actions).to eq([
+        { label: 'Back to workspace', path: '/resumes', style: :secondary, options: { data: { turbo_frame: '_top' } } },
+        { label: 'Preview', path: "/resumes/#{resume.id}?step=experience", style: :secondary, options: { data: { turbo_frame: '_top' } } }
+      ])
       expect(editor_state.builder_tab_items.fourth).to include(label: 'Experience', current: true, badge: 4, status: 'Current')
       expect(editor_state.builder_tab_items.map { |item| item[:label] }).not_to include(project_section.title)
+    end
+  end
+
+  context 'when a section-backed step is visited after the tracked builder flow is already complete' do
+    let(:requested_step) { 'education' }
+    let!(:experience_section) { create(:section, resume:, section_type: 'experience', title: 'Experience') }
+    let!(:education_section) { create(:section, resume:, section_type: 'education', title: 'Education') }
+    let!(:skills_section) { create(:section, resume:, section_type: 'skills', title: 'Skills') }
+
+    before do
+      resume.update!(summary: 'Short summary')
+      create(:entry, section: experience_section, content: { 'title' => 'Designer' })
+      create(:entry, section: education_section, content: { 'degree' => 'B.Des' })
+      create(:entry, section: skills_section, content: { 'name' => 'Figma' })
+    end
+
+    it 'recommends finalize instead of another already-complete tracked step' do
+      expect(editor_state.completion_percentage).to eq(100)
+      expect(editor_state.next_step).to include(key: 'skills')
+      expect(editor_state.next_step_card_attributes).to include(
+        title: 'Finalize',
+        description: 'Review settings and export when you are happy with the current content.'
+      )
+      expect(editor_state.primary_navigation_actions).to eq([
+        { label: 'Go back', path: "/resumes/#{resume.id}/edit?step=experience", style: :secondary, options: {} },
+        { label: 'Next: Finalize', path: "/resumes/#{resume.id}/edit?step=finalize", style: :primary, options: {} }
+      ])
     end
   end
 end

@@ -203,6 +203,9 @@ class ResumesController < ApplicationController
           :show_contact_icons,
           :font_scale,
           :density,
+          :section_spacing,
+          :paragraph_spacing,
+          :line_spacing,
           { hidden_sections: [] }
         ],
         intake_details: %i[experience_level student_status],

@@ -60,7 +60,33 @@ module ResumeTemplates
     end
 
     def section_stack_classes
-      density_scale.fetch(:section_stack)
+      return density_scale.fetch(:section_stack) unless explicit_section_spacing?
+
+      [section_spacing_scale.fetch(:stack_margin_top), section_spacing_scale.fetch(:stack_space)].join(" ")
+    end
+
+    def section_stack_spacing_class(fallback: nil)
+      return fallback unless explicit_section_spacing?
+
+      section_spacing_scale.fetch(:stack_space)
+    end
+
+    def section_margin_top_class(fallback: nil)
+      return fallback unless explicit_section_spacing?
+
+      section_spacing_scale.fetch(:stack_margin_top)
+    end
+
+    def compact_section_stack_classes(fallback: nil)
+      return fallback unless explicit_section_spacing?
+
+      section_spacing_scale.fetch(:compact_stack_space)
+    end
+
+    def section_content_margin_top_class(fallback: nil)
+      return fallback unless explicit_section_spacing?
+
+      section_spacing_scale.fetch(:content_margin_top)
     end
 
     def section_heading_spacing_class
@@ -71,12 +97,28 @@ module ResumeTemplates
       density_scale.fetch(:entry_stack)
     end
 
-    def entry_body_spacing_class
-      density_scale.fetch(:entry_body_spacing)
+    def entry_body_spacing_class(fallback: nil)
+      return fallback || density_scale.fetch(:entry_body_spacing) unless explicit_paragraph_spacing?
+
+      paragraph_spacing_scale.fetch(:entry_body_spacing)
     end
 
-    def summary_margin_top_class
-      density_scale.fetch(:summary_margin_top)
+    def summary_margin_top_class(fallback: nil)
+      return fallback || density_scale.fetch(:summary_margin_top) unless explicit_paragraph_spacing?
+
+      paragraph_spacing_scale.fetch(:summary_margin_top)
+    end
+
+    def body_leading_class(default: "leading-6")
+      explicit_line_spacing? ? line_spacing_scale.fetch(:body) : default
+    end
+
+    def relaxed_body_leading_class(default: "leading-7")
+      explicit_line_spacing? ? line_spacing_scale.fetch(:relaxed_body) : default
+    end
+
+    def meta_leading_class(default: "leading-6")
+      explicit_line_spacing? ? line_spacing_scale.fetch(:meta) : default
     end
 
     def name_text_class
@@ -221,6 +263,38 @@ module ResumeTemplates
 
       def density_scale
         @density_scale ||= ResumeTemplates::Catalog.density_scale(resume.density)
+      end
+
+      def section_spacing_scale
+        @section_spacing_scale ||= ResumeTemplates::Catalog.section_spacing_scale(resume.section_spacing)
+      end
+
+      def paragraph_spacing_scale
+        @paragraph_spacing_scale ||= ResumeTemplates::Catalog.paragraph_spacing_scale(resume.paragraph_spacing)
+      end
+
+      def line_spacing_scale
+        @line_spacing_scale ||= ResumeTemplates::Catalog.line_spacing_scale(resume.line_spacing)
+      end
+
+      def explicit_section_spacing?
+        raw_setting_present?("section_spacing")
+      end
+
+      def explicit_paragraph_spacing?
+        raw_setting_present?("paragraph_spacing")
+      end
+
+      def explicit_line_spacing?
+        raw_setting_present?("line_spacing")
+      end
+
+      def raw_setting_present?(key)
+        resume_settings[key].present?
+      end
+
+      def resume_settings
+        @resume_settings ||= (resume.settings || {}).deep_stringify_keys
       end
 
       def contact_value(key)

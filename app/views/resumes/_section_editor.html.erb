@@ -1,5 +1,29 @@
 <% allowed_section_types = local_assigns.fetch(:allowed_section_types, nil) %>
+<% show_section_type_badge = local_assigns.fetch(:show_section_type_badge, true) %>
+<% hide_redundant_title = local_assigns.fetch(:hide_redundant_title, false) %>
+<% collapse_section_actions = local_assigns.fetch(:collapse_section_actions, false) %>
 <% section_label = ResumeBuilder::SectionRegistry.title_for(section.section_type) %>
+<% show_section_title = !hide_redundant_title || section.title.to_s != section_label.to_s %>
+<% section_actions = [
+  {
+    label: t("resumes.section_editor.actions.up"),
+    path: move_resume_section_path(resume, section, direction: :up, **resume_builder_step_params),
+    method: :patch,
+    style: :secondary
+  },
+  {
+    label: t("resumes.section_editor.actions.down"),
+    path: move_resume_section_path(resume, section, direction: :down, **resume_builder_step_params),
+    method: :patch,
+    style: :secondary
+  },
+  {
+    label: t("resumes.section_editor.actions.remove"),
+    path: resume_section_path(resume, section, **resume_builder_step_params),
+    method: :delete,
+    style: :danger
+  }
+] %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-canvas-200/80 bg-canvas-50/92 px-5 py-3 sm:px-6">
@@ -7,15 +31,34 @@
       <div class="flex h-8 w-8 items-center justify-center rounded-xl border border-canvas-200/80 bg-canvas-50/92 text-xs font-semibold tracking-[0.18em] text-ink-950">
         <%= section.section_type.first(2).upcase %>
       </div>
-      <h4 class="text-sm font-semibold text-ink-950"><%= section.title %></h4>
+      <% if show_section_title %>
+        <h4 class="text-sm font-semibold text-ink-950"><%= section.title %></h4>
+      <% else %>
+        <span class="sr-only"><%= section.title %></span>
+      <% end %>
       <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.section_editor.entry_count", count: section.ordered_entries.count) %></span>
     </div>
 
-    <div class="flex flex-wrap gap-2">
-      <%= button_to t("resumes.section_editor.actions.up"), move_resume_section_path(resume, section, direction: :up, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
-      <%= button_to t("resumes.section_editor.actions.down"), move_resume_section_path(resume, section, direction: :down, **resume_builder_step_params), method: :patch, class: ui_button_classes(:secondary, size: :sm) %>
-      <%= button_to t("resumes.section_editor.actions.remove"), resume_section_path(resume, section, **resume_builder_step_params), method: :delete, class: ui_button_classes(:danger, size: :sm) %>
-    </div>
+    <% if collapse_section_actions %>
+      <details class="min-w-[11rem]" data-section-header-actions>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 rounded-full border border-canvas-300/80 bg-white px-4 py-2 text-sm font-semibold text-ink-900 shadow-sm transition hover:border-canvas-400 hover:bg-canvas-50 [&::-webkit-details-marker]:hidden">
+          <span><%= t("resumes.section_editor.actions.summary") %></span>
+          <span class="<%= ui_badge_classes(:neutral) %>"><%= section_actions.size %></span>
+        </summary>
+
+        <div class="mt-2 flex flex-wrap gap-2 rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50 p-3 shadow-[0_16px_32px_rgba(15,23,42,0.08)] sm:justify-end">
+          <% section_actions.each do |action| %>
+            <%= button_to action.fetch(:label), action.fetch(:path), method: action.fetch(:method), class: ui_button_classes(action.fetch(:style), size: :sm) %>
+          <% end %>
+        </div>
+      </details>
+    <% else %>
+      <div class="flex flex-wrap gap-2" data-section-header-inline-actions>
+        <% section_actions.each do |action| %>
+          <%= button_to action.fetch(:label), action.fetch(:path), method: action.fetch(:method), class: ui_button_classes(action.fetch(:style), size: :sm) %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <div class="space-y-4 px-5 py-5 sm:px-6">
@@ -44,7 +87,7 @@
     <% if section.ordered_entries.any? %>
       <div class="space-y-4" data-controller="sortable">
         <% section.ordered_entries.each do |entry| %>
-          <%= render "resumes/entry_form", resume: resume, section: section, entry: entry %>
+          <%= render "resumes/entry_form", resume: resume, section: section, entry: entry, show_section_type_badge: show_section_type_badge %>
         <% end %>
       </div>
     <% else %>
@@ -57,7 +100,7 @@
     <% end %>
 
     <div class="border-t border-canvas-200/80 pt-5">
-      <%= render "resumes/entry_form", resume: resume, section: section, entry: Entry.new(section: section) %>
+      <%= render "resumes/entry_form", resume: resume, section: section, entry: Entry.new(section: section), show_section_type_badge: show_section_type_badge %>
     </div>
     </div>
   </div>

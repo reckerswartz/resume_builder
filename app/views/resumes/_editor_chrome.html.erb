@@ -50,9 +50,26 @@
     <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
       <%= render Ui::SectionTabsComponent.new(items: builder_state.builder_tab_items, label: t("resumes.editor_chrome.builder_steps_label")) %>
 
-      <div class="flex flex-wrap gap-2 xl:justify-end">
-        <% builder_state.navigation_actions.each do |action| %>
-          <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), **action.fetch(:options, {}) %>
+      <div class="flex flex-wrap items-start gap-2 xl:justify-end">
+        <div class="flex flex-wrap gap-2" data-builder-primary-actions>
+          <% builder_state.primary_navigation_actions.each do |action| %>
+            <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), **action.fetch(:options, {}) %>
+          <% end %>
+        </div>
+
+        <% if builder_state.secondary_navigation_actions.any? %>
+          <details class="min-w-[11rem]" data-builder-secondary-actions>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 rounded-full border border-canvas-300/80 bg-white px-4 py-2 text-sm font-semibold text-ink-900 shadow-sm transition hover:border-canvas-400 hover:bg-canvas-50 [&::-webkit-details-marker]:hidden">
+              <span><%= t("resume_builder.editor_state.navigation.more_actions") %></span>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= builder_state.secondary_navigation_actions.size %></span>
+            </summary>
+
+            <div class="mt-2 flex flex-wrap gap-2 rounded-[1.25rem] border border-canvas-200/80 bg-canvas-50 p-3 shadow-[0_16px_32px_rgba(15,23,42,0.08)] xl:justify-end">
+              <% builder_state.secondary_navigation_actions.each do |action| %>
+                <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), **action.fetch(:options, {}) %>
+              <% end %>
+            </div>
+          </details>
         <% end %>
       </div>
     </div>

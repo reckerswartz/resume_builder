@@ -11,7 +11,7 @@ It should be read together with:
 - `docs/resume_editing_flow.md`
 - `docs/template_rendering.md`
 - `docs/references/behance/ai_voice_generator_reference.md`
-- `docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md`
+- GitHub Issues labeled `workflow:ui-guidelines-audit` for active audit findings and compliance tracking
 
 The goal is to keep UI work:
 
@@ -55,7 +55,7 @@ The current direction is:
 The main visual inspiration now comes from the Behance project `AI Voice Generator & Text to Speech Website Design` and the extracted reference notes in:
 
 - `docs/references/behance/ai_voice_generator_reference.md`
-- `docs/ui_audits/2026-03-20/behance-ai-voice-rollout/README.md`
+- GitHub Issues labeled `workflow:ui-guidelines-audit` for active audit findings and compliance tracking
 
 We translate those reference patterns into Resume Builder concepts:
 

@@ -1,13 +1,13 @@
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Admin",
-    title: "LLM models",
-    description: "Review model readiness, provider state, and workflow coverage.",
+    eyebrow: t("admin.llm_models.index.page_header.eyebrow"),
+    title: t("admin.llm_models.index.page_header.title"),
+    description: t("admin.llm_models.index.page_header.description"),
     density: :compact,
     actions: [
-      { label: "Platform settings", path: admin_settings_path, style: :secondary },
-      { label: "Manage providers", path: admin_llm_providers_path, style: :secondary },
-      { label: "New model", path: new_admin_llm_model_path, style: :primary }
+      { label: t("admin.llm_models.index.page_header.actions.platform_settings"), path: admin_settings_path, style: :secondary },
+      { label: t("admin.llm_models.index.page_header.actions.manage_providers"), path: admin_llm_providers_path, style: :secondary },
+      { label: t("admin.llm_models.index.page_header.actions.new_model"), path: new_admin_llm_model_path, style: :primary }
     ]
   ) %>
 
@@ -26,6 +26,7 @@
     before_table_partial: "admin/llm_models/summary",
     before_table_locals: {
       llm_models: @llm_models,
+      llm_model_summary: @llm_model_summary,
       total_count: @total_count,
       query: @query,
       status_filter: @status_filter,

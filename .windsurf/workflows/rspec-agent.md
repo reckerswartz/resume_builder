@@ -9,9 +9,13 @@ This workflow assesses and improves test coverage as part of the repeating TDD c
 ### Phase 1: Context & Regression-Aware Baseline
 
 1. Treat any text supplied after `/rspec-agent` as the file path, class, feature scope, mode (`assess-only`, `fill-gaps`, `strengthen`, or `full-cycle`), or testing target.
-2. Invoke `@rspec-agent`.
-3. Read the source and existing specs before writing new tests. Check for pending migrations — `bin/rails db:migrate:status` — as they are a common cause of false failures. If the target touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before writing coverage.
-4. **Assess current coverage position and regression baseline**: identify which areas have thin or missing coverage by examining spec files relative to implementation files. Prioritize uncovered controllers, services, and presenters. If a previously-covered path is now weak or flaky, address that regression before expanding to brand-new gaps.
+2. **Read current state from GitHub** to check for related open coverage issues:
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow rspec-agent
+   ```
+3. Invoke `@rspec-agent`. Read the source and existing specs. Check for pending migrations — `bin/rails db:migrate:status`. If the target touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+4. **Assess current coverage position**: identify areas with thin or missing coverage. Prioritize uncovered controllers, services, and presenters.
 
 ### Phase 2: Identify Gaps & Write Specs
 

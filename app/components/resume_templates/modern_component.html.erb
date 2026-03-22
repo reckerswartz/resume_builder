@@ -12,7 +12,7 @@
         <% if contact_items.any? %>
           <div class="flex flex-wrap gap-2 <%= meta_text_class %> text-slate-600 sm:max-w-xs sm:justify-end">
             <% contact_items.each do |label, value| %>
-              <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"><span class="font-medium text-slate-900"><%= label %>:</span> <%= value %></span>
+              <span class="rounded-full border px-3 py-1.5" style="border-color: <%= accent_color_with_alpha("28") %>; background-color: <%= accent_color_with_alpha("06") %>;"><span class="font-medium text-slate-900"><%= label %>:</span> <%= value %></span>
             <% end %>
           </div>
         <% end %>
@@ -28,14 +28,14 @@
       <% if contact_items.any? %>
         <div class="mt-4 flex flex-wrap gap-2 <%= meta_text_class %> text-slate-600">
           <% contact_items.each do |label, value| %>
-            <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"><span class="font-medium text-slate-900"><%= label %>:</span> <%= value %></span>
+            <span class="rounded-full border px-3 py-1.5" style="border-color: <%= accent_color_with_alpha("28") %>; background-color: <%= accent_color_with_alpha("06") %>;"><span class="font-medium text-slate-900"><%= label %>:</span> <%= value %></span>
           <% end %>
         </div>
       <% end %>
     <% end %>
 
     <% if resume.summary.present? %>
-      <p class="<%= [summary_margin_top_class, body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= resume.summary %></p>
+      <p class="<%= [summary_margin_top_class, body_text_class, body_leading_class, "text-slate-700"].join(" ") %>"><%= resume.summary %></p>
     <% end %>
   </header>
 
@@ -44,7 +44,7 @@
       <section>
         <% if marker_section_heading? %>
           <div class="<%= [section_heading_spacing_class, "flex items-center gap-3"].join(" ") %>">
-            <span class="h-3 w-3 rounded-full" style="background-color: <%= accent_color %>;"></span>
+            <span class="h-3.5 w-3.5 rounded-full shadow-sm" style="background-color: <%= accent_color %>;"></span>
             <h2 class="<%= [section_title_text_class, "font-semibold tracking-tight text-slate-900"].join(" ") %>"><%= section.title %></h2>
           </div>
         <% else %>
@@ -64,12 +64,12 @@
               <% end %>
             </div>
           <% else %>
-            <p class="<%= [body_text_class, "leading-7 text-slate-700"].join(" ") %>"><%= inline_skill_summary(section) %></p>
+            <p class="<%= [body_text_class, relaxed_body_leading_class, "text-slate-700"].join(" ") %>"><%= inline_skill_summary(section) %></p>
           <% end %>
         <% else %>
           <div class="<%= entry_stack_classes %>">
             <% section_entries(section).each do |entry| %>
-              <% article_classes = [("rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4" if card_entry_style?)].compact.join(" ") %>
+              <% article_classes = [("rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 shadow-sm shadow-slate-200/60" if card_entry_style?)].compact.join(" ") %>
               <% subtitle = entry_subtitle(entry) %>
               <% date_range = date_range_for(entry) %>
               <% location = entry_location(entry) %>
@@ -96,11 +96,11 @@
                 </div>
 
                 <% entry_body_paragraphs(entry).each do |paragraph| %>
-                  <p class="<%= [entry_body_spacing_class, body_text_class, "leading-6 text-slate-700"].join(" ") %>"><%= paragraph %></p>
+                  <p class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "text-slate-700"].join(" ") %>"><%= paragraph %></p>
                 <% end %>
 
                 <% if highlights.any? %>
-                  <ul class="<%= [entry_body_spacing_class, body_text_class, "space-y-2 leading-6 text-slate-700"].join(" ") %>">
+                  <ul class="<%= [entry_body_spacing_class, body_text_class, body_leading_class, "space-y-2 text-slate-700"].join(" ") %>">
                     <% highlights.each do |highlight| %>
                       <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
                     <% end %>

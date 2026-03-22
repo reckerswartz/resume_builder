@@ -47,16 +47,16 @@
           </header>
 
           <div class="grid gap-8 pt-6 sm:grid-cols-[10.5rem_minmax(0,1fr)]">
-            <aside class="space-y-8">
+            <aside class="<%= compact_section_stack_classes(fallback: "space-y-8") %>">
               <% sidebar_sections.each do |section| %>
                 <% entries = section_entries(section) %>
                 <section>
                   <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em] text-slate-800"><%= section.title %></h2>
 
                   <% if section.section_type == "skills" %>
-                    <ul class="mt-3 space-y-2">
+                    <ul class="<%= [section_content_margin_top_class(fallback: "mt-3"), compact_section_stack_classes(fallback: "space-y-2")].join(" ") %>">
                       <% entries.each do |entry| %>
-                        <li class="text-sm leading-6 text-slate-700">
+                        <li class="<%= ["text-sm", body_leading_class, "text-slate-700"].join(" ") %>">
                           <span class="font-medium text-slate-900"><%= value_for(entry, "name") %></span>
                           <% if value_for(entry, "level").present? %>
                             <span class="text-slate-400"> · <%= value_for(entry, "level") %></span>
@@ -65,7 +65,7 @@
                       <% end %>
                     </ul>
                   <% else %>
-                    <div class="mt-3 space-y-4">
+                    <div class="<%= [section_content_margin_top_class(fallback: "mt-3"), compact_section_stack_classes(fallback: "space-y-4")].join(" ") %>">
                       <% entries.each do |entry| %>
                         <% subtitle = entry_subtitle(entry) %>
                         <% date_range = date_range_for(entry) %>
@@ -79,7 +79,7 @@
                             <p class="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-slate-400"><%= date_range %></p>
                           <% end %>
                           <% if preview_paragraph.present? %>
-                            <p class="text-sm leading-6 text-slate-700"><%= preview_paragraph %></p>
+                            <p class="<%= ["text-sm", body_leading_class, "text-slate-700"].join(" ") %>"><%= preview_paragraph %></p>
                           <% end %>
                         </article>
                       <% end %>
@@ -89,11 +89,11 @@
               <% end %>
             </aside>
 
-            <div class="space-y-8">
+            <div class="<%= section_stack_spacing_class(fallback: "space-y-8") %>">
               <% if resume.summary.present? %>
                 <section>
-                  <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em]" style="color: <%= accent_color %>;">Profile</h2>
-                  <p class="mt-3 text-sm leading-7 text-slate-700"><%= resume.summary %></p>
+                  <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em]" style="color: <%= accent_color %>;"><%= t("resume_builder.editorial_split_component.profile_heading") %></h2>
+                  <p class="<%= [section_content_margin_top_class(fallback: "mt-3"), "text-sm", relaxed_body_leading_class, "text-slate-700"].join(" ") %>"><%= resume.summary %></p>
                 </section>
               <% end %>
 
@@ -102,7 +102,7 @@
                 <section>
                   <h2 class="text-[0.68rem] font-semibold uppercase tracking-[0.38em]" style="color: <%= accent_color %>;"><%= section.title %></h2>
 
-                  <div class="mt-3 space-y-5">
+                  <div class="<%= [section_content_margin_top_class(fallback: "mt-3"), compact_section_stack_classes(fallback: "space-y-5")].join(" ") %>">
                     <% entries.each do |entry| %>
                       <% subtitle = entry_subtitle(entry) %>
                       <% date_range = date_range_for(entry) %>
@@ -129,11 +129,11 @@
                         </div>
 
                         <% entry_body_paragraphs(entry).each do |paragraph| %>
-                          <p class="mt-3 text-sm leading-7 text-slate-700"><%= paragraph %></p>
+                          <p class="<%= [entry_body_spacing_class(fallback: "mt-3"), "text-sm", relaxed_body_leading_class, "text-slate-700"].join(" ") %>"><%= paragraph %></p>
                         <% end %>
 
                         <% if highlights.any? %>
-                          <ul class="mt-3 space-y-2 text-sm leading-7 text-slate-700">
+                          <ul class="<%= [entry_body_spacing_class(fallback: "mt-3"), "text-sm", relaxed_body_leading_class, "space-y-2 text-slate-700"].join(" ") %>">
                             <% highlights.each do |highlight| %>
                               <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 rounded-full" style="background-color: <%= accent_color %>;"></span><span><%= highlight %></span></li>
                             <% end %>
@@ -141,7 +141,7 @@
                         <% end %>
 
                         <% if url.present? %>
-                          <p class="mt-3 text-xs uppercase tracking-[0.24em] text-slate-400"><%= url %></p>
+                          <p class="<%= [entry_body_spacing_class(fallback: "mt-3"), "text-xs uppercase tracking-[0.24em] text-slate-400"].join(" ") %>"><%= url %></p>
                         <% end %>
                       </article>
                     <% end %>
@@ -155,19 +155,19 @@
         <aside class="hidden lg:flex flex-col items-center pt-3">
           <div class="flex flex-col items-center gap-3">
             <% utility_badges.each do |label, caption| %>
-              <div class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-slate-950 text-white shadow-[0_18px_32px_rgba(15,23,42,0.16)]">
-                <span class="text-base font-semibold uppercase tracking-[0.12em]"><%= label %></span>
-                <span class="mt-1 text-[0.45rem] uppercase tracking-[0.22em] text-white/60"><%= caption %></span>
+              <div class="flex h-14 w-14 flex-col items-center justify-center rounded-full border border-slate-800 bg-slate-950 text-white shadow-[0_14px_28px_rgba(15,23,42,0.14)]">
+                <span class="text-sm font-semibold uppercase tracking-[0.12em]"><%= label %></span>
+                <span class="mt-0.5 text-[0.42rem] uppercase tracking-[0.22em] text-white/60"><%= caption %></span>
               </div>
             <% end %>
           </div>
 
           <% if rail_contact_items.any? %>
-            <span class="mt-5 h-16 w-px bg-slate-300"></span>
+            <span class="mt-4 h-12 w-px bg-slate-300"></span>
 
-            <div class="mt-5 flex flex-col items-center gap-3">
+            <div class="mt-4 flex flex-col items-center gap-2.5">
               <% rail_contact_items.each do |label, _value| %>
-                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white/95 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-[0_10px_18px_rgba(15,23,42,0.08)]"><%= contact_badge_label(label) %></div>
+                <div class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white/95 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-[0_8px_16px_rgba(15,23,42,0.06)]"><%= contact_badge_label(label) %></div>
               <% end %>
             </div>
           <% end %>
@@ -175,19 +175,19 @@
       </div>
     </div>
 
-    <aside class="flex flex-wrap items-center gap-3 lg:hidden">
+    <aside class="flex flex-wrap items-center gap-2 lg:hidden">
       <% utility_badges.each do |label, caption| %>
-        <div class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-slate-950 text-white shadow-[0_18px_32px_rgba(15,23,42,0.16)]">
-          <span class="text-base font-semibold uppercase tracking-[0.12em]"><%= label %></span>
-          <span class="mt-1 text-[0.45rem] uppercase tracking-[0.22em] text-white/60"><%= caption %></span>
+        <div class="flex h-12 w-12 flex-col items-center justify-center rounded-full border border-slate-800 bg-slate-950 text-white shadow-[0_12px_24px_rgba(15,23,42,0.12)]">
+          <span class="text-xs font-semibold uppercase tracking-[0.12em]"><%= label %></span>
+          <span class="mt-0.5 text-[0.4rem] uppercase tracking-[0.22em] text-white/60"><%= caption %></span>
         </div>
       <% end %>
 
       <% if rail_contact_items.any? %>
-        <span class="h-8 w-px bg-slate-300"></span>
+        <span class="h-6 w-px bg-slate-300"></span>
 
         <% rail_contact_items.each do |label, _value| %>
-          <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white/95 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-[0_10px_18px_rgba(15,23,42,0.08)]"><%= contact_badge_label(label) %></div>
+          <div class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white/95 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-[0_6px_14px_rgba(15,23,42,0.05)]"><%= contact_badge_label(label) %></div>
         <% end %>
       <% end %>
     </aside>

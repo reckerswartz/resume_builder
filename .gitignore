@@ -40,7 +40,19 @@ vendor/bundle/
 !/tmp/storage/.keep
 
 /public/assets
-/docs/template_audits/artifacts/
+
+# Local tracking infrastructure — all state managed on GitHub
+/docs/maintainability_audits/
+/docs/template_audits/
+/docs/template_rollouts/
+/docs/resumebuilder_rollouts/
+/docs/ui_audits/
+/docs/github_ops/
+/docs/features/
+/tmp/ui_audit_artifacts/
+/tmp/gh_issues/
+/tmp/reference_artifacts/
+/tmp/screenshots/
 /docs/templates/*.pdf
 
 # Ignore key files for decrypting credentials and more.

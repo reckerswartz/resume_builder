@@ -288,6 +288,11 @@ It currently includes:
 - `slug`
 - `template_id`
 - `settings[accent_color]`
+- `settings[font_scale]`
+- `settings[density]`
+- `settings[section_spacing]`
+- `settings[paragraph_spacing]`
+- `settings[line_spacing]`
 - `settings[page_size]`
 - `settings[show_contact_icons]`
 - export and download controls

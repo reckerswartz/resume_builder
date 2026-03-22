@@ -9,9 +9,13 @@ This workflow is one phase of the repeating TDD cycle: **Red → Green → Refac
 ### Phase 1: Context & Regression-Aware Green Baseline
 
 1. Treat any text supplied after `/tdd-refactoring-agent` as the feature scope, code area, or green-phase context.
-2. Invoke `@tdd-refactoring-agent`.
-3. Verify a green test baseline before refactoring — run the targeted spec suite first. Check for pending migrations with `bin/rails db:migrate:status`. If the work touches views, components, helpers, presenters, CSS, Stimulus, user-facing copy, or page structure, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, and `docs/references/behance/ai_voice_generator_reference.md` before refactoring.
-4. **Assess current cycle position and regression baseline**: identify which areas were just implemented (Green phase) and which have the most refactoring value. Prioritize recently-implemented code that followed minimal-change conventions. If a previously-clean area has regressed structurally, restore that baseline before widening the refactor.
+2. **Read current state from GitHub** to check for related open issues:
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow tdd-refactoring-agent
+   ```
+3. Invoke `@tdd-refactoring-agent`. Verify a green test baseline first. Check for pending migrations with `bin/rails db:migrate:status`. If the work touches UI, also read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`.
+4. **Assess current cycle position**: identify which areas have the most refactoring value. Prioritize recently-implemented code.
 
 ### Phase 2: Refactor
 

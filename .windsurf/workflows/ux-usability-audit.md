@@ -4,76 +4,51 @@ description: Continuously audit routed pages for content quality, information de
 
 ## Continuous Improvement Cycle
 
-This workflow operates as a repeating cycle: **Audit → Score → Fix → Validate → Re-audit**. Each invocation advances the cycle from its current position. The registry, usability scores, and run logs track cycle state so work resumes cleanly across sessions.
+This workflow operates as a repeating cycle: **Audit → Score → Fix → Validate → Re-audit**. All state is tracked on GitHub Issues — no local registries or run logs.
 
 ### Phase 1: Context & Regression Baseline
 
-1. Treat any text supplied after `/ux-usability-audit` as optional page keys, route families, mode (`review-only`, `implement-next`, `re-review`, `close-page`, or `full-cycle`), batch size, or auth constraints.
-2. Read `docs/ui_audits/usability_review/README.md`, `docs/ui_audits/usability_review/registry.yml`, and the latest run log before doing anything else.
-3. Read `README.md`, `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`, `docs/architecture_overview.md`, `config/routes.rb`, and `lib/resume_builder/step_registry.rb` so the audit reflects the current routed surface, raw Behance baseline, shared UI rules, and page-family guidance.
-4. **Regression baseline**: before starting new work, re-audit any pages previously marked `clean` whose source files (views, locale files, components, presenters) have changed since the last verification. If usability scores have dropped, reopen the page and prioritize the regression fix before new work.
-5. Confirm audit prerequisites before reviewing pages: a running local app server, seeded non-production accounts or user-provided credentials, and any required sample data for authenticated and admin routes. Check for pending migrations with `bin/rails db:migrate:status` — missing migrations can cause runtime errors during audit.
+1. Treat any text supplied after `/ux-usability-audit` as optional page keys, route families, mode (`review-only`, `implement-next`, `re-review`, or `full-cycle`), batch size, or auth constraints.
+2. **Read current state from GitHub:**
+   ```bash
+   // turbo
+   bin/gh-bridge/fetch-issues --workflow ux-usability-audit
+   ```
+3. Read `docs/ui_guidelines.md`, `docs/behance_product_ui_system.md`, `docs/references/behance/ai_voice_generator_reference.md`, `docs/architecture_overview.md`, `config/routes.rb`, and `lib/resume_builder/step_registry.rb`.
+4. **Regression baseline**: re-audit pages whose source files have changed. Create or reopen GitHub issues for regressions.
+5. Confirm audit prerequisites: running local app server, seeded accounts, no pending migrations.
 
 ### Phase 2: Audit & Score
 
-6. Use the registry page inventory and the current routes and step registry to resolve the next page batch, grouping pages by `public_auth`, `workspace`, `builder`, `templates`, and `admin`.
-7. Use Playwright to navigate each selected page. For each page, capture the accessibility snapshot and a full-page screenshot at 1440×900 (the default usability viewport).
-8. Evaluate every page against the ten usability audit dimensions defined in the registry and README. Adopt the perspective of a **non-technical user who just wants to build a resume** — not a developer, not an admin:
-    - **Content brevity**: Identify long paragraphs, wordy labels, verbose guidance, or placeholder text that can be shortened without losing meaning. Flag any sentence longer than ~25 words in user-facing copy.
-    - **Information density**: Look for walls of text, large data blocks, or dense metadata dumps shown inline. Flag sections that should use accordions, disclosure panels, or expandable cards to reduce visual weight.
-    - **Progressive disclosure**: Check whether secondary detail (technical settings, advanced options, debug data) is hidden behind interaction or shown upfront. All non-essential information should be collapsed by default.
-    - **Repeated content**: Identify duplicate copy, redundant status badges, or the same guidance appearing in hero, sidebar, and inline positions simultaneously.
-    - **Icon usage**: Find text-only labels, actions, or badges where a small icon (from the existing `Ui::GlyphComponent` or Lucide set) would improve scanability and reduce reading load.
-    - **Form quality**: Check for missing or generic placeholders (e.g. "Enter value"), unclear field labels, poor field grouping, excessive required fields, and forms that ask for too much at once.
-    - **User flow clarity**: Determine whether a non-technical user can understand what to do next, what each action means, and where they are in the overall process. Flag jargon, ambiguous CTAs, and missing breadcrumbs or progress indicators.
-    - **Task overload**: Count competing CTAs, unrelated actions, or multiple distinct tasks presented on the same screen. A page should have one clear primary action and at most two secondary actions visible at once.
-    - **Scroll efficiency**: Measure page height relative to actionable content. Flag low-value chrome, decorative panels, or support text that pushes the primary task below the first fold.
-    - **Empty/error states**: Check for missing empty states, generic error messages, dead-end flows, or unhelpful fallback copy when data is absent.
-9. Score each dimension 0–100 and compute an overall usability score as the average. Compare against previous scores for the same page to track improvement or regression. Record scores in the page doc and registry.
-10. For each finding, assign an ID (`UX-<PAGE_PREFIX>-<NNN>`), classify severity (`critical`, `high`, `medium`, `low`), assign a category from the ten dimensions, and record evidence (screenshot path, snapshot excerpt, or quoted copy).
-11. Compare current findings against the registry to distinguish net-new issues from previously known items. Update severity of existing items if the page has evolved.
-12. Save raw artifacts under `tmp/ui_audit_artifacts/<timestamp>/<page_key>/usability/` and record the durable findings in the page doc and run log instead of overwriting earlier runs.
+6. Use `config/routes.rb` and `lib/resume_builder/step_registry.rb` to resolve the next page batch.
+7. Use Playwright to capture accessibility snapshot and screenshot at 1440×900. Save to `tmp/screenshots/usability-<page_key>.png`.
+8. Evaluate against 10 usability dimensions from the perspective of a **non-technical user**: content brevity, information density, progressive disclosure, repeated content, icon usage, form quality, user flow clarity, task overload, scroll efficiency, empty/error states.
+9. Score each dimension 0–100. Assign finding IDs: `UX-<PAGE_PREFIX>-<NNN>`.
+10. **Create a GitHub issue for each finding** with screenshots:
+    ```bash
+    bin/gh-bridge/create-issue --workflow ux-usability-audit --key "UX-<PREFIX>-<NNN>" \
+      --title "<description>" --severity "<level>" --domain "<domain>" --type usability-issue \
+      --body "<structured markdown with scores and evidence>" \
+      --screenshot "tmp/screenshots/usability-<page_key>.png"
+    ```
 
 ### Phase 3: Implement & Refine Data
 
-13. When a page shows problems that also appear on other pages, prefer a shared Rails-first fix through components, helpers, presenters, partials, locale files, or Stimulus controllers. Common usability fix patterns:
-    - **Verbose copy**: Shorten in the locale file (`config/locales/views/*.en.yml`) so the fix propagates everywhere the key is used
-    - **Information walls**: Wrap secondary blocks in a `<details>/<summary>` disclosure or a Stimulus-driven accordion
-    - **Repeated badges**: Consolidate into one authoritative position (usually the page header or hero) and remove duplicates
-    - **Missing icons**: Add `Ui::GlyphComponent` or inline Lucide SVG alongside the text label
-    - **Form friction**: Improve placeholders and labels in the locale file, regroup fields with `<fieldset>`, or split long forms into steps
-    - **Task overload**: Demote secondary actions to a dropdown, side rail, or overflow menu
-    - **Empty states**: Add or improve `Ui::EmptyStateComponent` usage with actionable guidance copy
-14. **Refine underlying data** alongside usability fixes:
-    - Update locale files when shortening copy, improving labels, or fixing empty states — these are the primary data artifacts for usability
-    - Update `db/seeds.rb` when demo data needs richer content to exercise empty/error states or form flows
-    - Update `docs/ui_guidelines.md` when usability findings reveal gaps in the design-system guidance
-    - Update specs to cover the improved user-facing behavior
-15. When evaluating admin pages, apply the same non-technical lens but adjust expectations: admin pages serve power users, so moderate density is acceptable, but jargon, unlabeled fields, and hidden primary actions are still findings.
+11. In `review-only` mode: stop after creating GitHub issues.
+12. In `implement-next` mode:
+    a. Pick the highest-severity open issue (or use `bin/gh-bridge/process-queue --workflow ux-usability-audit`)
+    b. Mark in-progress: `bin/gh-bridge/update-issue --issue <N> --status in-progress`
+    c. Create branch: `bin/gh-bridge/create-branch --workflow ux-usability-audit --key <key>`
+    d. Implement the smallest complete fix using shared Rails-first patterns (locale files, components, presenters)
+    e. Update locale files, seeds, specs as needed
 
 ### Phase 4: Validate
 
-16. In `review-only`, stop after updating the registry, page docs, usability scores, severity-ranked findings, and the next recommended slice — but still record cycle metrics.
-17. In `implement-next`, pick only one highest-value shared or page-local issue slice by default, implement the smallest complete fix, update the most targeted specs and docs, and then re-audit the affected pages in the same run. Verify with:
-    ```
-    bundle exec rspec <affected_spec_files>
-    ```
-    Then Playwright re-audit the fixed pages to confirm resolution and score improvement.
-18. **Cross-page regression check**: after fixing a shared locale key, component, or presenter, re-audit at least one other page that uses the same shared surface.
+13. Verify with `bundle exec rspec <affected_spec_files>`, then Playwright re-audit for score improvement.
+14. **Update GitHub issue**: `bin/gh-bridge/update-issue --issue <N> --status verified --comment "<results and new scores>"`
+15. **Open a PR**: `bin/gh-bridge/create-pr --workflow ux-usability-audit --key <key> --issue <N> --title "Fix: <description>"`
 
-### Phase 5: Re-audit & Cycle Forward
+### Phase 5: Close & Cycle Forward
 
-19. In `re-review`, verify only the targeted pages or open issue keys, close resolved issues explicitly, update usability scores, and keep unresolved follow-ups visible in the registry and page doc.
-20. In `close-page`, only mark a page `clean` when the latest run confirms target issues are resolved, remaining findings are intentionally deferred elsewhere, and the verification and audit notes are complete.
-21. Update cycle metrics in the registry per page:
-    - `cycle_count`: increment for the page
-    - `last_cycle_date`: current timestamp
-    - `usability_score_history`: append current score with timestamp
-    - `issues_found` / `issues_resolved` / `issues_remaining`: running totals
-    - `regression_detected`: boolean flag if a previously closed issue resurfaced
-22. In `full-cycle` mode, repeat Phase 2–4 in a loop for the target page(s) until all `critical` and `high` severity items are resolved, then summarize with aggregate metrics and score trends.
-
-### Cycle Completion
-
-23. Finish with changed files, verification results, usability score changes, artifact paths, page status changes, cycle metrics, and the next eligible page or shared usability issue cluster.
-24. **Always recommend the next cycle entry point**: if pages have open issues, recommend `implement-next` for the highest-severity item. If usability scores have plateaued, recommend broader `review-only` to discover issues on unaudited pages. If all pages are `clean`, recommend `re-review` to catch drift from recent development. The workflow never truly ends — it feeds back into itself.
+16. After PR merge: `bin/gh-bridge/close-issue --issue <N> --reason completed --delete-branch "ux-usability-audit/<key>"`
+17. Check `bin/gh-bridge/fetch-issues --workflow ux-usability-audit` for remaining issues. Recommend the next entry point.
