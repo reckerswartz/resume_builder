@@ -132,20 +132,20 @@ areas:
     path: "app/helpers/admin/job_logs_helper.rb"
     category: "helper"
     priority: "medium"
-    status: "improved"
+    status: "closed"
     reasons:
       - "Admin::JobLogsHelper mixed related-error lookup and description logic with lightweight formatting helpers."
       - "The helper also still owns runtime state copy, job-control decision logic, and debug-payload shaping across both index and show pages."
     recommended_refactor_shape: "extract_presenter"
     area_doc_path: "docs/maintainability_audits/areas/admin-job-logs-helper-mixed-responsibilities.md"
-    open_follow_up_keys:
-      - "extract-job-log-runtime-state"
-      - "extract-job-log-control-state"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "extract-job-log-related-error-state"
+      - "extract-job-log-runtime-state"
+      - "extract-job-log-control-state"
     last_reviewed_at: "2026-03-21T22:18:00Z"
     last_changed_at: "2026-03-21T22:18:00Z"
-    next_step: "Rotate back to the verification lane for Llm::Providers::BaseClient, then revisit Admin::JobLogsHelper for runtime-state or job-control-state extraction in a later structural slice."
+    next_step: "All 3 follow-ups resolved. Helper reduced from 181 to 86 lines with 3 extracted presenters (RelatedErrorState, RuntimeState, ControlState)."
   - area_key: "application-helper-mixed-responsibilities"
     title: "Application helper mixed responsibilities"
     lane: "structural"

@@ -209,6 +209,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(action_row.css('a, button').map { |element| element.text.squish }).to eq([
         I18n.t('resumes.resume_card.actions.edit'),
         I18n.t('resumes.resume_card.actions.preview'),
+        I18n.t('resumes.resume_card.actions.duplicate'),
         I18n.t('resumes.resume_card.actions.export_pdf'),
         I18n.t('resumes.resume_card.actions.delete')
       ])
@@ -334,6 +335,33 @@ RSpec.describe 'Resumes', type: :request do
 
       exported_card_buttons = exported_card.css('a, button').map { |el| el.text.squish }
       expect(exported_card_buttons).not_to include(I18n.t('resumes.resume_card.actions.export_pdf'))
+    end
+  end
+
+  describe 'POST /resumes/:id/duplicate' do
+    it 'creates a deep copy and redirects to the builder heading step' do
+      resume = create(:resume, user:, template:,
+        title: 'Original Resume',
+        headline: 'Product Designer',
+        summary: 'Experienced designer.',
+        contact_details: { 'full_name' => 'Alice Smith', 'email' => 'alice@example.com' },
+        settings: { 'accent_color' => '#4338CA', 'page_size' => 'A4', 'show_contact_icons' => true }
+      )
+      resume.sections.create!(title: 'Experience', section_type: 'experience', position: 0, settings: {})
+        .entries.create!(content: { 'title' => 'Lead Designer', 'company' => 'DesignCo' }, position: 0)
+
+      expect { post duplicate_resume_path(resume) }.to change(Resume, :count).by(1)
+
+      copy = Resume.last
+      expect(copy.title).to eq('Copy of Original Resume')
+      expect(copy.headline).to eq('Product Designer')
+      expect(copy.summary).to eq('Experienced designer.')
+      expect(copy.contact_details['full_name']).to eq('Alice Smith')
+      expect(copy.sections.size).to eq(1)
+      expect(copy.sections.first.entries.size).to eq(1)
+      expect(response).to redirect_to(edit_resume_path(copy, step: :heading))
+      follow_redirect!
+      expect(response.body).to include(I18n.t('resumes.controller.resume_duplicated'))
     end
   end
 

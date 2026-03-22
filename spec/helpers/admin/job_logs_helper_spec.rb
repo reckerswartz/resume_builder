@@ -36,6 +36,30 @@ RSpec.describe Admin::JobLogsHelper, type: :helper do
     end
   end
 
+  describe '#job_log_runtime_state' do
+    it 'builds a RuntimeState presenter from the job log and queue snapshot' do
+      job_log = build(:job_log)
+      snapshot = instance_double(Admin::QueueSnapshot, unavailable?: true, found?: false, orphaned_claimed?: false, state: nil, state_label: nil, process: nil)
+
+      state = helper.job_log_runtime_state(job_log, snapshot)
+
+      expect(state).to be_a(Admin::JobLogs::RuntimeState)
+      expect(state.label).to eq(I18n.t('admin.job_logs.helper.runtime_labels.unavailable'))
+    end
+  end
+
+  describe '#job_log_control_state' do
+    it 'builds a ControlState presenter from the job log and queue snapshot' do
+      job_log = build(:job_log, :failed)
+      snapshot = instance_double(Admin::QueueSnapshot, retryable?: false, discardable?: false, orphaned_claimed?: false)
+
+      state = helper.job_log_control_state(job_log, snapshot)
+
+      expect(state).to be_a(Admin::JobLogs::ControlState)
+      expect(state.requeue_available?).to be true
+    end
+  end
+
   describe '#formatted_debug_payload' do
     it 'serializes hashes with string keys' do
       payload = helper.formatted_debug_payload(resume_id: 12, nested: { status: 'ok' })

@@ -47,6 +47,7 @@ Rails.application.routes.draw do
     member do
       get :download
       get :download_text
+      post :duplicate
       post :export
     end
 

@@ -19,6 +19,10 @@ class ResumePolicy < ApplicationPolicy
     owner?
   end
 
+  def duplicate?
+    owner?
+  end
+
   def export?
     owner?
   end

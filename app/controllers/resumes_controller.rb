@@ -1,7 +1,7 @@
 class ResumesController < ApplicationController
   include ResumeBuilderRendering
 
-  before_action :set_resume, only: %i[ show edit update destroy export download download_text ]
+  before_action :set_resume, only: %i[ show edit update destroy duplicate export download download_text ]
 
   def index
     @resumes = policy_scope(Resume).includes(:template).with_attached_pdf_export.order(updated_at: :desc)
@@ -81,6 +81,13 @@ class ResumesController < ApplicationController
 
     @resume.destroy!
     redirect_to resumes_path, notice: controller_message(:resume_deleted), status: :see_other
+  end
+
+  def duplicate
+    authorize @resume
+
+    copy = Resumes::Duplicator.new(resume: @resume).call
+    redirect_to edit_resume_path(copy, step: :heading), notice: controller_message(:resume_duplicated)
   end
 
   def export
