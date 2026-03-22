@@ -51,7 +51,8 @@ class LlmModel < ApplicationRecord
   def self.sorted_for_admin(sort, direction)
     case admin_sort_column(sort)
     when "provider"
-      left_outer_joins(:llm_provider).includes(:llm_provider).distinct.order(Arel.sql("llm_providers.name #{direction.upcase}"), name: :asc, identifier: :asc)
+      sanitized_direction = %w[asc desc].include?(direction.to_s.downcase) ? direction.to_s.downcase : "asc"
+      left_outer_joins(:llm_provider).includes(:llm_provider).distinct.order(Arel.sql("llm_providers.name #{sanitized_direction}"), name: :asc, identifier: :asc)
     else
       order(admin_order_hash(admin_sort_column(sort), direction))
     end
