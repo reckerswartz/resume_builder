@@ -211,7 +211,7 @@ RSpec.describe 'Resume template PDF rendering' do
     expect(sidebar).to be_present
     expect(main_column['class']).to include('lg:col-span-1')
     expect(main_column['class']).not_to include('lg:col-span-2')
-    expect(sidebar['style']).to include('background-color: #4338CA15')
+    expect(sidebar['style']).to include('background-color: #4338CA18')
   end
 
   it 'renders an attached headshot for the editorial split family through the shared PDF template' do
