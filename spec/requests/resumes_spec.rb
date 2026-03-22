@@ -105,6 +105,54 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).not_to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
     end
 
+    it 'carries accent color through experience step links when a non-default variant is selected' do
+      classic_template = create(
+        :template,
+        name: 'Classic Ivory',
+        slug: 'classic-ivory-carry',
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic')
+      )
+
+      get new_resume_path, params: {
+        template_id: classic_template.id,
+        resume: {
+          settings: {
+            accent_color: '#334155'
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      experience_links = document.css('a').select { |a| a['href']&.include?('experience_level') }
+
+      expect(experience_links).not_to be_empty
+      experience_links.each do |link|
+        href = link['href']
+        expect(href).to include('accent_color'), "expected experience link to carry accent_color: #{href}"
+      end
+    end
+
+    it 'shows the choose-later note inside the setup template picker disclosure' do
+      template
+
+      get new_resume_path, params: {
+        step: 'setup',
+        resume: {
+          intake_details: {
+            experience_level: 'three_to_five_years'
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      template_disclosure = document.at_css('details[data-resume-template-disclosure]')
+
+      expect(template_disclosure).to be_present
+      expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.choose_later_note'))
+    end
+
     it 'preserves a requested accent selection in the setup picker state' do
       classic_template = create(
         :template,
@@ -203,6 +251,28 @@ RSpec.describe 'Resumes', type: :request do
       expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.counts_summary', ready_count: 1, draft_count: 1))
       expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.focus_note'))
       expect(workspace_aside.css('a, button').map { |element| element.text.squish }).to include(I18n.t('resumes.index.quick_actions.create_resume'))
+    end
+  end
+
+  describe 'GET /resumes/:id' do
+    it 'keeps the desktop preview rail focused on actions and status without duplicate explainer copy' do
+      resume = create(:resume, user:, template:)
+
+      get resume_path(resume)
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      desktop_actions_panel = document.css('aside').last
+
+      expect(response.body).to include(I18n.t('resumes.show.preview_title'))
+      expect(desktop_actions_panel).to be_present
+      expect(desktop_actions_panel.text).to include(I18n.t('resumes.show.desktop_actions.title'))
+      expect(desktop_actions_panel.text).not_to include(I18n.t('resumes.show.what_this_shows.eyebrow'))
+      expect(desktop_actions_panel.text).not_to include(I18n.t('resumes.show.what_this_shows.description'))
+      expect(desktop_actions_panel.text).to include(I18n.t('resumes.export_actions_state.actions.export_pdf'))
+      expect(desktop_actions_panel.text).to include(I18n.t('resumes.export_actions_state.actions.download_text'))
+      expect(desktop_actions_panel.text).to include(I18n.t('resumes.export_status_state.widget.eyebrow'))
     end
   end
 
@@ -427,6 +497,31 @@ RSpec.describe 'Resumes', type: :request do
       expect(persisted_entry_card.at_css('summary').text).not_to include(fallback_text)
       expect(new_entry_card).to be_present
       expect(new_entry_card.at_css('summary').text).to include(I18n.t('resumes.entry_form.supporting_text.new_with_existing'))
+    end
+
+    it 'renders the summary step without a duplicate step header and starts with the library panel' do
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        headline: 'Software Engineer',
+        intake_details: { 'experience_level' => 'three_to_five_years' }
+      )
+
+      get edit_resume_path(resume), params: { step: 'summary' }
+
+      expect(response).to have_http_status(:ok)
+
+      document = Nokogiri::HTML.parse(response.body)
+      step_content = document.at_css("##{ActionView::RecordIdentifier.dom_id(resume, :editor_step_content)}")
+
+      expect(step_content.text).to include(I18n.t('resumes.editor_summary_step.library.title'))
+      expect(step_content.text).to include(I18n.t('resumes.editor_summary_step.suggestions_title'))
+      expect(step_content.text).to include(I18n.t('resumes.editor_summary_step.summary_label'))
+
+      step_header_titles = step_content.css('h3').map { |h| h.text.squish }
+      step_title = I18n.t('resume_builder.step_registry.steps.summary.title')
+      expect(step_header_titles).not_to include(step_title)
     end
 
     it 'collapses section header actions on section-step pages while keeping finalize inline' do

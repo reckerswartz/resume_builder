@@ -122,4 +122,25 @@ RSpec.describe Resumes::StartFlowState do
       expect(start_flow_state.next_step_for_experience('three_to_five_years')).to eq('setup')
     end
   end
+
+  describe '#resume_settings_params' do
+    context 'when accent color matches the template default' do
+      it 'returns an empty hash' do
+        expect(start_flow_state.resume_settings_params).to eq({})
+      end
+    end
+
+    context 'when accent color differs from the template default' do
+      let(:resume) do
+        build(:resume, template:, template_id: template.id,
+              intake_details:,
+              settings: { "accent_color" => "#dc2626" })
+      end
+
+      it 'returns accent color for carry-through' do
+        expect(start_flow_state.resume_settings_params).to eq({ accent_color: "#dc2626" })
+        expect(start_flow_state).to be_accent_color_differs_from_template_default
+      end
+    end
+  end
 end

@@ -11,15 +11,12 @@
 
       <div class="grid gap-3 sm:grid-cols-2">
         <% start_flow_state.student_options.each do |option| %>
+          <% resume_params = { intake_details: { experience_level: start_flow_state.selected_experience_level, student_status: option.fetch(:value) } } %>
+          <% resume_params[:settings] = start_flow_state.resume_settings_params if start_flow_state.resume_settings_params.present? %>
           <%= link_to new_resume_path(
                 step: "setup",
                 template_id: start_flow_state.selected_template_id,
-                resume: {
-                  intake_details: {
-                    experience_level: start_flow_state.selected_experience_level,
-                    student_status: option.fetch(:value)
-                  }
-                }
+                resume: resume_params
               ),
               class: [ui_inset_panel_classes(tone: :subtle), "block transition hover:border-canvas-300 hover:bg-canvas-50/92 focus:outline-none focus:ring-2 focus:ring-ink-400/30"].join(" ") do %>
             <div class="space-y-2">
@@ -31,16 +28,13 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
+        <% skip_resume_params = { intake_details: { experience_level: start_flow_state.selected_experience_level, student_status: "" } } %>
+        <% skip_resume_params[:settings] = start_flow_state.resume_settings_params if start_flow_state.resume_settings_params.present? %>
         <%= link_to t(".skip_for_now"),
           new_resume_path(
             step: "setup",
             template_id: start_flow_state.selected_template_id,
-            resume: {
-              intake_details: {
-                experience_level: start_flow_state.selected_experience_level,
-                student_status: ""
-              }
-            }
+            resume: skip_resume_params
           ),
           class: ui_button_classes(:secondary) %>
       </div>

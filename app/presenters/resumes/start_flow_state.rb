@@ -62,6 +62,22 @@ module Resumes
       resume.template_id
     end
 
+    def selected_accent_color
+      resume.accent_color
+    end
+
+    def accent_color_differs_from_template_default?
+      return false if resume.template.blank?
+
+      selected_accent_color != resume.template.render_layout_config.fetch("accent_color")
+    end
+
+    def resume_settings_params
+      return {} unless accent_color_differs_from_template_default?
+
+      { accent_color: selected_accent_color }
+    end
+
     private
       attr_reader :resume, :step
   end

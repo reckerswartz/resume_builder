@@ -275,6 +275,8 @@ en:
       fast_start_pill: "Fast start"
       fast_start_description: "Open the full browser only if you want to compare more options."
       open_marketplace: "Open marketplace"
+      choose_later: "Choose later"
+      choose_later_note: "Skip template selection for now. You can always switch templates from the finalize step after the draft is created."
       recommended_pill: "Recommended for this draft"
       recommended_description: "Based on the experience details you chose, these templates are likely to fit best."
       preview_selected_badge: "Selected"
