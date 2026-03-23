@@ -28,8 +28,8 @@ RSpec.describe 'Shared density UI components' do
         title: 'Dashboard',
         description: 'Track rollout status',
         avatar_text: 'RB',
-        badges: [{ 'label' => 'Live' }],
-        actions: [{ 'label' => 'Open', 'path' => '/admin' }],
+        badges: [ { 'label' => 'Live' } ],
+        actions: [ { 'label' => 'Open', 'path' => '/admin' } ],
         metrics: [
           { 'label' => 'Templates', 'value' => '12' },
           { 'label' => 'Visible', 'value' => '9' },
@@ -38,8 +38,8 @@ RSpec.describe 'Shared density UI components' do
         ]
       )
 
-      expect(component.badges).to eq([{ label: 'Live' }])
-      expect(component.actions).to eq([{ label: 'Open', path: '/admin' }])
+      expect(component.badges).to eq([ { label: 'Live' } ])
+      expect(component.actions).to eq([ { label: 'Open', path: '/admin' } ])
       expect(component.metrics).to eq(
         [
           { label: 'Templates', value: '12' },
@@ -72,13 +72,13 @@ RSpec.describe 'Shared density UI components' do
         eyebrow: 'Admin',
         title: 'Templates',
         description: 'Manage gallery availability',
-        badges: [{ 'label' => 'Active' }],
-        actions: [{ 'label' => 'Edit', 'path' => '/admin/templates/1/edit' }]
+        badges: [ { 'label' => 'Active' } ],
+        actions: [ { 'label' => 'Edit', 'path' => '/admin/templates/1/edit' } ]
       )
 
       expect(component).not_to be_compact
-      expect(component.badges).to eq([{ label: 'Active' }])
-      expect(component.actions).to eq([{ label: 'Edit', path: '/admin/templates/1/edit' }])
+      expect(component.badges).to eq([ { label: 'Active' } ])
+      expect(component.actions).to eq([ { label: 'Edit', path: '/admin/templates/1/edit' } ])
       expect(component.wrapper_classes).to include('px-6')
       expect(component.divider_classes).to include('inset-x-6')
       expect(component.layout_classes).to include('gap-4')

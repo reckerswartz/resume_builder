@@ -19,8 +19,8 @@ RSpec.describe Resumes::Duplicator do
 
   before do
     experience = resume.sections.create!(title: "Experience", section_type: "experience", position: 0, settings: {})
-    experience.entries.create!(content: { "title" => "Staff Engineer", "company" => "Acme Corp", "highlights" => ["Led platform team"] }, position: 0)
-    experience.entries.create!(content: { "title" => "Senior Engineer", "company" => "StartupCo", "highlights" => ["Built API layer"] }, position: 1)
+    experience.entries.create!(content: { "title" => "Staff Engineer", "company" => "Acme Corp", "highlights" => [ "Led platform team" ] }, position: 0)
+    experience.entries.create!(content: { "title" => "Senior Engineer", "company" => "StartupCo", "highlights" => [ "Built API layer" ] }, position: 1)
 
     skills = resume.sections.create!(title: "Skills", section_type: "skills", position: 1, settings: {})
     skills.entries.create!(content: { "name" => "Ruby", "level" => "expert" }, position: 0)

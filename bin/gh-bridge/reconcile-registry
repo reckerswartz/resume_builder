@@ -11,7 +11,7 @@ TRACKED_STATES = %w[open closed].freeze
 
 options = {
   workflow: nil,
-  dry_run: false,
+  dry_run: false
 }
 
 OptionParser.new do |parser|
@@ -27,7 +27,7 @@ OptionParser.new do |parser|
 end.parse!
 
 def load_yaml(path)
-  YAML.safe_load(File.read(path), permitted_classes: [Date, Time], aliases: true) || {}
+  YAML.safe_load(File.read(path), permitted_classes: [ Date, Time ], aliases: true) || {}
 end
 
 def run_command(command)
@@ -74,16 +74,16 @@ def entry_sections(lines)
 
   lines.each_with_index do |line, index|
     if line.start_with?("  - workflow: ")
-      sections << [start_index, index - 1] if start_index
+      sections << [ start_index, index - 1 ] if start_index
       start_index = index
     elsif start_index && line.start_with?("file_locks:")
-      sections << [start_index, index - 1]
+      sections << [ start_index, index - 1 ]
       start_index = nil
       break
     end
   end
 
-  sections << [start_index, lines.length - 1] if start_index
+  sections << [ start_index, lines.length - 1 ] if start_index
   sections
 end
 
@@ -174,7 +174,7 @@ workflow_registries.each do |entry|
     github_issues: desired_numbers,
     changed_fields: changed_fields,
     previous_issue_count: current_counts,
-    previous_github_issues: current_numbers,
+    previous_github_issues: current_numbers
   }
 end
 

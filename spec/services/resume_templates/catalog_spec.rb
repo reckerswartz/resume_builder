@@ -10,9 +10,9 @@ RSpec.describe ResumeTemplates::Catalog do
   describe '.family_options' do
     it 'returns label-value pairs for the available template families' do
       expect(described_class.family_options).to include(
-        ['Modern', 'modern'],
-        ['Classic', 'classic'],
-        ['Sidebar Accent', 'sidebar-accent']
+        [ 'Modern', 'modern' ],
+        [ 'Classic', 'classic' ],
+        [ 'Sidebar Accent', 'sidebar-accent' ]
       )
     end
   end
@@ -87,9 +87,9 @@ RSpec.describe ResumeTemplates::Catalog do
   describe '.font_family_options' do
     it 'returns label-value pairs for all font families' do
       expect(described_class.font_family_options).to include(
-        ['Sans-serif', 'sans'],
-        ['Serif', 'serif'],
-        ['Monospace', 'mono']
+        [ 'Sans-serif', 'sans' ],
+        [ 'Serif', 'serif' ],
+        [ 'Monospace', 'mono' ]
       )
     end
   end

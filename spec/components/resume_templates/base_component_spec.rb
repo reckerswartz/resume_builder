@@ -108,7 +108,7 @@ RSpec.describe ResumeTemplates::BaseComponent do
           'start_date' => '2022',
           'current_role' => true,
           'summary' => 'Built shared preview and export rendering flows.',
-          'highlights' => ['Led the migration to reusable template helpers.'],
+          'highlights' => [ 'Led the migration to reusable template helpers.' ],
           'url' => 'https://example.com/platform'
         }
       )
@@ -117,22 +117,22 @@ RSpec.describe ResumeTemplates::BaseComponent do
     it 'normalizes contact values and shared entry formatting for template views' do
       expect(component.full_name).to eq('Jordan Rivera')
       expect(component.contact_items).to include(
-        ['Email', 'jordan@example.com'],
-        ['Phone', '555-0100'],
-        ['Location', 'Remote, USA'],
-        ['LinkedIn', 'https://linkedin.com/in/jordan']
+        [ 'Email', 'jordan@example.com' ],
+        [ 'Phone', '555-0100' ],
+        [ 'Location', 'Remote, USA' ],
+        [ 'LinkedIn', 'https://linkedin.com/in/jordan' ]
       )
       expect(component.entry_title(experience_entry)).to eq('Staff Engineer')
       expect(component.entry_subtitle(experience_entry)).to eq('Acme · Platform Lead · Expert')
-      expect(component.entry_body_paragraphs(experience_entry)).to eq(['Built shared preview and export rendering flows.'])
-      expect(component.entry_highlights(experience_entry)).to eq(['Led the migration to reusable template helpers.'])
+      expect(component.entry_body_paragraphs(experience_entry)).to eq([ 'Built shared preview and export rendering flows.' ])
+      expect(component.entry_highlights(experience_entry)).to eq([ 'Led the migration to reusable template helpers.' ])
       expect(component.entry_url(experience_entry)).to eq('https://example.com/platform')
       expect(component.date_range_for(experience_entry)).to eq('2022 - Current')
     end
   end
 
   describe '#visible_sections' do
-    let(:settings) { super().merge('hidden_sections' => ['projects']) }
+    let(:settings) { super().merge('hidden_sections' => [ 'projects' ]) }
     let!(:experience_section) do
       create(:section, resume:, title: 'Experience', section_type: 'experience', position: 0)
     end
@@ -149,7 +149,7 @@ RSpec.describe ResumeTemplates::BaseComponent do
     end
 
     it 'filters out hidden sections and empty sections from the shared section list' do
-      expect(component.visible_sections.map(&:section_type)).to eq(['experience'])
+      expect(component.visible_sections.map(&:section_type)).to eq([ 'experience' ])
       expect(component.section_visible?(projects_section)).to be(false)
       expect(component.empty_section?(skills_section)).to be(true)
     end

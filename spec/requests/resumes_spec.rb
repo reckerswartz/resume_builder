@@ -431,7 +431,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.index.sort.label'))
       expect(selected_option).to be_present
       expect(selected_option['value']).to eq('name_asc')
-      expect(titles.first(3)).to eq(['Alpha Resume', 'Beta Resume', 'Zulu Resume'])
+      expect(titles.first(3)).to eq([ 'Alpha Resume', 'Beta Resume', 'Zulu Resume' ])
     end
 
     it 'renders a collapsed mobile workspace controls disclosure that carries the current selection and query' do
@@ -472,7 +472,7 @@ RSpec.describe 'Resumes', type: :request do
       document = Nokogiri::HTML.parse(response.body)
       titles = document.css('article h2').map { |node| node.text.squish }
 
-      expect(titles.first(3)).to eq(['Oldest Resume', 'Middle Resume', 'Newest Resume'])
+      expect(titles.first(3)).to eq([ 'Oldest Resume', 'Middle Resume', 'Newest Resume' ])
     end
 
     it 'preserves the selected sort across pagination links' do
@@ -512,7 +512,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.index.search.eyebrow'))
       expect(search_input).to be_present
       expect(search_input['value']).to eq('designer')
-      expect(titles).to eq(['Designer Resume'])
+      expect(titles).to eq([ 'Designer Resume' ])
       expect(response.body).not_to include('Engineer Resume')
     end
 
@@ -627,7 +627,7 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.show.desktop_actions.title'))
       expect(response.body).to include(I18n.t('resumes.show.desktop_actions.description'))
       expect(response.body).not_to include(I18n.t('resumes.show.what_this_shows.eyebrow'))
-      expect(preview_badges).to eq([template.name, I18n.t('resumes.export_states.draft')])
+      expect(preview_badges).to eq([ template.name, I18n.t('resumes.export_states.draft') ])
       expect(response.body).to include(I18n.t('resumes.export_actions_state.actions.export_pdf'))
       expect(response.body).to include(I18n.t('resumes.export_actions_state.actions.download_text'))
       expect(response.body).to include(I18n.t('resumes.helper.export_status.labels.draft_only'))

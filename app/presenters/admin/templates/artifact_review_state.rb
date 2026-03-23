@@ -172,6 +172,6 @@ module Admin
         def template_lifecycle_status_label(status)
           status.to_s.tr("_", " ").titleize
         end
-      end
     end
   end
+end

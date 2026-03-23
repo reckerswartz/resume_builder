@@ -7,7 +7,7 @@ RSpec.describe Resumes::PdfTextExtractor do
       page1 = instance_double(PDF::Reader::Page, text: "Pat Kumar")
       page2 = instance_double(PDF::Reader::Page, text: "Senior Engineer")
       allow(PDF::Reader).to receive(:new).and_return(reader)
-      allow(reader).to receive(:pages).and_return([page1, page2])
+      allow(reader).to receive(:pages).and_return([ page1, page2 ])
 
       result = described_class.new(document_data: "fake-pdf-bytes").call
 
@@ -18,7 +18,7 @@ RSpec.describe Resumes::PdfTextExtractor do
       reader = instance_double(PDF::Reader)
       page = instance_double(PDF::Reader::Page, text: "One page resume")
       allow(PDF::Reader).to receive(:new).and_return(reader)
-      allow(reader).to receive(:pages).and_return([page])
+      allow(reader).to receive(:pages).and_return([ page ])
 
       result = described_class.new(document_data: "fake-pdf-bytes").call
 
@@ -43,7 +43,7 @@ RSpec.describe Resumes::PdfTextExtractor do
 
     it "wraps raw string data in a StringIO for PDF::Reader" do
       allow(PDF::Reader).to receive(:new).with(instance_of(StringIO)).and_return(
-        instance_double(PDF::Reader, pages: [instance_double(PDF::Reader::Page, text: "OK")])
+        instance_double(PDF::Reader, pages: [ instance_double(PDF::Reader::Page, text: "OK") ])
       )
 
       described_class.new(document_data: "raw-bytes").call

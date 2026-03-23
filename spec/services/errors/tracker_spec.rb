@@ -4,7 +4,7 @@ RSpec.describe Errors::Tracker do
   describe ".capture" do
     it "creates an ErrorLog with the error details and returns it" do
       error = StandardError.new("something broke")
-      error.set_backtrace(["app/services/foo.rb:10:in `bar'", "app/controllers/baz.rb:5:in `index'"])
+      error.set_backtrace([ "app/services/foo.rb:10:in `bar'", "app/controllers/baz.rb:5:in `index'" ])
 
       error_log = described_class.capture(
         error: error,
@@ -18,7 +18,7 @@ RSpec.describe Errors::Tracker do
       expect(error_log.message).to eq("something broke")
       expect(error_log.source).to eq("request")
       expect(error_log.context).to include("request_id" => "req-123")
-      expect(error_log.backtrace_lines).to eq(["app/services/foo.rb:10:in `bar'", "app/controllers/baz.rb:5:in `index'"])
+      expect(error_log.backtrace_lines).to eq([ "app/services/foo.rb:10:in `bar'", "app/controllers/baz.rb:5:in `index'" ])
       expect(error_log.reference_id).to start_with("ERR-")
     end
 

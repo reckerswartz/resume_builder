@@ -7,7 +7,7 @@ RSpec.describe Resumes::ExportStatusBroadcaster do
     it "broadcasts status replacements for editor, preview, and show contexts" do
       %i[editor preview show].each do |context|
         expect(Turbo::StreamsChannel).to receive(:broadcast_replace_to).with(
-          [resume, :export],
+          [ resume, :export ],
           target: "#{ActionView::RecordIdentifier.dom_id(resume, "#{context}_export_status")}",
           partial: "resumes/export_status_panel",
           locals: { resume: resume, context: context }
@@ -16,7 +16,7 @@ RSpec.describe Resumes::ExportStatusBroadcaster do
 
       %i[show finalize].each do |context|
         expect(Turbo::StreamsChannel).to receive(:broadcast_replace_to).with(
-          [resume, :export],
+          [ resume, :export ],
           target: "#{ActionView::RecordIdentifier.dom_id(resume, "#{context}_export_actions")}",
           partial: "resumes/export_actions",
           locals: { resume: resume, context: context }
@@ -33,7 +33,7 @@ RSpec.describe Resumes::ExportStatusBroadcaster do
 
       %i[show finalize].each do |context|
         expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
-          [resume, :export],
+          [ resume, :export ],
           hash_including(
             target: ActionView::RecordIdentifier.dom_id(resume, "#{context}_export_actions"),
             partial: "resumes/export_actions"
@@ -48,7 +48,7 @@ RSpec.describe Resumes::ExportStatusBroadcaster do
       described_class.new(resume: resume).call
 
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to)
-        .with([resume, :export], anything).exactly(5).times
+        .with([ resume, :export ], anything).exactly(5).times
     end
   end
 end

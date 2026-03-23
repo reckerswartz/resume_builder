@@ -9,7 +9,7 @@ Grover.configure do |config|
     },
     print_background: true,
     prefer_css_page_size: true,
-    launch_args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+    launch_args: [ "--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu" ],
     wait_until: "networkidle0"
   }
 end

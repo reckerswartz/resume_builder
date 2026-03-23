@@ -12,7 +12,7 @@ SUPPORTED_COLLECTIONS = %w[pages areas proposals findings].freeze
 
 options = {
   workflow: nil,
-  dry_run: false,
+  dry_run: false
 }
 
 OptionParser.new do |parser|
@@ -28,7 +28,7 @@ OptionParser.new do |parser|
 end.parse!
 
 def load_yaml(path)
-  YAML.safe_load(File.read(path), permitted_classes: [Date, Time], aliases: true) || {}
+  YAML.safe_load(File.read(path), permitted_classes: [ Date, Time ], aliases: true) || {}
 end
 
 def run_command(command)
@@ -84,7 +84,7 @@ def top_level_section_range(lines, section_name)
   return nil unless start_index
 
   end_index = ((start_index + 1)...lines.length).find { |index| lines[index].match?(/\A[^\s#][^:]*:/) }
-  [start_index, (end_index || lines.length) - 1]
+  [ start_index, (end_index || lines.length) - 1 ]
 end
 
 def section_entry_ranges(section_lines)
@@ -94,11 +94,11 @@ def section_entry_ranges(section_lines)
   section_lines.each_with_index do |line, index|
     next unless line.start_with?("  - ")
 
-    ranges << [start_index, index - 1] if start_index
+    ranges << [ start_index, index - 1 ] if start_index
     start_index = index
   end
 
-  ranges << [start_index, section_lines.length - 1] if start_index
+  ranges << [ start_index, section_lines.length - 1 ] if start_index
   ranges
 end
 
@@ -126,7 +126,7 @@ def find_block(lines, section_name, first_line_pattern)
 
     absolute_start = section_start + entry_start
     absolute_end = section_start + entry_end
-    return [absolute_start, absolute_end]
+    return [ absolute_start, absolute_end ]
   end
 
   nil
@@ -192,17 +192,17 @@ def apply_change_to_text(registry_text, change, timestamp)
   replace_top_level_timestamp!(lines, timestamp)
 
   block_range = case change.fetch(:collection)
-                when "pages"
+  when "pages"
                   find_block(lines, "pages", /\A  - page_key: "#{Regexp.escape(change.fetch(:record_identifier))}"/)
-                when "areas"
+  when "areas"
                   find_block(lines, "areas", /\A  - (?:area_key|key): "#{Regexp.escape(change.fetch(:record_identifier))}"/)
-                when "proposals"
+  when "proposals"
                   find_block(lines, "proposals", /\A  - id: "#{Regexp.escape(change.fetch(:record_identifier))}"/)
-                when "findings"
+  when "findings"
                   find_block(lines, "findings", /\A  - (?:finding_id|id|key): "#{Regexp.escape(change.fetch(:record_identifier))}"/)
-                else
+  else
                   nil
-                end
+  end
 
   raise "Unable to locate #{change.fetch(:collection)} record #{change.fetch(:record_identifier)} in #{change.fetch(:registry_path)}" unless block_range
 
@@ -328,7 +328,7 @@ def supported_changes(entry, issues_by_key)
     end
   end
 
-  [changes, skipped]
+  [ changes, skipped ]
 end
 
 central_registry = load_yaml(CENTRAL_REGISTRY_PATH)

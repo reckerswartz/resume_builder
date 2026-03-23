@@ -41,7 +41,7 @@ RSpec.describe Resumes::DocxTextExtractor do
   describe "#call" do
     it "extracts paragraph text from word/document.xml" do
       data = build_docx(
-        ["word/document.xml", document_xml('<w:p><w:r><w:t>Hello World</w:t></w:r></w:p>')]
+        [ "word/document.xml", document_xml('<w:p><w:r><w:t>Hello World</w:t></w:r></w:p>') ]
       )
 
       result = described_class.new(document_data: data).call
@@ -51,9 +51,9 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "joins multiple text runs within a paragraph" do
       data = build_docx(
-        ["word/document.xml", document_xml(
+        [ "word/document.xml", document_xml(
           '<w:p><w:r><w:t>Pat</w:t></w:r><w:r><w:t> Kumar</w:t></w:r></w:p>'
-        )]
+        ) ]
       )
 
       result = described_class.new(document_data: data).call
@@ -63,9 +63,9 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "converts tab nodes to tab characters" do
       data = build_docx(
-        ["word/document.xml", document_xml(
+        [ "word/document.xml", document_xml(
           '<w:p><w:r><w:t>Name</w:t></w:r><w:r><w:tab/></w:r><w:r><w:t>Value</w:t></w:r></w:p>'
-        )]
+        ) ]
       )
 
       result = described_class.new(document_data: data).call
@@ -75,10 +75,10 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "converts break and carriage-return nodes to newlines" do
       data = build_docx(
-        ["word/document.xml", document_xml(
+        [ "word/document.xml", document_xml(
           '<w:p><w:r><w:t>Line1</w:t></w:r><w:r><w:br/></w:r><w:r><w:t>Line2</w:t></w:r>' \
           '<w:r><w:cr/></w:r><w:r><w:t>Line3</w:t></w:r></w:p>'
-        )]
+        ) ]
       )
 
       result = described_class.new(document_data: data).call
@@ -88,8 +88,8 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "places headers before document content" do
       data = build_docx(
-        ["word/header1.xml", header_xml('<w:p><w:r><w:t>Header Text</w:t></w:r></w:p>')],
-        ["word/document.xml", document_xml('<w:p><w:r><w:t>Body Text</w:t></w:r></w:p>')]
+        [ "word/header1.xml", header_xml('<w:p><w:r><w:t>Header Text</w:t></w:r></w:p>') ],
+        [ "word/document.xml", document_xml('<w:p><w:r><w:t>Body Text</w:t></w:r></w:p>') ]
       )
 
       result = described_class.new(document_data: data).call
@@ -99,8 +99,8 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "places footers after document content" do
       data = build_docx(
-        ["word/document.xml", document_xml('<w:p><w:r><w:t>Body Text</w:t></w:r></w:p>')],
-        ["word/footer1.xml", footer_xml('<w:p><w:r><w:t>Footer Text</w:t></w:r></w:p>')]
+        [ "word/document.xml", document_xml('<w:p><w:r><w:t>Body Text</w:t></w:r></w:p>') ],
+        [ "word/footer1.xml", footer_xml('<w:p><w:r><w:t>Footer Text</w:t></w:r></w:p>') ]
       )
 
       result = described_class.new(document_data: data).call
@@ -110,9 +110,9 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "sorts multiple headers numerically" do
       data = build_docx(
-        ["word/header2.xml", header_xml('<w:p><w:r><w:t>Second Header</w:t></w:r></w:p>')],
-        ["word/header1.xml", header_xml('<w:p><w:r><w:t>First Header</w:t></w:r></w:p>')],
-        ["word/document.xml", document_xml('<w:p><w:r><w:t>Body</w:t></w:r></w:p>')]
+        [ "word/header2.xml", header_xml('<w:p><w:r><w:t>Second Header</w:t></w:r></w:p>') ],
+        [ "word/header1.xml", header_xml('<w:p><w:r><w:t>First Header</w:t></w:r></w:p>') ],
+        [ "word/document.xml", document_xml('<w:p><w:r><w:t>Body</w:t></w:r></w:p>') ]
       )
 
       result = described_class.new(document_data: data).call
@@ -122,12 +122,12 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "skips blank paragraphs" do
       data = build_docx(
-        ["word/document.xml", document_xml(
+        [ "word/document.xml", document_xml(
           '<w:p><w:r><w:t>Line1</w:t></w:r></w:p>' \
           '<w:p></w:p>' \
           '<w:p><w:r><w:t>  </w:t></w:r></w:p>' \
           '<w:p><w:r><w:t>Line2</w:t></w:r></w:p>'
-        )]
+        ) ]
       )
 
       result = described_class.new(document_data: data).call
@@ -143,7 +143,7 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "returns empty string when word/document.xml is missing" do
       data = build_docx(
-        ["word/styles.xml", "<styles/>"]
+        [ "word/styles.xml", "<styles/>" ]
       )
 
       result = described_class.new(document_data: data).call
@@ -153,7 +153,7 @@ RSpec.describe Resumes::DocxTextExtractor do
 
     it "returns empty string when all paragraphs are empty" do
       data = build_docx(
-        ["word/document.xml", document_xml('<w:p></w:p><w:p><w:r><w:t>   </w:t></w:r></w:p>')]
+        [ "word/document.xml", document_xml('<w:p></w:p><w:p><w:r><w:t>   </w:t></w:r></w:p>') ]
       )
 
       result = described_class.new(document_data: data).call

@@ -258,13 +258,13 @@ RSpec.describe Templates::MarketplaceState do
       expect(marketplace_state.apply_to_resume_available?).to be(true)
       expect(marketplace_state.selected_apply_resume_id).to eq(newer_resume.id)
       expect(marketplace_state.apply_resume_options).to eq([
-        ['Legal Resume · Classic Ivory', newer_resume.id],
-        ['Platform Resume · Modern Slate', older_resume.id]
+        [ 'Legal Resume · Classic Ivory', newer_resume.id ],
+        [ 'Platform Resume · Modern Slate', older_resume.id ]
       ])
       expect(marketplace_state.apply_to_resume_path_for(modern_template)).to eq("/templates/#{modern_template.id}/apply_to_resume")
       expect(modern_card_state.fetch(:apply_resume_options)).to eq([
-        ['Legal Resume · Classic Ivory', newer_resume.id],
-        ['Platform Resume · Modern Slate', older_resume.id]
+        [ 'Legal Resume · Classic Ivory', newer_resume.id ],
+        [ 'Platform Resume · Modern Slate', older_resume.id ]
       ])
       expect(modern_card_state.fetch(:selected_apply_resume_id)).to eq(newer_resume.id)
     end

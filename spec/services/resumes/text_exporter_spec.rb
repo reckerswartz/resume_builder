@@ -83,7 +83,7 @@ RSpec.describe Resumes::TextExporter do
           'role' => 'Lead Engineer',
           'url' => 'https://example.com',
           'summary' => 'Built a live-editing resume platform.',
-          'highlights' => ['Implemented Turbo-driven editing', 'Shared rendering between preview and export']
+          'highlights' => [ 'Implemented Turbo-driven editing', 'Shared rendering between preview and export' ]
         }
       )
       create(
@@ -145,10 +145,10 @@ RSpec.describe Resumes::TextExporter do
           'end_date' => 'Current',
           'current_role' => false,
           'summary' => '  Scaling platform workflows.  ',
-          'highlights' => ['  Cut export latency  ', '   ']
+          'highlights' => [ '  Cut export latency  ', '   ' ]
         }
       )
-      create(:entry, section: blank_projects_section, content: { 'name' => '', 'role' => nil, 'summary' => '   ', 'highlights' => [''] })
+      create(:entry, section: blank_projects_section, content: { 'name' => '', 'role' => nil, 'summary' => '   ', 'highlights' => [ '' ] })
 
       text_export = described_class.new(resume: resume).call
 

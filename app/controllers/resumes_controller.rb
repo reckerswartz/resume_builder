@@ -17,8 +17,8 @@ class ResumesController < ApplicationController
     scope = sorted_workspace_scope(scope)
     @total_count = scope.count
     @per_page = 12
-    @total_pages = [(@total_count.to_f / @per_page).ceil, 1].max
-    @current_page = [[params[:page].to_i, 1].max, @total_pages].min
+    @total_pages = [ (@total_count.to_f / @per_page).ceil, 1 ].max
+    @current_page = [ [ params[:page].to_i, 1 ].max, @total_pages ].min
     @resumes = scope.offset((@current_page - 1) * @per_page).limit(@per_page)
   end
 

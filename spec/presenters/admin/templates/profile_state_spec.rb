@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Admin::Templates::ProfileState do
   let(:summary_builder) do
     lambda do |family_label:, entry_style:, sidebar_section_labels:, **|
-      [family_label, entry_style.to_s.titleize, sidebar_section_labels.presence&.to_sentence].compact.join(" · ")
+      [ family_label, entry_style.to_s.titleize, sidebar_section_labels.presence&.to_sentence ].compact.join(" · ")
     end
   end
 
@@ -41,7 +41,7 @@ RSpec.describe Admin::Templates::ProfileState do
         shell_style: "card",
         shell_style_label: "Card",
         sidebar_position: "left",
-        sidebar_section_labels: ["Skills", "Education"],
+        sidebar_section_labels: [ "Skills", "Education" ],
         summary: "Sidebar Accent · List · Skills and Education",
         short_label: "SI"
       )

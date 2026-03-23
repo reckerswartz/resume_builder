@@ -58,14 +58,14 @@ module Admin
 
         def state_description
           key = case queue_snapshot.state.to_s
-                when "failed" then "failed"
-                when "finished" then "finished"
-                when "scheduled" then "scheduled"
-                when "blocked" then "blocked"
-                when "queued" then "queued"
-                when "running" then "running"
-                else "default"
-                end
+          when "failed" then "failed"
+          when "finished" then "finished"
+          when "scheduled" then "scheduled"
+          when "blocked" then "blocked"
+          when "queued" then "queued"
+          when "running" then "running"
+          else "default"
+          end
 
           I18n.t("admin.job_logs.helper.runtime_descriptions.#{key}")
         end
