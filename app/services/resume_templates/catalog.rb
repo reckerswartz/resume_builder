@@ -1,5 +1,9 @@
 module ResumeTemplates
   class Catalog
+    ACCENT_COLOR_PATTERN = AccentConfiguration::ACCENT_COLOR_PATTERN
+    ACCENT_TONE_COLORS = AccentConfiguration::ACCENT_TONE_COLORS
+    ACCENT_VARIANT_TONES = AccentConfiguration::ACCENT_VARIANT_TONES
+    ACCENT_COLOR_PALETTE = AccentConfiguration::ACCENT_COLOR_PALETTE
     BOOLEAN_TYPE = ActiveModel::Type::Boolean.new
     PHOTO_SLOT_NAMES = %w[headshot].freeze
     FONT_FAMILY_OPTIONS = {
