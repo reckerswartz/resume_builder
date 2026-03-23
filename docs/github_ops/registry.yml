@@ -248,9 +248,9 @@ workflow_registries:
     issue_prefix: "meta-learning"
     domain: "infrastructure"
     type: "automation"
-    issue_count: { open: 2, closed: 0 }
+    issue_count: { open: 1, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-23T00:10:51Z"
+    last_synced_at: "2026-03-23T02:31:54Z"
     github_issues: [81, 82]
 
 file_locks:
