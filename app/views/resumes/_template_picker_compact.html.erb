@@ -65,7 +65,7 @@
     </div>
   </details>
 
-  <div class="<%= ui_inset_panel_classes(tone: :default) %>">
+  <button type="button" class="<%= [ui_inset_panel_classes(tone: :default), "w-full cursor-pointer text-left transition hover:-translate-y-0.5 hover:border-aqua-200/80 hover:bg-canvas-50"].join(" ") %>" data-action="click->template-picker#chooseLater">
     <div class="flex items-start gap-3">
       <%= render Ui::GlyphComponent.new(name: :spark, size: :xs, tone: :minimal) %>
       <div>
@@ -73,7 +73,7 @@
         <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("#{compact_text_scope}.choose_later_description") %></p>
       </div>
     </div>
-  </div>
+  </button>
 </div>
 
 <details class="<%= [ui_inset_panel_classes(tone: :default), "group template-picker-disclosure"].join(" ") %>">

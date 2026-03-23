@@ -57,6 +57,19 @@ export default class extends Controller {
     }
   }
 
+  chooseLater(event) {
+    event.preventDefault()
+
+    this.inputTargets.forEach((input) => { input.checked = false })
+    this.update()
+
+    const disclosure = this.element.closest("[data-resume-template-disclosure]")
+    if (disclosure && disclosure.open) {
+      disclosure.open = false
+      disclosure.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    }
+  }
+
   update() {
     const selectedTemplateId = this.selectedTemplateId
 

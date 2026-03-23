@@ -106,6 +106,9 @@ RSpec.describe 'Resumes', type: :request do
       expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.fast_start_description'))
       expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.choose_later_pill'))
       expect(template_disclosure.text).to include(I18n.t('resumes.template_picker_compact.choose_later_description'))
+      choose_later_button = template_disclosure.at_css('button[data-action*="template-picker#chooseLater"]')
+      expect(choose_later_button).to be_present
+      expect(choose_later_button['type']).to eq('button')
       expect(template_disclosure.text).to include(I18n.t('resumes.form.template_disclosure_description', template: template.name))
       expect(template_disclosure.at_css('.template-picker-compact')).to be_present
       expect(response.body).not_to include(I18n.t('resumes.editor_finalize_step.template_picker.fast_start_description'))
@@ -214,6 +217,23 @@ RSpec.describe 'Resumes', type: :request do
       expect(created_resume.source_mode).to eq('paste')
       expect(response).to redirect_to(edit_resume_path(created_resume, step: 'source'))
       expect(flash[:notice]).to eq(I18n.t('resumes.controller.resume_created'))
+    end
+
+    it 'assigns the default template when template_id is blank (choose-later flow)' do
+      template
+
+      post resumes_path, params: {
+        resume: {
+          title: 'Deferred Template Resume',
+          headline: 'Manager',
+          template_id: ''
+        }
+      }
+
+      created_resume = user.resumes.order(created_at: :desc).first
+      expect(created_resume).to be_present
+      expect(created_resume.template).to be_present
+      expect(response).to redirect_to(edit_resume_path(created_resume, step: 'heading'))
     end
   end
 
