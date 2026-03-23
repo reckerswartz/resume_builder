@@ -1,0 +1,209 @@
+#!/usr/bin/env ruby
+
+require "json"
+require "open3"
+require "optparse"
+require "time"
+require "yaml"
+
+REGISTRY_PATH = "docs/github_ops/registry.yml"
+TRACKED_STATES = %w[open closed].freeze
+
+options = {
+  workflow: nil,
+  dry_run: false,
+}
+
+OptionParser.new do |parser|
+  parser.banner = "Usage: bin/gh-bridge/reconcile-registry [--workflow NAME] [--dry-run]"
+
+  parser.on("--workflow NAME", "Limit reconciliation to a single workflow") do |workflow|
+    options[:workflow] = workflow
+  end
+
+  parser.on("--dry-run", "Print the planned reconciliation without writing docs/github_ops/registry.yml") do
+    options[:dry_run] = true
+  end
+end.parse!
+
+def load_yaml(path)
+  YAML.safe_load(File.read(path), permitted_classes: [Date, Time], aliases: true) || {}
+end
+
+def run_command(command)
+  stdout, stderr, status = Open3.capture3(command)
+  return stdout if status.success?
+
+  raise "Command failed: #{command}\n#{stderr.strip}"
+end
+
+def repository_name(registry)
+  configured = registry.dig("github", "repo")
+  return configured unless configured.to_s.strip.empty?
+
+  run_command("gh repo view --json nameWithOwner -q '.nameWithOwner'").strip
+end
+
+def fetch_repo_issues(repo, state)
+  command = [
+    "gh issue list",
+    "--repo #{repo}",
+    "--state #{state}",
+    "--limit 1000",
+    "--json number,state,labels"
+  ].join(" ")
+
+  JSON.parse(run_command(command))
+end
+
+def label_names(issue)
+  Array(issue["labels"]).filter_map do |label|
+    label.is_a?(Hash) ? label["name"] : label
+  end
+end
+
+def normalized_counts(counts)
+  TRACKED_STATES.each_with_object({}) do |state, normalized|
+    normalized[state] = counts.fetch(state, counts.fetch(state.to_sym, 0)).to_i
+  end
+end
+
+def entry_sections(lines)
+  sections = []
+  start_index = nil
+
+  lines.each_with_index do |line, index|
+    if line.start_with?("  - workflow: ")
+      sections << [start_index, index - 1] if start_index
+      start_index = index
+    elsif start_index && line.start_with?("file_locks:")
+      sections << [start_index, index - 1]
+      start_index = nil
+      break
+    end
+  end
+
+  sections << [start_index, lines.length - 1] if start_index
+  sections
+end
+
+def workflow_name(section_lines)
+  section_lines.first[/^  - workflow: "([^"]+)"/, 1]
+end
+
+def replace_line!(lines, prefix, value)
+  index = lines.index { |line| line.start_with?(prefix) }
+  raise "Missing line starting with #{prefix.inspect}" unless index
+
+  lines[index] = value
+end
+
+def update_github_issues_line!(lines, issue_numbers)
+  existing_index = lines.index { |line| line.start_with?("    github_issues:") }
+  if issue_numbers.empty?
+    lines.delete_at(existing_index) if existing_index
+    return
+  end
+
+  replacement = "    github_issues: [#{issue_numbers.join(', ')}]\n"
+  if existing_index
+    lines[existing_index] = replacement
+  else
+    last_synced_index = lines.index { |line| line.start_with?("    last_synced_at:") }
+    raise 'Missing line starting with "    last_synced_at:"' unless last_synced_index
+
+    lines.insert(last_synced_index + 1, replacement)
+  end
+end
+
+def update_registry_text(registry_text, workflow_updates, timestamp)
+  lines = registry_text.lines
+  replace_line!(lines, "updated_at:", "updated_at: \"#{timestamp}\"\n")
+
+  entry_sections(lines).reverse_each do |start_index, end_index|
+    section_lines = lines[start_index..end_index]
+    workflow = workflow_name(section_lines)
+    next unless workflow_updates.key?(workflow)
+
+    update = workflow_updates.fetch(workflow)
+    replace_line!(section_lines, "    issue_count:", "    issue_count: { open: #{update.fetch(:issue_count).fetch('open')}, closed: #{update.fetch(:issue_count).fetch('closed')} }\n")
+    replace_line!(section_lines, "    last_synced_at:", "    last_synced_at: \"#{timestamp}\"\n")
+    update_github_issues_line!(section_lines, update.fetch(:github_issues))
+    lines[start_index..end_index] = section_lines
+  end
+
+  lines.join
+end
+
+ops_registry = load_yaml(REGISTRY_PATH)
+repo = repository_name(ops_registry)
+issues = fetch_repo_issues(repo, "open") + fetch_repo_issues(repo, "closed")
+workflow_registries = Array(ops_registry["workflow_registries"])
+workflow_registries.select! { |entry| entry["workflow"] == options[:workflow] } if options[:workflow]
+
+if options[:workflow] && workflow_registries.empty?
+  warn "ERROR: Workflow #{options[:workflow]} not found in #{REGISTRY_PATH}."
+  exit 1
+end
+
+timestamp = Time.now.utc.iso8601
+workflow_updates = {}
+
+workflow_registries.each do |entry|
+  workflow = entry.fetch("workflow")
+  workflow_label = "workflow:#{workflow}"
+  live_issues = issues.select { |issue| label_names(issue).include?(workflow_label) }
+  desired_numbers = live_issues.map { |issue| issue.fetch("number").to_i }.sort
+  desired_counts = normalized_counts(
+    live_issues.each_with_object({}) do |issue, counts|
+      state = issue.fetch("state").to_s.downcase
+      counts[state] = counts.fetch(state, 0) + 1 if TRACKED_STATES.include?(state)
+    end
+  )
+
+  current_numbers = Array(entry["github_issues"]).map(&:to_i).uniq.sort
+  current_counts = normalized_counts(entry.fetch("issue_count", {}))
+
+  changed_fields = []
+  changed_fields << "github_issues" unless current_numbers == desired_numbers
+  changed_fields << "issue_count" unless current_counts == desired_counts
+  next if changed_fields.empty?
+
+  workflow_updates[workflow] = {
+    issue_count: desired_counts,
+    github_issues: desired_numbers,
+    changed_fields: changed_fields,
+    previous_issue_count: current_counts,
+    previous_github_issues: current_numbers,
+  }
+end
+
+puts "=== GitHub Ops Registry Reconciliation ==="
+puts "Registry: #{REGISTRY_PATH}"
+puts "Repository: #{repo}"
+puts "Timestamp: #{timestamp}"
+puts "Mode: #{options[:dry_run] ? 'dry-run' : 'write'}"
+puts ""
+
+if workflow_updates.empty?
+  puts "No registry summary changes required."
+  exit 0
+end
+
+workflow_updates.each do |workflow, update|
+  puts "- #{workflow}: #{update.fetch(:changed_fields).join(', ')}"
+  puts "  previous issue_count: #{update.fetch(:previous_issue_count)}"
+  puts "  new issue_count: #{update.fetch(:issue_count)}"
+  puts "  previous github_issues: #{update.fetch(:previous_github_issues).inspect}"
+  puts "  new github_issues: #{update.fetch(:github_issues).inspect}"
+end
+
+exit 0 if options[:dry_run]
+
+registry_text = File.read(REGISTRY_PATH)
+updated_text = update_registry_text(registry_text, workflow_updates, timestamp)
+File.write(REGISTRY_PATH, updated_text)
+
+puts ""
+puts "Updated #{REGISTRY_PATH}."
+puts "Changed workflows: #{workflow_updates.keys.join(', ')}"

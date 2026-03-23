@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-23T00:10:51Z"
+updated_at: "2026-03-23T02:24:37Z"
 workflow:
   status: active
   path: ".windsurf/workflows/meta-learning.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/meta_learning/README.md"
   knowledge_path: "docs/meta_learning/knowledge"
   run_doc_pattern: "docs/meta_learning/runs/<date>-<slug>/00-overview.md"
-  latest_run: "docs/meta_learning/runs/2026-03-23-registry-drift-validate/00-overview.md"
+  latest_run: "docs/meta_learning/runs/2026-03-23-registry-reconcile-generate/00-overview.md"
 artifacts:
   cache_root: "tmp/meta_learning"
   collection_subfolder: "collections"
@@ -85,13 +85,13 @@ cross_workflow_routing:
   feature_gaps: "/continuous-improvement"
   ci_cd_gaps: ".github/workflows/"
 cycle_metrics:
-  cycle_count: 6
-  last_cycle_date: "2026-03-23T00:10:51Z"
+  cycle_count: 7
+  last_cycle_date: "2026-03-23T02:24:37Z"
   patterns_discovered: 23
   knowledge_entries: 7
-  automations_generated: 3
+  automations_generated: 4
   automations_validated: 3
-  automations_active: 3
+  automations_active: 4
   effectiveness_score: null
   collection_log:
     - collected_at: "2026-03-22T23:13:16Z"
@@ -173,6 +173,22 @@ automation_inventory:
       - "Initial live workflow run 23415819512 surfaced a step-summary rendering bug, which was fixed in commit 61dba1f."
       - "Live GitHub workflow run 23415868702 completed successfully."
       - "Registry drift alert issue #82 was created with the expected drift report content."
+  - id: "ML-GEN-004"
+    title: "GitHub ops registry reconciliation companion"
+    status: automated
+    generated_at: "2026-03-23T02:24:37Z"
+    outputs:
+      - "bin/gh-bridge/reconcile-registry"
+      - "docs/github_ops/registry.yml"
+      - "docs/github_workflow_integration.md"
+      - ".windsurf/workflows/github-ops.md"
+    source_findings:
+      - "ML-GAP-021"
+    validation_notes:
+      - "Ruby syntax validation passed for bin/gh-bridge/reconcile-registry."
+      - "Dry-run preview matched the expected security-audit, code-review, and resumebuilder-reference-rollout drift cases."
+      - "Local reconciliation updated docs/github_ops/registry.yml for the three drifted workflows."
+      - "Post-reconcile registry drift check passed locally with zero drifted workflows."
 findings:
   - id: "ML-PATTERN-002"
     category: recurring_issue
@@ -224,5 +240,5 @@ findings:
     actionability: inform
     title: "Small, focused PRs are the dominant merge pattern"
 next_step:
-  recommended_mode: "generate"
-  reason: "The registry drift monitor is now live and validated. The strongest next automation slice is a reconciliation companion that refreshes `docs/github_ops/registry.yml` summaries from live workflow-labeled issue state so this monitor can detect and heal drift." 
+  recommended_mode: "validate"
+  reason: "The registry reconciliation companion now heals the central summary locally. The strongest next step is a live dispatch of `registry-drift.yml` from `main` to confirm alert issue #82 closes once the reconciled docs/github_ops/registry.yml is pushed." 

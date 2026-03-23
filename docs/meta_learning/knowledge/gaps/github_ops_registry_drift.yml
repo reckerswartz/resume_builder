@@ -32,6 +32,7 @@ recommended_automation:
   type: registry_observability
   actions:
     - "Monitor `docs/github_ops/registry.yml` workflow summaries against live GitHub issues grouped by `workflow:*` labels."
+    - "Reconcile `docs/github_ops/registry.yml` summary counts, issue arrays, and sync timestamps from live workflow-labeled GitHub issue state."
     - "Flag registry-linked issue references that no longer exist or no longer carry the expected workflow label."
     - "Create or close a single durable GitHub alert issue when drift appears or is reconciled."
-next_owner: "/meta-learning generate"
+next_owner: "/meta-learning validate"

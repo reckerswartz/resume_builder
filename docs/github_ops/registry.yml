@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-23T00:10:51Z"
+updated_at: "2026-03-23T02:24:37Z"
 
 github:
   remote: "origin"
@@ -23,6 +23,7 @@ bridge_scripts:
   update_issue: "bin/gh-bridge/update-issue"
   close_issue: "bin/gh-bridge/close-issue"
   sync_registry: "bin/gh-bridge/sync-registry"
+  reconcile_registry: "bin/gh-bridge/reconcile-registry"
   roadmap_summary: "bin/gh-bridge/roadmap-summary"
   aggregate_history: "bin/gh-bridge/aggregate-history"
 
@@ -93,9 +94,10 @@ workflow_registries:
     issue_prefix: "security-audit"
     domain: "security"
     type: "security-finding"
-    issue_count: { open: 0, closed: 0 }
+    issue_count: { open: 0, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T23:20:00Z"
+    last_synced_at: "2026-03-23T02:24:37Z"
+    github_issues: [32]
 
   - workflow: "code-review"
     registry_path: "docs/code_reviews/registry.yml"
@@ -103,9 +105,10 @@ workflow_registries:
     issue_prefix: "code-review"
     domain: "infrastructure"
     type: "refactor"
-    issue_count: { open: 0, closed: 0 }
+    issue_count: { open: 0, closed: 1 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T23:20:00Z"
+    last_synced_at: "2026-03-23T02:24:37Z"
+    github_issues: [34]
 
   - workflow: "behance-template-rollout"
     registry_path: "docs/template_rollouts/registry.yml"
@@ -135,7 +138,8 @@ workflow_registries:
     type: "rollout-slice"
     issue_count: { open: 0, closed: 5 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T06:20:04Z"
+    last_synced_at: "2026-03-23T02:24:37Z"
+    github_issues: [11, 12, 13, 47, 50]
 
   - workflow: "continuous-improvement"
     registry_path: "docs/continuous_improvement/registry.yml"

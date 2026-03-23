@@ -300,6 +300,20 @@ Reads a workflow registry YAML and creates/updates GitHub issues for all open it
 # creates a GitHub issue and writes the issue number back into the registry YAML.
 ```
 
+#### `bin/gh-bridge/reconcile-registry`
+
+Refreshes the central `docs/github_ops/registry.yml` workflow summaries from live GitHub issue state grouped by `workflow:*` labels.
+
+```bash
+# Usage: bin/gh-bridge/reconcile-registry \
+#   [--workflow "template-audit"] \
+#   [--dry-run]
+#
+# Updates `issue_count`, `github_issues`, and `last_synced_at` for the selected
+# workflow entries in docs/github_ops/registry.yml without modifying the
+# per-workflow registry files.
+```
+
 ### 6.2 Issue Body Templates (`docs/github_ops/issue_templates/`)
 
 Structured Markdown templates that workflows populate before calling `create-issue`.
@@ -569,6 +583,11 @@ label_taxonomy:
   severity_labels: 4
   status_labels: 6
   type_labels: 12
+
+bridge_scripts:
+  sync_registry: "bin/gh-bridge/sync-registry"
+  reconcile_registry: "bin/gh-bridge/reconcile-registry"
+  roadmap_summary: "bin/gh-bridge/roadmap-summary"
 
 workflow_registries:
   - workflow: "template-audit"

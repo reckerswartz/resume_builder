@@ -71,13 +71,14 @@ All workflows commit and push directly to `main`. No feature branches or PRs are
     a. Call `bin/gh-bridge/sync-registry` for the target workflow
     b. Review the output for items needing GitHub issues
     c. For each item, generate an issue body and call `create-issue`
-    d. Update `docs/github_ops/registry.yml` with sync timestamp and counts
+    d. Call `bin/gh-bridge/reconcile-registry --workflow <workflow>` to refresh `issue_count`, `github_issues`, and `last_synced_at` in `docs/github_ops/registry.yml`
 
 12. In `full-sync` mode:
     a. Run `ensure-labels`
     b. Run `sync-registry` for each workflow that has a registry_path in `docs/github_ops/registry.yml`
-    c. Generate the roadmap summary
-    d. Update all sync timestamps
+    c. Run `bin/gh-bridge/reconcile-registry`
+    d. Generate the roadmap summary
+    e. Update all sync timestamps
 
 ### Phase 6: Roadmap Generation
 
