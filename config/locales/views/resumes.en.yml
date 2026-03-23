@@ -15,6 +15,10 @@ en:
       pdf_export_started: "PDF export started."
       pdf_export_started_turbo: "PDF export started. The export panel will update automatically."
       pdf_export_unavailable: "PDF export is not available yet."
+      bulk_export_started: "Bulk export started for the selected resumes."
+      bulk_delete_completed: "Selected resumes deleted successfully."
+      bulk_action_unavailable: "Choose a valid bulk action."
+      bulk_selection_required: "Select at least one resume to continue."
       template_selection_unavailable_error: "is not available."
       choose_available_template: "Choose a template that is still available."
       selected_photo_unavailable: "Selected photo is not available."
@@ -170,9 +174,10 @@ en:
           focus_note: "Use the card actions to jump back into editing or preview without starting another draft first."
       bulk_actions:
         title: "Bulk actions"
-        description: "Select resumes on this page to export them together or remove drafts you no longer need."
+        description: "Select resumes across this workspace to export them together or remove drafts you no longer need."
         selected_count_one: "1 resume selected"
         selected_count_other: "%{count} resumes selected"
+        clear_selection: "Clear selection"
         export_selected: "Export selected"
         delete_selected: "Delete selected"
     resume_card:

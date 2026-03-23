@@ -1,11 +1,12 @@
 <% return unless total_pages > 1 %>
+<% pagination_link_data = local_assigns.fetch(:link_data, {}) %>
 
 <nav aria-label="<%= t("shared.pagination.aria_label") %>" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
   <p class="text-sm text-ink-700/70"><%= t("shared.pagination.page_info", current: current_page, total: total_pages) %></p>
 
   <div class="flex flex-wrap items-center gap-2">
     <% if current_page > 1 %>
-      <%= link_to t("shared.pagination.previous"), table_query_path(base_path, page_params.merge("page" => current_page - 1)), class: ui_button_classes(:secondary, size: :sm) %>
+      <%= link_to t("shared.pagination.previous"), table_query_path(base_path, page_params.merge("page" => current_page - 1)), class: ui_button_classes(:secondary, size: :sm), data: pagination_link_data %>
     <% else %>
       <span class="rounded-full border border-canvas-200/80 px-4 py-2 text-sm font-medium text-ink-700/35"><%= t("shared.pagination.previous") %></span>
     <% end %>
@@ -14,12 +15,12 @@
       <% if page == current_page %>
         <span class="rounded-full bg-ink-950 px-4 py-2 text-sm font-medium text-white"><%= page %></span>
       <% else %>
-        <%= link_to page, table_query_path(base_path, page_params.merge("page" => page)), class: ui_button_classes(:secondary, size: :sm) %>
+        <%= link_to page, table_query_path(base_path, page_params.merge("page" => page)), class: ui_button_classes(:secondary, size: :sm), data: pagination_link_data %>
       <% end %>
     <% end %>
 
     <% if current_page < total_pages %>
-      <%= link_to t("shared.pagination.next"), table_query_path(base_path, page_params.merge("page" => current_page + 1)), class: ui_button_classes(:secondary, size: :sm) %>
+      <%= link_to t("shared.pagination.next"), table_query_path(base_path, page_params.merge("page" => current_page + 1)), class: ui_button_classes(:secondary, size: :sm), data: pagination_link_data %>
     <% else %>
       <span class="rounded-full border border-canvas-200/80 px-4 py-2 text-sm font-medium text-ink-700/35"><%= t("shared.pagination.next") %></span>
     <% end %>

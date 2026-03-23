@@ -3,6 +3,8 @@
 <% ready_count = page_resumes.count { |resume| resume.summary.present? && resume.contact_field("email").present? } %>
 <% draft_count = page_resumes.size - ready_count %>
 <% bulk_form_id = "workspace-bulk-actions" %>
+<% selected_resume_count = @selected_resume_ids.size %>
+<% bulk_actions_enabled = selected_resume_count.positive? %>
 <% workspace_sort_options = @sort_options.map { |option| [option.fetch(:label), option.fetch(:value)] } %>
 <% selected_sort_label = @sort_options.find { |option| option.fetch(:value) == @sort }&.fetch(:label) || workspace_sort_options.first&.first %>
 <% clear_workspace_filters_path = resumes_path(@workspace_page_params.except("query")) %>
@@ -62,7 +64,11 @@
     <% end %>
 
     <% if page_resumes.any? %>
-      <div class="space-y-5" data-controller="workspace-bulk-actions">
+      <div
+        class="space-y-5"
+        data-controller="workspace-bulk-actions"
+        data-workspace-bulk-actions-selected-ids-value="<%= ERB::Util.json_escape(@selected_resume_ids.to_json) %>"
+      >
         <div class="<%= [ui_inset_panel_classes(tone: :subtle, padding: :lg), 'hidden space-y-4 xl:block'].join(' ') %>">
           <div class="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -84,10 +90,16 @@
               <%= form.select :sort, options_for_select(workspace_sort_options, @sort), {}, class: ui_input_classes.delete_prefix("mt-2 ") %>
             </div>
 
+            <div data-workspace-bulk-actions-target="selectionFields">
+              <% @selected_resume_ids.each do |resume_id| %>
+                <%= hidden_field_tag "resume_ids[]", resume_id, id: nil %>
+              <% end %>
+            </div>
+
             <div class="flex flex-wrap gap-2">
               <%= form.submit t("resumes.index.search.apply"), class: ui_button_classes(:secondary, size: :sm) %>
               <% if @query.present? %>
-                <%= link_to t("resumes.index.search.clear"), clear_workspace_filters_path, class: ui_button_classes(:ghost, size: :sm) %>
+                <%= link_to t("resumes.index.search.clear"), clear_workspace_filters_path, class: ui_button_classes(:ghost, size: :sm), data: { workspace_bulk_actions_target: "pageLink" } %>
               <% end %>
             </div>
           <% end %>
@@ -115,16 +127,22 @@
               <%= form.select :sort, options_for_select(workspace_sort_options, @sort), {}, class: ui_input_classes.delete_prefix("mt-2 ") %>
             </div>
 
+            <div data-workspace-bulk-actions-target="selectionFields">
+              <% @selected_resume_ids.each do |resume_id| %>
+                <%= hidden_field_tag "resume_ids[]", resume_id, id: nil %>
+              <% end %>
+            </div>
+
             <div class="flex flex-wrap gap-2">
               <%= form.submit t("resumes.index.search.apply"), class: ui_button_classes(:secondary, size: :sm) %>
               <% if @query.present? %>
-                <%= link_to t("resumes.index.search.clear"), clear_workspace_filters_path, class: ui_button_classes(:ghost, size: :sm) %>
+                <%= link_to t("resumes.index.search.clear"), clear_workspace_filters_path, class: ui_button_classes(:ghost, size: :sm), data: { workspace_bulk_actions_target: "pageLink" } %>
               <% end %>
             </div>
           <% end %>
         </details>
 
-        <%= form_with url: bulk_action_resumes_path, method: :post, html: { id: bulk_form_id } do %>
+        <%= form_with url: bulk_action_resumes_path, method: :post, html: { id: bulk_form_id, data: { action: "submit->workspace-bulk-actions#submit" } } do %>
           <% if @current_page.to_i > 1 %>
             <%= hidden_field_tag :page, @current_page %>
           <% end %>
@@ -134,6 +152,11 @@
           <% if @sort.present? && @sort != "recently_updated" %>
             <%= hidden_field_tag :sort, @sort %>
           <% end %>
+          <div data-workspace-bulk-actions-target="selectionFields">
+            <% @selected_resume_ids.each do |resume_id| %>
+              <%= hidden_field_tag "resume_ids[]", resume_id, id: nil %>
+            <% end %>
+          </div>
 
           <%= render Ui::StickyActionBarComponent.new(
             title: t("resumes.index.bulk_actions.title"),
@@ -145,13 +168,21 @@
               data-workspace-bulk-actions-target="selectionSummary"
               data-one="<%= t("resumes.index.bulk_actions.selected_count_one") %>"
               data-other="<%= t("resumes.index.bulk_actions.selected_count_other") %>"
-            ><%= t("resumes.index.bulk_actions.selected_count_other", count: 0) %></p>
+            ><%= selected_resume_count == 1 ? t("resumes.index.bulk_actions.selected_count_one") : t("resumes.index.bulk_actions.selected_count_other", count: selected_resume_count) %></p>
+            <%= button_tag t("resumes.index.bulk_actions.clear_selection"),
+              type: :button,
+              disabled: !bulk_actions_enabled,
+              class: ui_button_classes(:ghost, size: :sm),
+              data: {
+                action: "click->workspace-bulk-actions#clearSelection",
+                workspace_bulk_actions_target: "clearButton"
+              } %>
             <%= button_tag t("resumes.index.bulk_actions.export_selected"),
               type: :submit,
               name: "bulk_operation",
               value: "export",
-              disabled: true,
-              class: ui_button_classes(:disabled, size: :sm),
+              disabled: !bulk_actions_enabled,
+              class: ui_button_classes(bulk_actions_enabled ? :secondary : :disabled, size: :sm),
               data: {
                 workspace_bulk_actions_target: "actionButton",
                 enabled_classes: ui_button_classes(:secondary, size: :sm),
@@ -161,8 +192,8 @@
               type: :submit,
               name: "bulk_operation",
               value: "delete",
-              disabled: true,
-              class: ui_button_classes(:disabled, size: :sm),
+              disabled: !bulk_actions_enabled,
+              class: ui_button_classes(bulk_actions_enabled ? :danger : :disabled, size: :sm),
               data: {
                 workspace_bulk_actions_target: "actionButton",
                 enabled_classes: ui_button_classes(:danger, size: :sm),
@@ -173,7 +204,7 @@
 
         <div class="grid gap-5 xl:grid-cols-2">
           <% page_resumes.each do |resume| %>
-            <%= render "resume_card", resume: resume, bulk_form_id: bulk_form_id %>
+            <%= render "resume_card", resume: resume, bulk_form_id: bulk_form_id, selected_resume_ids: @selected_resume_ids %>
           <% end %>
         </div>
 
@@ -181,7 +212,8 @@
           current_page: @current_page,
           total_pages: @total_pages,
           base_path: resumes_path,
-          page_params: @workspace_page_params %>
+          page_params: @workspace_page_params,
+          link_data: { workspace_bulk_actions_target: "pageLink" } %>
       </div>
     <% else %>
       <% if @query.present? %>

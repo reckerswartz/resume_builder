@@ -10,6 +10,7 @@ class ResumesController < ApplicationController
     @sort = selected_workspace_sort
     @sort_options = workspace_sort_options
     @workspace_page_params = workspace_page_params
+    @selected_resume_ids = selected_workspace_resume_ids
 
     scope = policy_scope(Resume).includes(:template).with_attached_pdf_export
     scope = scope.matching_query(@query)
@@ -96,6 +97,27 @@ class ResumesController < ApplicationController
 
     @resume.destroy!
     redirect_with_workspace_alert(:resume_deleted)
+  end
+
+  def bulk_action
+    authorize Resume, :bulk_action?
+
+    resumes = selected_workspace_resumes
+    return redirect_with_workspace_alert(:bulk_selection_required) if resumes.empty?
+
+    case params[:bulk_operation].to_s
+    when "export"
+      resumes.each { |resume| ResumeExportJob.perform_later(resume.id, current_user.id) }
+      redirect_to resumes_path(workspace_redirect_params(include_selection: false)), notice: controller_message(:bulk_export_started, count: resumes.size), status: :see_other
+    when "delete"
+      Resume.transaction do
+        resumes.each(&:destroy!)
+      end
+
+      redirect_to resumes_path(workspace_redirect_params(include_selection: false)), notice: controller_message(:bulk_delete_completed, count: resumes.size), status: :see_other
+    else
+      redirect_with_workspace_alert(:bulk_action_unavailable)
+    end
   end
 
   def duplicate
@@ -349,19 +371,29 @@ class ResumesController < ApplicationController
       @resume.source_mode == "scratch" ? "heading" : "source"
     end
 
+    def selected_workspace_resume_ids
+      ids = Array(params[:resume_ids]).filter_map(&:presence).uniq
+      return [] if ids.empty?
+
+      policy_scope(Resume).where(id: ids).pluck(:id).map(&:to_s)
+    end
+
     def selected_workspace_resumes
-      ids = Array(params[:resume_ids]).filter_map(&:presence)
+      ids = selected_workspace_resume_ids
       return [] if ids.empty?
 
       policy_scope(Resume).where(id: ids).to_a
     end
 
-    def workspace_redirect_params
-      params.permit(:page, :query, :sort).to_h.compact_blank
+    def workspace_redirect_params(include_selection: true)
+      workspace_params = params.permit(:page, :query, :sort, resume_ids: []).to_h
+      workspace_params["resume_ids"] = Array(workspace_params["resume_ids"]).filter_map(&:presence).uniq
+      workspace_params.except!("resume_ids") unless include_selection
+      workspace_params.compact_blank
     end
 
     def workspace_page_params
-      params.permit(:query, :sort).to_h.compact_blank
+      params.permit(:query, :sort, resume_ids: []).to_h.compact_blank
     end
 
     def workspace_sort_options

@@ -3,6 +3,10 @@ class ResumePolicy < ApplicationPolicy
     authenticated?
   end
 
+  def bulk_action?
+    authenticated?
+  end
+
   def show?
     owner?
   end

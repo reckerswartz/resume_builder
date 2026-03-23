@@ -1,5 +1,6 @@
 <% summary_ready = resume.summary.present? %>
 <% bulk_form_id = local_assigns[:bulk_form_id] %>
+<% selected_resume_ids = Array(local_assigns[:selected_resume_ids]).map(&:to_s) %>
 <% source_mode_badge_label = case resume.source_mode.to_s
 when "scratch"
   t("resumes.resume_card.metadata_badges.source_mode.scratch")
@@ -20,7 +21,7 @@ end %>
     <% if bulk_form_id.present? %>
       <div class="mb-4 flex items-center justify-between gap-3">
         <label class="inline-flex items-center gap-3 text-sm font-medium text-ink-700/80">
-          <%= check_box_tag "resume_ids[]", resume.id, false,
+          <%= check_box_tag "resume_ids[]", resume.id, selected_resume_ids.include?(resume.id.to_s),
             form: bulk_form_id,
             class: ui_checkbox_classes,
             data: {
