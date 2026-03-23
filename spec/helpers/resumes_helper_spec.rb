@@ -321,8 +321,7 @@ RSpec.describe ResumesHelper, type: :helper do
         label: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
         description: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.description'),
         status_label: I18n.t('resumes.helper.source_cloud_import.status.setup_required'),
-        status_tone: :warning,
-        action_label: I18n.t('resumes.helper.source_cloud_import.actions.see_setup')
+        status_tone: :warning
       )
       expect(google_drive_state.fetch(:message)).to eq(
         I18n.t(
@@ -331,8 +330,6 @@ RSpec.describe ResumesHelper, type: :helper do
           env_vars: 'GOOGLE_DRIVE_CLIENT_ID and GOOGLE_DRIVE_CLIENT_SECRET'
         )
       )
-      expect(google_drive_state.fetch(:action_path)).to include('/resume_source_imports/google_drive')
-      expect(google_drive_state.fetch(:action_path)).to include('resume_id=')
     end
 
     it 'marks configured providers separately when environment credentials are present' do
@@ -348,8 +345,7 @@ RSpec.describe ResumesHelper, type: :helper do
         label: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
         description: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.description'),
         status_label: I18n.t('resumes.helper.source_cloud_import.status.configured'),
-        status_tone: :neutral,
-        action_label: I18n.t('resumes.helper.source_cloud_import.actions.connect_soon')
+        status_tone: :neutral
       )
       expect(google_drive_state.fetch(:message)).to eq(
         I18n.t(

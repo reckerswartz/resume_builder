@@ -701,6 +701,34 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_source_step.supported_formats.autofill_badge'))
     end
 
+    it 'keeps cloud import provider guidance inline on the upload source step without launch links' do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('GOOGLE_DRIVE_CLIENT_ID').and_return(nil)
+      allow(ENV).to receive(:[]).with('GOOGLE_DRIVE_CLIENT_SECRET').and_return(nil)
+      allow(ENV).to receive(:[]).with('DROPBOX_APP_KEY').and_return(nil)
+      allow(ENV).to receive(:[]).with('DROPBOX_APP_SECRET').and_return(nil)
+
+      resume = create(:resume, user:, template:, source_mode: 'upload')
+
+      get edit_resume_path(resume), params: { step: 'source' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      hrefs = document.css('a[href]').map { |link| link['href'] }
+
+      expect(response.body).to include(I18n.t('resumes.source_import_fields.cloud.title'))
+      expect(response.body).to include(I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'))
+      expect(response.body).to include(I18n.t('resumes.cloud_import_provider_catalog.providers.dropbox.label'))
+      expect(response.body).to include(
+        I18n.t(
+          'resumes.cloud_import_provider_catalog.feedback.setup_required',
+          provider: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
+          env_vars: 'GOOGLE_DRIVE_CLIENT_ID and GOOGLE_DRIVE_CLIENT_SECRET'
+        )
+      )
+      expect(hrefs.grep(%r{/resume_source_imports/})).to be_empty
+    end
+
     it 'hides the extra mobile preview panel on section-based builder steps while collapsing secondary builder actions and repeated section-type cues' do
       resume = create(:resume, user:, template:)
 

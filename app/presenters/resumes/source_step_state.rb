@@ -80,9 +80,6 @@ module Resumes
     end
 
     def cloud_import_provider_states
-      return_to = view_context.request&.fullpath.to_s
-      resume_id = resume&.persisted? ? resume.id : nil
-
       ::Resumes::CloudImportProviderCatalog.all.map do |provider|
         configured = provider.fetch(:configured)
         provider_label = provider.fetch(:label)
@@ -93,8 +90,6 @@ module Resumes
           description: provider.fetch(:description),
           status_label: configured ? I18n.t("resumes.helper.source_cloud_import.status.configured") : I18n.t("resumes.helper.source_cloud_import.status.setup_required"),
           status_tone: configured ? :neutral : :warning,
-          action_label: configured ? I18n.t("resumes.helper.source_cloud_import.actions.connect_soon") : I18n.t("resumes.helper.source_cloud_import.actions.see_setup"),
-          action_path: view_context.resume_source_import_path(provider.fetch(:key), return_to: return_to.presence, resume_id: resume_id),
           message: if configured
             I18n.t("resumes.cloud_import_provider_catalog.feedback.configured", provider: provider_label)
                    else

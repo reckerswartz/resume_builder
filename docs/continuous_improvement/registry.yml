@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-23T02:43:08Z"
+updated_at: "2026-03-23T03:05:01Z"
 workflow:
   status: active
   path: ".windsurf/workflows/continuous-improvement.md"
@@ -12,7 +12,7 @@ tracking:
   overview_path: "docs/continuous_improvement/README.md"
   run_doc_pattern: "docs/continuous_improvement/runs/<date>-<slug>/00-overview.md"
   proposal_doc_pattern: "docs/continuous_improvement/proposals/<proposal_id>.md"
-  latest_run: "docs/continuous_improvement/runs/2026-03-23-workspace-bulk-selection-persistence-implementation/00-overview.md"
+  latest_run: "docs/continuous_improvement/runs/2026-03-23-cloud-import-truthful-source-step-implementation/00-overview.md"
 artifacts:
   cache_root: "tmp/ci_artifacts"
   competitive_subfolder: "competitive"
@@ -122,14 +122,14 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 21
-  last_cycle_date: "2026-03-23T02:43:08Z"
-  proposals_discovered: 17
-  proposals_implemented: 17
-  proposals_remaining: 0
+  cycle_count: 23
+  last_cycle_date: "2026-03-23T03:05:01Z"
+  proposals_discovered: 19
+  proposals_implemented: 18
+  proposals_remaining: 1
   proposals_routed: 0
   competitive_scans_completed: 0
-  journeys_simulated: 10
+  journeys_simulated: 12
   journey_log:
     - persona: new_user
       date: "2026-03-22T04:30:00Z"
@@ -295,10 +295,39 @@ cycle_metrics:
         - "Selected resume IDs now persist across pagination through the workspace state handoff"
         - "Page 2 keeps the selection summary and bulk-action buttons active even when the selected resume lives on page 1"
         - "Clear selection resets the bulk-action bar back to an empty state without stale selection params"
+    - persona: power_user
+      date: "2026-03-23T03:05:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Sign in as template-audit@resume-builder.local"
+        - "Open an existing high-volume workspace resume on the source step"
+        - "Switch the source mode from scratch to upload"
+        - "Inspect the visible Google Drive and Dropbox cloud import connectors"
+        - "Open the Google Drive connector launch page"
+      console_errors: 0
+      observations:
+        - "Cloud import only becomes visible after switching to upload mode, where provider cards appear beside normal local-file upload"
+        - "The source step presents Google Drive and Dropbox as live connectors with CTA buttons, but both only lead to setup/deferred-state scaffolds"
+        - "The Google Drive launch page explicitly says OAuth handoff, remote file chooser, and server-side import are still deferred"
+        - "For a power user expecting cloud import, the current flow is a dead-end detour away from the real upload path rather than a usable advanced import capability"
+    - persona: power_user
+      date: "2026-03-23T03:05:01Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Open an existing resume on the source step and switch to upload mode"
+        - "Verify cloud import providers remain visible as inline deferred-state guidance"
+        - "Confirm the source step no longer offers provider launch CTAs into the scaffold flow"
+        - "Revisit the templates marketplace to identify the next highest-confidence power-user follow-on"
+      console_errors: 0
+      observations:
+        - "The upload source step still shows Google Drive and Dropbox provider status inline, but no longer advertises them as live launch paths"
+        - "The deferred provider scaffold remains available for future implementation, but it is no longer the next step from the main upload workflow"
+        - "Focused request, helper, and presenter coverage passed for the truthful inline-only source-step cloud import state"
+        - "The next visible power-user gap is marketplace chooser scale: 9 template cards each repeat the full 112-resume chooser footprint"
 next_step:
-  recommended_mode: "explore"
+  recommended_mode: "implement-next"
   recommended_persona: "power_user"
-  reason: "CI-WORKSPACE-007 is now validated and the tracked continuous-improvement backlog is back to zero. The next honest step is a fresh explore pass on the power-user journey, where the high-volume workspace remains the strongest surface for discovering the next productivity gap."
+  reason: "CI-TEMPLATE-005 is now the top open proposal: the marketplace chooser from CI-TEMPLATE-004 is correct but still scales poorly for the 112-resume power-user account because each template card repeats the full resume list inline. The next honest step is to keep the chooser accurate while reducing the marketplace chooser footprint."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -655,6 +684,46 @@ proposals:
       - "spec/requests/templates_spec.rb"
       - "spec/presenters/templates/marketplace_state_spec.rb"
 
+  - id: "CI-TEMPLATE-005"
+    category: productivity_boost
+    impact: high
+    effort: medium
+    status: discovered
+    user_personas:
+      - power_user
+    journey_step: "Browse templates marketplace with many existing resumes after opening the chooser flow"
+    problem: >
+      The marketplace chooser from CI-TEMPLATE-004 now lets a power user
+      pick the correct existing resume, but it still scales poorly once
+      the account has many drafts. In the observed 112-resume workspace,
+      `Templates::MarketplaceState#apply_resume_options` materializes the
+      full resume list and each marketplace card renders that entire
+      chooser inline. With 9 templates in view, the page projects to 1008
+      inline chooser options, making the marketplace heavier and forcing a
+      long repeated selection list into every card.
+    proposed_improvement: >
+      Keep marketplace cards lightweight while preserving chooser
+      correctness. Prefer a small Rails-first follow-on: replace the full
+      inline resume dropdown on each card with a focused handoff into the
+      selected template's chooser surface, or upgrade the chooser to a
+      searchable/recent-resume picker that only loads the full resume list
+      when needed.
+    evidence:
+      page_url: "/templates"
+      template_count: 9
+      resume_count: 112
+      projected_inline_chooser_options: 1008
+      current_chooser_source: "Templates::MarketplaceState#apply_resume_options"
+    affected_files:
+      - "app/presenters/templates/marketplace_state.rb"
+      - "app/views/templates/_template_card.html.erb"
+      - "app/views/templates/show.html.erb"
+      - "app/controllers/templates_controller.rb"
+      - "config/locales/views/templates.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/templates_spec.rb"
+      - "spec/presenters/templates/marketplace_state_spec.rb"
+
   - id: "CI-PREVIEW-001"
     category: remove_friction
     impact: medium
@@ -811,6 +880,47 @@ proposals:
       - "app/views/resumes/index.html.erb"
       - "config/locales/views/resumes.en.yml"
     estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+
+  - id: "CI-IMPORT-001"
+    category: remove_friction
+    impact: high
+    effort: medium
+    status: validated
+    implemented_at: "2026-03-23T03:05:01Z"
+    user_personas:
+      - power_user
+    journey_step: "Use cloud import from the resume source step"
+    problem: >
+      On the source step, switching to upload mode reveals Google Drive
+      and Dropbox connector cards with active CTA buttons. A power user
+      can click into those connectors expecting to import an existing
+      resume from cloud storage, but the destination page is only a safe
+      scaffold that explicitly says OAuth handoff, remote file
+      selection, and server-side import are still deferred. This creates
+      a dead-end detour away from the real local-upload workflow while
+      implying a capability that is not yet usable.
+    proposed_improvement: >
+      Make the source-step cloud import surface truthful until a real
+      provider handoff exists. Prefer a small Rails-first slice: keep the
+      provider status visible inline, but remove or soften the dead-end
+      CTA path from the main upload flow when the connector is not
+      actually usable. For example, replace `See setup` with an inline
+      deferred-state disclosure or secondary details panel, and reserve a
+      full-page launch path for the future real connector flow.
+    evidence:
+      source_step_url: "/resumes/122/edit?step=source"
+      connector_launch_url: "/resume_source_imports/google_drive?resume_id=122&return_to=%2Fresumes%2F122%2Fedit%3Fstep%3Dsource"
+      visible_source_copy: "Cloud import is planned next. For now, upload files from your device."
+      launch_page_state: "SETUP REQUIRED / SAFE SCAFFOLD / OAuth authorization handoff still deferred"
+    affected_files:
+      - "app/presenters/resumes/source_step_state.rb"
+      - "app/views/resumes/_source_import_fields.html.erb"
+      - "app/views/resume_source_imports/show.html.erb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resume_source_imports_spec.rb"
+      - "spec/helpers/resumes_helper_spec.rb"
       - "spec/requests/resumes_spec.rb"
 
   - id: "CI-WORKSPACE-007"

@@ -170,10 +170,6 @@
         </div>
 
         <p class="text-sm leading-6 text-ink-700/80"><%= provider_state.fetch(:message) %></p>
-
-        <div>
-          <%= link_to provider_state.fetch(:action_label), provider_state.fetch(:action_path), class: ui_button_classes(:secondary, size: :sm) %>
-        </div>
       </div>
     <% end %>
   </div>

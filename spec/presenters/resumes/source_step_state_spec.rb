@@ -163,8 +163,14 @@ RSpec.describe Resumes::SourceStepState do
       google = states.find { |s| s[:key] == 'google_drive' }
 
       expect(google).to include(
+        label: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
         status_tone: :warning,
-        status_label: I18n.t('resumes.helper.source_cloud_import.status.setup_required')
+        status_label: I18n.t('resumes.helper.source_cloud_import.status.setup_required'),
+        message: I18n.t(
+          'resumes.cloud_import_provider_catalog.feedback.setup_required',
+          provider: I18n.t('resumes.cloud_import_provider_catalog.providers.google_drive.label'),
+          env_vars: 'GOOGLE_DRIVE_CLIENT_ID and GOOGLE_DRIVE_CLIENT_SECRET'
+        )
       )
     end
   end
