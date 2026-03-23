@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:58:00Z"
+updated_at: "2026-03-23T00:10:51Z"
 workflow:
   status: active
   path: ".windsurf/workflows/meta-learning.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/meta_learning/README.md"
   knowledge_path: "docs/meta_learning/knowledge"
   run_doc_pattern: "docs/meta_learning/runs/<date>-<slug>/00-overview.md"
-  latest_run: "docs/meta_learning/runs/2026-03-22-registry-drift-generate/00-overview.md"
+  latest_run: "docs/meta_learning/runs/2026-03-23-registry-drift-validate/00-overview.md"
 artifacts:
   cache_root: "tmp/meta_learning"
   collection_subfolder: "collections"
@@ -85,13 +85,13 @@ cross_workflow_routing:
   feature_gaps: "/continuous-improvement"
   ci_cd_gaps: ".github/workflows/"
 cycle_metrics:
-  cycle_count: 5
-  last_cycle_date: "2026-03-22T23:58:00Z"
+  cycle_count: 6
+  last_cycle_date: "2026-03-23T00:10:51Z"
   patterns_discovered: 23
   knowledge_entries: 7
   automations_generated: 3
-  automations_validated: 2
-  automations_active: 2
+  automations_validated: 3
+  automations_active: 3
   effectiveness_score: null
   collection_log:
     - collected_at: "2026-03-22T23:13:16Z"
@@ -157,8 +157,9 @@ automation_inventory:
       - "Dormant workflow alert issue #81 was created with the expected report content."
   - id: "ML-GEN-003"
     title: "GitHub ops registry drift monitor"
-    status: automated
+    status: validated
     generated_at: "2026-03-22T23:58:00Z"
+    validated_at: "2026-03-23T00:10:51Z"
     outputs:
       - ".github/scripts/registry-drift-check.rb"
       - ".github/workflows/registry-drift.yml"
@@ -169,6 +170,9 @@ automation_inventory:
       - "Ruby syntax validation passed for .github/scripts/registry-drift-check.rb."
       - "Workflow YAML parsing passed for .github/workflows/registry-drift.yml."
       - "Meta-learning YAML parsing passed for docs/meta_learning/registry.yml and docs/meta_learning/knowledge/gaps/github_ops_registry_drift.yml."
+      - "Initial live workflow run 23415819512 surfaced a step-summary rendering bug, which was fixed in commit 61dba1f."
+      - "Live GitHub workflow run 23415868702 completed successfully."
+      - "Registry drift alert issue #82 was created with the expected drift report content."
 findings:
   - id: "ML-PATTERN-002"
     category: recurring_issue
@@ -209,7 +213,7 @@ findings:
     category: automation_gap
     severity: medium
     confidence: high
-    status: automated
+    status: validated
     actionability: automate
     title: "GitHub ops registry summaries drift from live workflow-labeled issues"
   - id: "ML-SOLUTION-018"
@@ -220,5 +224,5 @@ findings:
     actionability: inform
     title: "Small, focused PRs are the dominant merge pattern"
 next_step:
-  recommended_mode: "validate"
-  reason: "The GitHub ops registry drift monitor is implemented locally. The strongest next step is a live dispatch of `registry-drift.yml` from `main` to confirm alert creation and report accuracy."
+  recommended_mode: "generate"
+  reason: "The registry drift monitor is now live and validated. The strongest next automation slice is a reconciliation companion that refreshes `docs/github_ops/registry.yml` summaries from live workflow-labeled issue state so this monitor can detect and heal drift." 

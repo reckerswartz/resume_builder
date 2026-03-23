@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:52:28Z"
+updated_at: "2026-03-23T00:10:51Z"
 
 github:
   remote: "origin"
@@ -244,14 +244,14 @@ workflow_registries:
     issue_prefix: "meta-learning"
     domain: "infrastructure"
     type: "automation"
-    issue_count: { open: 1, closed: 0 }
+    issue_count: { open: 2, closed: 0 }
     pr_count: { open: 0, merged: 0 }
-    last_synced_at: "2026-03-22T23:46:30Z"
-    github_issues: [81]
+    last_synced_at: "2026-03-23T00:10:51Z"
+    github_issues: [81, 82]
 
 file_locks:
   active: []
 
 roadmap:
-  generated_at: "2026-03-22T23:52:28Z"
+  generated_at: "2026-03-23T00:10:51Z"
   path: "docs/github_ops/roadmap.md"
