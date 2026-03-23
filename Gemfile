@@ -18,8 +18,7 @@ gem "pundit"
 gem "view_component"
 gem "pdf-reader"
 gem "rubyzip"
-gem "wicked_pdf"
-gem "wkhtmltopdf-binary"
+gem "grover"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 

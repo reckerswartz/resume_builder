@@ -1,16 +1,16 @@
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Admin",
-    title: "Templates",
-    description: "Manage the layouts used by the shared preview and PDF export pipeline.",
+    eyebrow: t("admin.templates.index.page_header.eyebrow"),
+    title: t("admin.templates.index.page_header.title"),
+    description: t("admin.templates.index.page_header.description"),
     density: :compact,
     badges: [
-      { label: "Shared renderer", tone: :neutral },
-      { label: "Admin controls", tone: :neutral }
+      { label: t("admin.templates.index.page_header.badges.gallery_coverage"), tone: :neutral },
+      { label: t("admin.templates.index.page_header.badges.admin_review"), tone: :neutral }
     ],
     actions: [
-      { label: "Template gallery", path: templates_path, style: :secondary },
-      { label: "New template", path: new_admin_template_path, style: :primary }
+      { label: t("admin.templates.index.page_header.actions.template_gallery"), path: templates_path, style: :secondary },
+      { label: t("admin.templates.index.page_header.actions.new_template"), path: new_admin_template_path, style: :primary }
     ]
   ) %>
 

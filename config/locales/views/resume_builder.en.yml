@@ -756,8 +756,8 @@ en:
       guidance:
         pill: "Import guidance"
         title: "Start with the lightest path"
+        description: "Start from scratch or paste/upload existing content to save time."
         badge: "Autofill optional"
-        description: "Start from scratch for a clean draft, or paste and upload existing content to save time."
       footer_note_ready: "Changes save in place. Autofill becomes available when pasted text or a supported upload is present."
       footer_note_default: "Changes save in place. Use the stepper or the next button when the source setup feels right."
       save_source_setup: "Save source setup"

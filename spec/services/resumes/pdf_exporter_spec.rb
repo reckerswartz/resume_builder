@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Resumes::PdfExporter do
   describe '#call' do
-    it 'renders the shared PDF template and passes it to WickedPdf' do
+    it 'renders the shared PDF template and passes it to Grover' do
       resume = create(
         :resume,
         title: 'Export Resume',
@@ -16,16 +16,16 @@ RSpec.describe Resumes::PdfExporter do
           'email' => 'export@example.com'
         }
       )
-      wicked_pdf = instance_double(WickedPdf)
+      grover = instance_double(Grover)
 
-      allow(WickedPdf).to receive(:new).and_return(wicked_pdf)
-      allow(wicked_pdf).to receive(:pdf_from_string) do |html, options|
+      allow(Grover).to receive(:new) do |html, **options|
         expect(html).to include('Export User')
         expect(html).to include('export@example.com')
         expect(html).to include('#111827')
-        expect(options).to include(page_size: 'Letter')
-        'pdf-binary'
+        expect(options[:format]).to eq('Letter')
+        grover
       end
+      allow(grover).to receive(:to_pdf).and_return('pdf-binary')
 
       pdf = described_class.new(resume:).call
 
@@ -48,15 +48,15 @@ RSpec.describe Resumes::PdfExporter do
           'email' => 'classic@example.com'
         }
       )
-      wicked_pdf = instance_double(WickedPdf)
+      grover = instance_double(Grover)
 
-      allow(WickedPdf).to receive(:new).and_return(wicked_pdf)
-      allow(wicked_pdf).to receive(:pdf_from_string) do |html, _options|
+      allow(Grover).to receive(:new) do |html, **_options|
         expect(html).to include('Classic User')
         expect(html).to include('classic@example.com')
         expect(html).to include('#1D4ED8')
-        'pdf-binary'
+        grover
       end
+      allow(grover).to receive(:to_pdf).and_return('pdf-binary')
 
       pdf = described_class.new(resume:).call
 

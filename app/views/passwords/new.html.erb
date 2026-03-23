@@ -17,14 +17,14 @@
       <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: ui_input_classes %>
     </div>
 
-    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-      <p class="text-sm font-semibold text-ink-950"><%= t("passwords.new.next_title") %></p>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("passwords.new.next_description") %></p>
-    </div>
-
     <div class="space-y-3">
       <%= form.submit t("passwords.new.submit"), class: "#{ui_button_classes(:primary)} w-full sm:w-auto" %>
       <%= link_to t("passwords.new.back_to_sign_in"), new_session_path, class: ui_button_classes(:ghost) %>
+    </div>
+
+    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+      <p class="text-sm font-semibold text-ink-950"><%= t("passwords.new.next_title") %></p>
+      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("passwords.new.next_description") %></p>
     </div>
   <% end %>
 <% end %>

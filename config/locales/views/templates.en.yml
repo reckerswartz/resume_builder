@@ -2,6 +2,7 @@ en:
   templates:
     controller:
       template_unavailable: "Template is not available."
+      resume_selection_required: "Choose a resume to apply this template."
     marketplace_state:
       page_header:
         eyebrow: "Template marketplace"
@@ -41,7 +42,8 @@ en:
         header: "Header: %{header}"
         entries: "Entries: %{entries}"
         sidebar: "Sidebar: %{sections}"
-      apply_to_resume: "Apply to %{title}"
+      apply_to_resume: "Apply to existing resume"
+      apply_to_resume_option: "%{title} · %{template}"
       layout_focus:
         balanced: "Balanced single-column flow"
         sidebar: "Sidebar: %{sections}"
@@ -97,6 +99,9 @@ en:
       shell_style_description: "Keep the same resume content reusable if you switch layouts later."
       preview_template: "Preview template"
       use_template: "Use template"
+      apply_to_resume: "Apply to existing resume"
+      apply_to_resume_label: "Choose resume"
+      apply_to_resume_submit: "Open in finalize"
     show:
       sidebar_positions:
         left: "Left"
@@ -127,7 +132,8 @@ en:
         try_in_builder_title: "Try it in the builder"
         try_in_builder_description: "Use this layout now, then keep refining copy, sections, and accent decisions inside the live editor."
         use_template: "Use this template"
-        apply_to_resume: "Apply to %{title}"
+        apply_to_resume_label: "Choose resume"
+        apply_to_resume_submit: "Open in finalize"
         browse_all_templates: "Browse all templates"
       carry_through:
         pill: "Builder carry-through"

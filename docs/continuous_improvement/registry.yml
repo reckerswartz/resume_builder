@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:55:00Z"
+updated_at: "2026-03-23T01:40:00Z"
 workflow:
   status: active
   path: ".windsurf/workflows/continuous-improvement.md"
@@ -12,7 +12,7 @@ tracking:
   overview_path: "docs/continuous_improvement/README.md"
   run_doc_pattern: "docs/continuous_improvement/runs/<date>-<slug>/00-overview.md"
   proposal_doc_pattern: "docs/continuous_improvement/proposals/<proposal_id>.md"
-  latest_run: "docs/continuous_improvement/runs/2026-03-22-returning-user-explore-refresh/00-overview.md"
+  latest_run: "docs/continuous_improvement/runs/2026-03-23-workspace-bulk-selection-persistence-explore/00-overview.md"
 artifacts:
   cache_root: "tmp/ci_artifacts"
   competitive_subfolder: "competitive"
@@ -122,14 +122,14 @@ journey_definitions:
       - "Adjust platform settings"
     success_criteria: "Admin can monitor and configure the platform efficiently"
 cycle_metrics:
-  cycle_count: 15
-  last_cycle_date: "2026-03-22T23:55:00Z"
-  proposals_discovered: 14
-  proposals_implemented: 14
-  proposals_remaining: 0
+  cycle_count: 20
+  last_cycle_date: "2026-03-23T01:40:00Z"
+  proposals_discovered: 17
+  proposals_implemented: 16
+  proposals_remaining: 1
   proposals_routed: 0
   competitive_scans_completed: 0
-  journeys_simulated: 4
+  journeys_simulated: 9
   journey_log:
     - persona: new_user
       date: "2026-03-22T04:30:00Z"
@@ -205,10 +205,85 @@ cycle_metrics:
         - "Preview preserves step=finalize when returning to editing"
         - "Mobile preview surfaces export and edit actions before the long document preview"
         - "No new CI-owned friction or productivity gap was identified in this re-exploration pass"
+    - persona: new_user
+      date: "2026-03-23T00:05:00Z"
+      viewport: "1440x900 + 390x844"
+      steps_completed:
+        - "Visit homepage as a guest"
+        - "Open the public template gallery"
+        - "Choose ATS Minimal from the gallery via Use template"
+        - "Create a new account from the registration flow"
+        - "Land on the starter workspace and inspect the first draft"
+      console_errors: 0
+      observations:
+        - "Public template browsing now works for guests, resolving the earlier gallery-access blocker"
+        - "The guest 'Use template' handoff drops template context and lands on plain /registration/new"
+        - "After signup, the starter draft used the default Modern template instead of the selected ATS Minimal template"
+        - "This creates a broken expectation in the strongest new-user conversion path: choose a template first, then start"
+    - persona: new_user
+      date: "2026-03-23T00:20:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Open the public template gallery as a guest"
+        - "Click Use template on a public template card"
+        - "Verify registration shows the selected-template summary"
+        - "Create a new account from the preserved template handoff"
+        - "Confirm the starter draft uses the same selected template on /resumes"
+      console_errors: 0
+      observations:
+        - "Guest Use template CTAs now carry template_id through registration"
+        - "Registration shows the selected template before account creation"
+        - "Starter draft creation now preserves the selected template through signup"
+        - "Focused request coverage passed for templates and registrations (23 examples, 0 failures)"
+    - persona: power_user
+      date: "2026-03-23T00:35:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Sign in as template-audit@resume-builder.local"
+        - "Inspect the high-volume workspace with 112 resumes"
+        - "Open the templates marketplace"
+        - "Inspect Apply to existing resume actions across marketplace cards"
+        - "Apply a template from the marketplace and observe the target resume handoff"
+      console_errors: 0
+      observations:
+        - "Workspace improvements remain intact at high volume: pagination, search, sort, bulk actions, duplicate, and quick export are present"
+        - "Marketplace apply-to-existing actions all target the same single resume instead of letting the user choose among many existing resumes"
+        - "For a user with 112 resumes, the current marketplace apply flow does not scale beyond the most recent draft"
+        - "Applying a template from the marketplace jumped directly into /resumes/123/edit?step=finalize&template_id=9 for one fixed resume"
+    - persona: power_user
+      date: "2026-03-23T01:10:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Sign in as template-audit@resume-builder.local"
+        - "Open the templates marketplace"
+        - "Open the new apply-to-existing chooser on a template card"
+        - "Select a non-default existing resume target"
+        - "Submit the chooser and verify finalize opens on the selected resume"
+      console_errors: 0
+      observations:
+        - "Marketplace cards now expose a chooser-based apply flow instead of a single fixed target"
+        - "Focused request and presenter coverage passed for the chooser flow (26 examples, 0 failures)"
+        - "Live validation selected Junior Ferry DO instead of the default first option and landed on /resumes/122/edit?step=finalize&template_id=3"
+        - "Finalize showed the chosen resume name and the template-applied confirmation with no console errors"
+    - persona: power_user
+      date: "2026-03-23T01:40:00Z"
+      viewport: "1440x900"
+      steps_completed:
+        - "Sign in as template-audit@resume-builder.local"
+        - "Open the high-volume workspace at /resumes"
+        - "Select a resume in the bulk-action bar on page 1"
+        - "Navigate to page 2 of the paginated workspace"
+        - "Observe bulk selection state and action availability after pagination"
+      console_errors: 0
+      observations:
+        - "Workspace bulk actions are present and functional within a single page"
+        - "Selection state is silently page-local: choosing one resume on page 1 resets to 0 resumes selected on page 2"
+        - "The bulk action buttons become disabled after pagination, blocking multi-page export or delete workflows for a 112-resume user"
+        - "The current UI copy reinforces the implementation limit ('Select resumes on this page'), but that still leaves a real power-user productivity gap"
 next_step:
-  recommended_mode: "explore"
-  recommended_persona: "new_user"
-  reason: "The returning-user journey re-exploration did not surface a new CI-owned proposal, and the tracked workspace backlog remains validated. The next honest explore pass is the new-user journey, especially the end-to-end public → account creation → first-draft flow after the recent auth and setup refinements."
+  recommended_mode: "implement-next"
+  recommended_persona: "power_user"
+  reason: "CI-WORKSPACE-007 is now the top open proposal: bulk selection on the high-volume workspace resets across pagination, so a power user cannot select resumes across pages for export or delete. The next honest step is to persist selection state across page changes and keep the bulk action bar coherent for multi-page workflows."
 proposals:
   - id: "CI-BUILDER-001"
     category: remove_friction
@@ -480,6 +555,91 @@ proposals:
       - "spec/requests/templates_spec.rb"
       - "spec/presenters/templates/marketplace_state_spec.rb"
 
+  - id: "CI-TEMPLATE-003"
+    category: remove_friction
+    impact: high
+    effort: medium
+    status: validated
+    implemented_at: "2026-03-23T00:20:00Z"
+    user_personas:
+      - new_user
+    journey_step: "Choose a public template as a guest, then create an account"
+    problem: >
+      A guest can now browse the public template gallery and click 'Use
+      template', but that selection does not survive the signup flow.
+      The guest is sent to plain /registration/new with no visible
+      template summary, and after account creation the starter draft is
+      bootstrapped with the default Modern template rather than the
+      template the user just chose (observed with ATS Minimal). This
+      breaks the user's expectation that choosing a template first will
+      shape the first draft they are about to create.
+    proposed_improvement: >
+      Preserve template intent from the public gallery through
+      registration and starter-draft creation. The guest 'Use template'
+      CTA should carry template_id (and any selected variant data such as
+      accent_color when relevant) into /registration/new, the
+      registration page should confirm the selected template, and
+      RegistrationsController#create should pass that template into the
+      starter Resume bootstrap flow so the first draft matches the user's
+      pre-signup choice.
+    evidence:
+      page_url: "/templates"
+      selected_template: "Professional Debug"
+      handoff_url: "/registration/new?template_id=:id"
+      resulting_workspace_url: "/resumes"
+      resulting_resume_template: "Professional Debug"
+    affected_files:
+      - "app/controllers/registrations_controller.rb"
+      - "app/presenters/templates/marketplace_state.rb"
+      - "app/views/templates/_template_card.html.erb"
+      - "app/views/templates/show.html.erb"
+      - "app/views/registrations/new.html.erb"
+      - "config/locales/views/public_auth.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/templates_spec.rb"
+      - "spec/requests/registrations_spec.rb"
+
+  - id: "CI-TEMPLATE-004"
+    category: productivity_boost
+    impact: high
+    effort: medium
+    status: validated
+    implemented_at: "2026-03-23T01:10:00Z"
+    user_personas:
+      - power_user
+    journey_step: "Browse templates marketplace with many existing resumes"
+    problem: >
+      The marketplace now offers an 'Apply to existing resume' action,
+      but for a power user with many resumes it always targets a single
+      fixed recent draft. In the observed 112-resume workspace, every
+      marketplace card pointed to the same resume (`/resumes/123/...`).
+      The user cannot choose which existing resume should receive the
+      selected template, so the flow does not scale beyond one recent
+      draft.
+    proposed_improvement: >
+      Replace the single fixed-target apply action with a chooser that
+      lets the user select which existing resume should receive the
+      marketplace template. A lightweight disclosure, dropdown, or modal
+      with recent resumes plus search would be sufficient. Preserve the
+      existing finalize-step handoff (`/resumes/:id/edit?step=finalize&template_id=N`)
+      after the user picks the target resume.
+    evidence:
+      page_url: "/templates"
+      resume_count: 112
+      selected_resume_target: "/resumes/122/edit?step=finalize&template_id=3"
+      selected_resume_label: "Junior Ferry DO – Senior Corporate Counsel (Modern Clean, full)"
+      chooser_flow: "Choose which existing resume receives the selected template"
+    affected_files:
+      - "config/routes.rb"
+      - "app/controllers/templates_controller.rb"
+      - "app/presenters/templates/marketplace_state.rb"
+      - "app/views/templates/_template_card.html.erb"
+      - "app/views/templates/show.html.erb"
+      - "config/locales/views/templates.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/templates_spec.rb"
+      - "spec/presenters/templates/marketplace_state_spec.rb"
+
   - id: "CI-PREVIEW-001"
     category: remove_friction
     impact: medium
@@ -638,11 +798,52 @@ proposals:
     estimated_spec_paths:
       - "spec/requests/resumes_spec.rb"
 
+  - id: "CI-WORKSPACE-007"
+    category: productivity_boost
+    impact: high
+    effort: medium
+    status: discovered
+    user_personas:
+      - power_user
+    journey_step: "Use bulk actions across a paginated high-volume workspace"
+    problem: >
+      The workspace bulk-action bar only tracks checked boxes from the
+      current page render. In a 112-resume workspace, selecting a resume
+      on page 1 and then moving to page 2 resets the summary back to
+      `0 resumes selected` and disables the bulk action buttons. This
+      makes bulk export and delete effectively page-local, so a power
+      user cannot build a cross-page selection set without manually
+      processing each page in isolation.
+    proposed_improvement: >
+      Persist workspace bulk-selection state across pagination (and, if
+      practical, search/sort changes) so a power user can build a
+      multi-page selection set before exporting or deleting. A small,
+      Rails-native approach could store selected resume IDs in hidden
+      fields or session-backed state and let the Stimulus controller
+      hydrate the current page checkboxes plus a global selection
+      summary. Add a clear-selection affordance so the cross-page state
+      stays understandable.
+    evidence:
+      page_url: "/resumes?page=2"
+      resume_count: 112
+      page_1_selection_summary: "1 resume selected"
+      after_pagination_summary: "0 resumes selected"
+      action_state_after_pagination: "Export selected and Delete selected disabled"
+    affected_files:
+      - "app/views/resumes/index.html.erb"
+      - "app/views/resumes/_resume_card.html.erb"
+      - "app/javascript/controllers/workspace_bulk_actions_controller.js"
+      - "app/controllers/resumes_controller.rb"
+      - "config/locales/views/resumes.en.yml"
+    estimated_spec_paths:
+      - "spec/requests/resumes_spec.rb"
+      - "spec/system/workspace_bulk_actions_spec.rb"
+
   - id: "CI-EXPORT-001"
     category: productivity_boost
     impact: medium
     effort: medium
-    status: discovered
+    status: validated
     github_issue: 78
     user_personas:
       - power_user

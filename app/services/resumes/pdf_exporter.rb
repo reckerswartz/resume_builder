@@ -1,30 +1,21 @@
 module Resumes
   class PdfExporter
-    DEFAULT_OPTIONS = {
-      margin: {
-        top: 12,
-        bottom: 12,
-        left: 12,
-        right: 12
-      },
-      print_media_type: true,
-      disable_smart_shrinking: false,
-      encoding: "UTF-8"
-    }.freeze
-
     def initialize(resume:)
       @resume = resume
     end
 
     def call
-      WickedPdf.new.pdf_from_string(rendered_html, export_options)
+      Grover.new(rendered_html, **grover_options).to_pdf
     end
 
     private
       attr_reader :resume
 
-      def export_options
-        DEFAULT_OPTIONS.merge(page_size: resume.page_size)
+      def grover_options
+        {
+          format: resume.page_size.presence || "A4",
+          display_url: "http://localhost"
+        }
       end
 
       def rendered_html

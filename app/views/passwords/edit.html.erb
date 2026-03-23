@@ -60,13 +60,13 @@
       <p class="mt-2 hidden text-sm text-amber-700" data-password-field-target="capsHint"><%= t("passwords.shared.caps_lock_hint") %></p>
     </div>
 
-    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-      <p class="text-sm leading-6 text-ink-700/80"><%= t("passwords.edit.help_text") %></p>
-    </div>
-
     <div class="space-y-3">
       <%= form.submit t("passwords.edit.submit"), class: "#{ui_button_classes(:primary)} w-full sm:w-auto" %>
       <%= link_to t("passwords.edit.request_new_link"), new_password_path, class: ui_button_classes(:ghost) %>
+    </div>
+
+    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+      <p class="text-sm leading-6 text-ink-700/80"><%= t("passwords.edit.help_text") %></p>
     </div>
   <% end %>
 <% end %>

@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-skills`
 - **Goal**: Add truthful, deterministic, role-aware skill suggestions inside the skills entry UI so users can discover and add curated skills organized by professional role and experience level.
 
@@ -47,6 +47,7 @@
 - This slice intentionally stops at deterministic curated skill suggestions.
 - A skill rating or proficiency level suggestion system was not added here.
 - LLM-generated skills drafting was intentionally not expanded.
+- Close-out re-review on `2026-03-22` did not reveal a stable regression in this slice, so it is now complete for the current rollout scope.
 
 ## Verification
 
@@ -55,8 +56,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-22-skills-guidance/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `template-variant-carry-through`
+- None inside the current `resumebuilder-reference-rollout` scope.

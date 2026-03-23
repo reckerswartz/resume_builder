@@ -3,7 +3,7 @@
 <% template = template_card.fetch(:template) %>
 <% description_text = card_state.present? ? card_state.fetch(:description_text) : template.description.presence || template_card.fetch(:summary) %>
 <% preview_template_path = card_state.present? ? card_state.fetch(:preview_template_path) : template_path(id: template) %>
-<% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : (current_user.present? ? new_resume_path(template_id: template.id) : new_registration_path) %>
+<% use_template_path = card_state.present? ? card_state.fetch(:use_template_path) : (current_user.present? ? new_resume_path(template_id: template.id) : new_registration_path(template_id: template.id)) %>
 <% selected_accent_color = card_state.present? ? card_state.fetch(:selected_accent_color) : template_card.fetch(:selected_accent_color) %>
 <% accent_variants = card_state.present? ? card_state.fetch(:accent_variants) : template_card.fetch(:accent_variants) %>
 <% selected_accent_variant_label = if card_state.present?
@@ -148,9 +148,23 @@ end %>
     <div class="mt-6 flex flex-wrap gap-3">
       <%= link_to t(".preview_template"), preview_template_path, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center", data: { template_variant_preview_link: true, template_id: template.id } %>
       <%= link_to t(".use_template"), use_template_path, class: "#{ui_button_classes(:primary, size: :sm)} justify-center", data: { template_variant_use_link: true, template_id: template.id } %>
-      <% if card_state.present? && card_state[:apply_to_resume_path].present? %>
-        <%= link_to card_state[:apply_to_resume_label], card_state[:apply_to_resume_path], class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
-      <% end %>
     </div>
+
+    <% if card_state.present? && card_state[:apply_to_resume_path].present? %>
+      <details class="mt-3" data-controller="disclosure">
+        <summary class="list-none cursor-pointer">
+          <span class="<%= ui_button_classes(:secondary, size: :sm) %> justify-center"><%= t(".apply_to_resume") %></span>
+        </summary>
+
+        <%= form_with url: card_state[:apply_to_resume_path], method: :get, local: true, class: "mt-3 grid gap-3" do %>
+          <div>
+            <%= label_tag "apply_resume_#{template.id}", t(".apply_to_resume_label"), class: "text-xs font-semibold uppercase tracking-[0.18em] text-ink-700/70" %>
+            <%= select_tag :resume_id, options_for_select(card_state[:apply_resume_options], card_state[:selected_apply_resume_id]), id: "apply_resume_#{template.id}", class: ui_input_classes %>
+          </div>
+
+          <%= button_tag t(".apply_to_resume_submit"), type: :submit, class: "#{ui_button_classes(:secondary, size: :sm)} justify-center" %>
+        <% end %>
+      </details>
+    <% end %>
   </div>
 <% end %>

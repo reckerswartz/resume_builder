@@ -1,10 +1,19 @@
 class ResumesController < ApplicationController
   include ResumeBuilderRendering
 
+  WORKSPACE_DEFAULT_SORT = "recently_updated".freeze
+
   before_action :set_resume, only: %i[ show edit update destroy duplicate export download download_text ]
 
   def index
-    scope = policy_scope(Resume).includes(:template).with_attached_pdf_export.order(updated_at: :desc)
+    @query = params[:query].to_s.strip
+    @sort = selected_workspace_sort
+    @sort_options = workspace_sort_options
+    @workspace_page_params = workspace_page_params
+
+    scope = policy_scope(Resume).includes(:template).with_attached_pdf_export
+    scope = scope.matching_query(@query)
+    scope = sorted_workspace_scope(scope)
     @total_count = scope.count
     @per_page = 12
     @total_pages = [(@total_count.to_f / @per_page).ceil, 1].max
@@ -86,7 +95,7 @@ class ResumesController < ApplicationController
     authorize @resume
 
     @resume.destroy!
-    redirect_to resumes_path, notice: controller_message(:resume_deleted), status: :see_other
+    redirect_with_workspace_alert(:resume_deleted)
   end
 
   def duplicate
@@ -340,6 +349,55 @@ class ResumesController < ApplicationController
       @resume.source_mode == "scratch" ? "heading" : "source"
     end
 
+    def selected_workspace_resumes
+      ids = Array(params[:resume_ids]).filter_map(&:presence)
+      return [] if ids.empty?
+
+      policy_scope(Resume).where(id: ids).to_a
+    end
+
+    def workspace_redirect_params
+      params.permit(:page, :query, :sort).to_h.compact_blank
+    end
+
+    def workspace_page_params
+      params.permit(:query, :sort).to_h.compact_blank
+    end
+
+    def workspace_sort_options
+      [
+        { value: WORKSPACE_DEFAULT_SORT, label: I18n.t("resumes.index.sort.options.recently_updated") },
+        { value: "name_asc", label: I18n.t("resumes.index.sort.options.name_asc") },
+        { value: "template_asc", label: I18n.t("resumes.index.sort.options.template_asc") },
+        { value: "oldest_first", label: I18n.t("resumes.index.sort.options.oldest_first") }
+      ]
+    end
+
+    def selected_workspace_sort
+      requested_sort = params[:sort].to_s
+      workspace_sort_options.any? { |option| option.fetch(:value) == requested_sort } ? requested_sort : WORKSPACE_DEFAULT_SORT
+    end
+
+    def sorted_workspace_scope(scope)
+      resume_table = Resume.arel_table
+      template_table = Template.arel_table
+
+      case @sort
+      when "name_asc"
+        scope.order(resume_table[:title].asc, resume_table[:updated_at].desc)
+      when "template_asc"
+        scope.joins(:template).order(template_table[:name].asc, resume_table[:title].asc, resume_table[:updated_at].desc)
+      when "oldest_first"
+        scope.order(resume_table[:created_at].asc, resume_table[:title].asc)
+      else
+        scope.order(resume_table[:updated_at].desc, resume_table[:title].asc)
+      end
+    end
+
+    def redirect_with_workspace_alert(message_key)
+      redirect_to resumes_path(workspace_redirect_params), alert: controller_message(message_key), status: :see_other
+    end
+
     def render_unavailable_template_selection_on_create
       @resume = build_new_resume_from_params
       @resume.errors.add(:template, controller_message(:template_selection_unavailable_error))
@@ -357,7 +415,7 @@ class ResumesController < ApplicationController
       end
     end
 
-    def controller_message(key)
-      I18n.t("resumes.controller.#{key}")
+    def controller_message(key, **options)
+      I18n.t("resumes.controller.#{key}", **options)
     end
 end

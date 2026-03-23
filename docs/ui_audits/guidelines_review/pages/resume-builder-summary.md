@@ -8,8 +8,8 @@
 - Page family: builder
 - Status: `compliant`
 - Compliance score: 93
-- Last audited: `2026-03-21T22:48:42Z`
-- Latest run: `docs/ui_audits/guidelines_review/runs/2026-03-21-builder-personal-summary-review/00-overview.md`
+- Last audited: `2026-03-22T06:40:00Z`
+- Latest run: `docs/ui_audits/guidelines_review/runs/2026-03-22-resume-builder-summary-library-disclosure-review/00-overview.md`
 - Artifact root: `tmp/ui_audit_artifacts/2026-03-21T22-48-42Z/resume-builder-summary/guidelines`
 
 ## Compliance scorecard
@@ -36,10 +36,10 @@
 ## Verification
 
 - Playwright review:
-  - `tmp/ui_audit_artifacts/2026-03-21T22-48-42Z/resume-builder-summary/guidelines/accessibility_snapshot.md`
+  - Authenticated user review against `/resumes/14/edit?step=summary`
+  - Confirmed the curated summary library renders as `details[data-summary-library-disclosure]`, stays collapsed by default, and appears before the summary textarea
+  - Zero console errors during the review pass
 - Specs:
-  - Not run (`review-only`)
+  - `bundle exec rspec spec/requests/resumes_spec.rb:776`
 - Notes:
-  - Reviewed through a real reachable resume edit flow discovered from `/resumes`, using `/resumes/127/edit?step=summary`.
-  - The page kept the shared builder shell and suggestion-library guidance intact; the main tradeoff is density rather than a material compliance gap.
-  - Zero console errors or warnings during the review pass.
+  - The new disclosure reduces first-fold density without introducing new token drift or page-local chrome.

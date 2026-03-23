@@ -1,5 +1,11 @@
 # Slice: font-family-settings
 
+## Status
+
+- **State**: `closed`
+- **Page family**: `resume-builder-finalize`
+- **Goal**: Add truthful, renderer-backed font family selection to the finalize workspace while keeping preview and PDF output aligned.
+
 ## Title
 
 Font family settings
@@ -65,7 +71,12 @@ bundle exec rspec spec/services/resume_templates/catalog_spec.rb spec/services/r
 
 - No user-facing font family preview in template picker cards (future slice)
 - No custom web font loading — limited to system font stacks via Tailwind (sans/serif/mono)
+- Close-out re-review on `2026-03-22` did not reveal a stable regression in this slice, so it is now complete for the current rollout scope.
+
+## Latest run
+
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-`unified-finalize-workspace` — consolidate template, formatting, and section controls into one cohesive post-build customization hub
+None inside the current `resumebuilder-reference-rollout` scope.

@@ -49,29 +49,6 @@
     </aside>
 
     <div class="space-y-6 min-w-0 w-full max-w-full">
-      <%= render Ui::DashboardPanelComponent.new(
-        eyebrow: t("admin.settings.show.summary.eyebrow"),
-        title: t("admin.settings.show.summary.title"),
-        description: t("admin.settings.show.summary.description"),
-        padding: :sm,
-        density: :compact
-      ) do %>
-        <div class="<%= [ ui_inset_panel_classes(tone: :subtle), 'space-y-3' ].join(' ') %>">
-          <div class="flex flex-wrap gap-2">
-            <span class="atelier-pill">
-              <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-              <%= t("admin.settings.show.summary.readiness_badge") %>
-            </span>
-            <span class="<%= ui_badge_classes(page_state.save_posture_ready? ? :success : :warning) %>"><%= page_state.save_posture_ready? ? t("admin.settings.show.summary.save_posture.ready") : t("admin.settings.show.summary.save_posture.follow_up") %></span>
-            <span class="<%= ui_badge_classes(page_state.workflow_ready_count == 2 ? :success : :warning) %>"><%= t("admin.settings.show.navigation.badges.workflows_assigned", count: page_state.workflow_ready_count) %></span>
-            <span class="<%= ui_badge_classes(page_state.configured_cloud_import_provider_count == page_state.cloud_import_provider_states.size ? :success : :warning) %>"><%= t("admin.settings.show.navigation.badges.connectors_configured", configured: page_state.configured_cloud_import_provider_count, total: page_state.cloud_import_provider_states.size) %></span>
-          </div>
-
-          <p class="text-sm leading-6 text-ink-700/80"><%= t("admin.settings.show.summary.guidance_registry_changes") %></p>
-          <p class="text-sm leading-6 text-ink-700/80"><%= t("admin.settings.show.summary.guidance_save_posture") %></p>
-        </div>
-      <% end %>
-
       <%= render Ui::SettingsSectionComponent.new(
         title: t("admin.settings.show.sections.feature_access.title"),
         anchor: "feature-access",

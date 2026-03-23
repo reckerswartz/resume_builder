@@ -2,7 +2,7 @@
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <div class="space-y-6 px-6 py-6" data-controller="summary-suggestions">
-    <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>">
+    <details data-summary-library-disclosure class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>">
       <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
         <div class="flex-1 space-y-1">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_summary_step.library.eyebrow") %></p>

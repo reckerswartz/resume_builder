@@ -20,11 +20,19 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next verification slice is complete: `Resumes::PdfTextExtractor` and `Resumes::DocxTextExtractor` now have dedicated spec coverage (16 examples).
 - The next structural slice is complete: `Admin::JobLogsHelper` runtime-state and control-state extracted to `Admin::JobLogs::RuntimeState` and `Admin::JobLogs::ControlState` presenters. Helper reduced from 181 to 85 lines (53% reduction). Area closed with all 3 follow-ups resolved.
 - The next verification slice is complete: `Resumes::ExportStatusBroadcaster` and `Errors::Tracker` now have dedicated spec coverage (11 examples). All inventoried service coverage gaps are closed.
+- The next structural slice is improved: `Admin::TemplatesHelper` now delegates layout metadata, layout focus, visibility, and headshot state to `Admin::Templates::ProfileState`. Helper reduced from 425 to 345 lines (19% reduction) and remains open for artifact/lifecycle review extraction.
+- The next verification slice is complete: `ResumeTemplates::BaseComponent` now has direct shared-helper coverage (6 examples), with adjacent PDF rendering verification still green.
+- The most recent structural run restored the extracted `Admin::Templates::ProfileState` boundary after regression drift on the admin template show surface and helper factory.
+- The next verification slice is complete: `Ui::PageHeaderComponent` now has direct default-state coverage for normalized badges/actions, default spacing, and default action sizing.
+- The current structural preflight cleared the admin template request regression baseline by restoring the parsed `admin.templates.show` locale tree and the empty-state `Saved layout snapshot` disclosure on the admin template detail surface.
+- The next structural slice is complete: `Admin::TemplatesHelper` now delegates the remaining package-backed artifact/lifecycle review cluster to `Admin::Templates::ArtifactReviewState`. The original helper mixed-responsibility hotspot is now closed.
+- The next verification slice is complete: `Ui::HeroHeaderComponent` now has direct default-state coverage for normalized badges/actions/metrics, default class branches, and four-metric grid behavior.
+- The next structural slice is complete: duplicated template-browser support logic shared by `Resumes::TemplatePickerState` and `Templates::MarketplaceState` now lives in `TemplateBrowserSupport`, with adjacent marketplace apply-to-resume route and authorization drift corrected during validation.
+- The next verification slice is complete: `Resumes::TextExporter` now has focused coverage for non-experience formatting branches, blank-section suppression, date normalization, and blank-line cleanup.
 
 ### Pending
 
-- Both candidate queues are now empty. The next `implement-next` run requires a fresh whole-codebase hotspot scan.
-- Remaining coverage gaps are concentrated in low-priority UI components (25 missing) and skip-tier models.
+- The structural lane is next in round-robin, with the remaining named structural candidate reduced to `ResumeTemplates::Catalog`. The named verification queue is empty again after the fresh low-priority scan and `Resumes::TextExporter` follow-up.
 
 ## Installed workflow
 
@@ -102,11 +110,11 @@ If this overview is stale, the workflow is considered incomplete even if code an
 
 ### Current structural candidates
 
-(empty — scan for new hotspots when the structural lane rotates back)
+- `app/services/resume_templates/catalog.rb`
 
 ### Current verification candidates
 
-(empty — all inventoried service coverage gaps are closed)
+- (none)
 
 ## Audited and completed structural hotspots
 
@@ -125,11 +133,17 @@ If this overview is stale, the workflow is considered incomplete even if code an
 - `app/helpers/admin/job_logs_helper.rb`
   - area: `admin-job-logs-helper-mixed-responsibilities`
   - status: `closed`
+- `app/helpers/admin/templates_helper.rb`
+  - area: `admin-templates-helper-mixed-responsibilities`
+  - status: `closed`
 - `app/helpers/application_helper.rb`
   - area: `application-helper-mixed-responsibilities`
   - status: `closed`
 - `app/helpers/resumes_helper.rb`
   - area: `resumes-helper-mixed-responsibilities`
+  - status: `closed`
+- `app/presenters/resumes/template_picker_state.rb` / `app/presenters/templates/marketplace_state.rb`
+  - area: `template-browser-presenter-duplication`
   - status: `closed`
 - `app/controllers/photo_assets_controller.rb`
   - area: `photo-assets-controller-run-orchestration`
@@ -165,6 +179,12 @@ If this overview is stale, the workflow is considered incomplete even if code an
   - area: `broad-codebase-coverage-scan`
   - status: `improved`
 - `app/services/resumes/pdf_text_extractor.rb`, `app/services/resumes/docx_text_extractor.rb`
+  - area: `broad-codebase-coverage-scan`
+  - status: `improved`
+- `app/components/resume_templates/base_component.rb`
+  - area: `broad-codebase-coverage-scan`
+  - status: `improved`
+- `app/components/ui/page_header_component.rb`
   - area: `broad-codebase-coverage-scan`
   - status: `improved`
 

@@ -11,6 +11,11 @@ RSpec.describe 'Passwords', type: :request do
       expect(response.body).to include('What happens next')
       expect(response.body).to include('Back to sign in')
       expect(response.body).to include('atelier-pill')
+
+      submit_index = response.body.index('Send reset link')
+      next_title_index = response.body.index('What happens next')
+
+      expect(submit_index).to be < next_title_index
     end
 
     it 'preserves locale query params through the sign-in handoff link' do
@@ -34,6 +39,11 @@ RSpec.describe 'Passwords', type: :request do
       expect(response.body).to include('Save password')
       expect(response.body).to include(%(href="#{new_password_path(locale: :en)}"))
       expect(response.body).to include('atelier-pill')
+
+      submit_index = response.body.index('Save password')
+      help_text_index = response.body.index(I18n.t('passwords.edit.help_text'))
+
+      expect(submit_index).to be < help_text_index
     end
 
     it 'redirects to the recovery request with a localized alert when the token is invalid' do

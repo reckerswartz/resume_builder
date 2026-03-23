@@ -95,6 +95,6 @@ RSpec.describe "Template accent variants", type: :system, js: true do
     expect(page).to have_current_path(preview_path, ignore_query: false)
     expect(page).to have_text("Blue accent")
     expect(page).to have_link("Use this template", href: use_template_path)
-    expect(page).to have_link("Back to templates", href: templates_with_accent_path)
+    expect(page).to have_link("Browse all templates", href: templates_with_accent_path)
   end
 end

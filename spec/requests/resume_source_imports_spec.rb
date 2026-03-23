@@ -40,6 +40,8 @@ RSpec.describe 'ResumeSourceImports', type: :request do
       expect(response.body).to include(I18n.t('resumes.resume_source_imports.show.actions.back_to_source_step'))
       expect(response.body).to include(edit_resume_path(resume, step: 'source'))
       expect(response.body).to include(resume.title)
+      expect(response.body.scan(I18n.t('resumes.resume_source_imports.show.actions.back_to_source_step')).size).to eq(1)
+      expect(response.body).not_to include(I18n.t('resumes.resume_source_imports.show.actions.open_draft'))
     end
 
     it 'falls back to the safe resume source path when return_to is not a safe internal path' do
@@ -82,6 +84,8 @@ RSpec.describe 'ResumeSourceImports', type: :request do
       expect(response.body).to include(I18n.t('resumes.resume_source_imports.show.actions.back_to_resume_setup'))
       expect(response.body).to include(new_resume_path(step: 'setup'))
       expect(response.body).to include(I18n.t('resumes.resume_source_imports.show.provider_state.new_resume_setup'))
+      expect(response.body.scan(I18n.t('resumes.resume_source_imports.show.actions.back_to_resume_setup')).size).to eq(1)
+      expect(response.body).not_to include(I18n.t('resumes.resume_source_imports.show.actions.resume_setup'))
     end
   end
 end

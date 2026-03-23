@@ -7,6 +7,10 @@ class TemplatePolicy < ApplicationPolicy
     true
   end
 
+  def apply_to_resume?
+    authenticated?
+  end
+
   def create?
     admin?
   end

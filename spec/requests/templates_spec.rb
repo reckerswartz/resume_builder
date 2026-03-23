@@ -269,27 +269,65 @@ RSpec.describe 'Templates', type: :request do
         get template_path(id: template)
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include(new_registration_path)
+        expect(response.body).to include(new_registration_path(template_id: template.id))
         expect(response.body).not_to include(new_resume_path(template_id: template.id))
+      end
+
+      it 'preserves selected template context through guest use-template links' do
+        template = create(:template, name: 'Classic Ivory', slug: 'classic-ivory', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
+
+        get template_path(id: template), params: {
+          resume: {
+            intake_details: {
+              experience_level: 'less_than_3_years',
+              student_status: 'student'
+            },
+            settings: {
+              accent_color: '#334155'
+            }
+          }
+        }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(
+          ERB::Util.html_escape(
+            new_registration_path(
+              template_id: template.id,
+              resume: {
+                intake_details: { experience_level: 'less_than_3_years', student_status: 'student' },
+                settings: { accent_color: '#334155' }
+              }
+            )
+          )
+        )
       end
     end
 
-    it 'shows Apply to resume link when the user has existing resumes' do
+    it 'shows Apply to existing resume chooser on marketplace cards when the user has existing resumes' do
       template = create(:template, name: 'Modern Slate')
-      resume = create(:resume, user:, template:, title: 'My Active Resume')
+      older_resume = create(:resume, user:, template:, title: 'Platform Resume', updated_at: 2.days.ago)
+      newer_template = create(:template, name: 'Classic Ivory', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'classic'))
+      newer_resume = create(:resume, user:, template: newer_template, title: 'Legal Resume', updated_at: 1.day.ago)
 
       get templates_path
 
       expect(response).to have_http_status(:ok)
       document = Nokogiri::HTML.parse(response.body)
-      apply_links = document.css('a').select { |a| a.text.include?('Apply to') }
+      apply_form = document.at_css(%(form[action="#{apply_to_resume_template_path(template)}"]))
+      resume_select = apply_form.at_css('select[name="resume_id"]')
+      selected_option = resume_select.at_css('option[selected]')
 
-      expect(apply_links).to be_present
-      expect(apply_links.first.text).to include('My Active Resume')
-      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize, template_id: template.id))
+      expect(response.body).to include('Apply to existing resume')
+      expect(apply_form).to be_present
+      expect(resume_select).to be_present
+      expect(resume_select.text).to include('Platform Resume')
+      expect(resume_select.text).to include('Legal Resume')
+      expect(selected_option.text).to include('Legal Resume')
+      expect(selected_option['value']).to eq(newer_resume.id.to_s)
+      expect(older_resume.id).not_to eq(newer_resume.id)
     end
 
-    it 'shows Apply to resume link on the template detail page' do
+    it 'shows Apply to existing resume chooser on the template detail page' do
       template = create(:template, name: 'Modern Slate')
       resume = create(:resume, user:, template:, title: 'My Active Resume')
 
@@ -297,11 +335,33 @@ RSpec.describe 'Templates', type: :request do
 
       expect(response).to have_http_status(:ok)
       document = Nokogiri::HTML.parse(response.body)
-      apply_links = document.css('a').select { |a| a.text.include?('Apply to') }
+      apply_form = document.at_css(%(form[action="#{apply_to_resume_template_path(template)}"]))
+      resume_select = apply_form.at_css('select[name="resume_id"]')
 
-      expect(apply_links).to be_present
-      expect(apply_links.first.text).to include('My Active Resume')
-      expect(apply_links.first['href']).to include(edit_resume_path(resume, step: :finalize, template_id: template.id))
+      expect(apply_form).to be_present
+      expect(resume_select).to be_present
+      expect(resume_select.text).to include('My Active Resume')
+      expect(response.body).to include('Choose resume')
+      expect(response.body).to include('Open in finalize')
+    end
+
+    it 'redirects the chosen existing resume into finalize when applying a marketplace template' do
+      template = create(:template, name: 'Modern Slate')
+      resume = create(:resume, user:, template:, title: 'My Active Resume')
+
+      get apply_to_resume_template_path(template), params: { resume_id: resume.id }
+
+      expect(response).to redirect_to(edit_resume_path(resume, step: :finalize, template_id: template.id))
+    end
+
+    it 'redirects back to the template detail chooser when no resume is selected for marketplace apply' do
+      template = create(:template, name: 'Modern Slate')
+
+      get apply_to_resume_template_path(template)
+
+      expect(response).to redirect_to(template_path(template))
+      follow_redirect!
+      expect(response.body).to include('Choose a resume to apply this template.')
     end
 
     it 'hides Apply to resume link for guests with no resumes' do

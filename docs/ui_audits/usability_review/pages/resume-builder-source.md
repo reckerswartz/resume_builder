@@ -11,15 +11,15 @@
 ## Current status
 
 - **Status**: improved
-- **Usability score**: 85 (post-fix)
-- **Cycle count**: 3
-- **Last audited**: 2026-03-22T06:18:00Z
+- **Usability score**: 86 (post-fix)
+- **Cycle count**: 4
+- **Last audited**: 2026-03-22T23:51:48Z
 
 ## Dimension scores
 
 | Dimension | Pre-fix | Post-fix |
 |---|---|---|
-| Content brevity | 74 | 82 |
+| Content brevity | 74 | 86 |
 | Information density | 68 | 84 |
 | Progressive disclosure | 78 | 88 |
 | Repeated content | 55 | 80 |
@@ -29,7 +29,7 @@
 | Task overload | 76 | 85 |
 | Scroll efficiency | 68 | 83 |
 | Empty/error states | 82 | 82 |
-| **Overall** | **75** | **85** |
+| **Overall** | **75** | **86** |
 
 ## Findings
 
@@ -57,9 +57,9 @@
 
 - **Severity**: low
 - **Category**: content_brevity
-- **Status**: open
-- **Evidence**: The "Import guidance" panel contains a 31-word description: "Start from scratch when you want a clean draft. Use paste or upload only when existing content will save time. Once the source feels right, continue into heading and the rest of the guided builder." This is informative but long for guidance that could be a single sentence.
-- **Suggested fix**: Shorten to a single sentence or wrap in a disclosure.
+- **Status**: resolved
+- **Evidence**: The "Import guidance" panel used a three-sentence description that repeated the choice framing already communicated by the source-mode cards.
+- **Fix**: Shortened `resumes.editor_source_step.guidance.description` in `config/locales/views/resume_builder.en.yml` to one sentence: "Start from scratch or paste/upload existing content to save time."
 
 ### UX-BLDSRC-004 — Upload-only supported formats shown before upload selection (resolved)
 
@@ -73,4 +73,4 @@
 
 ## Next step
 
-No medium or high source-step issues remain open. If this page is revisited, UX-BLDSRC-003 is the only remaining low-priority follow-up.
+No open issues remain on the source step. Revisit only if the source-step helper copy grows again or the import decision flow changes materially.

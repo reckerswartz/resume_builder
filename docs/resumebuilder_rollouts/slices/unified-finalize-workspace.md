@@ -1,5 +1,11 @@
 # Slice: unified-finalize-workspace
 
+## Status
+
+- **State**: `closed`
+- **Page family**: `resume-builder-finalize`
+- **Goal**: Consolidate template, design, and section customization into one cohesive finalize workspace without breaking the shared preview/export model.
+
 ## Title
 
 Unified finalize workspace
@@ -52,11 +58,12 @@ bundle exec rspec spec/requests/resumes_spec.rb:520 spec/requests/resumes_spec.r
 - No keyboard navigation for tabs (arrow key support) — follow-up accessibility improvement
 - Additional sections area remains outside the tabbed workspace since it has its own sortable/form concerns
 - No deep-link support for tabs via URL params
+- Close-out re-review on `2026-03-22` did not reveal a stable regression in this slice, so it is now complete for the current rollout scope.
+
+## Latest run
+
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-No immediate next slice from the reference doc architecture translation. The remaining gaps are:
-- Broader color palette UX with reset/default affordances (matrix row: late-stage color switching)
-- Section reorder controls inside the finalize workspace (matrix row: late-stage layout/order controls)
-
-Evaluate these against product value before starting a new slice.
+None inside the current `resumebuilder-reference-rollout` scope.

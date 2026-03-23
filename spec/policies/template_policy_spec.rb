@@ -12,6 +12,7 @@ RSpec.describe TemplatePolicy do
 
     it { is_expected.to be_index }
     it { is_expected.to be_show }
+    it { is_expected.to be_apply_to_resume }
     it { is_expected.not_to be_create }
     it { is_expected.not_to be_update }
     it { is_expected.not_to be_destroy }
@@ -22,6 +23,7 @@ RSpec.describe TemplatePolicy do
 
     it { is_expected.to be_index }
     it { is_expected.to be_show }
+    it { is_expected.to be_apply_to_resume }
     it { is_expected.to be_create }
     it { is_expected.to be_update }
     it { is_expected.to be_destroy }
@@ -30,8 +32,9 @@ RSpec.describe TemplatePolicy do
   describe 'permissions for a guest (nil user)' do
     let(:user) { nil }
 
-    it { is_expected.not_to be_index }
-    it { is_expected.not_to be_show }
+    it { is_expected.to be_index }
+    it { is_expected.to be_show }
+    it { is_expected.not_to be_apply_to_resume }
     it { is_expected.not_to be_create }
     it { is_expected.not_to be_update }
     it { is_expected.not_to be_destroy }

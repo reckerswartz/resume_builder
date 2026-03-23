@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:36:00Z"
+updated_at: "2026-03-23T00:06:35Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ui-guidelines-audit.md"
@@ -10,7 +10,7 @@ tracking:
   guidelines_changelog_path: "docs/ui_audits/guidelines_review/guidelines_changelog.md"
   page_doc_template: "docs/ui_audits/guidelines_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/guidelines_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-sweep-finalize-tabs-accent-download/00-overview.md"
+  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-finalize-sections-order-card-fix/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "guidelines"
@@ -135,11 +135,12 @@ inventory_notes:
     - "docs/ui_audits/responsive_review/registry.yml"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope: []
-  reason: "All 37 tracked pages are now compliant. Full page inventory is complete."
-  recommended_implementation: "Run review-only after significant shared UI changes (shell, components, tokens, helpers) to catch regression drift, or refine-guidelines if cross-page patterns have accumulated."
-  last_regression_sweep: "2026-03-22T05:36:00Z"
-  regression_sweep_scope: "resumes-index, resume-builder-finalize, resume-show, templates-index"
+  recommended_scope:
+    - "template-show"
+  reason: "The finalize issue is now closed. The next honest review-only target is template-show because its routed UI changed locally and its last guidelines audit is older than the other remaining changed compliant surfaces."
+  recommended_implementation: "Run review-only for template-show, then continue across the remaining changed routed surfaces in priority order."
+  last_regression_sweep: "2026-03-23T00:01:22Z"
+  regression_sweep_scope: "resume-builder-finalize"
 pages:
   - page_key: "home"
     title: "Home"
@@ -256,18 +257,20 @@ pages:
       - "resumes-index-action-duplication"
       - "resumes-index-card-copy-clarity"
       - "resumes-index-avatar-token"
-    last_audited_at: "2026-03-22T05:36:00Z"
-    last_changed_at: "2026-03-22T05:36:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-sweep-finalize-tabs-accent-download/00-overview.md"
-    next_step: "Download PDF / Export PDF conditional verified compliant. No new issues. Re-review after shared shell or card patterns change."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T05:36:00Z"
+    last_audited_at: "2026-03-22T06:14:00Z"
+    last_changed_at: "2026-03-22T06:14:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-resumes-index-workspace-sort-review/00-overview.md"
+    next_step: "Workspace sort controls verified compliant. No new issues. Re-review after shared shell, workspace card, or helper-token changes."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T06:14:00Z"
     compliance_score_history:
       - timestamp: "2026-03-21T02:14:00Z"
         score: 93
       - timestamp: "2026-03-22T05:13:00Z"
         score: 93
       - timestamp: "2026-03-22T05:36:00Z"
+        score: 93
+      - timestamp: "2026-03-22T06:14:00Z"
         score: 93
   - page_key: "resumes-new"
     title: "New resume"
@@ -492,13 +495,15 @@ pages:
     page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-builder-summary.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T22:48:42Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-builder-personal-summary-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared builder shell or summary-suggestion patterns change."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T22:48:42Z"
+    last_audited_at: "2026-03-22T06:40:00Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-resume-builder-summary-library-disclosure-review/00-overview.md"
+    next_step: "Library disclosure verified compliant. Re-review after shared builder shell or summary-suggestion patterns change."
+    cycle_count: 2
+    last_cycle_date: "2026-03-22T06:40:00Z"
     compliance_score_history:
       - timestamp: "2026-03-21T22:48:42Z"
+        score: 93
+      - timestamp: "2026-03-22T06:40:00Z"
         score: 93
     issues_found: 0
     issues_resolved: 0
@@ -517,12 +522,13 @@ pages:
     open_issue_keys: []
     closed_issue_keys:
       - "finalize-output-settings-raw-classes"
-    last_audited_at: "2026-03-22T05:36:00Z"
-    last_changed_at: "2026-03-22T05:36:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-regression-sweep-finalize-tabs-accent-download/00-overview.md"
-    next_step: "Tabbed workspace, accent palette, and export actions verified compliant. No new issues. Re-review after shared builder shell or component changes."
-    cycle_count: 3
-    last_cycle_date: "2026-03-22T05:36:00Z"
+      - "finalize-sections-order-card-raw-surface"
+    last_audited_at: "2026-03-23T00:06:35Z"
+    last_changed_at: "2026-03-23T00:06:35Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-finalize-sections-order-card-fix/00-overview.md"
+    next_step: "All issues closed. Re-review after shared builder shell, finalize workspace, or helper-token changes."
+    cycle_count: 5
+    last_cycle_date: "2026-03-23T00:06:35Z"
     compliance_score_history:
       - timestamp: "2026-03-21T02:58:00Z"
         score: 95
@@ -530,6 +536,14 @@ pages:
         score: 95
       - timestamp: "2026-03-22T05:36:00Z"
         score: 95
+      - timestamp: "2026-03-23T00:01:22Z"
+        score: 94
+      - timestamp: "2026-03-23T00:06:35Z"
+        score: 95
+    issues_found: 2
+    issues_resolved: 2
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "admin-dashboard"
     title: "Admin dashboard"
     path: "/admin"
@@ -556,10 +570,25 @@ pages:
     compliance_score: 95
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-templates-index.md"
     open_issue_keys: []
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:06:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-6-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared admin shell or component changes."
+    closed_issue_keys:
+      - "admin-template-family-implementation-copy-leak"
+    last_audited_at: "2026-03-22T23:43:02Z"
+    last_changed_at: "2026-03-22T23:43:02Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-admin-template-family-copy-fix/00-overview.md"
+    next_step: "Shared admin template copy fix verified. Re-review after shared admin table, template review copy, or helper-token changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T23:43:02Z"
+    compliance_score_history:
+      - timestamp: "2026-03-21T03:08:00Z"
+        score: 95
+      - timestamp: "2026-03-22T06:30:00Z"
+        score: 95
+      - timestamp: "2026-03-22T23:43:02Z"
+        score: 95
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "admin-template-show"
     title: "Admin template detail"
     path: "/admin/templates/:id"
@@ -571,19 +600,25 @@ pages:
     compliance_score: 95
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-template-show.md"
     open_issue_keys: []
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:29:42Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-close-batch-7-admin-pages/00-overview.md"
-    next_step: "All issues closed. Re-review after shared admin shell or component changes."
-    cycle_count: 2
-    last_cycle_date: "2026-03-21T03:29:42Z"
+    closed_issue_keys:
+      - "admin-template-family-implementation-copy-leak"
+    last_audited_at: "2026-03-22T23:43:02Z"
+    last_changed_at: "2026-03-22T23:43:02Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-admin-template-family-copy-fix/00-overview.md"
+    next_step: "Shared admin template copy fix verified. Re-review after shared admin detail panels, template-profile state, or helper-token changes."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T23:43:02Z"
     compliance_score_history:
       - timestamp: "2026-03-21T03:08:00Z"
         score: 95
       - timestamp: "2026-03-21T03:29:42Z"
         score: 95
-    issues_found: 0
-    issues_resolved: 0
+      - timestamp: "2026-03-22T06:30:00Z"
+        score: 95
+      - timestamp: "2026-03-22T23:43:02Z"
+        score: 95
+    issues_found: 1
+    issues_resolved: 1
     issues_remaining: 0
     guideline_refinements_triggered: 0
   - page_key: "admin-template-new"
@@ -597,17 +632,23 @@ pages:
     compliance_score: 94
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-template-new.md"
     open_issue_keys: []
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T22:53:31Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-template-form-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared admin form primitives, template setup copy, or preview-card patterns change."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T22:53:31Z"
+    closed_issue_keys:
+      - "admin-template-family-implementation-copy-leak"
+    last_audited_at: "2026-03-22T23:43:02Z"
+    last_changed_at: "2026-03-22T23:43:02Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-admin-template-family-copy-fix/00-overview.md"
+    next_step: "Shared admin template copy fix verified. Re-review after shared admin form primitives, template setup copy, or preview-card patterns change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T23:43:02Z"
     compliance_score_history:
       - timestamp: "2026-03-21T22:53:31Z"
         score: 94
-    issues_found: 0
-    issues_resolved: 0
+      - timestamp: "2026-03-22T06:30:00Z"
+        score: 94
+      - timestamp: "2026-03-22T23:43:02Z"
+        score: 94
+    issues_found: 1
+    issues_resolved: 1
     issues_remaining: 0
     guideline_refinements_triggered: 0
   - page_key: "admin-template-edit"
@@ -621,17 +662,23 @@ pages:
     compliance_score: 94
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-template-edit.md"
     open_issue_keys: []
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T22:53:31Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-admin-template-form-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared admin form primitives, template setup copy, or preview-card patterns change."
-    cycle_count: 1
-    last_cycle_date: "2026-03-21T22:53:31Z"
+    closed_issue_keys:
+      - "admin-template-family-implementation-copy-leak"
+    last_audited_at: "2026-03-22T23:43:02Z"
+    last_changed_at: "2026-03-22T23:43:02Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-admin-template-family-copy-fix/00-overview.md"
+    next_step: "Shared admin template copy fix verified. Re-review after shared admin form primitives, template setup copy, or preview-card patterns change."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T23:43:02Z"
     compliance_score_history:
       - timestamp: "2026-03-21T22:53:31Z"
         score: 94
-    issues_found: 0
-    issues_resolved: 0
+      - timestamp: "2026-03-22T06:30:00Z"
+        score: 94
+      - timestamp: "2026-03-22T23:43:02Z"
+        score: 94
+    issues_found: 1
+    issues_resolved: 1
     issues_remaining: 0
     guideline_refinements_triggered: 0
   - page_key: "admin-llm-providers-index"

@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-finalize`
 - **Goal**: Add truthful renderer-backed section, paragraph, and line spacing controls to the finalize workspace while keeping builder preview and PDF export aligned.
 
@@ -59,6 +59,7 @@
 
 - Font-family selection remains a separate capability slice and was intentionally left out of this foundation pass.
 - Builder guidance and template carry-through behavior remain tracked as separate slices.
+- Close-out re-review on `2026-03-22` found no stable regressions, so this slice no longer has an active next step inside the current rollout scope.
 
 ## Verification
 
@@ -67,8 +68,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-21-finalize-formatting-foundation/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `experience-guidance`
+- None inside the current `resumebuilder-reference-rollout` scope.

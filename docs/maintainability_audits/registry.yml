@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:19:00Z"
+updated_at: "2026-03-23T00:18:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/maintainability-audit.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/maintainability_audits/README.md"
   area_doc_template: "docs/maintainability_audits/areas/TEMPLATE.md"
   run_doc_template: "docs/maintainability_audits/runs/TEMPLATE.md"
-  latest_run: "docs/maintainability_audits/runs/2026-03-22-page-header-verification/00-overview.md"
+  latest_run: "docs/maintainability_audits/runs/2026-03-23-text-exporter-verification/00-overview.md"
 area_statuses:
   - new
   - reviewed
@@ -46,12 +46,8 @@ round_robin:
   next_preferred_lane: "structural"
   max_consecutive_lane_runs: 1
   structural_candidate_paths:
-    - "app/helpers/admin/templates_helper.rb"
-    - "app/presenters/resumes/template_picker_state.rb"
-    - "app/presenters/templates/marketplace_state.rb"
     - "app/services/resume_templates/catalog.rb"
-  verification_candidate_paths:
-    - "app/components/ui/hero_header_component.rb"
+  verification_candidate_paths: []
 areas:
   - area_key: "resumes-controller-draft-building"
     title: "Resumes controller builder flow cleanup"
@@ -154,26 +150,26 @@ areas:
     path: "app/helpers/admin/templates_helper.rb"
     category: "helper"
     priority: "medium"
-    status: "improved"
+    status: "closed"
     github_issue_number: 80
     reasons:
       - "Admin::TemplatesHelper mixed lightweight formatting and artifact/lifecycle review helpers with a separate template-profile state cluster for layout metadata, layout-focus summary, visibility messaging, and headshot messaging."
       - "The helper served the admin templates index, form, and show pages while assembling a large normalized layout hash inline and layering multiple badge/copy branches on top."
     recommended_refactor_shape: "extract_presenter"
     area_doc_path: "docs/maintainability_audits/areas/admin-templates-helper-mixed-responsibilities.md"
-    open_follow_up_keys:
-      - "extract-template-artifact-review-state"
+    open_follow_up_keys: []
     closed_follow_up_keys:
       - "extract-template-profile-state"
-    last_reviewed_at: "2026-03-22T23:15:00Z"
-    last_changed_at: "2026-03-22T23:15:00Z"
-    next_step: "The profile-state regression is restored. Rotate to the verification lane for the remaining UI component coverage gaps, then return to the artifact/lifecycle review cluster in Admin::TemplatesHelper."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T23:15:00Z"
-    issues_found: 2
-    issues_resolved: 1
-    issues_remaining: 1
-    regression_detected: true
+      - "extract-template-artifact-review-state"
+    last_reviewed_at: "2026-03-22T23:42:00Z"
+    last_changed_at: "2026-03-22T23:42:00Z"
+    next_step: "All tracked follow-ups are closed. Rotate to the verification lane for the remaining UI component coverage gap in Ui::HeroHeaderComponent."
+    cycle_count: 4
+    last_cycle_date: "2026-03-22T23:42:00Z"
+    issues_found: 4
+    issues_resolved: 4
+    issues_remaining: 0
+    regression_detected: false
   - area_key: "application-helper-mixed-responsibilities"
     title: "Application helper mixed responsibilities"
     lane: "structural"
@@ -212,6 +208,30 @@ areas:
     last_reviewed_at: "2026-03-21T01:55:00Z"
     last_changed_at: "2026-03-21T01:55:00Z"
     next_step: "Scan for the next maintainability hotspot among PhotoAssetsController (135 lines), Resume model (268 lines), or ApplicationHelper (206 lines)."
+  - area_key: "template-browser-presenter-duplication"
+    title: "Template browser presenter duplication"
+    lane: "structural"
+    path: "app/presenters/"
+    category: "mixed"
+    priority: "medium"
+    status: "closed"
+    reasons:
+      - "Resumes::TemplatePickerState and Templates::MarketplaceState each owned a near-duplicate template-browser support cluster for filter shaping, searchable card text, recommendation ordering, and accent preview support."
+      - "Maintaining shared browser behavior required editing more than one presenter and risked silent drift between builder and marketplace surfaces."
+    recommended_refactor_shape: "extract_shared_support"
+    area_doc_path: "docs/maintainability_audits/areas/template-browser-presenter-duplication.md"
+    open_follow_up_keys: []
+    closed_follow_up_keys:
+      - "extract-template-browser-support"
+    last_reviewed_at: "2026-03-23T00:12:00Z"
+    last_changed_at: "2026-03-23T00:12:00Z"
+    next_step: "All follow-ups closed. The remaining named structural candidate queue is now reduced to ResumeTemplates::Catalog."
+    cycle_count: 1
+    last_cycle_date: "2026-03-23T00:12:00Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - area_key: "photo-assets-controller-run-orchestration"
     title: "Photo assets controller run orchestration"
     lane: "structural"
@@ -329,14 +349,16 @@ areas:
       - "add-resumes-cloud-import-provider-catalog-spec"
       - "add-resume-templates-base-component-spec"
       - "add-ui-page-header-component-spec"
-    last_reviewed_at: "2026-03-22T23:19:00Z"
-    last_changed_at: "2026-03-22T23:19:00Z"
-    next_step: "The next preferred lane is structural. Remaining verification gaps are low-priority UI components and skip-tier models; Ui::HeroHeaderComponent is the only remaining named verification candidate."
-    cycle_count: 25
-    last_cycle_date: "2026-03-22T23:19:00Z"
+      - "add-ui-hero-header-component-spec"
+      - "add-resumes-text-exporter-spec"
+    last_reviewed_at: "2026-03-23T00:18:00Z"
+    last_changed_at: "2026-03-23T00:18:00Z"
+    next_step: "The named verification queue is empty again after the fresh low-priority scan. Rotate back to the structural lane for ResumeTemplates::Catalog."
+    cycle_count: 27
+    last_cycle_date: "2026-03-23T00:18:00Z"
     issues_found: 61
-    issues_resolved: 37
-    issues_remaining: 24
+    issues_resolved: 39
+    issues_remaining: 22
     regression_detected: false
   - area_key: "llm-provider-credential-management"
     title: "LlmProvider credential management extraction"

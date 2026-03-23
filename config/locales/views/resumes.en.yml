@@ -122,6 +122,23 @@ en:
         create_new_resume: "Create new resume"
         browse_templates: "Browse templates"
         open_admin: "Open admin"
+      search:
+        eyebrow: "Find a draft"
+        description: "Search by resume title or headline, then change the workspace order only when you need a different scan path."
+        label: "Search resumes"
+        placeholder: "Search by title or headline"
+        apply: "Apply filters"
+        clear: "Clear search"
+      sort:
+        eyebrow: "Workspace order"
+        description: "Choose how the workspace list is ordered when you need to scan a larger set of drafts."
+        label: "Sort resumes"
+        apply: "Apply order"
+        options:
+          recently_updated: "Recently updated"
+          name_asc: "Name A–Z"
+          template_asc: "Template"
+          oldest_first: "Oldest first"
       welcome:
         pill: "Welcome"
         title: "Your starter draft is ready"
@@ -130,7 +147,10 @@ en:
       empty_state:
         title: "No resumes yet"
         description: "Create your first resume to start editing and previewing live."
+        filtered_title: "No resumes match that search yet"
+        filtered_description: "Try a broader title or headline search, or clear the current search to return to the full workspace list."
         create_resume: "Create resume"
+        clear_search: "Clear search"
       quick_actions:
         eyebrow: "Quick actions"
         title: "Keep moving"
@@ -148,8 +168,16 @@ en:
             one: "1 resume ready to review"
             other: "%{count} resumes ready to review"
           focus_note: "Use the card actions to jump back into editing or preview without starting another draft first."
+      bulk_actions:
+        title: "Bulk actions"
+        description: "Select resumes on this page to export them together or remove drafts you no longer need."
+        selected_count_one: "1 resume selected"
+        selected_count_other: "%{count} resumes selected"
+        export_selected: "Export selected"
+        delete_selected: "Delete selected"
     resume_card:
       canvas_pill: "Resume canvas"
+      selection_label: "Select %{title}"
       summary_status:
         ready: "Summary ready"
         needs: "Needs summary"

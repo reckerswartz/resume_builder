@@ -21,6 +21,40 @@ RSpec.describe 'Shared density UI components' do
       expect(component.title_classes).to include('text-4xl')
       expect(component.metrics_wrapper_classes).to include('mt-8')
     end
+
+    it 'normalizes badges, actions, and metrics while using the default hero layout branches' do
+      component = described_class.new(
+        eyebrow: 'Admin',
+        title: 'Dashboard',
+        description: 'Track rollout status',
+        avatar_text: 'RB',
+        badges: [{ 'label' => 'Live' }],
+        actions: [{ 'label' => 'Open', 'path' => '/admin' }],
+        metrics: [
+          { 'label' => 'Templates', 'value' => '12' },
+          { 'label' => 'Visible', 'value' => '9' },
+          { 'label' => 'Drafts', 'value' => '3' },
+          { 'label' => 'Checks', 'value' => '7' }
+        ]
+      )
+
+      expect(component.badges).to eq([{ label: 'Live' }])
+      expect(component.actions).to eq([{ label: 'Open', path: '/admin' }])
+      expect(component.metrics).to eq(
+        [
+          { label: 'Templates', value: '12' },
+          { label: 'Visible', value: '9' },
+          { label: 'Drafts', value: '3' },
+          { label: 'Checks', value: '7' }
+        ]
+      )
+      expect(component.description_classes).to include('sm:text-base')
+      expect(component.badges_classes).to include('mt-5')
+      expect(component.actions_classes).to include('max-w-sm')
+      expect(component.avatar_classes).to include('h-16')
+      expect(component.metrics_grid_classes).to include('xl:grid-cols-4')
+      expect(component.metrics_wrapper_classes).to include('pt-6')
+    end
   end
 
   describe Ui::PageHeaderComponent do
@@ -31,6 +65,29 @@ RSpec.describe 'Shared density UI components' do
       expect(component.wrapper_classes).to include('page-header-compact')
       expect(component.title_classes).to include('text-2xl')
       expect(component.default_action_size).to eq(:sm)
+    end
+
+    it 'keeps default spacing and normalizes badges and actions for standard page headers' do
+      component = described_class.new(
+        eyebrow: 'Admin',
+        title: 'Templates',
+        description: 'Manage gallery availability',
+        badges: [{ 'label' => 'Active' }],
+        actions: [{ 'label' => 'Edit', 'path' => '/admin/templates/1/edit' }]
+      )
+
+      expect(component).not_to be_compact
+      expect(component.badges).to eq([{ label: 'Active' }])
+      expect(component.actions).to eq([{ label: 'Edit', path: '/admin/templates/1/edit' }])
+      expect(component.wrapper_classes).to include('px-6')
+      expect(component.divider_classes).to include('inset-x-6')
+      expect(component.layout_classes).to include('gap-4')
+      expect(component.eyebrow_classes).to include('text-[0.72rem]')
+      expect(component.title_classes).to include('text-3xl')
+      expect(component.description_classes).to include('mt-3')
+      expect(component.badges_classes).to include('mt-4')
+      expect(component.actions_classes).to eq('flex flex-wrap gap-2')
+      expect(component.default_action_size).to eq(:md)
     end
   end
 

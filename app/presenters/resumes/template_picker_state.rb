@@ -1,5 +1,7 @@
 module Resumes
   class TemplatePickerState
+    include TemplateBrowserSupport
+
     attr_reader :description, :field_label, :mode
 
     def initialize(resume:, form_object_name:, field_label:, description:, mode: :default, view_context:)
@@ -56,6 +58,7 @@ module Resumes
           key: "family",
           label: picker_text("filter_groups.family"),
           options: filter_options_for(
+            template_cards: template_cards,
             key: "family",
             value_proc: ->(template_card) { template_card.fetch(:family) },
             label_proc: ->(template_card) { template_card.fetch(:family_label) }
@@ -65,6 +68,7 @@ module Resumes
           key: "density",
           label: picker_text("filter_groups.density"),
           options: filter_options_for(
+            template_cards: template_cards,
             key: "density",
             value_proc: ->(template_card) { template_card.fetch(:density) },
             label_proc: ->(template_card) { template_card.fetch(:density_label) }
@@ -74,6 +78,7 @@ module Resumes
           key: "column_count",
           label: picker_text("filter_groups.columns"),
           options: filter_options_for(
+            template_cards: template_cards,
             key: "column_count",
             value_proc: ->(template_card) { template_card.fetch(:column_count) },
             label_proc: ->(template_card) { template_card.fetch(:column_count_label) }
@@ -83,6 +88,7 @@ module Resumes
           key: "theme_tone",
           label: picker_text("filter_groups.theme"),
           options: filter_options_for(
+            template_cards: template_cards,
             key: "theme_tone",
             value_proc: ->(template_card) { template_card.fetch(:theme_tone) },
             label_proc: ->(template_card) { template_card.fetch(:theme_tone_label) }
@@ -92,6 +98,7 @@ module Resumes
           key: "shell_style",
           label: picker_text("filter_groups.layout"),
           options: filter_options_for(
+            template_cards: template_cards,
             key: "shell_style",
             value_proc: ->(template_card) { template_card.fetch(:shell_style) },
             label_proc: ->(template_card) { template_card.fetch(:shell_style_label) }
@@ -274,38 +281,16 @@ module Resumes
           label: label,
           options: [
             filter_option_state(key: key, value: "all", label: picker_text("filter_groups.all"), count: template_cards.size, active: true),
-            *options
+            *options.map do |option|
+              filter_option_state(
+                key: key,
+                value: option.fetch(:value),
+                label: option.fetch(:label),
+                count: option.fetch(:count),
+                active: false
+              )
+            end
           ]
-        }
-      end
-
-      def filter_options_for(key:, value_proc:, label_proc:)
-        template_cards
-          .group_by { |template_card| value_proc.call(template_card) }
-          .map do |value, cards|
-            representative_card = cards.first
-
-            filter_option_state(
-              key: key,
-              value: value,
-              label: label_proc.call(representative_card),
-              count: cards.size,
-              active: false
-            )
-          end
-          .sort_by { |option| option.fetch(:label) }
-      end
-
-      def filter_option_state(key:, value:, label:, count:, active:)
-        {
-          key: key,
-          value: value,
-          label: label,
-          count: count,
-          button_classes: active ? selected_filter_chip_classes : unselected_filter_chip_classes,
-          button_selected_classes: selected_filter_chip_classes,
-          button_unselected_classes: unselected_filter_chip_classes,
-          aria_pressed: active.to_s
         }
       end
 
@@ -326,19 +311,6 @@ module Resumes
             preview_template_path: preview_template_path_for(template, accent_color: accent_color)
           )
         end
-      end
-
-      def preview_template_paths_by_accent_color(template, template_card)
-        template_card_accent_variants(template_card).each_with_object({}) do |accent_variant, paths|
-          accent_color = accent_variant.fetch(:accent_color)
-          paths[accent_color] = preview_template_path_for(template, accent_color: accent_color)
-        end
-      end
-
-      def selected_accent_variant_for(template_card, selected_accent_color)
-        template_card_accent_variants(template_card).find do |accent_variant|
-          accent_variant.fetch(:accent_color) == selected_accent_color
-        end || template_card_accent_variants(template_card).first
       end
 
       def preview_template_path_for(template, accent_color:)
@@ -365,70 +337,12 @@ module Resumes
         { selected_template_id => resume.accent_color }
       end
 
-      def template_card_accent_variants(template_card)
-        template_card.fetch(:accent_variants) do
-          ResumeTemplates::Catalog.accent_variants(
-            {
-              "theme_tone" => template_card.fetch(:theme_tone),
-              "accent_color" => template_card.fetch(:accent_color)
-            },
-            selected_accent_color: template_card.fetch(:selected_accent_color, template_card.fetch(:accent_color))
-          )
-        end
-      end
-
-      def searchable_text_for(template_card)
-        template = template_card.fetch(:template)
-
-        [
-          template.name,
-          template.description,
-          template_card.fetch(:family_label),
-          template_card.fetch(:density_label),
-          template_card.fetch(:column_count_label),
-          template_card.fetch(:theme_tone_label),
-          template_card.fetch(:header_style_label),
-          template_card.fetch(:entry_style_label),
-          template_card.fetch(:skill_style_label),
-          template_card.fetch(:section_heading_style_label),
-          template_card.fetch(:shell_style_label),
-          template_card.fetch(:summary),
-          template_card.fetch(:sidebar_section_labels).join(" ")
-        ].compact.join(" ").downcase
-      end
-
-      def density_sort_rank(density)
-        {
-          "compact" => 0,
-          "comfortable" => 1,
-          "relaxed" => 2
-        }.fetch(density, 99)
-      end
-
-      def recommendation_sort_available?
-        recommendations.present?
-      end
-
       def recommendations
         @recommendations ||= Resumes::TemplateRecommendationService.new(resume: resume, template_cards: raw_template_cards).call
       end
 
-      def recommendations_by_template_id
-        @recommendations_by_template_id ||= recommendations.index_by { |recommendation| recommendation.fetch(:template_id) }
-      end
-
       def recommendation_for(template)
         recommendations_by_template_id[template.id]
-      end
-
-      def recommendation_sort_rank(template_id)
-        recommendation_sort_ranks.fetch(template_id, 99)
-      end
-
-      def recommendation_sort_ranks
-        @recommendation_sort_ranks ||= recommendations.each_with_index.to_h do |recommendation, index|
-          [ recommendation.fetch(:template_id), index ]
-        end
       end
 
       def sort_template_cards(template_cards)

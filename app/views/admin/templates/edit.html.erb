@@ -1,11 +1,11 @@
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Admin",
-    title: "Edit template",
-    description: "Update the layout defaults and gallery visibility for this template.",
+    eyebrow: t("admin.templates.edit.page_header.eyebrow"),
+    title: t("admin.templates.edit.page_header.title"),
+    description: t("admin.templates.edit.page_header.description"),
     density: :compact,
     actions: [
-      { label: "View template", path: admin_template_path(@template), style: :secondary }
+      { label: t("admin.templates.edit.page_header.actions.view_template"), path: admin_template_path(@template), style: :secondary }
     ]
   ) %>
 

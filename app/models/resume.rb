@@ -21,6 +21,13 @@ class Resume < ApplicationRecord
   has_many :resume_photo_selections, dependent: :destroy
   has_many :sections, -> { order(position: :asc, created_at: :asc) }, dependent: :destroy, inverse_of: :resume
 
+  scope :matching_query, ->(query) do
+    next all if query.blank?
+
+    term = "%#{ActiveRecord::Base.sanitize_sql_like(query.to_s.strip)}%"
+    where("resumes.title ILIKE :term OR resumes.headline ILIKE :term", term: term)
+  end
+
   validates :slug, presence: true, uniqueness: { scope: :user_id }
   validates :source_mode, inclusion: { in: SOURCE_MODES }
   validates :title, presence: true

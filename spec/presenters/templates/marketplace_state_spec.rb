@@ -242,6 +242,34 @@ RSpec.describe Templates::MarketplaceState do
     end
   end
 
+  describe 'apply-to-existing chooser state' do
+    let(:chooser_user) { create(:user) }
+    let!(:older_resume) { create(:resume, user: chooser_user, template: modern_template, title: 'Platform Resume', updated_at: 2.days.ago) }
+    let!(:newer_resume) { create(:resume, user: chooser_user, template: classic_template, title: 'Legal Resume', updated_at: 1.day.ago) }
+
+    before do
+      allow(view_context).to receive(:current_user).and_return(chooser_user)
+      allow(view_context).to receive(:apply_to_resume_template_path) { |template| "/templates/#{template.id}/apply_to_resume" }
+    end
+
+    it 'exposes ordered resume options and chooser redirect paths for applying templates' do
+      modern_card_state = marketplace_state.card_states.find { |card_state| card_state.fetch(:template) == modern_template }
+
+      expect(marketplace_state.apply_to_resume_available?).to be(true)
+      expect(marketplace_state.selected_apply_resume_id).to eq(newer_resume.id)
+      expect(marketplace_state.apply_resume_options).to eq([
+        ['Legal Resume · Classic Ivory', newer_resume.id],
+        ['Platform Resume · Modern Slate', older_resume.id]
+      ])
+      expect(marketplace_state.apply_to_resume_path_for(modern_template)).to eq("/templates/#{modern_template.id}/apply_to_resume")
+      expect(modern_card_state.fetch(:apply_resume_options)).to eq([
+        ['Legal Resume · Classic Ivory', newer_resume.id],
+        ['Platform Resume · Modern Slate', older_resume.id]
+      ])
+      expect(modern_card_state.fetch(:selected_apply_resume_id)).to eq(newer_resume.id)
+    end
+  end
+
   describe 'intake-driven recommendations' do
     let(:ats_template) do
       create(

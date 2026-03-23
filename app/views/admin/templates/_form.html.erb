@@ -1,12 +1,14 @@
+<% profile_state = template_profile_state(template) %>
 <% layout_metadata = template_layout_metadata(template) %>
 <% template_card = template_cards_for_builder(selected_template: template, templates: [template]).first %>
+<% copy_scope = "admin.templates.form" %>
 <% template_sections = [
-     { id: "template-identity", label: "Template identity", caption: "Name, slug, and description" },
-     { id: "layout-system", label: "Layout system", caption: "Family, typography, density, and accent" },
-     { id: "availability-preview", label: "Availability & preview", caption: "Visibility, activation, and sample rendering" }
+     { id: "template-identity", label: t("#{copy_scope}.navigation.sections.template_identity.label"), caption: t("#{copy_scope}.navigation.sections.template_identity.caption") },
+     { id: "layout-system", label: t("#{copy_scope}.navigation.sections.layout_system.label"), caption: t("#{copy_scope}.navigation.sections.layout_system.caption") },
+     { id: "availability-preview", label: t("#{copy_scope}.navigation.sections.availability_preview.label"), caption: t("#{copy_scope}.navigation.sections.availability_preview.caption") }
    ] %>
-<% save_message = template.persisted? ? "Saving changes updates the shared preview and PDF export renderer for future resume sessions that use this template." : "Creating the template registers it for admin review and, if active, user selection in the template gallery." %>
-<% preview_guidance = "Changes to family, font scale, density, columns, theme tone, and accent color update the shared preview after save." %>
+<% save_message = template.persisted? ? t("#{copy_scope}.save_messages.update") : t("#{copy_scope}.save_messages.create") %>
+<% preview_guidance = t("#{copy_scope}.side_panels.preview_description") %>
 
 <%= form_with model: [:admin, template], class: "grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)] min-w-0 w-full max-w-full overflow-hidden" do |form| %>
   <% layout_config = template.normalized_layout_config %>
@@ -22,10 +24,10 @@
         <div>
           <span class="atelier-pill">
             <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-            Template setup
+            <%= t("#{copy_scope}.navigation.pill") %>
           </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= template.persisted? ? "Update template profile" : "Create a template" %></h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Work through identity, layout settings, and visibility before saving this template.</p>
+          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= template.persisted? ? t("#{copy_scope}.navigation.title.edit") : t("#{copy_scope}.navigation.title.new") %></h2>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("#{copy_scope}.navigation.description") %></p>
         </div>
 
         <div class="space-y-3">
@@ -39,7 +41,7 @@
         </div>
 
         <div class="<%= ui_inset_panel_classes(tone: template.active? ? :success : :subtle) %>">
-          <p class="text-sm font-medium text-ink-950">Visibility</p>
+          <p class="text-sm font-medium text-ink-950"><%= t("#{copy_scope}.side_panels.visibility_title") %></p>
           <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= template_visibility_description(template) %></p>
           <div class="mt-3 flex flex-wrap gap-2">
             <span class="<%= ui_badge_classes(template_visibility_tone(template)) %>"><%= template_visibility_label(template) %></span>
@@ -48,7 +50,7 @@
         </div>
 
         <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-          <p class="text-sm font-medium text-ink-950">Preview behavior</p>
+          <p class="text-sm font-medium text-ink-950"><%= t("#{copy_scope}.side_panels.preview_title") %></p>
           <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= preview_guidance %></p>
           <div class="mt-3 flex flex-wrap gap-2">
             <span class="<%= ui_badge_classes(:neutral) %>"><%= layout_metadata.fetch(:family_label) %></span>
@@ -58,9 +60,9 @@
 
         <div class="flex flex-wrap gap-2">
           <% if template.persisted? %>
-            <%= link_to "View template", admin_template_path(template), class: ui_button_classes(:secondary, size: :sm) %>
+            <%= link_to t("#{copy_scope}.actions.view_template"), admin_template_path(template), class: ui_button_classes(:secondary, size: :sm) %>
           <% else %>
-            <%= link_to "Back to templates", admin_templates_path, class: ui_button_classes(:secondary, size: :sm) %>
+            <%= link_to t("#{copy_scope}.actions.back_to_templates"), admin_templates_path, class: ui_button_classes(:secondary, size: :sm) %>
           <% end %>
         </div>
       </div>
@@ -69,12 +71,12 @@
 
   <div class="space-y-6">
     <%= render Ui::SettingsSectionComponent.new(
-      title: "Template identity",
+      title: t("#{copy_scope}.sections.template_identity.title"),
       anchor: "template-identity",
-      eyebrow: "Core details",
-      description: "Register the admin-facing name, slug, and description used to manage this template.",
+      eyebrow: t("#{copy_scope}.sections.template_identity.eyebrow"),
+      description: t("#{copy_scope}.sections.template_identity.description"),
       badges: [
-        { label: template.persisted? ? "Saved record" : "New record", tone: template.persisted? ? :success : :neutral },
+        { label: template.persisted? ? t("#{copy_scope}.sections.template_identity.badges.saved_record") : t("#{copy_scope}.sections.template_identity.badges.new_record"), tone: template.persisted? ? :success : :neutral },
         { label: layout_metadata.fetch(:family_label), tone: :neutral }
       ]
     ) do %>
@@ -92,16 +94,16 @@
         <div class="sm:col-span-2">
           <%= form.label :description, class: ui_label_classes %>
           <%= form.text_area :description, rows: 4, class: ui_input_classes %>
-          <p class="mt-2 text-sm text-ink-700/80">Descriptions help admin review and clarify when a template belongs in the gallery.</p>
+          <p class="mt-2 text-sm text-ink-700/80"><%= t("#{copy_scope}.sections.template_identity.description_help") %></p>
         </div>
       </div>
     <% end %>
 
     <%= render Ui::SettingsSectionComponent.new(
-      title: "Layout system",
+      title: t("#{copy_scope}.sections.layout_system.title"),
       anchor: "layout-system",
-      eyebrow: "Rendering configuration",
-      description: "Adjust the family, typography, density, and accent settings that shape the shared preview and export output.",
+      eyebrow: t("#{copy_scope}.sections.layout_system.eyebrow"),
+      description: t("#{copy_scope}.sections.layout_system.description"),
       badges: [
         { label: layout_metadata.fetch(:shell_style_label), tone: :neutral },
         { label: layout_metadata.fetch(:entry_style_label), tone: :neutral }
@@ -110,54 +112,54 @@
       <div class="space-y-4">
         <div class="grid gap-5 sm:grid-cols-2">
           <div>
-            <%= label_tag "template_layout_config_family", "Family", class: ui_label_classes %>
+            <%= label_tag "template_layout_config_family", t("#{copy_scope}.sections.layout_system.labels.family"), class: ui_label_classes %>
             <%= select_tag "template[layout_config][family]", options_for_select(ResumeTemplates::Catalog.family_options, template.layout_family), class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "template_layout_config_font_scale", "Font scale", class: ui_label_classes %>
+            <%= label_tag "template_layout_config_font_scale", t("#{copy_scope}.sections.layout_system.labels.font_scale"), class: ui_label_classes %>
             <%= select_tag "template[layout_config][font_scale]", options_for_select(ResumeTemplates::Catalog.font_scale_options, layout_config.fetch("font_scale")), class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "template_layout_config_density", "Density", class: ui_label_classes %>
+            <%= label_tag "template_layout_config_density", t("#{copy_scope}.sections.layout_system.labels.density"), class: ui_label_classes %>
             <%= select_tag "template[layout_config][density]", options_for_select(ResumeTemplates::Catalog.density_options, layout_config.fetch("density")), class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "template_layout_config_column_count", "Columns", class: ui_label_classes %>
+            <%= label_tag "template_layout_config_column_count", t("#{copy_scope}.sections.layout_system.labels.columns"), class: ui_label_classes %>
             <%= select_tag "template[layout_config][column_count]", options_for_select(ResumeTemplates::Catalog.column_count_options, layout_config.fetch("column_count")), class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "template_layout_config_theme_tone", "Theme tone", class: ui_label_classes %>
+            <%= label_tag "template_layout_config_theme_tone", t("#{copy_scope}.sections.layout_system.labels.theme_tone"), class: ui_label_classes %>
             <%= select_tag "template[layout_config][theme_tone]", options_for_select(ResumeTemplates::Catalog.theme_tone_options, layout_config.fetch("theme_tone")), class: ui_input_classes %>
           </div>
 
           <div>
-            <%= label_tag "template_layout_config_accent_color", "Accent color", class: ui_label_classes %>
+            <%= label_tag "template_layout_config_accent_color", t("#{copy_scope}.sections.layout_system.labels.accent_color"), class: ui_label_classes %>
             <%= color_field_tag "template[layout_config][accent_color]", layout_config.fetch("accent_color"), class: "mt-2 block h-12 w-full rounded-2xl border border-canvas-200/80 bg-canvas-50/92 px-2 py-2 shadow-sm focus:border-ink-700 focus:outline-none focus:ring-2 focus:ring-canvas-200" %>
           </div>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <p class="text-sm font-medium text-ink-700/70">Layout focus</p>
+            <p class="text-sm font-medium text-ink-700/70"><%= t("#{copy_scope}.sections.layout_system.cards.layout_focus") %></p>
             <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= template_layout_focus_summary(template) %></p>
           </div>
 
           <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <p class="text-sm font-medium text-ink-700/70">Current profile</p>
+            <p class="text-sm font-medium text-ink-700/70"><%= t("#{copy_scope}.sections.layout_system.cards.current_profile") %></p>
             <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= layout_metadata.fetch(:summary) %></p>
           </div>
 
           <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <p class="text-sm font-medium text-ink-700/70">Columns</p>
+            <p class="text-sm font-medium text-ink-700/70"><%= t("#{copy_scope}.sections.layout_system.cards.columns") %></p>
             <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= layout_metadata.fetch(:column_count_label) %></p>
           </div>
 
           <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-            <p class="text-sm font-medium text-ink-700/70">Theme tone</p>
+            <p class="text-sm font-medium text-ink-700/70"><%= t("#{copy_scope}.sections.layout_system.cards.theme_tone") %></p>
             <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= layout_metadata.fetch(:theme_tone_label) %></p>
           </div>
 
@@ -165,11 +167,11 @@
             <summary class="cursor-pointer px-5 py-4">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm font-medium text-ink-950">Advanced layout metadata</p>
-                  <p class="mt-1 text-sm leading-6 text-ink-700/80">Lower-priority planning flags that do not need to stay open during normal template editing.</p>
+                  <p class="text-sm font-medium text-ink-950"><%= t("#{copy_scope}.sections.layout_system.advanced_details.title") %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("#{copy_scope}.sections.layout_system.advanced_details.description") %></p>
                 </div>
 
-                <span class="<%= ui_badge_classes(:neutral) %>">Optional</span>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= t("#{copy_scope}.sections.layout_system.advanced_details.badge") %></span>
               </div>
             </summary>
 
@@ -178,8 +180,8 @@
                 <%= hidden_field_tag "template[layout_config][supports_headshot]", false %>
                 <label class="flex items-start justify-between gap-4">
                   <span>
-                    <span class="block text-sm font-medium text-ink-950">Headshot metadata</span>
-                    <span class="mt-1 block text-sm leading-6 text-ink-700/80">Enable this only when the template renderer honestly supports an uploaded resume headshot. Disabled templates keep their non-photo identity treatment.</span>
+                    <span class="block text-sm font-medium text-ink-950"><%= t("#{copy_scope}.sections.layout_system.advanced_details.photo_support.title") %></span>
+                    <span class="mt-1 block text-sm leading-6 text-ink-700/80"><%= t("#{copy_scope}.sections.layout_system.advanced_details.photo_support.description") %></span>
                   </span>
 
                   <span class="flex items-center gap-3">
@@ -195,10 +197,10 @@
     <% end %>
 
     <%= render Ui::SettingsSectionComponent.new(
-      title: "Availability & preview",
+      title: t("#{copy_scope}.sections.availability_preview.title"),
       anchor: "availability-preview",
-      eyebrow: "User exposure",
-      description: "Control gallery visibility and review the current shared preview before saving.",
+      eyebrow: t("#{copy_scope}.sections.availability_preview.eyebrow"),
+      description: t("#{copy_scope}.sections.availability_preview.description"),
       badges: [
         { label: template_visibility_label(template), tone: template_visibility_tone(template) },
         { label: template_status_label(template), tone: template_status_badge_tone(template) }
@@ -208,8 +210,8 @@
         <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'sm:col-span-2'].join(' ') %>">
           <label class="flex items-start justify-between gap-4">
             <span>
-              <span class="block text-sm font-medium text-ink-950">Active template</span>
-              <span class="mt-1 block text-sm leading-6 text-ink-700/80">Inactive templates remain stored for admin review and existing resumes, but non-admin users will not see them in the gallery.</span>
+              <span class="block text-sm font-medium text-ink-950"><%= t("#{copy_scope}.sections.availability_preview.active_template.title") %></span>
+              <span class="mt-1 block text-sm leading-6 text-ink-700/80"><%= t("#{copy_scope}.sections.availability_preview.active_template.description") %></span>
             </span>
             <%= form.check_box :active, class: ui_checkbox_classes %>
           </label>
@@ -218,7 +220,7 @@
         <div class="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
           <div class="space-y-4">
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-              <p class="text-sm font-medium text-ink-700/70">Visibility summary</p>
+              <p class="text-sm font-medium text-ink-700/70"><%= t("#{copy_scope}.sections.availability_preview.visibility_summary") %></p>
               <div class="mt-2 flex flex-wrap items-center gap-2">
                 <span class="<%= ui_badge_classes(template_visibility_tone(template)) %>"><%= template_visibility_label(template) %></span>
                 <span class="text-sm leading-6 text-ink-700/80"><%= template_visibility_description(template) %></span>
@@ -229,7 +231,7 @@
               <div class="flex items-start gap-3">
                 <%= render Ui::GlyphComponent.new(name: :layers, size: :sm, tone: :soft) %>
                 <div>
-                  <p class="text-sm font-medium text-ink-950">Save behavior</p>
+                  <p class="text-sm font-medium text-ink-950"><%= t("#{copy_scope}.sections.availability_preview.save_behavior_title") %></p>
                   <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= save_message %></p>
                 </div>
               </div>
@@ -238,9 +240,9 @@
 
           <div>
             <%= render Ui::DashboardPanelComponent.new(
-              eyebrow: "Shared preview",
-              title: "Current renderer sample",
-              description: "This miniature preview reflects the current normalized layout config for the template record.",
+              eyebrow: t("#{copy_scope}.sections.availability_preview.preview_panel.eyebrow"),
+              title: t("#{copy_scope}.sections.availability_preview.preview_panel.title"),
+              description: t("#{copy_scope}.sections.availability_preview.preview_panel.description"),
               padding: :sm
             ) do %>
               <div class="relative overflow-hidden rounded-[1.5rem] border border-canvas-200/80 bg-canvas-50/92 p-3 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
@@ -256,16 +258,16 @@
     <% end %>
 
     <%= render Ui::StickyActionBarComponent.new(
-      title: template.persisted? ? "Save template" : "Create template",
+      title: template.persisted? ? t("#{copy_scope}.actions.save_template") : t("#{copy_scope}.actions.create_template"),
       description: save_message,
       density: :compact
     ) do %>
       <% if template.persisted? %>
-        <%= link_to "View template", admin_template_path(template), class: ui_button_classes(:secondary, size: :sm) %>
+        <%= link_to t("#{copy_scope}.actions.view_template"), admin_template_path(template), class: ui_button_classes(:secondary, size: :sm) %>
       <% else %>
-        <%= link_to "Back to templates", admin_templates_path, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= link_to t("#{copy_scope}.actions.back_to_templates"), admin_templates_path, class: ui_button_classes(:secondary, size: :sm) %>
       <% end %>
-      <%= form.submit(template.persisted? ? "Save template" : "Create template", class: ui_button_classes(:primary)) %>
+      <%= form.submit(template.persisted? ? t("#{copy_scope}.actions.save_template") : t("#{copy_scope}.actions.create_template"), class: ui_button_classes(:primary)) %>
     <% end %>
   </div>
 <% end %>

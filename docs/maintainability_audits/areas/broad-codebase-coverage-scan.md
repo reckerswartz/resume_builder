@@ -11,13 +11,13 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `add_targeted_specs`
-- Last reviewed: `2026-03-22T06:10:00Z`
-- Last changed: `2026-03-22T06:10:00Z`
+- Last reviewed: `2026-03-23T00:18:00Z`
+- Last changed: `2026-03-23T00:18:00Z`
 
 ## Hotspot summary
 
 - Primary problem:
-  - Full codebase scan revealed ~60 missing spec files across all layers: 8 models, 15 services, 5 jobs, 1 presenter, 3 helpers, 9 policies, and 25 components.
+  - Full codebase scan revealed ~60 missing spec files across all Rails layers: 8 models, 15 services, 5 jobs, 1 presenter, 3 helpers, 9 policies, and 23 components.
 - Signals:
   - `ApplicationJob` (91 lines) — shared base class for all background jobs with automatic JobLog lifecycle, error capture, and output tracking — zero dedicated coverage.
 - Risks:
@@ -162,10 +162,6 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Added `spec/services/resumes/cloud_import_provider_catalog_spec.rb` (6 examples) covering hydrated provider metadata from `.all`, known and unknown provider lookup via `.fetch`, and the `provider_unavailable`, `configured`, and `setup_required` feedback branches from `.launch_feedback`.
 - Re-verified adjacent consumer coverage in `spec/presenters/resumes/source_step_state_spec.rb`, `spec/helpers/resumes_helper_spec.rb`, `spec/helpers/admin/settings_helper_spec.rb`, and `spec/requests/resume_source_imports_spec.rb`.
 
-### Spec fix: registrations_spec.rb
-
-- Fixed stale assertion `expect(Resume.last.sections.count).to eq(4)` → `eq(ResumeBuilder::SectionRegistry.starter_sections.size)` since starter sections grew from 4 to 6 (added certifications and languages).
-
 ### Slice 31: resumes-pdf-text-extractor-spec
 
 - Added `spec/services/resumes/pdf_text_extractor_spec.rb` (5 examples) covering multi-page text joined by double newlines, single-page without trailing separators, MalformedPDFError recovery, generic StandardError recovery, and StringIO wrapping.
@@ -184,10 +180,29 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Added `spec/services/errors/tracker_spec.rb` (8 examples) covering ErrorLog creation with error details, backtrace truncation to 25 lines, context normalization with string keys, occurred_at and duration_ms recording, log message with reference_id and context details, request_id/active_job_id inclusion in log, nil return with fallback log on creation failure, and nil context handling.
 - Re-verified adjacent consumer coverage in `spec/jobs/application_job_spec.rb`.
 
+### Slice 35: resume-templates-base-component-spec
+
+- Added `spec/components/resume_templates/base_component_spec.rb` (6 examples) covering shared shell-class composition, explicit spacing override behavior, shared resume content shaping, visible-section filtering, and headshot data URL generation for headshot-capable templates.
+- Re-verified adjacent shared-rendering coverage in `spec/services/resume_templates/pdf_rendering_spec.rb`.
+
+### Slice 36: ui-page-header-component-spec
+
+- Extended `spec/components/ui/shared_density_components_spec.rb` with direct default-state coverage for `Ui::PageHeaderComponent`.
+- Added assertions for normalized badge/action payloads, default wrapper/divider/layout spacing, default typography classes, default badge/action spacing, and the default action size branch.
+
+### Slice 37: ui-hero-header-component-spec
+
+- Extended `spec/components/ui/shared_density_components_spec.rb` with direct default-state coverage for `Ui::HeroHeaderComponent`.
+- Added assertions for normalized badge/action/metric payloads, default description/badge/action/avatar class branches, four-metric grid branching, and default metrics-wrapper spacing.
+
+### Slice 38: resumes-text-exporter-spec
+
+- Extended `spec/services/resumes/text_exporter_spec.rb` with focused coverage for non-experience section formatting, blank-section suppression, `Current`/`Present` date normalization, contact-field whitespace cleanup, excess blank-line collapse, and trailing newline preservation.
+
 ## Pending
 
 - All inventoried service coverage gaps are now closed.
-- Remaining coverage gaps are concentrated in low-priority UI components (25 missing) and skip-tier models.
+- Remaining coverage gaps are concentrated in low-priority UI components and skip-tier models. The named verification queue remains empty after the fresh low-priority verification scan.
 
 ## Open follow-up keys
 
@@ -214,13 +229,23 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - `add-resumes-docx-text-extractor-spec`
 - `add-resumes-export-status-broadcaster-spec`
 - `add-errors-tracker-spec`
+- `add-resume-templates-base-component-spec`
+- `add-ui-page-header-component-spec`
+- `add-ui-hero-header-component-spec`
+- `add-resumes-text-exporter-spec`
 
 ## Verification
 
 - Specs:
   - `bundle exec rspec spec/services/resumes/export_status_broadcaster_spec.rb spec/services/errors/tracker_spec.rb spec/jobs/application_job_spec.rb` (17 examples, 0 failures)
+  - `bundle exec rspec spec/components/resume_templates/base_component_spec.rb spec/services/resume_templates/pdf_rendering_spec.rb` (29 examples, 0 failures)
+  - `bundle exec rspec spec/components/ui/shared_density_components_spec.rb` (10 examples, 0 failures)
+  - `bundle exec rspec spec/services/resumes/text_exporter_spec.rb` (3 examples, 0 failures)
 - Lint or syntax:
   - `ruby -c spec/services/resumes/export_status_broadcaster_spec.rb spec/services/errors/tracker_spec.rb` (Syntax OK)
+  - `ruby -c spec/components/resume_templates/base_component_spec.rb` (Syntax OK)
+  - `ruby -c spec/components/ui/shared_density_components_spec.rb` (Syntax OK)
+  - `ruby -c spec/services/resumes/text_exporter_spec.rb` (Syntax OK)
 
 ## Full missing-spec inventory (as of 2026-03-21)
 
@@ -249,5 +274,5 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 |------|-------|----------|
 | All inventoried policies for this area now have dedicated coverage.
 
-### Components (25 missing — all UI components)
+### Components (23 missing — all UI components)
 Lower priority since UI components are verified through request specs and Playwright audits.

@@ -6,7 +6,7 @@ class TemplatesController < ApplicationController
 
   allow_unauthenticated_access only: %i[index show]
   before_action :resume_session, only: %i[index show]
-  before_action :set_template, only: :show
+  before_action :set_template, only: %i[show apply_to_resume]
 
   def index
     authorize Template
@@ -35,6 +35,18 @@ class TemplatesController < ApplicationController
       template: @template,
       accent_color: requested_resume_accent_color
     ).call
+  end
+
+  def apply_to_resume
+    authorize @template, :show?
+
+    target_resume = selectable_resumes.find_by(id: params[:resume_id])
+    unless target_resume.present?
+      return redirect_back fallback_location: template_path(template_redirect_params), alert: I18n.t("templates.controller.resume_selection_required")
+    end
+
+    authorize target_resume, :update?
+    redirect_to edit_resume_path(target_resume, step: :finalize, template_id: @template.id)
   end
 
   private
@@ -67,6 +79,24 @@ class TemplatesController < ApplicationController
 
     def requested_resume_accent_color
       requested_resume_settings["accent_color"]
+    end
+
+    def requested_resume_context_params
+      context = {}
+      context[:intake_details] = requested_resume_intake_details if requested_resume_intake_details.present?
+      context[:settings] = requested_resume_settings if requested_resume_settings.present?
+      context
+    end
+
+    def selectable_resumes
+      @selectable_resumes ||= policy_scope(Resume).includes(:template).order(updated_at: :desc)
+    end
+
+    def template_redirect_params(apply_to_resume: false)
+      path_params = { id: @template }
+      path_params[:apply_to_resume] = true if apply_to_resume
+      path_params[:resume] = requested_resume_context_params if requested_resume_context_params.present?
+      path_params
     end
 
     def user_visible_templates

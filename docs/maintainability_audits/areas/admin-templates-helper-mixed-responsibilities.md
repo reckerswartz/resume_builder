@@ -10,10 +10,10 @@ This file tracks the `Admin::TemplatesHelper` maintainability hotspot around mix
 - Path: `app/helpers/admin/templates_helper.rb`
 - Category: `helper`
 - Priority: `medium`
-- Status: `improved`
+- Status: `closed`
 - Recommended refactor shape: `extract_presenter`
-- Last reviewed: `2026-03-22T23:15:00Z`
-- Last changed: `2026-03-22T23:15:00Z`
+- Last reviewed: `2026-03-22T23:42:00Z`
+- Last changed: `2026-03-22T23:42:00Z`
 
 ## Hotspot summary
 
@@ -44,24 +44,26 @@ This file tracks the `Admin::TemplatesHelper` maintainability hotspot around mix
 - Audited files:
   - `app/helpers/admin/templates_helper.rb`
   - `app/presenters/admin/templates/profile_state.rb`
+  - `app/presenters/admin/templates/artifact_review_state.rb`
   - `app/views/admin/templates/_table.html.erb`
   - `app/views/admin/templates/_form.html.erb`
   - `app/views/admin/templates/show.html.erb`
   - `spec/helpers/admin/templates_helper_spec.rb`
   - `spec/presenters/admin/templates/profile_state_spec.rb`
+  - `spec/presenters/admin/templates/artifact_review_state_spec.rb`
   - `spec/requests/admin/templates_spec.rb`
 - Completed files:
   - `app/presenters/admin/templates/profile_state.rb`
+  - `app/presenters/admin/templates/artifact_review_state.rb`
   - `app/helpers/admin/templates_helper.rb`
   - `app/views/admin/templates/_table.html.erb`
   - `app/views/admin/templates/_form.html.erb`
   - `app/views/admin/templates/show.html.erb`
   - `spec/presenters/admin/templates/profile_state_spec.rb`
+  - `spec/presenters/admin/templates/artifact_review_state_spec.rb`
   - `spec/helpers/admin/templates_helper_spec.rb`
 - Remaining files or follow-up targets:
-  - `app/helpers/admin/templates_helper.rb`
-  - `app/views/admin/templates/show.html.erb`
-  - `spec/helpers/admin/templates_helper_spec.rb`
+  - (none)
 
 ## Current slice
 
@@ -92,24 +94,33 @@ This file tracks the `Admin::TemplatesHelper` maintainability hotspot around mix
 - Added direct presenter coverage in `spec/presenters/admin/templates/profile_state_spec.rb` and replaced the removed helper method expectations with factory coverage.
 - Re-verified the adjacent admin template request surface to confirm the extracted presenter preserved rendering behavior.
 - Restored the extracted `ProfileState` boundary after regression drift reintroduced helper-owned usage on the show surface and dropped the thin helper factory from `Admin::TemplatesHelper`.
+- Cleared the admin template request regression baseline by restoring the parsed `admin.templates.show` locale tree used by the detail surface and restoring the empty-state `Saved layout snapshot` disclosure for the implementation review card.
+- Extracted `Admin::Templates::ArtifactReviewState` to own the package-backed artifact/lifecycle review state cluster for the admin template detail surface, including review counts, summary tone/title/detail, grouped artifacts, seed baseline state, implementation badge state, and packaged implementation/history/validation collections.
+- Reduced `Admin::TemplatesHelper` to a thin `template_artifact_review_state` factory for the remaining artifact/lifecycle state cluster while keeping only lightweight row-formatting helpers in the module.
+- Updated `app/views/admin/templates/show.html.erb` to consume `artifact_review_state` directly instead of helper-owned package orchestration methods.
+- Added direct presenter coverage in `spec/presenters/admin/templates/artifact_review_state_spec.rb` and narrowed `spec/helpers/admin/templates_helper_spec.rb` to the thin factory boundary.
 
 ## Pending
 
-- The helper still owns a large artifact/lifecycle review state cluster. A later structural slice should extract that cluster into a focused presenter or presenters.
+- All tracked follow-ups for this helper are complete. Remaining admin template work, if any, should come from future whole-codebase scans rather than this hotspot's original mixed-responsibility cluster.
 
 ## Open follow-up keys
 
-- `extract-template-artifact-review-state`
+- (none)
 
 ## Closed follow-up keys
 
 - `extract-template-profile-state`
+- `extract-template-artifact-review-state`
 
 ## Verification
 
 - Specs:
   - `bundle exec rspec spec/presenters/admin/templates/profile_state_spec.rb spec/helpers/admin/templates_helper_spec.rb spec/requests/admin/templates_spec.rb` (42 examples, 0 failures)
+  - `bundle exec rspec spec/requests/admin/templates_spec.rb` (20 examples, 0 failures)
+  - `bundle exec rspec spec/presenters/admin/templates/artifact_review_state_spec.rb spec/helpers/admin/templates_helper_spec.rb spec/requests/admin/templates_spec.rb` (36 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/helpers/admin/templates_helper.rb app/views/admin/templates/show.html.erb spec/helpers/admin/templates_helper_spec.rb spec/presenters/admin/templates/profile_state_spec.rb` (Syntax OK)
+  - `ruby - <<'RUBY' require 'yaml'; YAML.load_file('config/locales/views/admin.en.yml'); puts 'YAML OK'; RUBY` (YAML OK)
+  - `ruby -c app/helpers/admin/templates_helper.rb app/presenters/admin/templates/artifact_review_state.rb spec/helpers/admin/templates_helper_spec.rb spec/presenters/admin/templates/artifact_review_state_spec.rb` (Syntax OK)
 - Notes:
-  - The restored presenter boundary preserved the existing admin template copy and shared admin page-family primitives.
+  - The extracted artifact review presenter preserved the existing admin template copy and request-surface contract while closing the original helper mixed-responsibility hotspot.

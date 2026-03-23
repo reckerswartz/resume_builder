@@ -9,132 +9,21 @@ require 'rails_helper'
 #       expect(helper.concat_strings("this","that")).to eq("this that")
 #     end
 #   end
-# end
-RSpec.describe Admin::TemplatesHelper, type: :helper do
-  describe '#template_artifact_review_detail' do
-    it 'summarizes source coverage, implementation state, and validation run count' do
-      template = create(:template, slug: 'editorial-split')
-      source_artifact = create(
-        :template_artifact,
-        template: template,
-        artifact_type: 'reference_design',
-        lineage_kind: 'source',
-        name: 'Behance capture'
-      )
-      implementation = create(
-        :template_implementation,
-        template: template,
-        source_artifact: source_artifact,
-        status: 'stable',
-        renderer_family: 'editorial-split',
-        render_profile: template.normalized_layout_config
-      )
-      create(
-        :template_validation_run,
-        template: template,
-        template_implementation: implementation,
-        reference_artifact: source_artifact,
-        status: 'passed',
-        validation_type: 'manual_review'
-      )
-
-      expect(helper.template_artifact_review_detail(template)).to include('1 source')
-      expect(helper.template_artifact_review_detail(template)).to include('Implementation Stable')
-      expect(helper.template_artifact_review_detail(template)).to include('1 validation run')
-      expect(helper.template_artifact_review_tone(template)).to eq(:success)
-    end
-  end
-
-  describe '#template_artifact_review_groups' do
-    it 'returns localized artifact groups with source artifacts first' do
+ # end
+ RSpec.describe Admin::TemplatesHelper, type: :helper do
+  describe '#template_artifact_review_state' do
+    it 'returns a presenter with packaged artifact and lifecycle review state' do
       template = create(:template, slug: 'editorial-split')
       create(:template_artifact, template: template, artifact_type: 'reference_design', lineage_kind: 'source', name: 'Behance capture')
-      create(:template_artifact, template: template, artifact_type: 'design_note', lineage_kind: 'documentation', name: 'Capture notes')
 
-      groups = helper.template_artifact_review_groups(template)
+      review_state = helper.template_artifact_review_state(template)
 
-      expect(groups.first.fetch(:key)).to eq(:source_artifacts)
-      expect(groups.first.fetch(:title)).to eq('Source artifacts')
-      expect(groups.first.fetch(:artifacts).size).to eq(1)
-      expect(groups.second.fetch(:key)).to eq(:documentation_artifacts)
-      expect(groups.second.fetch(:artifacts).size).to eq(1)
-    end
-  end
-
-  describe '#template_artifact_review_title' do
-    it 'surfaces draft candidate progress when source artifacts exist but no render-ready implementation is present' do
-      template = create(:template, slug: 'editorial-split')
-      source_artifact = create(:template_artifact, template: template, artifact_type: 'reference_design', lineage_kind: 'source', name: 'Behance capture')
-      create(
-        :template_implementation,
-        template: template,
-        source_artifact: source_artifact,
-        status: 'draft',
-        renderer_family: template.layout_family,
-        render_profile: template.render_layout_config
-      )
-
-      expect(helper.template_artifact_review_title(template)).to eq('1 draft candidate in progress')
-      expect(helper.template_artifact_review_implementation_badge_label(template)).to eq('1 draft candidate')
-      expect(helper.template_artifact_review_implementation_badge_tone(template)).to eq(:info)
-    end
-
-    it 'surfaces the seed baseline state when a seeded implementation has a matching seed snapshot' do
-      template = create(:template, slug: 'editorial-split')
-      source_artifact = create(:template_artifact, template: template, artifact_type: 'reference_design', lineage_kind: 'source', name: 'Behance capture')
-      implementation = create(
-        :template_implementation,
-        template: template,
-        source_artifact: source_artifact,
-        status: 'seeded',
-        renderer_family: template.layout_family,
-        render_profile: template.render_layout_config,
-        validated_at: Time.zone.local(2026, 3, 21, 18, 15),
-        seeded_at: Time.zone.local(2026, 3, 21, 19, 0)
-      )
-      create(
-        :template_artifact,
-        template: template,
-        artifact_type: 'seed_snapshot',
-        lineage_kind: 'derived',
-        parent_artifact: source_artifact,
-        name: implementation.name,
-        version_label: "#{implementation.identifier}-seeded",
-        metadata: {
-          'artifact_role' => 'seeded_implementation_snapshot',
-          'template_implementation_identifier' => implementation.identifier,
-          'source_artifact_identifier' => source_artifact.identifier
-        }
-      )
-
-      expect(helper.template_artifact_review_title(template)).to eq('Seed baseline ready')
-      expect(helper.template_seed_baseline_status_label(template)).to eq('Seed baseline ready')
-      expect(helper.template_seed_baseline_detail(template)).to include('matching seed snapshot ready')
-      expect(helper.template_seed_baseline_tone(template)).to eq(:success)
-      expect(helper.template_artifact_review_tone(template)).to eq(:success)
-    end
-  end
-
-  describe '#template_seed_baseline_status_label' do
-    it 'reports missing snapshot follow-up for a seeded implementation without a matching seed snapshot' do
-      template = create(:template, slug: 'editorial-split')
-      source_artifact = create(:template_artifact, template: template, artifact_type: 'reference_design', lineage_kind: 'source', name: 'Behance capture')
-      create(
-        :template_implementation,
-        template: template,
-        source_artifact: source_artifact,
-        status: 'seeded',
-        renderer_family: template.layout_family,
-        render_profile: template.render_layout_config,
-        validated_at: Time.zone.local(2026, 3, 21, 18, 15),
-        seeded_at: Time.zone.local(2026, 3, 21, 19, 0)
-      )
-
-      expect(helper.template_artifact_review_title(template)).to eq('Seed snapshot follow-up needed')
-      expect(helper.template_seed_baseline_status_label(template)).to eq('Seed snapshot missing')
-      expect(helper.template_seed_baseline_detail(template)).to include('no active seed snapshot matches it yet')
-      expect(helper.template_seed_baseline_tone(template)).to eq(:warning)
-      expect(helper.template_artifact_review_tone(template)).to eq(:warning)
+      expect(review_state).to be_a(Admin::Templates::ArtifactReviewState)
+      expect(review_state.artifact_review_counts).to include(source_artifacts: 1, candidate_implementations: 0)
+      expect(review_state.artifact_review_groups.first.fetch(:title)).to eq('Source artifacts')
+      expect(review_state.current_implementation).to eq({})
+      expect(review_state.seed_baseline).to include(available: false, ready: false, missing_artifact: false)
+      expect(review_state.recent_validation_runs).to eq([])
     end
   end
 
@@ -243,47 +132,24 @@ RSpec.describe Admin::TemplatesHelper, type: :helper do
     end
   end
 
-  describe '#template_headshot_metadata_label' do
-    it 'returns Supported when the headshot flag is on' do
-      template = build_stubbed(:template, layout_config: ResumeTemplates::Catalog.default_layout_config.merge('supports_headshot' => true))
+  describe '#template_profile_state' do
+    it 'returns a presenter with layout, visibility, and headshot state' do
+      template = build_stubbed(
+        :template,
+        active: true,
+        layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'editorial-split')
+      )
 
-      expect(helper.template_headshot_metadata_label(template)).to eq('Supported')
-    end
+      profile_state = helper.template_profile_state(template)
 
-    it 'returns Fallback only when the headshot flag is off' do
-      template = build_stubbed(:template)
-
-      expect(helper.template_headshot_metadata_label(template)).to eq('Fallback only')
-    end
-  end
-
-  describe '#template_headshot_metadata_description' do
-    it 'explains enabled headshot metadata as renderer support' do
-      template = build_stubbed(:template, layout_config: ResumeTemplates::Catalog.default_layout_config.merge('supports_headshot' => true))
-
-      expect(helper.template_headshot_metadata_description(template)).to include('uploaded resume headshot')
-      expect(helper.template_headshot_metadata_description(template)).to include('live preview and PDF export')
-    end
-
-    it 'explains disabled headshot metadata as fallback-only behavior' do
-      template = build_stubbed(:template)
-
-      expect(helper.template_headshot_metadata_description(template)).to include('non-photo identity treatment')
-      expect(helper.template_headshot_metadata_description(template)).to include('headshot attached')
-    end
-  end
-
-  describe '#template_headshot_metadata_tone' do
-    it 'uses an informational tone when the internal headshot flag is on' do
-      template = build_stubbed(:template, layout_config: ResumeTemplates::Catalog.default_layout_config.merge('supports_headshot' => true))
-
-      expect(helper.template_headshot_metadata_tone(template)).to eq(:info)
-    end
-
-    it 'uses a neutral tone when the internal headshot flag is off' do
-      template = build_stubbed(:template)
-
-      expect(helper.template_headshot_metadata_tone(template)).to eq(:neutral)
+      expect(profile_state).to be_a(Admin::Templates::ProfileState)
+      expect(profile_state.layout_metadata).to include(
+        family_label: 'Editorial Split',
+        theme_tone_label: 'Lime',
+        shell_style_label: 'Flat'
+      )
+      expect(profile_state.visibility_label).to eq('User-visible')
+      expect(profile_state.headshot_metadata_label).to eq('Supported')
     end
   end
 end

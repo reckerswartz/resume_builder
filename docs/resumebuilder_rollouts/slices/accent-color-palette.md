@@ -1,5 +1,11 @@
 # Accent Color Palette
 
+## Status
+
+- **State**: `closed`
+- **Page family**: `resume-builder-finalize`
+- **Goal**: Replace the raw custom accent field with a truthful curated palette, reset-to-default behavior, and custom-color fallback that remain aligned across preview and PDF output.
+
 ## Slice key
 
 `accent-color-palette`
@@ -101,14 +107,12 @@ bundle exec rspec spec/services/resume_templates/pdf_rendering_spec.rb \
 
 None — the accent color palette slice is complete. The curated palette covers the hosted app's broader color selection, reset-to-default, and custom color fallback behaviors.
 
+Close-out re-review on `2026-03-22` did not reveal a stable regression in this slice, so it is now complete for the current rollout scope.
+
+## Latest run
+
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
+
 ## Next recommended slice
 
-The rollout's four priority recommendations from the architecture translation doc are now all covered:
-
-1. ✅ Richer late-stage formatting settings (finalize-formatting-foundation, font-family-settings)
-2. ✅ Unified late-stage customization hub (unified-finalize-workspace)
-3. ✅ Earlier template-variant exploration (template-variant-carry-through)
-4. ✅ Stronger experience/skills drafting assistance (experience-guidance, skills-guidance)
-5. ✅ Accent color palette UX (accent-color-palette)
-
-The remaining hosted behaviors are either intentional product divergences (paywall gating, spell check, smart optimization) or low-priority surface polish. The rollout can be considered complete for the current reference scope.
+None inside the current `resumebuilder-reference-rollout` scope.

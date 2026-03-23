@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-experience`
 - **Goal**: Add truthful, deterministic, role-aware experience bullet guidance inside the experience entry UI while keeping early-career examples visible for lighter real-world experience paths.
 
@@ -47,6 +47,7 @@
 - This slice intentionally stops at deterministic bullet guidance.
 - Searchable or insertable guidance for skills remains a separate follow-on slice.
 - LLM-generated experience drafting was intentionally not expanded here.
+- Close-out re-review on `2026-03-22` did not reveal a stable regression in this slice, so it is now complete for the current rollout scope.
 
 ## Verification
 
@@ -55,8 +56,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-21-experience-guidance/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `skills-guidance`
+- None inside the current `resumebuilder-reference-rollout` scope.

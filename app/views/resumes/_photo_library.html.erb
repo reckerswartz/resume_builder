@@ -2,25 +2,29 @@
 <% if photo_library_state.enabled? %>
 
 <section class="border-t border-canvas-200/80 px-6 pb-6 pt-1">
-  <div class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-5' ].join(' ') %>">
-    <div class="space-y-1">
-      <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.photo_library.eyebrow") %></p>
-      <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.title") %></h3>
-      <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.description") %></p>
-    </div>
+  <details class="<%= [ ui_inset_panel_classes(tone: :subtle, padding: :lg) ].join(' ') %>" data-photo-library-disclosure>
+    <summary class="flex cursor-pointer items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
+      <div class="flex-1 space-y-1">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-ink-700/70"><%= t("resumes.editor_personal_details_step.photo_library.eyebrow") %></p>
+        <h3 class="text-base font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.title") %></h3>
+        <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.description") %></p>
+      </div>
+      <span class="text-ink-400 transition-transform group-open:rotate-180">▾</span>
+    </summary>
 
-    <div class="flex flex-col gap-3 rounded-[1.25rem] border border-canvas-200/80 bg-white/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.create_profile_title") %></p>
-        <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.create_profile_description") %></p>
+    <div class="mt-5 space-y-5">
+      <div class="flex flex-col gap-3 rounded-[1.25rem] border border-canvas-200/80 bg-white/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.create_profile_title") %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.create_profile_description") %></p>
+        </div>
+
+        <%= button_to t("resumes.editor_personal_details_step.photo_library.create_profile_action"), photo_library_state.create_profile_path, method: :post, class: ui_button_classes(:primary, size: :sm) %>
       </div>
 
-      <%= button_to t("resumes.editor_personal_details_step.photo_library.create_profile_action"), photo_library_state.create_profile_path, method: :post, class: ui_button_classes(:primary, size: :sm) %>
-    </div>
-
-    <% if photo_library_state.profile_present? %>
-      <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
-        <div class="space-y-5">
+      <% if photo_library_state.profile_present? %>
+        <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+          <div class="space-y-5">
           <%= form_with url: photo_library_state.upload_path, scope: :photo_assets, html: { multipart: true }, class: "space-y-4" do |upload_form| %>
             <div>
               <%= upload_form.label :files, t("resumes.editor_personal_details_step.photo_library.upload_label"), class: ui_label_classes %>
@@ -95,9 +99,9 @@
               description: t("resumes.editor_personal_details_step.photo_library.empty_state.description")
             ) %>
           <% end %>
-        </div>
+          </div>
 
-        <aside class="space-y-4 rounded-[1.25rem] border border-canvas-200/80 bg-white/85 p-4">
+          <aside class="space-y-4 rounded-[1.25rem] border border-canvas-200/80 bg-white/85 p-4">
           <div>
             <p class="text-sm font-semibold text-ink-950"><%= t("resumes.editor_personal_details_step.photo_library.current_selection_title") %></p>
             <p class="mt-1 text-sm leading-6 text-ink-700/80">
@@ -136,10 +140,11 @@
             <% else %>
               <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_personal_details_step.photo_library.recent_runs_empty") %></p>
             <% end %>
-          </div>
-        </aside>
-      </div>
-    <% end %>
-  </div>
+            </div>
+          </aside>
+        </div>
+      <% end %>
+    </div>
+  </details>
 </section>
 <% end %>

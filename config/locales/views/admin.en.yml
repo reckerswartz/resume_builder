@@ -800,24 +800,235 @@ en:
             title: "No backtrace"
             description: "No stack frames were stored for this incident. Use the captured context above to continue the investigation."
     templates:
-      show:
+      index:
+        page_header:
+          eyebrow: "Admin"
+          title: "Templates"
+          description: "Review gallery visibility, layout coverage, and template variety from one shared admin surface."
+          badges:
+            gallery_coverage: "Gallery coverage"
+            admin_review: "Admin review"
+          actions:
+            template_gallery: "Template gallery"
+            new_template: "New template"
+        summary:
+          panel:
+            eyebrow: "Template registry"
+            title: "Template index snapshot"
+            description:
+              filtered: "Showing %{count} templates matching the current filters."
+              unfiltered: "Review template visibility, family coverage, and layout variety across the template registry."
+            actions:
+              clear_filters: "Clear filters"
+              template_gallery: "Template gallery"
+            filter_badges:
+              query: "Query: %{query}"
+              status: "Status: %{status}"
+            guidance:
+              title: "Filter by gallery visibility or cleanup targets"
+              description: "Use search and status filters to isolate user-visible templates, archived records, or layout coverage gaps before editing template details."
+          cards:
+            matches:
+              eyebrow: "Matches"
+              description: "Templates currently returned by the active filter set."
+              badge: "%{count} on this page"
+            user_visible:
+              eyebrow: "User-visible"
+              description: "Visible templates currently available to signed-in users within the active filter set."
+              badges:
+                live: "Live"
+                hidden: "Hidden"
+            layout_families:
+              eyebrow: "Layout families"
+              description: "Distinct template families represented in the active filter set."
+              badge_card_shells: "%{count} card shells"
+              badge_flat_only: "Flat only"
+            sidebar_layouts:
+              eyebrow: "Sidebar layouts"
+              description: "Templates in the active filter set that place supporting sections in a sidebar."
+              badges:
+                varied: "Varied"
+                single_column: "Single column"
+      new:
+        page_header:
+          eyebrow: "Admin"
+          title: "New template"
+          description: "Add a template and its starting layout choices before making it visible in the gallery."
+          actions:
+            back_to_templates: "Back to templates"
+      edit:
+        page_header:
+          eyebrow: "Admin"
+          title: "Edit template"
+          description: "Update this template's layout choices and gallery visibility."
+          actions:
+            view_template: "View template"
+      form:
         navigation:
+          pill: "Template setup"
+          title:
+            new: "Create a template"
+            edit: "Update template details"
+          description: "Work through name, layout choices, and visibility before saving this template."
+          sections:
+            template_identity:
+              label: "Template details"
+              caption: "Name, slug, and description"
+            layout_system:
+              label: "Layout choices"
+              caption: "Family, spacing, and accent"
+            availability_preview:
+              label: "Availability & sample"
+              caption: "Visibility, activation, and resume sample"
+        side_panels:
+          visibility_title: "Visibility"
+          preview_title: "Sample preview"
+          preview_description: "Changes to family, font scale, density, columns, theme tone, and accent color update the sample after save."
+        actions:
+          view_template: "View template"
+          back_to_templates: "Back to templates"
+          save_template: "Save template"
+          create_template: "Create template"
+        save_messages:
+          create: "Creating the template registers it for admin review and, if active, user selection in the template gallery."
+          update: "Saving changes updates the current sample and future resume sessions that use this template."
+        sections:
+          template_identity:
+            title: "Template details"
+            eyebrow: "Core details"
+            description: "Add the admin-facing name, slug, and description used to manage this template."
+            badges:
+              saved_record: "Saved record"
+              new_record: "New record"
+            description_help: "Descriptions help admin review and clarify when a template belongs in the gallery."
+          layout_system:
+            title: "Layout choices"
+            eyebrow: "Template style"
+            description: "Adjust the family, spacing, and accent choices that shape how this template feels in the gallery and resume preview."
+            labels:
+              family: "Family"
+              font_scale: "Font scale"
+              density: "Density"
+              columns: "Columns"
+              theme_tone: "Theme tone"
+              accent_color: "Accent color"
+            cards:
+              layout_focus: "Layout focus"
+              current_profile: "Current summary"
+              columns: "Columns"
+              theme_tone: "Theme tone"
+            advanced_details:
+              title: "Additional layout details"
+              description: "Lower-priority options you may only need when a template needs extra review."
+              badge: "Optional"
+              photo_support:
+                title: "Photo support"
+                description: "Turn this on only when the template truly supports a resume headshot. Otherwise the template keeps its non-photo heading treatment."
+          availability_preview:
+            title: "Availability & sample"
+            eyebrow: "User exposure"
+            description: "Control gallery visibility and review the current sample before saving."
+            active_template:
+              title: "Active template"
+              description: "Inactive templates remain stored for admin review and existing resumes, but non-admin users will not see them in the gallery."
+            visibility_summary: "Visibility summary"
+            save_behavior_title: "What save updates"
+            preview_panel:
+              eyebrow: "Resume sample"
+              title: "Current sample"
+              description: "This miniature preview reflects the current layout choices for this template."
+      show:
+        page_header:
+          eyebrow: "Template"
+          actions:
+            back_to_templates: "Back to templates"
+            template_gallery: "Template gallery"
+            use_in_new_resume: "Use in new resume"
+            edit_template: "Edit template"
+        summary:
+          pill: "Review summary"
+          title: "Review this template"
+          description: "Check gallery visibility and the resume sample first, then open layout details or reference notes only when you need deeper context."
+          titles:
+            hidden_from_gallery: "Hidden from the gallery"
+            ready_for_gallery_review: "Ready for gallery review"
+            ready_with_follow_up: "Ready, with small follow-up"
+          review_items:
+            gallery_visibility:
+              label: "Gallery visibility"
+            template_description:
+              label: "Template description"
+              available: "Description is available for admin review and gallery guidance."
+              missing: "Add a short description so admin review and gallery decisions stay easy to scan."
+            resume_sample:
+              label: "Resume sample"
+              detail: "The sample below shows how this template reads in the editor preview and exported resume."
+            artifact_coverage:
+              label: "Artifact coverage"
+        badges:
+          ready: "Ready"
+          follow_up: "Follow-up"
+        navigation:
+          eyebrow: "Template sections"
+          title: "Jump to details"
+          description: "Move between the resume sample, layout details, and reference notes without re-scanning the whole page."
           sections:
             shared_preview:
-              label: "Shared preview"
-              caption: "Live sample from the shared renderer"
+              label: "Resume sample"
+              caption: "Preview how this template reads in the editor and export views"
             layout_profile:
               label: "Layout profile"
-              caption: "Family, density, shell, and structure"
+              caption: "Family, spacing, structure, and accents"
             artifact_review:
               label: "Artifact review"
-              caption: "Stored source captures, notes, and reference lineage"
+              caption: "Source captures, notes, and follow-up history"
             implementation_validation:
-              label: "Implementation & validation"
-              caption: "Current render profile and the latest review trail"
+              label: "Template history"
+              caption: "Current baseline and recent review trail"
             configuration:
               label: "Configuration"
-              caption: "Visibility and raw layout config"
+              caption: "Visibility and saved layout values"
+        configuration:
+          title: "Configuration"
+          eyebrow: "Visibility & reference values"
+          description: "Review who can see this template and open the saved layout snapshot only when you need reference detail."
+          visibility_title: "Template visibility"
+          next_step_title: "Next step"
+          next_step_description: "Use the edit flow to adjust layout choices, then confirm the resume sample still matches the intended direction."
+          layout_snapshot_title: "Saved layout snapshot"
+          layout_snapshot_description: "Saved values are shown here for reference after the template record is normalized on save."
+          reference_badge: "Reference only"
+          actions:
+            delete_template: "Delete template"
+        shared_preview:
+          title: "Resume sample"
+          eyebrow: "Live preview"
+          description: "Review how this template looks with the shared sample resume before making changes."
+          gallery_visibility_title: "Gallery visibility"
+          layout_focus_title: "Layout focus"
+          live_sample_pill: "Live sample"
+          live_sample_description: "Preview the current sample before changing layout details."
+        layout_profile:
+          title: "Layout profile"
+          eyebrow: "Layout details"
+          description: "Review the saved layout choices that shape spacing, emphasis, and structure for this template."
+          cards:
+            layout_summary: "Layout summary"
+            shell_profile: "Shell profile"
+            accent_color: "Accent color"
+            accent_description: "Current accent"
+            photo_support: "Photo support"
+        layout_families:
+          eyebrow: "Layout families"
+          description: "Distinct template families represented in the active filter set."
+          badge_card_shells: "%{count} card shells"
+          badge_flat_only: "Flat only"
+        sidebar_layouts:
+          eyebrow: "Sidebar layouts"
+          description: "Templates in the active filter set that place supporting sections in a sidebar."
+          badges:
+            varied: "Varied"
+            single_column: "Single column"
         artifact_review:
           summary:
             states:
@@ -885,9 +1096,9 @@ en:
               empty_title: "No derived artifacts yet"
               empty_description: "Derived artifacts will appear once implementation or seed-promotion work begins."
         implementation_validation:
-          title: "Implementation & validation"
-          eyebrow: "Lifecycle status"
-          description: "Review the current render-ready implementation profile and the latest validation runs before creating another revision."
+          title: "Template history"
+          eyebrow: "Review trail"
+          description: "Review the current approved template baseline and the latest review checks before creating another revision."
           badges:
             no_implementation: "No implementation"
             draft_candidates:
@@ -900,18 +1111,18 @@ en:
               one: "%{count} validation run"
               other: "%{count} validation runs"
           implementation_card:
-            title: "Current implementation"
-            description: "The shared renderer adopts this implementation profile whenever a render-ready record is available."
+            title: "Current baseline"
+            description: "This is the current approved template baseline whenever a render-ready record is available."
             actions:
               create_candidate: "Create draft from latest source"
               promote_to_stable: "Promote to stable"
               promote_to_seeded: "Promote to seeded"
-            empty_title: "No render-ready implementation yet"
-            empty_description: "Source artifacts can exist before a validated implementation profile is recorded."
+            empty_title: "No approved baseline yet"
+            empty_description: "Source artifacts can exist before an approved template baseline is recorded."
             reference_badge: "Reference only"
-            promotion_title: "Lifecycle promotion"
-            render_profile_title: "Stored render profile"
-            render_profile_description: "This normalized profile is what the shared renderer can adopt without mutating the stored source artifacts."
+            promotion_title: "Next lifecycle step"
+            render_profile_title: "Saved layout snapshot"
+            render_profile_description: "This saved layout snapshot shows the approved choices without changing the original source captures."
             guidance:
               stable_ready: "This validated implementation can now be promoted to stable when you want to lock it as the shared baseline."
               seeded_ready: "This stable implementation can now be promoted to seeded when you want to mark it ready for durable seed and demo flows."
@@ -919,9 +1130,9 @@ en:
               no_further_promotion: "No further lifecycle promotion is available for this implementation."
           draft_candidates:
             title: "Draft candidates"
-            description: "These implementation snapshots are isolated from live rendering until validation promotes one to a render-ready state."
+            description: "These draft template options stay separate from the live template until review promotes one to the next stage."
             empty_title: "No draft candidates yet"
-            empty_description: "Create a draft from a reviewed source artifact to start implementation work without changing the live renderer."
+            empty_description: "Create a draft from a reviewed source artifact to start follow-up work without changing the live template."
             validation:
               title: "Latest validation"
               empty_state: "No validation recorded yet"
@@ -934,11 +1145,11 @@ en:
               record_pass: "Record review pass"
               record_follow_up: "Needs follow-up"
               promote: "Promote to validated"
-            render_profile_title: "Candidate render profile"
-            render_profile_description: "Draft candidates begin from the currently resolved render profile and stay isolated from live rendering until validation."
+            render_profile_title: "Candidate layout snapshot"
+            render_profile_description: "Draft candidates begin from the current approved layout snapshot and stay separate from the live template until review."
           history:
             title: "Lifecycle history"
-            description: "Superseded validated, stable, seeded, and archived records stay visible here so implementation history remains easy to audit."
+            description: "Superseded validated, stable, seeded, and archived records stay visible here so template history remains easy to audit."
             empty_title: "No lifecycle history yet"
             empty_description: "Prior render-ready records will appear here once a newer implementation supersedes them or they are archived for cleanup."
             archived_from_badge: "Archived from %{status}"
@@ -948,16 +1159,12 @@ en:
             actions:
               archive: "Archive implementation"
           validation_runs:
-            title: "Recent validation runs"
-            description: "Keep the latest review trail visible even when implementation work is still in progress."
+            title: "Recent review checks"
+            description: "Keep the latest review trail visible even when follow-up work is still in progress."
             empty_title: "No validation runs yet"
             empty_description: "Record manual review, PDF export, or pixel-compare runs once validation work begins."
             metadata_title: "Validation metadata"
             metadata_description: "Stored metrics and metadata for this validation run."
-        summary:
-          review_items:
-            artifact_coverage:
-              label: "Artifact coverage"
         fields:
           source_url: "Source URL"
           parent_artifact: "Parent artifact"

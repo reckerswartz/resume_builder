@@ -82,15 +82,6 @@
           </div>
         </div>
       </div>
-
-      <div class="flex flex-wrap gap-3">
-        <%= link_to return_label, @return_path, class: ui_button_classes(:secondary) %>
-        <% if @resume.present? %>
-          <%= link_to t("resumes.resume_source_imports.show.actions.open_draft"), edit_resume_path(@resume, step: "source"), class: ui_button_classes(:secondary, size: :sm) %>
-        <% else %>
-          <%= link_to t("resumes.resume_source_imports.show.actions.resume_setup"), new_resume_path(step: "setup"), class: ui_button_classes(:secondary, size: :sm) %>
-        <% end %>
-      </div>
     </div>
   <% end %>
 </section>

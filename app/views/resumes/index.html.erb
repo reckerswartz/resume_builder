@@ -2,6 +2,10 @@
 <% page_resumes = @resumes %>
 <% ready_count = page_resumes.count { |resume| resume.summary.present? && resume.contact_field("email").present? } %>
 <% draft_count = page_resumes.size - ready_count %>
+<% bulk_form_id = "workspace-bulk-actions" %>
+<% workspace_sort_options = @sort_options.map { |option| [option.fetch(:label), option.fetch(:value)] } %>
+<% selected_sort_label = @sort_options.find { |option| option.fetch(:value) == @sort }&.fetch(:label) || workspace_sort_options.first&.first %>
+<% clear_workspace_filters_path = resumes_path(@workspace_page_params.except("query")) %>
 <% page_header_actions = [
   { label: t("resumes.index.actions.create_new_resume"), path: new_resume_path, style: :primary },
   { label: t("resumes.index.actions.browse_templates"), path: templates_path, style: :secondary },
@@ -58,26 +62,147 @@
     <% end %>
 
     <% if page_resumes.any? %>
-      <div class="grid gap-5 xl:grid-cols-2">
-        <% page_resumes.each do |resume| %>
-          <%= render "resume_card", resume: resume %>
-        <% end %>
-      </div>
+      <div class="space-y-5" data-controller="workspace-bulk-actions">
+        <div class="<%= [ui_inset_panel_classes(tone: :subtle, padding: :lg), 'hidden space-y-4 xl:block'].join(' ') %>">
+          <div class="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= t("resumes.index.search.eyebrow") %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.index.search.description") %></p>
+            </div>
 
-      <%= render "shared/pagination",
-        current_page: @current_page,
-        total_pages: @total_pages,
-        base_path: resumes_path,
-        page_params: {} %>
+            <span class="<%= ui_badge_classes(:neutral) %>"><%= selected_sort_label %></span>
+          </div>
+
+          <%= form_with url: resumes_path, method: :get, local: true, class: "grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem_auto] lg:items-end" do |form| %>
+            <div>
+              <%= form.label :query, t("resumes.index.search.label"), class: "text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" %>
+              <%= form.search_field :query, value: @query, placeholder: t("resumes.index.search.placeholder"), class: ui_input_classes.delete_prefix("mt-2 ") %>
+            </div>
+
+            <div>
+              <%= form.label :sort, t("resumes.index.sort.label"), class: "text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" %>
+              <%= form.select :sort, options_for_select(workspace_sort_options, @sort), {}, class: ui_input_classes.delete_prefix("mt-2 ") %>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <%= form.submit t("resumes.index.search.apply"), class: ui_button_classes(:secondary, size: :sm) %>
+              <% if @query.present? %>
+                <%= link_to t("resumes.index.search.clear"), clear_workspace_filters_path, class: ui_button_classes(:ghost, size: :sm) %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <details class="<%= [ui_inset_panel_classes(tone: :subtle), 'xl:hidden'].join(' ') %>" data-workspace-controls-disclosure>
+          <summary class="cursor-pointer list-none">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= t("resumes.index.search.label") %></p>
+                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= @query.presence || t("resumes.index.search.placeholder") %></p>
+              </div>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= selected_sort_label %></span>
+            </div>
+          </summary>
+
+          <%= form_with url: resumes_path, method: :get, local: true, class: "mt-4 grid gap-3" do |form| %>
+            <div>
+              <%= form.label :query, t("resumes.index.search.label"), class: "text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" %>
+              <%= form.search_field :query, value: @query, placeholder: t("resumes.index.search.placeholder"), class: ui_input_classes.delete_prefix("mt-2 ") %>
+            </div>
+
+            <div>
+              <%= form.label :sort, t("resumes.index.sort.label"), class: "text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70" %>
+              <%= form.select :sort, options_for_select(workspace_sort_options, @sort), {}, class: ui_input_classes.delete_prefix("mt-2 ") %>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <%= form.submit t("resumes.index.search.apply"), class: ui_button_classes(:secondary, size: :sm) %>
+              <% if @query.present? %>
+                <%= link_to t("resumes.index.search.clear"), clear_workspace_filters_path, class: ui_button_classes(:ghost, size: :sm) %>
+              <% end %>
+            </div>
+          <% end %>
+        </details>
+
+        <%= form_with url: bulk_action_resumes_path, method: :post, html: { id: bulk_form_id } do %>
+          <% if @current_page.to_i > 1 %>
+            <%= hidden_field_tag :page, @current_page %>
+          <% end %>
+          <% if @query.present? %>
+            <%= hidden_field_tag :query, @query %>
+          <% end %>
+          <% if @sort.present? && @sort != "recently_updated" %>
+            <%= hidden_field_tag :sort, @sort %>
+          <% end %>
+
+          <%= render Ui::StickyActionBarComponent.new(
+            title: t("resumes.index.bulk_actions.title"),
+            description: t("resumes.index.bulk_actions.description"),
+            density: :compact
+          ) do %>
+            <p
+              class="self-center text-sm leading-6 text-ink-700/80"
+              data-workspace-bulk-actions-target="selectionSummary"
+              data-one="<%= t("resumes.index.bulk_actions.selected_count_one") %>"
+              data-other="<%= t("resumes.index.bulk_actions.selected_count_other") %>"
+            ><%= t("resumes.index.bulk_actions.selected_count_other", count: 0) %></p>
+            <%= button_tag t("resumes.index.bulk_actions.export_selected"),
+              type: :submit,
+              name: "bulk_operation",
+              value: "export",
+              disabled: true,
+              class: ui_button_classes(:disabled, size: :sm),
+              data: {
+                workspace_bulk_actions_target: "actionButton",
+                enabled_classes: ui_button_classes(:secondary, size: :sm),
+                disabled_classes: ui_button_classes(:disabled, size: :sm)
+              } %>
+            <%= button_tag t("resumes.index.bulk_actions.delete_selected"),
+              type: :submit,
+              name: "bulk_operation",
+              value: "delete",
+              disabled: true,
+              class: ui_button_classes(:disabled, size: :sm),
+              data: {
+                workspace_bulk_actions_target: "actionButton",
+                enabled_classes: ui_button_classes(:danger, size: :sm),
+                disabled_classes: ui_button_classes(:disabled, size: :sm)
+              } %>
+          <% end %>
+        <% end %>
+
+        <div class="grid gap-5 xl:grid-cols-2">
+          <% page_resumes.each do |resume| %>
+            <%= render "resume_card", resume: resume, bulk_form_id: bulk_form_id %>
+          <% end %>
+        </div>
+
+        <%= render "shared/pagination",
+          current_page: @current_page,
+          total_pages: @total_pages,
+          base_path: resumes_path,
+          page_params: @workspace_page_params %>
+      </div>
     <% else %>
-      <%= render Ui::EmptyStateComponent.new(
-        title: t("resumes.index.empty_state.title"),
-        description: t("resumes.index.empty_state.description"),
-        action_label: t("resumes.index.empty_state.create_resume"),
-        action_path: new_resume_path,
-        padding: :lg,
-        title_size: :lg
-      ) %>
+      <% if @query.present? %>
+        <%= render Ui::EmptyStateComponent.new(
+          title: t("resumes.index.empty_state.filtered_title"),
+          description: t("resumes.index.empty_state.filtered_description"),
+          action_label: t("resumes.index.empty_state.clear_search"),
+          action_path: clear_workspace_filters_path,
+          padding: :lg,
+          title_size: :lg
+        ) %>
+      <% else %>
+        <%= render Ui::EmptyStateComponent.new(
+          title: t("resumes.index.empty_state.title"),
+          description: t("resumes.index.empty_state.description"),
+          action_label: t("resumes.index.empty_state.create_resume"),
+          action_path: new_resume_path,
+          padding: :lg,
+          title_size: :lg
+        ) %>
+      <% end %>
     <% end %>
   </div>
 

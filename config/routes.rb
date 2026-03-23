@@ -31,7 +31,11 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   resource :session, only: %i[ new create destroy ]
   resources :passwords, only: %i[ new create edit update ], param: :token
-  resources :templates, only: %i[ index show ]
+  resources :templates, only: %i[ index show ] do
+    member do
+      get :apply_to_resume
+    end
+  end
   resources :photo_profiles, only: %i[ create ] do
     resources :photo_assets, only: %i[ create destroy ] do
       member do
@@ -44,6 +48,10 @@ Rails.application.routes.draw do
   get "resume_source_imports/:provider", to: "resume_source_imports#show", as: :resume_source_import
 
   resources :resumes do
+    collection do
+      post :bulk_action
+    end
+
     member do
       get :download
       get :download_text

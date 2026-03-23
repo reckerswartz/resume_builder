@@ -1,4 +1,5 @@
 <% summary_ready = resume.summary.present? %>
+<% bulk_form_id = local_assigns[:bulk_form_id] %>
 <% source_mode_badge_label = case resume.source_mode.to_s
 when "scratch"
   t("resumes.resume_card.metadata_badges.source_mode.scratch")
@@ -16,12 +17,34 @@ end %>
   extra_classes: "group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(15,23,42,0.1)]"
 ) do %>
   <div class="border-b border-canvas-200/80 bg-canvas-50/92 px-6 py-5">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div class="min-w-0">
+    <% if bulk_form_id.present? %>
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <label class="inline-flex items-center gap-3 text-sm font-medium text-ink-700/80">
+          <%= check_box_tag "resume_ids[]", resume.id, false,
+            form: bulk_form_id,
+            class: ui_checkbox_classes,
+            data: {
+              action: "change->workspace-bulk-actions#update",
+              workspace_bulk_actions_target: "checkbox"
+            } %>
+          <span><%= t("resumes.resume_card.selection_label", title: resume.title) %></span>
+        </label>
+
         <span class="atelier-pill">
           <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
           <%= t("resumes.resume_card.canvas_pill") %>
         </span>
+      </div>
+    <% end %>
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div class="min-w-0">
+        <% unless bulk_form_id.present? %>
+          <span class="atelier-pill">
+            <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
+            <%= t("resumes.resume_card.canvas_pill") %>
+          </span>
+        <% end %>
 
         <div class="mt-4 flex flex-wrap gap-2 text-xs font-medium text-ink-700/70">
           <span class="<%= "#{ui_badge_classes(:neutral)} uppercase tracking-[0.18em]" %>"><%= resume.template.name %></span>

@@ -1,11 +1,11 @@
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: "Admin",
-    title: "New template",
-    description: "Register a template and its layout defaults before exposing it in the gallery.",
+    eyebrow: t("admin.templates.new.page_header.eyebrow"),
+    title: t("admin.templates.new.page_header.title"),
+    description: t("admin.templates.new.page_header.description"),
     density: :compact,
     actions: [
-      { label: "Back to templates", path: admin_templates_path, style: :secondary }
+      { label: t("admin.templates.new.page_header.actions.back_to_templates"), path: admin_templates_path, style: :secondary }
     ]
   ) %>
 

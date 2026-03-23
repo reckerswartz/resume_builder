@@ -59,4 +59,4 @@
 
 ## Next recommended slice
 
-- None committed yet for the post-closeout rollout backlog.
+- `finalize-sections-single-panel-surface`

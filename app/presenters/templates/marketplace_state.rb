@@ -1,5 +1,7 @@
 module Templates
   class MarketplaceState
+    include TemplateBrowserSupport
+
     attr_reader :query, :family_filter, :density_filter, :column_count_filter, :theme_tone_filter, :shell_style_filter, :sort
 
     def initialize(templates:, filter_templates: nil, query:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:, sort: nil, resume: nil, view_context:)
@@ -47,19 +49,33 @@ module Templates
     end
 
     def apply_to_resume_available?
-      latest_user_resume.present?
+      selectable_user_resumes.any?
     end
 
-    def apply_to_resume_path_for(template)
-      return unless latest_user_resume.present?
+    def apply_to_resume_path_for(template, accent_color: nil)
+      return unless apply_to_resume_available?
 
-      view_context.edit_resume_path(latest_user_resume, step: :finalize, template_id: template.id)
+      resume_params = resume_intake_params.present? ? { intake_details: resume_intake_params } : {}
+      path_params = {}
+      path_params[:resume] = resume_params if resume_params.present?
+      view_context.apply_to_resume_template_path(template, **path_params)
     end
 
-    def apply_to_resume_label
-      return unless latest_user_resume.present?
+    def apply_resume_options
+      @apply_resume_options ||= selectable_user_resumes.map do |resume|
+        [
+          I18n.t(
+            "templates.marketplace_state.apply_to_resume_option",
+            title: resume.title.to_s.truncate(36),
+            template: resume.template.name
+          ),
+          resume.id
+        ]
+      end
+    end
 
-      I18n.t("templates.marketplace_state.apply_to_resume", title: latest_user_resume.title.truncate(30))
+    def selected_apply_resume_id
+      selectable_user_resumes.first&.id
     end
 
     def clear_filters_path
@@ -74,6 +90,7 @@ module Templates
           label: I18n.t("templates.marketplace_state.filter_groups.family"),
           selected_value: family_filter,
           options: filter_options_for(
+            template_cards: filter_template_cards,
             key: "family",
             value_proc: ->(template_card) { template_card.fetch(:family) },
             label_proc: ->(template_card) { template_card.fetch(:family_label) }
@@ -84,6 +101,7 @@ module Templates
           label: I18n.t("templates.marketplace_state.filter_groups.density"),
           selected_value: density_filter,
           options: filter_options_for(
+            template_cards: filter_template_cards,
             key: "density",
             value_proc: ->(template_card) { template_card.fetch(:density) },
             label_proc: ->(template_card) { template_card.fetch(:density_label) }
@@ -94,6 +112,7 @@ module Templates
           label: I18n.t("templates.marketplace_state.filter_groups.columns"),
           selected_value: column_count_filter,
           options: filter_options_for(
+            template_cards: filter_template_cards,
             key: "column_count",
             value_proc: ->(template_card) { template_card.fetch(:column_count) },
             label_proc: ->(template_card) { template_card.fetch(:column_count_label) }
@@ -104,6 +123,7 @@ module Templates
           label: I18n.t("templates.marketplace_state.filter_groups.theme"),
           selected_value: theme_tone_filter,
           options: filter_options_for(
+            template_cards: filter_template_cards,
             key: "theme_tone",
             value_proc: ->(template_card) { template_card.fetch(:theme_tone) },
             label_proc: ->(template_card) { template_card.fetch(:theme_tone_label) }
@@ -114,6 +134,7 @@ module Templates
           label: I18n.t("templates.marketplace_state.filter_groups.layout"),
           selected_value: shell_style_filter,
           options: filter_options_for(
+            template_cards: filter_template_cards,
             key: "shell_style",
             value_proc: ->(template_card) { template_card.fetch(:shell_style) },
             label_proc: ->(template_card) { template_card.fetch(:shell_style_label) }
@@ -200,8 +221,9 @@ module Templates
           preview_template_paths_by_accent_color: preview_template_paths_by_accent_color(template, template_card),
           use_template_path: use_template_path_for(template, accent_color: selected_accent_color),
           use_template_paths_by_accent_color: use_template_paths_by_accent_color(template, template_card),
-          apply_to_resume_path: apply_to_resume_path_for(template),
-          apply_to_resume_label: apply_to_resume_label
+          apply_to_resume_path: apply_to_resume_path_for(template, accent_color: selected_accent_color),
+          apply_resume_options: apply_resume_options,
+          selected_apply_resume_id: selected_apply_resume_id
         }
       end
     end
@@ -248,86 +270,11 @@ module Templates
         }
       end
 
-      def filter_options_for(key:, value_proc:, label_proc:)
-        filter_template_cards
-          .group_by { |template_card| value_proc.call(template_card) }
-          .map do |value, cards|
-            representative_card = cards.first
-
-            {
-              key: key,
-              value: value,
-              label: label_proc.call(representative_card),
-              count: cards.size
-            }
-          end
-          .sort_by { |option| option.fetch(:label) }
-      end
-
-      def filter_option_state(key:, value:, label:, count:, active:)
-        {
-          key: key,
-          value: value,
-          label: label,
-          count: count,
-          button_classes: active ? selected_filter_chip_classes : unselected_filter_chip_classes,
-          button_selected_classes: selected_filter_chip_classes,
-          button_unselected_classes: unselected_filter_chip_classes,
-          aria_pressed: active.to_s
-        }
-      end
-
-      def searchable_text_for(template_card)
-        template = template_card.fetch(:template)
-
-        [
-          template.name,
-          template.description,
-          template_card.fetch(:family_label),
-          template_card.fetch(:density_label),
-          template_card.fetch(:column_count_label),
-          template_card.fetch(:theme_tone_label),
-          template_card.fetch(:header_style_label),
-          template_card.fetch(:entry_style_label),
-          template_card.fetch(:skill_style_label),
-          template_card.fetch(:section_heading_style_label),
-          template_card.fetch(:shell_style_label),
-          template_card.fetch(:summary),
-          template_card.fetch(:sidebar_section_labels).join(" ")
-        ].compact.join(" ").downcase
-      end
-
-      def density_sort_rank(density)
-        {
-          "compact" => 0,
-          "comfortable" => 1,
-          "relaxed" => 2
-        }.fetch(density, 99)
-      end
-
-      def recommendation_sort_available?
-        recommendations.present?
-      end
-
       def recommendations
         @recommendations ||= if resume.present?
           Resumes::TemplateRecommendationService.new(resume: resume, template_cards: template_cards).call
         else
           []
-        end
-      end
-
-      def recommendations_by_template_id
-        @recommendations_by_template_id ||= recommendations.index_by { |recommendation| recommendation.fetch(:template_id) }
-      end
-
-      def recommendation_sort_rank(template_id)
-        recommendation_sort_ranks.fetch(template_id, 99)
-      end
-
-      def recommendation_sort_ranks
-        @recommendation_sort_ranks ||= recommendations.each_with_index.to_h do |recommendation, index|
-          [ recommendation.fetch(:template_id), index ]
         end
       end
 
@@ -402,13 +349,6 @@ module Templates
         end
       end
 
-      def preview_template_paths_by_accent_color(template, template_card)
-        template_card_accent_variants(template_card).each_with_object({}) do |accent_variant, paths|
-          accent_color = accent_variant.fetch(:accent_color)
-          paths[accent_color] = preview_template_path_for(template, accent_color: accent_color)
-        end
-      end
-
       def use_template_paths_by_accent_color(template, template_card)
         template_card_accent_variants(template_card).each_with_object({}) do |accent_variant, paths|
           accent_color = accent_variant.fetch(:accent_color)
@@ -416,30 +356,13 @@ module Templates
         end
       end
 
-      def selected_accent_variant_for(template_card, selected_accent_color)
-        template_card_accent_variants(template_card).find do |accent_variant|
-          accent_variant.fetch(:accent_color) == selected_accent_color
-        end || template_card_accent_variants(template_card).first
-      end
-
-      def template_card_accent_variants(template_card)
-        template_card.fetch(:accent_variants) do
-          ResumeTemplates::Catalog.accent_variants(
-            {
-              "theme_tone" => template_card.fetch(:theme_tone),
-              "accent_color" => template_card.fetch(:accent_color)
-            },
-            selected_accent_color: template_card.fetch(:selected_accent_color, template_card.fetch(:accent_color))
-          )
-        end
-      end
-
       def use_template_path_for(template, accent_color: nil)
-        return view_context.new_registration_path unless view_context.current_user.present?
-
         path_params = template.present? ? { template_id: template.id } : {}
         resume_params = resume_context_params(template: template, accent_color: accent_color)
         path_params[:resume] = resume_params if resume_params.present?
+
+        return view_context.new_registration_path(**path_params) unless view_context.current_user.present?
+
         view_context.new_resume_path(**path_params)
       end
 
@@ -459,10 +382,10 @@ module Templates
         context
       end
 
-      def latest_user_resume
-        @latest_user_resume ||= begin
+      def selectable_user_resumes
+        @selectable_user_resumes ||= begin
           user = view_context.respond_to?(:current_user) ? view_context.current_user : nil
-          user&.resumes&.order(updated_at: :desc)&.first
+          user.present? ? user.resumes.includes(:template).order(updated_at: :desc).to_a : []
         end
       end
 

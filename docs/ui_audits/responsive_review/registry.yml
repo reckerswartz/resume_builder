@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T05:37:00Z"
+updated_at: "2026-03-22T06:23:00Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/responsive_review/README.md"
   page_doc_template: "docs/ui_audits/responsive_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/responsive_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-regression-check-closed-pages/00-overview.md"
+  latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-resumes-index-mobile-controls-disclosure/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   commit_policy: "metadata_only"
@@ -64,8 +64,9 @@ inventory_notes:
     - "docs/ui_audits/2026-03-20/resumebuilder-saas-ux-audit/README.md"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope: []
-  reason: "Regression check passed for 4 closed pages (finalize, template-show, templates-index, summary) whose source files changed since closure. Zero overflow, zero console errors at 390x844, 768x1024, 1280x800. All closed pages remain stable. Next honest entry point is review-only after future shared UI changes."
+  recommended_scope:
+    - "resumes-index"
+  reason: "Implement-next resolved resumes-index-mobile-first-fold-density by collapsing the mobile workspace controls into a disclosure. The first resume card now starts around 730px at 390x844 with no overflow or console errors. Next honest entry point is close-page on resumes-index to confirm focused mobile/tablet/desktop stability before marking it closed."
 pages:
   - page_key: "home"
     title: "Home"
@@ -132,13 +133,21 @@ pages:
     auth_context: "authenticated_user"
     page_family: "workspace"
     priority: "medium"
-    status: "reviewed"
+    status: "improved"
     page_doc_path: "docs/ui_audits/responsive_review/pages/resumes-index.md"
     open_issue_keys: []
-    closed_issue_keys: []
-    last_audited_at: "2026-03-21T02:14:00Z"
-    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-21-resumes-index-review/00-overview.md"
-    next_step: "No issues found. Re-review after major workspace card or shell changes."
+    closed_issue_keys:
+      - "resumes-index-mobile-first-fold-density"
+    last_audited_at: "2026-03-22T06:23:00Z"
+    last_changed_at: "2026-03-22T06:23:00Z"
+    latest_run: "docs/ui_audits/responsive_review/runs/2026-03-22-resumes-index-mobile-controls-disclosure/00-overview.md"
+    next_step: "Close-page on resumes-index: verify the focused mobile, tablet, and desktop checkpoints remain clean after the mobile controls disclosure fix, then mark the page closed if no new issues appear."
+    cycle_count: 3
+    last_cycle_date: "2026-03-22T06:23:00Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - page_key: "resumes-new"
     title: "New resume"
     path: "/resumes/new"

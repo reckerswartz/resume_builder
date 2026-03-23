@@ -1,5 +1,11 @@
 # Template Variant Carry-Through
 
+## Status
+
+- **State**: `closed`
+- **Page family**: `resumes-new-and-templates-index`
+- **Goal**: Keep template and accent preselection visible and trustworthy across marketplace-to-setup carry-through without forcing immediate commitment.
+
 ## Slice key
 
 `template-variant-carry-through`
@@ -62,9 +68,14 @@
 bundle exec rspec spec/presenters/resumes/template_picker_state_spec.rb spec/requests/resumes_spec.rb spec/requests/templates_spec.rb spec/presenters/templates/marketplace_state_spec.rb
 ```
 
+## Remaining scope
+
+- Close-out re-review on `2026-03-22` did not reveal a stable regression in this slice, so it is now complete for the current rollout scope.
+
+## Latest run
+
+- `docs/resumebuilder_rollouts/runs/2026-03-22-rollout-closeout/00-overview.md`
+
 ## Next recommended slice
 
-Evaluate the deferred backlog for the next highest-value reference parity improvement. Candidates include:
-- Font family / font size preset formatting settings
-- Unified late-stage customization hub consolidation
-- Broader color palette and reset/default affordances
+None inside the current `resumebuilder-reference-rollout` scope.

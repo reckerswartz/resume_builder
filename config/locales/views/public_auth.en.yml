@@ -111,6 +111,12 @@ en:
       change_layouts:
         title: "Change layouts later"
         description: "Your content stays reusable, so you can switch templates without starting over."
+      selected_template:
+        eyebrow: "Selected template"
+        title: "Start with %{template}"
+        description: "We will use this template for your starter draft so you can continue with the layout you already chose."
+        badge: "Ready to carry through"
+        accent_description: "Your selected accent will carry into the starter draft too."
       form:
         pill: "Workspace setup"
         title: "Create account"
