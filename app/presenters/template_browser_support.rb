@@ -44,6 +44,7 @@ module TemplateBrowserSupport
         template_card.fetch(:skill_style_label),
         template_card.fetch(:section_heading_style_label),
         template_card.fetch(:shell_style_label),
+        template_card.fetch(:headshot_support_label),
         template_card.fetch(:summary),
         template_card.fetch(:sidebar_section_labels).join(" ")
       ].compact.join(" ").downcase

@@ -55,6 +55,8 @@ RSpec.describe ResumesHelper, type: :helper do
         theme_tone: 'slate',
         theme_tone_label: 'Slate',
         supports_headshot: false,
+        headshot_support: "no",
+        headshot_support_label: "Text only",
         header_style: 'split',
         header_style_label: 'Split',
         entry_style: 'cards',

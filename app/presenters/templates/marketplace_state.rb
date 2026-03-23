@@ -2,9 +2,9 @@ module Templates
   class MarketplaceState
     include TemplateBrowserSupport
 
-    attr_reader :query, :family_filter, :density_filter, :column_count_filter, :theme_tone_filter, :shell_style_filter, :sort
+    attr_reader :query, :family_filter, :density_filter, :column_count_filter, :theme_tone_filter, :shell_style_filter, :headshot_support_filter, :sort
 
-    def initialize(templates:, filter_templates: nil, query:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:, sort: nil, resume: nil, view_context:)
+    def initialize(templates:, filter_templates: nil, query:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:, headshot_support_filter: nil, sort: nil, resume: nil, view_context:)
       @templates = templates
       @filter_templates = filter_templates
       @query = query.to_s.strip
@@ -13,6 +13,7 @@ module Templates
       @column_count_filter = column_count_filter
       @theme_tone_filter = theme_tone_filter
       @shell_style_filter = shell_style_filter
+      @headshot_support_filter = headshot_support_filter
       @sort = sort
       @resume = resume
       @view_context = view_context
@@ -139,6 +140,17 @@ module Templates
             value_proc: ->(template_card) { template_card.fetch(:shell_style) },
             label_proc: ->(template_card) { template_card.fetch(:shell_style_label) }
           )
+        ),
+        build_filter_group(
+          key: "headshot_support",
+          label: I18n.t("templates.marketplace_state.filter_groups.headshot"),
+          selected_value: headshot_support_filter,
+          options: filter_options_for(
+            template_cards: filter_template_cards,
+            key: "headshot_support",
+            value_proc: ->(template_card) { template_card.fetch(:headshot_support) },
+            label_proc: ->(template_card) { template_card.fetch(:headshot_support_label) }
+          )
         )
       ]
     end
@@ -148,7 +160,7 @@ module Templates
     end
 
     def filters_active?
-      [ query, family_filter, density_filter, column_count_filter, theme_tone_filter, shell_style_filter ].any?(&:present?) || sort_active?
+      [ query, family_filter, density_filter, column_count_filter, theme_tone_filter, shell_style_filter, headshot_support_filter ].any?(&:present?) || sort_active?
     end
 
     def active_filter_badges
@@ -159,6 +171,7 @@ module Templates
       badges << { label: ResumeTemplates::Catalog.column_count_label(column_count_filter), tone: :neutral } if column_count_filter.present?
       badges << { label: ResumeTemplates::Catalog.theme_tone_label(theme_tone_filter), tone: :neutral } if theme_tone_filter.present?
       badges << { label: ResumeTemplates::Catalog.shell_style_label(shell_style_filter), tone: :neutral } if shell_style_filter.present?
+      badges << { label: ResumeTemplates::Catalog.headshot_support_label(headshot_support_filter), tone: :neutral } if headshot_support_filter.present?
       badges << { label: I18n.t("templates.marketplace_state.active_badges.sort", sort: selected_sort_label), tone: :neutral } if sort_active?
       badges
     end
@@ -203,6 +216,7 @@ module Templates
           filter_column_count: template_card.fetch(:column_count),
           filter_theme_tone: template_card.fetch(:theme_tone),
           filter_shell_style: template_card.fetch(:shell_style),
+          filter_headshot_support: template_card.fetch(:headshot_support),
           search_text: searchable_text_for(template_card),
           sort_name: template.name.downcase,
           sort_family: template_card.fetch(:family_label).downcase,

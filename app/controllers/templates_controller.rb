@@ -2,6 +2,7 @@ class TemplatesController < ApplicationController
   COLUMN_COUNT_FILTER_VALUES = ResumeTemplates::Catalog.column_count_options.map(&:last).freeze
   DENSITY_FILTER_VALUES = ResumeTemplates::Catalog.density_options.map(&:last).freeze
   SHELL_STYLE_FILTER_VALUES = ResumeTemplates::Catalog.shell_style_options.map(&:last).freeze
+  HEADSHOT_SUPPORT_FILTER_VALUES = ResumeTemplates::Catalog.headshot_support_options.map(&:last).freeze
   THEME_TONE_FILTER_VALUES = ResumeTemplates::Catalog.theme_tone_options.map(&:last).freeze
 
   allow_unauthenticated_access only: %i[index show]
@@ -16,6 +17,7 @@ class TemplatesController < ApplicationController
     @column_count_filter = params[:column_count].to_s.presence_in(COLUMN_COUNT_FILTER_VALUES)
     @theme_tone_filter = params[:theme_tone].to_s.presence_in(THEME_TONE_FILTER_VALUES)
     @shell_style_filter = params[:shell_style].to_s.presence_in(SHELL_STYLE_FILTER_VALUES)
+    @headshot_support_filter = params[:headshot_support].to_s.presence_in(HEADSHOT_SUPPORT_FILTER_VALUES)
     @sort = params[:sort].to_s.presence
     @recommendation_resume = Resume.new(intake_details: requested_resume_intake_details, settings: requested_resume_settings)
 
@@ -26,6 +28,7 @@ class TemplatesController < ApplicationController
       .with_column_count_filter(@column_count_filter)
       .with_theme_tone_filter(@theme_tone_filter)
       .with_shell_style_filter(@shell_style_filter)
+      .with_headshot_support_filter(@headshot_support_filter)
   end
 
   def show

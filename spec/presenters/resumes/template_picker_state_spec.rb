@@ -32,6 +32,8 @@ RSpec.describe Resumes::TemplatePickerState do
         theme_tone: 'slate',
         theme_tone_label: 'Slate',
         supports_headshot: false,
+        headshot_support: "no",
+        headshot_support_label: "Text only",
         header_style: 'split',
         header_style_label: 'Split',
         entry_style: 'cards',
@@ -58,6 +60,8 @@ RSpec.describe Resumes::TemplatePickerState do
         theme_tone: 'indigo',
         theme_tone_label: 'Indigo',
         supports_headshot: true,
+        headshot_support: "yes",
+        headshot_support_label: "Photo ready",
         header_style: 'split',
         header_style_label: 'Split',
         entry_style: 'list',
@@ -84,6 +88,8 @@ RSpec.describe Resumes::TemplatePickerState do
         theme_tone: 'blue',
         theme_tone_label: 'Blue',
         supports_headshot: false,
+        headshot_support: "no",
+        headshot_support_label: "Text only",
         header_style: 'rule',
         header_style_label: 'Rule',
         entry_style: 'list',
@@ -149,6 +155,7 @@ RSpec.describe Resumes::TemplatePickerState do
         filter_column_count: 'single_column',
         filter_theme_tone: 'slate',
         filter_shell_style: 'card',
+        filter_headshot_support: 'no',
         card_classes: 'card-selected',
         indicator_text: '✓',
         indicator_selected_text: '✓',
@@ -179,6 +186,7 @@ RSpec.describe Resumes::TemplatePickerState do
         filter_column_count: 'two_column',
         filter_theme_tone: 'indigo',
         filter_shell_style: 'card',
+        filter_headshot_support: 'yes',
         card_classes: 'card-unselected',
         indicator_text: 'SI',
         supporting_text: 'Clean professional resume layout',
@@ -248,6 +256,15 @@ RSpec.describe Resumes::TemplatePickerState do
               { key: 'shell_style', value: 'all', label: 'All', count: 3, button_classes: 'filter-active', button_selected_classes: 'filter-active', button_unselected_classes: 'filter-inactive', aria_pressed: 'true' },
               { key: 'shell_style', value: 'card', label: 'Card', count: 2, button_classes: 'filter-inactive', button_selected_classes: 'filter-active', button_unselected_classes: 'filter-inactive', aria_pressed: 'false' },
               { key: 'shell_style', value: 'flat', label: 'Flat', count: 1, button_classes: 'filter-inactive', button_selected_classes: 'filter-active', button_unselected_classes: 'filter-inactive', aria_pressed: 'false' }
+            ]
+          },
+          {
+            key: 'headshot_support',
+            label: 'Photo',
+            options: [
+              { key: 'headshot_support', value: 'all', label: 'All', count: 3, button_classes: 'filter-active', button_selected_classes: 'filter-active', button_unselected_classes: 'filter-inactive', aria_pressed: 'true' },
+              { key: 'headshot_support', value: 'yes', label: 'Photo ready', count: 1, button_classes: 'filter-inactive', button_selected_classes: 'filter-active', button_unselected_classes: 'filter-inactive', aria_pressed: 'false' },
+              { key: 'headshot_support', value: 'no', label: 'Text only', count: 2, button_classes: 'filter-inactive', button_selected_classes: 'filter-active', button_unselected_classes: 'filter-inactive', aria_pressed: 'false' }
             ]
           }
         ]
@@ -387,6 +404,8 @@ RSpec.describe Resumes::TemplatePickerState do
           theme_tone: 'slate',
           theme_tone_label: 'Slate',
           supports_headshot: false,
+        headshot_support: "no",
+        headshot_support_label: "Text only",
           header_style: 'rule',
           header_style_label: 'Rule',
           entry_style: 'list',
@@ -413,6 +432,8 @@ RSpec.describe Resumes::TemplatePickerState do
           theme_tone: 'indigo',
           theme_tone_label: 'Indigo',
           supports_headshot: true,
+        headshot_support: "yes",
+        headshot_support_label: "Photo ready",
           header_style: 'split',
           header_style_label: 'Split',
           entry_style: 'list',
@@ -439,6 +460,8 @@ RSpec.describe Resumes::TemplatePickerState do
           theme_tone: 'slate',
           theme_tone_label: 'Slate',
           supports_headshot: false,
+        headshot_support: "no",
+        headshot_support_label: "Text only",
           header_style: 'stacked',
           header_style_label: 'Stacked',
           entry_style: 'timeline',

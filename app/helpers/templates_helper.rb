@@ -1,7 +1,7 @@
 module TemplatesHelper
   include ResumesHelper
 
-  def template_marketplace_state(templates:, query:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:, filter_templates: nil, sort: nil, resume: nil)
+  def template_marketplace_state(templates:, query:, family_filter:, density_filter:, column_count_filter:, theme_tone_filter:, shell_style_filter:, headshot_support_filter: nil, filter_templates: nil, sort: nil, resume: nil)
     @template_marketplace_states ||= {}
     resolved_templates = Array(templates)
     resolved_filter_templates = Array(filter_templates)
@@ -9,7 +9,7 @@ module TemplatesHelper
       resume&.intake_details&.slice("experience_level", "student_status")&.compact_blank || {},
       resume&.settings&.to_h&.fetch("accent_color", nil)
     ]
-    state_key = [ resolved_templates.map(&:id), resolved_filter_templates.map(&:id), query, family_filter, density_filter, column_count_filter, theme_tone_filter, shell_style_filter, sort, resume_key ]
+    state_key = [ resolved_templates.map(&:id), resolved_filter_templates.map(&:id), query, family_filter, density_filter, column_count_filter, theme_tone_filter, shell_style_filter, headshot_support_filter, sort, resume_key ]
 
     @template_marketplace_states[state_key] ||= Templates::MarketplaceState.new(
       templates: resolved_templates,
@@ -20,6 +20,7 @@ module TemplatesHelper
       column_count_filter: column_count_filter,
       theme_tone_filter: theme_tone_filter,
       shell_style_filter: shell_style_filter,
+      headshot_support_filter: headshot_support_filter,
       sort: sort,
       resume: resume,
       view_context: self

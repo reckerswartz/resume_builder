@@ -123,4 +123,31 @@ RSpec.describe Template, type: :model do
       expect(template.render_layout_config).to include('family' => 'modern')
     end
   end
+
+  describe '.with_headshot_support_filter' do
+    let!(:headshot_template) do
+      create(:template, name: 'Editorial', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'editorial-split'))
+    end
+    let!(:text_template) do
+      create(:template, name: 'Modern', layout_config: ResumeTemplates::Catalog.default_layout_config(family: 'modern'))
+    end
+
+    it 'returns all templates when filter is blank or "all"' do
+      expect(described_class.with_headshot_support_filter(nil)).to include(headshot_template, text_template)
+      expect(described_class.with_headshot_support_filter('')).to include(headshot_template, text_template)
+      expect(described_class.with_headshot_support_filter('all')).to include(headshot_template, text_template)
+    end
+
+    it 'filters to headshot-supporting templates when value is "yes"' do
+      results = described_class.with_headshot_support_filter('yes')
+      expect(results).to include(headshot_template)
+      expect(results).not_to include(text_template)
+    end
+
+    it 'filters to non-headshot templates when value is "no"' do
+      results = described_class.with_headshot_support_filter('no')
+      expect(results).to include(text_template)
+      expect(results).not_to include(headshot_template)
+    end
+  end
 end

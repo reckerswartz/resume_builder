@@ -43,6 +43,18 @@ class Template < ApplicationRecord
 
     where("templates.layout_config ->> 'shell_style' = ?", shell_style.to_s)
   end
+  scope :with_headshot_support_filter, ->(headshot_support) do
+    next all if headshot_support.blank? || headshot_support.to_s == "all"
+
+    case headshot_support.to_s
+    when "yes"
+      where("(templates.layout_config ->> 'supports_headshot')::boolean = true")
+    when "no"
+      where("(templates.layout_config ->> 'supports_headshot')::boolean IS DISTINCT FROM true")
+    else
+      all
+    end
+  end
   scope :with_active_filter, ->(status) do
     case status
     when "active"

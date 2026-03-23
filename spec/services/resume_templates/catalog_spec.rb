@@ -172,4 +172,20 @@ RSpec.describe ResumeTemplates::Catalog do
       )
     end
   end
+
+  describe '.headshot_support_options' do
+    it 'returns label-value pairs for headshot support filtering' do
+      expect(described_class.headshot_support_options).to eq([
+        [ 'Photo ready', 'yes' ],
+        [ 'Text only', 'no' ]
+      ])
+    end
+  end
+
+  describe '.headshot_support_label' do
+    it 'returns the display label for a headshot support value' do
+      expect(described_class.headshot_support_label('yes')).to eq('Photo ready')
+      expect(described_class.headshot_support_label('no')).to eq('Text only')
+    end
+  end
 end

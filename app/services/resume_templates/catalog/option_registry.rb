@@ -116,6 +116,14 @@ module ResumeTemplates
         option_label("sidebar_position", sidebar_position)
       end
 
+      def headshot_support_options
+        %w[yes no].map { |value| [ headshot_support_label(value), value ] }
+      end
+
+      def headshot_support_label(headshot_support)
+        option_label("headshot_support", headshot_support)
+      end
+
       private
         def option_label(group, value)
           value_key = value.to_s

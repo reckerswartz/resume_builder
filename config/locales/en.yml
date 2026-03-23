@@ -129,6 +129,9 @@ en:
         sidebar_position:
           left: "Left"
           right: "Right"
+        headshot_support:
+          "yes": "Photo ready"
+          "no": "Text only"
 
   shared:
     pagination:

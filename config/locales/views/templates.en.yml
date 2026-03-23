@@ -16,6 +16,7 @@ en:
         columns: "Columns"
         theme: "Theme"
         layout: "Layout"
+        headshot: "Photo"
         all: "All"
       active_badges:
         query: 'Query: "%{query}"'

@@ -302,6 +302,7 @@ en:
         columns: "Columns"
         theme: "Theme"
         layout: "Layout"
+        headshot: "Photo"
         all: "All"
       search_placeholder: "Search by name, family, or layout details"
       sort_options:

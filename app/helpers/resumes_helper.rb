@@ -53,6 +53,8 @@ module ResumesHelper
         theme_tone: layout_config.fetch("theme_tone"),
         theme_tone_label: ResumeTemplates::Catalog.theme_tone_label(layout_config.fetch("theme_tone")),
         supports_headshot: layout_config.fetch("supports_headshot"),
+        headshot_support: layout_config.fetch("supports_headshot") ? "yes" : "no",
+        headshot_support_label: ResumeTemplates::Catalog.headshot_support_label(layout_config.fetch("supports_headshot") ? "yes" : "no"),
         header_style: layout_config.fetch("header_style"),
         header_style_label: ResumeTemplates::Catalog.header_style_label(layout_config.fetch("header_style")),
         entry_style: layout_config.fetch("entry_style"),

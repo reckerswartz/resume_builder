@@ -103,6 +103,16 @@ module Resumes
             value_proc: ->(template_card) { template_card.fetch(:shell_style) },
             label_proc: ->(template_card) { template_card.fetch(:shell_style_label) }
           )
+        ),
+        build_filter_group(
+          key: "headshot_support",
+          label: picker_text("filter_groups.headshot"),
+          options: filter_options_for(
+            template_cards: template_cards,
+            key: "headshot_support",
+            value_proc: ->(template_card) { template_card.fetch(:headshot_support) },
+            label_proc: ->(template_card) { template_card.fetch(:headshot_support_label) }
+          )
         )
       ]
     end
@@ -153,6 +163,7 @@ module Resumes
           filter_column_count: template_card.fetch(:column_count),
           filter_theme_tone: template_card.fetch(:theme_tone),
           filter_shell_style: template_card.fetch(:shell_style),
+          filter_headshot_support: template_card.fetch(:headshot_support),
           search_text: searchable_text_for(template_card),
           sort_name: template.name.downcase,
           sort_family: template_card.fetch(:family_label).downcase,
