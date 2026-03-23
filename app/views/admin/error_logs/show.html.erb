@@ -2,46 +2,11 @@
 <% request_summary = error_log_request_summary(@error_log) %>
 <% primary_reference_label = error_log_primary_reference_label(@error_log) %>
 <% primary_reference_description = error_log_primary_reference_description(@error_log) %>
-<% guidance_items = [
-     {
-       label: @error_log.job? ? t(".guidance_items.source.job") : t(".guidance_items.source.request"),
-       detail: error_log_source_description(@error_log),
-       tone: error_log_source_badge_tone(@error_log)
-     }
-   ] %>
-<% if related_job_log.present? %>
-  <% guidance_items << {
-       label: t(".guidance_items.related_job.label"),
-       detail: t(".guidance_items.related_job.detail", reference: related_job_log.active_job_id || t(".guidance_items.related_job.fallback_reference", id: related_job_log.id)),
-       tone: :success
-     } %>
-<% elsif @error_log.context["job_log_id"].present? %>
-  <% guidance_items << {
-       label: t(".guidance_items.recorded_job_reference.label"),
-       detail: t(".guidance_items.recorded_job_reference.detail", id: @error_log.context["job_log_id"]),
-       tone: :neutral
-     } %>
-<% end %>
-<% if @error_log.backtrace_lines.blank? %>
-  <% guidance_items << {
-       label: t(".guidance_items.no_backtrace.label"),
-       detail: t(".guidance_items.no_backtrace.detail"),
-       tone: :neutral
-     } %>
-<% end %>
 <% section_links = [
      { id: "incident-summary", label: t(".navigation.sections.incident_summary.label"), caption: t(".navigation.sections.incident_summary.caption") },
      { id: "captured-context", label: t(".navigation.sections.captured_context.label"), caption: t(".navigation.sections.captured_context.caption") },
      { id: "backtrace", label: t(".navigation.sections.backtrace.label"), caption: t(".navigation.sections.backtrace.caption") }
    ] %>
-<% triage_tone = related_job_log.present? ? :success : :neutral %>
-<% triage_title = if related_job_log.present?
-     t(".triage.titles.correlation_available")
-   elsif @error_log.backtrace_lines.blank?
-     t(".triage.titles.structured_only")
-   else
-     t(".triage.titles.review_context")
-   end %>
 
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
@@ -61,52 +26,6 @@
     ].compact,
     density: :compact
   ) %>
-
-  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
-    <div class="space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <span class="atelier-pill">
-            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-            <%= t(".triage.pill") %>
-          </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t(".triage.title") %></h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t(".triage.description") %></p>
-        </div>
-
-        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <span class="<%= ui_badge_classes(error_log_source_badge_tone(@error_log)) %>"><%= error_log_source_label(@error_log) %></span>
-        <span class="<%= ui_badge_classes(related_job_log.present? ? :success : :neutral) %>"><%= related_job_log.present? ? t(".triage.badges.related_job") : @error_log.job? ? t(".triage.badges.job_context") : t(".triage.badges.request_context") %></span>
-        <span class="<%= ui_badge_classes(@error_log.backtrace_lines.any? ? :neutral : :warning) %>"><%= @error_log.backtrace_lines.any? ? pluralize(@error_log.backtrace_lines.size, "frame") : t(".triage.badges.no_backtrace") %></span>
-        <span class="<%= ui_badge_classes(:neutral) %>"><%= error_log_duration_label(@error_log) %></span>
-      </div>
-
-      <div class="<%= ui_inset_panel_classes(tone: :danger, padding: :lg) %>">
-        <p class="text-sm font-medium text-rose-700"><%= t(".triage.message_title") %></p>
-        <p class="mt-2 text-sm text-rose-900"><%= @error_log.message %></p>
-      </div>
-
-      <div class="space-y-3">
-        <% guidance_items.each do |item| %>
-          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
-              </div>
-
-              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                <%= item.fetch(:tone) == :success ? t(".triage.badges.linked") : item.fetch(:tone) == :warning ? t(".triage.badges.attention") : item.fetch(:tone) == :info ? t(".triage.badges.source") : t(".triage.badges.noted") %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 
   <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
     <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
@@ -162,6 +81,11 @@
         ]
       ) do %>
         <div class="space-y-4">
+          <div class="<%= ui_inset_panel_classes(tone: :danger, padding: :lg) %>">
+            <p class="text-sm font-medium text-rose-700"><%= t(".triage.message_title") %></p>
+            <p class="mt-2 text-sm text-rose-900"><%= @error_log.message %></p>
+          </div>
+
           <div class="grid gap-4 sm:grid-cols-2">
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
               <p class="text-sm font-medium text-ink-700/80"><%= t(".incident_summary.cards.error_class") %></p>

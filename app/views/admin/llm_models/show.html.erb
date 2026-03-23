@@ -39,22 +39,6 @@
        tone: :success
      } %>
 <% end %>
-<% blocking_items = readiness_items.reject { |item| item.fetch(:tone, :neutral) == :success } %>
-<% triage_tone = if blocking_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
-     :warning
-   elsif blocking_items.any?
-     :neutral
-   else
-     :success
-   end %>
-<% triage_title = case triage_tone
-   when :warning
-     "Blocked for assignment"
-   when :neutral
-     "Usable with follow-up"
-   else
-     "Good to assign"
-   end %>
 <% technical_metadata_present = [ @llm_model.family, @llm_model.parameter_size, @llm_model.owned_by, @llm_model.quantization_level, @llm_model.modality_summary ].any?(&:present?) %>
 
 <section class="space-y-6">
@@ -75,47 +59,6 @@
     ],
     density: :compact
   ) %>
-
-  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
-    <div class="space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <span class="atelier-pill">
-            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-            Assignment readiness
-          </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Review this model</h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Decide whether this model is good to assign now, usable with caution, or still blocked before you inspect deeper catalog metadata.</p>
-        </div>
-
-        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <span class="<%= ui_badge_classes(llm_model_provider_status_tone(@llm_model)) %>"><%= llm_model_provider_status_label(@llm_model) %></span>
-        <span class="<%= ui_badge_classes(@llm_model.active? ? :success : :neutral) %>"><%= @llm_model.active? ? "Active" : "Inactive" %></span>
-        <span class="<%= ui_badge_classes(llm_model_assignment_tone(@llm_model)) %>"><%= llm_model_assignment_badge_label(@llm_model) %></span>
-        <span class="<%= ui_badge_classes(@llm_model.provider_synced? ? :success : :neutral) %>"><%= llm_model_catalog_label(@llm_model) %></span>
-      </div>
-
-      <div class="space-y-3">
-        <% readiness_items.each do |item| %>
-          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
-              </div>
-
-              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 
   <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
     <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
@@ -288,12 +231,6 @@
               </div>
             </div>
           <% end %>
-
-          <div class="flex flex-wrap gap-2 pt-2">
-            <%= link_to "Edit model", edit_admin_llm_model_path(@llm_model), class: ui_button_classes(:primary, size: :sm) %>
-            <%= link_to "Feature settings", admin_settings_path, class: ui_button_classes(:secondary, size: :sm) %>
-            <%= link_to "View provider", admin_llm_provider_path(@llm_model.llm_provider), class: ui_button_classes(:secondary, size: :sm) %>
-          </div>
         </div>
       <% end %>
 

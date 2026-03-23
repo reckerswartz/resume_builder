@@ -124,16 +124,20 @@ RSpec.describe 'Admin::LlmModels', type: :request do
 
       get admin_llm_model_path(llm_model)
       response_body = CGI.unescapeHTML(response.body)
+      document = Nokogiri::HTML(response.body)
 
       expect(response).to have_http_status(:ok)
-      expect(response_body).to include('Review this model')
       expect(response_body).to include('Catalog & runtime')
       expect(response_body).to include('Operational readiness')
       expect(response_body).to include('Assigned roles')
       expect(response_body).to include('Provider readiness')
+      expect(response_body).to include('Finish provider setup')
       expect(response_body).to include('Assignment order and workflow coverage')
       expect(response_body).to include('Vision Review Model')
       expect(response_body).to include('Text generation')
+      expect(document.css(%(a[href="#{edit_admin_llm_model_path(llm_model)}"])).size).to eq(1)
+      expect(document.css(%(a[href="#{admin_llm_provider_path(provider)}"])).size).to eq(1)
+      expect(response_body).not_to include('Review this model')
     end
   end
 

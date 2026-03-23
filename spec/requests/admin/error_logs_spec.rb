@@ -104,7 +104,6 @@ RSpec.describe 'Admin::ErrorLogs', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response_body).to include(error_log.reference_id)
-      expect(response_body).to include('Review this error')
       expect(response_body).to include('Incident summary')
       expect(response_body).to include('Captured context')
       expect(response_body).to include('Backtrace')
@@ -112,6 +111,7 @@ RSpec.describe 'Admin::ErrorLogs', type: :request do
       expect(response_body).to include('Structured details')
       expect(response_body).to include('Job reference')
       expect(response_body).to include('Open related job log')
+      expect(response_body).not_to include('Review this error')
       expect(response_body).not_to include('Request-cycle failure')
       expect(response_body).not_to include('Active job ID')
     end

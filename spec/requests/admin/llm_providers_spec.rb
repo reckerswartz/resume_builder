@@ -77,17 +77,20 @@ RSpec.describe 'Admin::LlmProviders', type: :request do
 
       get admin_llm_provider_path(provider)
       response_body = CGI.unescapeHTML(response.body)
+      document = Nokogiri::HTML(response.body)
 
       expect(response).to have_http_status(:ok)
-      expect(response_body).to include('Review this provider')
       expect(response_body).to include('Connection & runtime')
       expect(response_body).to include('Request readiness')
       expect(response_body).to include('Registered models')
-      expect(response_body).to include('Configured for requests')
+      expect(response_body).to include('Rotate to an env var when convenient')
       expect(response_body).to include('Catalog and assignment follow-up')
       expect(response_body).to include('Direct token')
       expect(response_body).to include('nvapi-••••cdef')
+      expect(document.css(%(form[action="#{sync_models_admin_llm_provider_path(provider)}"])).size).to eq(1)
+      expect(document.css(%(a[href="#{edit_admin_llm_provider_path(provider)}"])).size).to eq(1)
       expect(response.body).not_to include('nvapi-1234567890abcdef')
+      expect(response_body).not_to include('Review this provider')
     end
   end
 

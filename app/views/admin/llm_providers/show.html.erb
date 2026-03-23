@@ -51,36 +51,6 @@
        tone: :success
      } %>
 <% end %>
-<% readiness_widget_tone = if readiness_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
-     :dark
-   elsif readiness_items.any? { |item| item.fetch(:tone, :neutral) == :success }
-     :success
-   else
-     :subtle
-   end %>
-<% sync_widget_tone = if @llm_provider.sync_status == :synced
-     :success
-   elsif @llm_provider.sync_status == :error
-     :default
-   else
-     :subtle
-   end %>
-<% blocking_items = readiness_items.reject { |item| item.fetch(:tone, :neutral) == :success } %>
-<% triage_tone = if blocking_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
-     :warning
-   elsif blocking_items.any?
-     :neutral
-   else
-     :success
-   end %>
-<% triage_title = case triage_tone
-   when :warning
-     "Needs setup before live requests"
-   when :neutral
-     "Still needs follow-up"
-   else
-     "Configured for requests"
-   end %>
 
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
@@ -99,40 +69,6 @@
     ],
     density: :compact
   ) %>
-
-  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
-    <div class="space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <span class="atelier-pill">
-            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-            Triage first
-          </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950">Review this provider</h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80">Start with live-request blockers and sync issues, then open connection details or the model catalog only when you need deeper reference.</p>
-        </div>
-
-        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
-      </div>
-
-      <div class="space-y-3">
-        <% readiness_items.each do |item| %>
-          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
-              </div>
-
-              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 
   <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
     <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
@@ -228,46 +164,20 @@
         ]
       ) do %>
         <div class="space-y-4">
-          <div class="grid gap-4 lg:grid-cols-3">
-            <%= render Ui::WidgetCardComponent.new(
-              eyebrow: "Request readiness",
-              title: llm_provider_request_badge_label(@llm_provider),
-              description: llm_provider_request_status_label(@llm_provider),
-              tone: readiness_widget_tone,
-              badge: @llm_provider.active? ? "Active" : "Inactive",
-              badge_classes: ui_badge_classes(@llm_provider.active? ? :success : :neutral),
-              padding: :sm,
-              title_size: :base
-            ) %>
+          <% readiness_items.each do |item| %>
+            <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
+                  <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
+                </div>
 
-            <%= render Ui::WidgetCardComponent.new(
-              eyebrow: "Credential mode",
-              title: llm_provider_credential_status_label(@llm_provider),
-              description: llm_provider_credential_summary(@llm_provider),
-              tone: llm_provider_credential_status_tone(@llm_provider) == :success ? :success : :subtle,
-              badge: llm_provider_adapter_label(@llm_provider),
-              badge_classes: ui_badge_classes(:neutral),
-              padding: :sm,
-              title_size: :base
-            ) %>
-
-            <%= render Ui::WidgetCardComponent.new(
-              eyebrow: "Catalog sync",
-              title: llm_provider_sync_label(@llm_provider),
-              description: llm_provider_sync_summary(@llm_provider),
-              tone: sync_widget_tone,
-              badge: @llm_provider.last_synced_model_count.present? ? pluralize(@llm_provider.last_synced_model_count, "model") : "Catalog pending",
-              badge_classes: ui_badge_classes(llm_provider_sync_tone(@llm_provider)),
-              padding: :sm,
-              title_size: :base
-            ) %>
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <%= button_to "Sync models", sync_models_admin_llm_provider_path(@llm_provider), method: :post, form_class: "inline-flex", class: ui_button_classes(:secondary, size: :sm) %>
-            <%= link_to "Edit provider", edit_admin_llm_provider_path(@llm_provider), class: ui_button_classes(:primary, size: :sm) %>
-            <%= link_to "Manage models", admin_llm_models_path, class: ui_button_classes(:secondary, size: :sm) %>
-          </div>
+                <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
+                  <%= item.fetch(:tone) == :success ? "Ready" : item.fetch(:tone) == :warning ? "Attention" : "Follow-up" %>
+                </span>
+              </div>
+            </div>
+          <% end %>
         </div>
       <% end %>
 

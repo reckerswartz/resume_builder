@@ -91,21 +91,6 @@
        tone: :neutral
      } %>
 <% end %>
-<% triage_tone = if runtime_items.any? { |item| item.fetch(:tone, :neutral) == :warning }
-     :warning
-   elsif runtime_items.any? { |item| item.fetch(:tone, :neutral) != :success }
-     :neutral
-   else
-     :success
-   end %>
-<% triage_title = case triage_tone
-  when :warning
-    t(".triage.titles.warning")
-  when :neutral
-    t(".triage.titles.neutral")
-  else
-    t(".triage.titles.success")
-  end %>
 
 <section class="space-y-6">
   <%= render Ui::PageHeaderComponent.new(
@@ -125,56 +110,6 @@
     ].compact,
     density: :compact
   ) %>
-
-  <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :lg) do %>
-    <div class="space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <span class="atelier-pill">
-            <%= render Ui::GlyphComponent.new(name: :shield, size: :xs, tone: :minimal) %>
-            <%= t(".triage.pill") %>
-          </span>
-          <h2 class="mt-4 text-lg font-semibold tracking-tight text-ink-950"><%= t(".triage.title") %></h2>
-          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t(".triage.description") %></p>
-        </div>
-
-        <span class="<%= ui_badge_classes(triage_tone) %>"><%= triage_title %></span>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <span class="<%= ui_badge_classes(job_log_status_badge_tone(@job_log)) %>"><%= @job_log.status.humanize %></span>
-        <span class="<%= ui_badge_classes(runtime_tone) %>"><%= runtime_label %></span>
-        <span class="<%= ui_badge_classes(control_actions.any? ? :warning : :neutral) %>"><%= control_actions.any? ? t(".triage.badges.safe_action_count", count: control_actions.size) : t(".triage.badges.read_only") %></span>
-        <span class="<%= ui_badge_classes(related_error_log.present? ? :success : :neutral) %>"><%= related_error_log.present? ? t(".triage.badges.related_error") : related_error_reference.present? ? t(".triage.badges.error_reference") : t(".triage.badges.no_related_error") %></span>
-      </div>
-
-      <div class="space-y-3">
-        <% runtime_items.each do |item| %>
-          <div class="<%= ui_inset_panel_classes(tone: item.fetch(:tone, :neutral) == :success ? :success : item.fetch(:tone, :neutral) == :warning ? :default : :subtle) %>">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="text-sm font-medium text-ink-950"><%= item.fetch(:label) %></p>
-                <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= item.fetch(:detail) %></p>
-              </div>
-
-              <span class="<%= ui_badge_classes(item.fetch(:tone, :neutral)) %>">
-                <%= item.fetch(:tone) == :success ? t(".triage.badges.ready") : item.fetch(:tone) == :warning ? t(".triage.badges.attention") : t(".triage.badges.follow_up") %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <% control_actions.each do |action| %>
-          <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), data: { turbo_method: action.fetch(:method), turbo_confirm: action.fetch(:confirm) }.compact %>
-        <% end %>
-        <% if related_error_log.present? %>
-          <%= link_to t(".page_header.actions.open_related_error"), admin_error_log_path(related_error_log), class: ui_button_classes(:secondary, size: :sm) %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 
   <div class="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)]">
     <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
@@ -256,6 +191,14 @@
             <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
               <p class="text-sm font-medium text-ink-950"><%= t(".follow_up_section.empty_state.title") %></p>
               <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".follow_up_section.empty_state.description") %></p>
+            </div>
+          <% end %>
+
+          <% if control_actions.any? %>
+            <div class="flex flex-wrap gap-2 pt-2">
+              <% control_actions.each do |action| %>
+                <%= link_to action.fetch(:label), action.fetch(:path), class: ui_button_classes(action.fetch(:style), size: :sm), data: { turbo_method: action.fetch(:method), turbo_confirm: action.fetch(:confirm) }.compact %>
+              <% end %>
             </div>
           <% end %>
         </div>

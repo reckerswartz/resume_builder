@@ -126,13 +126,13 @@ RSpec.describe 'Admin::JobLogs', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response_body).to include(job_log.job_type)
-      expect(response_body).to include('Review this job')
       expect(response_body).to include('Follow-up actions')
       expect(response_body).to include('Live queue status')
       expect(response_body).to include('Captured payloads')
       expect(response_body).to include('Safe actions')
       expect(response_body).to include('Lifecycle and worker details')
       expect(response_body).to include('Open related error')
+      expect(response_body).not_to include('Review this job')
     end
 
     it 'renders succeeded logs without raising an error' do

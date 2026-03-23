@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-23T00:07:52Z"
+updated_at: "2026-03-23T02:48:12Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ux-usability-audit.md"
@@ -10,7 +10,7 @@ tracking:
   overview_path: "docs/ui_audits/usability_review/README.md"
   page_doc_template: "docs/ui_audits/usability_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/usability_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/usability_review/runs/2026-03-23-admin-settings-trim-duplicate-summary/00-overview.md"
+  latest_run: "docs/ui_audits/usability_review/runs/2026-03-23-admin-error-log-show-trim-duplicate-triage/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "usability"
@@ -73,11 +73,8 @@ inventory_notes:
     - "docs/ui_audits/guidelines_review/registry.yml"
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
-  recommended_scope:
-    - "admin-llm-provider-show"
-    - "admin-llm-model-show"
-    - "admin-job-log-show"
-  reason: "admin-settings is now audited and has no open issues. The next honest targets are the remaining unaudited high-priority admin detail surfaces: admin-llm-provider-show, admin-llm-model-show, and admin-job-log-show."
+  recommended_scope: []
+  reason: "The current high-priority admin detail queue is fully audited. The next honest step is a fresh registry-guided discovery pass or a follow-up on separate cross-page regressions if desired."
 pages:
   - page_key: "home"
     title: "Home"
@@ -105,6 +102,9 @@ pages:
     issues_resolved: 4
     issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      UX-HOME-002: 40
+      UX-HOME-003: 41
   - page_key: "sign-in"
     title: "Sign in"
     path: "/session/new"
@@ -314,6 +314,9 @@ pages:
     issues_resolved: 4
     issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      UX-TSHOW-002: 62
+      UX-TSHOW-003: 70
   - page_key: "resume-source-import"
     title: "Resume source import launcher"
     path: "/resume_source_imports/:provider"
@@ -364,6 +367,7 @@ pages:
     issues_remaining: 0
     regression_detected: false
     github_issue_numbers:
+      UX-BLDSRC-002: 61
       UX-BLDSRC-003: 71
   - page_key: "resume-builder-heading"
     title: "Resume builder heading step"
@@ -390,6 +394,8 @@ pages:
     issues_resolved: 3
     issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDHDG-003: 72
   - page_key: "resume-builder-personal-details"
     title: "Resume builder personal details step"
     path: "/resumes/:id/edit?step=personal_details"
@@ -415,6 +421,8 @@ pages:
     issues_resolved: 3
     issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDPD-003: 79
   - page_key: "resume-builder-experience"
     title: "Resume builder experience step"
     path: "/resumes/:id/edit?step=experience"
@@ -518,6 +526,8 @@ pages:
     issues_resolved: 3
     issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      UX-BLDSUM-002: 73
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"
     path: "/resumes/:id/edit?step=finalize"
@@ -553,11 +563,55 @@ pages:
   - { page_key: "admin-template-new", title: "Admin template new", path: "/admin/templates/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-template-edit", title: "Admin template edit", path: "/admin/templates/:id/edit", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-llm-providers-index", title: "Admin LLM providers index", path: "/admin/llm_providers", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-llm-provider-show", title: "Admin LLM provider detail", path: "/admin/llm_providers/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "admin-llm-provider-show"
+    title: "Admin LLM provider detail"
+    path: "/admin/llm_providers/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "improved"
+    usability_score: 83
+    page_doc_path: "docs/ui_audits/usability_review/pages/admin-llm-provider-show.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-ALPRV-001"
+    last_audited_at: "2026-03-23T02:23:36Z"
+    last_changed_at: "2026-03-23T02:23:36Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-23-admin-llm-provider-show-trim-duplicate-readiness/00-overview.md"
+    next_step: "No open issues remain on admin-llm-provider-show. Revisit only if the provider detail page grows new summary chrome or repeated action clusters."
+    cycle_count: 1
+    last_cycle_date: "2026-03-23T02:23:36Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "admin-llm-provider-new", title: "Admin LLM provider new", path: "/admin/llm_providers/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-llm-provider-edit", title: "Admin LLM provider edit", path: "/admin/llm_providers/:id/edit", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-llm-models-index", title: "Admin LLM models index", path: "/admin/llm_models", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-llm-model-show", title: "Admin LLM model detail", path: "/admin/llm_models/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "admin-llm-model-show"
+    title: "Admin LLM model detail"
+    path: "/admin/llm_models/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "improved"
+    usability_score: 84
+    page_doc_path: "docs/ui_audits/usability_review/pages/admin-llm-model-show.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-ALMOD-001"
+    last_audited_at: "2026-03-23T02:29:23Z"
+    last_changed_at: "2026-03-23T02:29:23Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-23-admin-llm-model-show-trim-duplicate-readiness/00-overview.md"
+    next_step: "No open issues remain on admin-llm-model-show. Revisit only if the model detail page grows new summary chrome or repeated action clusters."
+    cycle_count: 1
+    last_cycle_date: "2026-03-23T02:29:23Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
   - { page_key: "admin-llm-model-new", title: "Admin LLM model new", path: "/admin/llm_models/new", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - { page_key: "admin-llm-model-edit", title: "Admin LLM model edit", path: "/admin/llm_models/:id/edit", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
   - page_key: "admin-settings"
@@ -584,6 +638,60 @@ pages:
     issues_remaining: 0
     regression_detected: false
   - { page_key: "admin-job-logs-index", title: "Admin job logs index", path: "/admin/job_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-job-log-show", title: "Admin job log detail", path: "/admin/job_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-error-logs-index", title: "Admin error logs index", path: "/admin/error_logs", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "medium", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
-  - { page_key: "admin-error-log-show", title: "Admin error log detail", path: "/admin/error_logs/:id", access_level: "admin", auth_context: "admin", page_family: "admin", priority: "high", status: "new", usability_score: null, open_issue_keys: [], closed_issue_keys: [] }
+  - page_key: "admin-job-log-show"
+    title: "Admin job log detail"
+    path: "/admin/job_logs/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "improved"
+    usability_score: 82
+    page_doc_path: "docs/ui_audits/usability_review/pages/admin-job-log-show.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-AJOB-001"
+    last_audited_at: "2026-03-23T02:36:23Z"
+    last_changed_at: "2026-03-23T02:36:23Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-23-admin-job-log-show-trim-duplicate-triage/00-overview.md"
+    next_step: "No open page-local usability issues remain on admin-job-log-show. Revisit only if the detail page grows new summary chrome or repeated first-fold status panels. Separate follow-up: shared application.js parse error observed during browser audit."
+    cycle_count: 1
+    last_cycle_date: "2026-03-23T02:36:23Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
+  - page_key: "admin-error-logs-index"
+    title: "Admin error logs index"
+    path: "/admin/error_logs"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "medium"
+    status: "new"
+    usability_score: null
+    open_issue_keys: []
+    closed_issue_keys: []
+  - page_key: "admin-error-log-show"
+    title: "Admin error log detail"
+    path: "/admin/error_logs/:id"
+    access_level: "admin"
+    auth_context: "admin"
+    page_family: "admin"
+    priority: "high"
+    status: "improved"
+    usability_score: 84
+    page_doc_path: "docs/ui_audits/usability_review/pages/admin-error-log-show.md"
+    open_issue_keys: []
+    closed_issue_keys:
+      - "UX-AERR-001"
+    last_audited_at: "2026-03-23T02:44:10Z"
+    last_changed_at: "2026-03-23T02:44:10Z"
+    latest_run: "docs/ui_audits/usability_review/runs/2026-03-23-admin-error-log-show-trim-duplicate-triage/00-overview.md"
+    next_step: "No open issues remain on admin-error-log-show. Revisit only if the error detail page grows new summary chrome or repeated first-fold triage panels."
+    cycle_count: 1
+    last_cycle_date: "2026-03-23T02:44:10Z"
+    issues_found: 1
+    issues_resolved: 1
+    issues_remaining: 0
+    regression_detected: false
