@@ -1,5 +1,6 @@
 <% finalize_workspace_state = resume_finalize_workspace_state(resume, step_sections: step_sections) %>
 <% active_finalize_tab = params[:tab].presence_in(%w[template design sections]) || "template" %>
+<% finalize_settings_form_id = dom_id(resume, :finalize_settings_form) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
   <div class="flex flex-wrap items-center gap-3 px-6 py-4">
@@ -25,7 +26,7 @@
       <% end %>
     </nav>
 
-    <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-0" do |form| %>
+    <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), id: finalize_settings_form_id, data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-0" do |form| %>
       <%= hidden_field_tag :tab, active_finalize_tab, data: { workspace_tabs_target: "input" } %>
 
       <% if resume.errors.any? %>
@@ -41,68 +42,19 @@
       <div class="py-5" data-tab-key="design" data-workspace-tabs-target="panel" <%= active_finalize_tab == "design" ? nil : "hidden" %>>
         <%= render "resumes/finalize_workspace_design_panel", form: form, finalize_workspace_state: finalize_workspace_state %>
       </div>
-
-      <div class="py-5" data-tab-key="sections" data-workspace-tabs-target="panel" <%= active_finalize_tab == "sections" ? nil : "hidden" %>>
-        <%= render "resumes/finalize_workspace_sections_panel", finalize_workspace_state: finalize_workspace_state %>
-      </div>
-
-      <div class="flex flex-col gap-3 border-t border-canvas-200/80 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-sm text-ink-700/70"><%= t("resumes.editor_finalize_step.footer_note") %></p>
-        <%= form.submit t("resumes.editor_finalize_step.save_finalize_settings"), class: ui_button_classes(:primary) %>
-      </div>
     <% end %>
 
     <div class="py-5" data-tab-key="sections" data-workspace-tabs-target="panel" <%= active_finalize_tab == "sections" ? nil : "hidden" %>>
-      <section id="<%= dom_id(resume, :step_sections) %>" class="space-y-4">
-        <details class="overflow-hidden" data-finalize-additional-sections-disclosure>
-          <summary class="cursor-pointer list-none">
-            <%= render Ui::SurfaceCardComponent.new(padding: :sm, extra_classes: "overflow-hidden") do %>
-              <div class="relative">
-                <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
+      <%= render "resumes/finalize_workspace_sections_panel",
+        resume: resume,
+        step_sections: step_sections,
+        add_section_types: add_section_types,
+        finalize_workspace_state: finalize_workspace_state %>
+    </div>
 
-                <div class="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div class="space-y-3">
-                    <span class="atelier-pill">
-                      <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
-                      <%= t("resumes.editor_finalize_step.additional_sections.pill") %>
-                    </span>
-                    <div>
-                      <h3 class="text-xl font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.additional_sections.title") %></h3>
-                      <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.additional_sections.description") %></p>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-3">
-                    <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.additional_sections.badge") %></span>
-                    <span class="text-ink-400 transition-transform group-open:rotate-180">▾</span>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-          </summary>
-
-          <div class="mt-4 space-y-4">
-            <% if step_sections.any? %>
-              <div class="space-y-4" data-controller="sortable">
-                <% step_sections.each do |section| %>
-                  <div id="<%= dom_id(section, :sortable_item) %>" data-action="dragstart->sortable#dragstart dragover->sortable#dragover drop->sortable#drop dragend->sortable#dragend" data-sortable-target="item" data-sortable-move-url="<%= move_resume_section_path(resume, section, **resume_builder_step_params) %>" draggable="true">
-                    <%= render "resumes/section_editor", resume: resume, section: section, allowed_section_types: add_section_types %>
-                  </div>
-                <% end %>
-              </div>
-            <% else %>
-              <%= render Ui::EmptyStateComponent.new(
-                title: t("resumes.editor_finalize_step.empty_state.title"),
-                description: t("resumes.editor_finalize_step.empty_state.description")
-              ) %>
-            <% end %>
-
-            <% if add_section_types.any? %>
-              <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types, open: step_sections.empty? %>
-            <% end %>
-          </div>
-        </details>
-      </section>
+    <div class="flex flex-col gap-3 border-t border-canvas-200/80 pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-ink-700/70"><%= t("resumes.editor_finalize_step.footer_note") %></p>
+      <%= button_tag t("resumes.editor_finalize_step.save_finalize_settings"), type: :submit, form: finalize_settings_form_id, class: ui_button_classes(:primary) %>
     </div>
   </div>
 <% end %>

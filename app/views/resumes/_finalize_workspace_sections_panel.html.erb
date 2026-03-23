@@ -47,6 +47,9 @@
     </div>
   <% end %>
 
+  <%= form_with model: resume, url: resume_path(resume, **resume_builder_step_params), data: { controller: "autosave", autosave_delay_value: 500, action: "input->autosave#queue change->autosave#queue" }, class: "space-y-5" do %>
+    <%= hidden_field_tag :tab, "sections", data: { workspace_tabs_target: "input" } %>
+
     <% if finalize_workspace_state.has_section_visibility_controls? %>
       <%= hidden_field_tag "resume[settings][hidden_sections][]", "", id: nil %>
 
@@ -79,4 +82,53 @@
         align: :left
       ) %>
     <% end %>
+  <% end %>
+
+  <section id="<%= dom_id(resume, :step_sections) %>" class="space-y-4">
+    <div data-finalize-additional-sections-surface>
+      <%= render Ui::SurfaceCardComponent.new(padding: :sm, extra_classes: "overflow-hidden") do %>
+        <div class="relative">
+          <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
+
+          <div class="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div class="space-y-3">
+              <span class="atelier-pill">
+                <%= render Ui::GlyphComponent.new(name: :layers, size: :xs, tone: :minimal) %>
+                <%= t("resumes.editor_finalize_step.additional_sections.pill") %>
+              </span>
+              <div>
+                <h3 class="text-xl font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.additional_sections.title") %></h3>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.additional_sections.description") %></p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.additional_sections.badge") %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+          <% if step_sections.any? %>
+            <div class="space-y-4" data-controller="sortable">
+              <% step_sections.each do |section| %>
+                <div id="<%= dom_id(section, :sortable_item) %>" data-action="dragstart->sortable#dragstart dragover->sortable#dragover drop->sortable#drop dragend->sortable#dragend" data-sortable-target="item" data-sortable-move-url="<%= move_resume_section_path(resume, section, **resume_builder_step_params) %>" draggable="true">
+                  <%= render "resumes/section_editor", resume: resume, section: section, allowed_section_types: add_section_types %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <%= render Ui::EmptyStateComponent.new(
+              title: t("resumes.editor_finalize_step.empty_state.title"),
+              description: t("resumes.editor_finalize_step.empty_state.description")
+            ) %>
+          <% end %>
+
+          <% if add_section_types.any? %>
+            <%= render "resumes/section_form", resume: resume, allowed_section_types: add_section_types, open: step_sections.empty? %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
 </div>
