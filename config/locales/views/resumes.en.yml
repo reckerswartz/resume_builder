@@ -19,6 +19,7 @@ en:
       bulk_delete_completed: "Selected resumes deleted successfully."
       bulk_action_unavailable: "Choose a valid bulk action."
       bulk_selection_required: "Select at least one resume to continue."
+      bulk_download_not_ready: "Not all selected resumes have a PDF ready. Export them first (%{ready} of %{total} ready)."
       template_selection_unavailable_error: "is not available."
       choose_available_template: "Choose a template that is still available."
       selected_photo_unavailable: "Selected photo is not available."
@@ -192,6 +193,7 @@ en:
         selected_count_other: "%{count} resumes selected"
         clear_selection: "Clear selection"
         export_selected: "Export selected"
+        download_zip: "Download ZIP"
         delete_selected: "Delete selected"
     resume_card:
       canvas_pill: "Resume canvas"

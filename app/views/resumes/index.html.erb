@@ -192,6 +192,18 @@
                 enabled_classes: ui_button_classes(:secondary, size: :sm),
                 disabled_classes: ui_button_classes(:disabled, size: :sm)
               } %>
+            <%= button_tag t("resumes.index.bulk_actions.download_zip"),
+              type: :submit,
+              name: "bulk_operation",
+              value: "download_zip",
+              formaction: bulk_download_resumes_path,
+              disabled: !bulk_actions_enabled,
+              class: ui_button_classes(bulk_actions_enabled ? :primary : :disabled, size: :sm),
+              data: {
+                workspace_bulk_actions_target: "actionButton",
+                enabled_classes: ui_button_classes(:primary, size: :sm),
+                disabled_classes: ui_button_classes(:disabled, size: :sm)
+              } %>
             <%= button_tag t("resumes.index.bulk_actions.delete_selected"),
               type: :submit,
               name: "bulk_operation",

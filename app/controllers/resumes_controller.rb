@@ -120,6 +120,25 @@ class ResumesController < ApplicationController
     end
   end
 
+  def bulk_download
+    authorize Resume, :bulk_download?
+
+    resumes = selected_workspace_resumes
+    return redirect_with_workspace_alert(:bulk_selection_required) if resumes.empty?
+
+    exporter = Resumes::BulkZipExporter.new(resumes: resumes)
+    unless exporter.all_exports_ready?
+      return redirect_to resumes_path(workspace_redirect_params), alert: controller_message(:bulk_download_not_ready, ready: exporter.ready_count, total: resumes.size), status: :see_other
+    end
+
+    send_data(
+      exporter.call,
+      filename: "resumes-#{Date.current.iso8601}.zip",
+      type: "application/zip",
+      disposition: "attachment"
+    )
+  end
+
   def duplicate
     authorize @resume
 

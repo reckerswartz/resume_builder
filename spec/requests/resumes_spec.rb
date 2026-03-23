@@ -1687,4 +1687,99 @@ RSpec.describe 'Resumes', type: :request do
       expect(flash[:alert]).to eq(I18n.t('resumes.controller.bulk_selection_required'))
     end
   end
+
+  describe 'POST /resumes/bulk_download' do
+    context 'when not authenticated' do
+      let(:authenticated) { false }
+
+      it 'redirects to the sign-in page' do
+        post bulk_download_resumes_path, params: { resume_ids: [ 1 ] }
+
+        expect(response).to redirect_to(new_session_path)
+      end
+    end
+
+    it 'returns a ZIP when all selected resumes have PDFs' do
+      resumes = Array.new(2) { create(:resume, user:, template:) }
+      resumes.each do |resume|
+        resume.pdf_export.attach(
+          io: StringIO.new("fake pdf for #{resume.slug}"),
+          filename: "#{resume.slug}.pdf",
+          content_type: "application/pdf"
+        )
+      end
+
+      post bulk_download_resumes_path, params: { resume_ids: resumes.map(&:id) }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("application/zip")
+      expect(response.headers["Content-Disposition"]).to include("resumes-")
+      expect(response.headers["Content-Disposition"]).to include(Date.current.iso8601)
+
+      entries = []
+      Zip::InputStream.open(StringIO.new(response.body)) do |zip|
+        while (entry = zip.get_next_entry)
+          entries << entry.name
+        end
+      end
+
+      expect(entries.size).to eq(2)
+      resumes.each do |resume|
+        expect(entries).to include("#{resume.slug}.pdf")
+      end
+    end
+
+    it 'returns a see_other redirect with alert when some PDFs are missing' do
+      resume_with_pdf = create(:resume, user:, template:)
+      resume_without_pdf = create(:resume, user:, template:)
+      resume_with_pdf.pdf_export.attach(
+        io: StringIO.new("fake pdf"),
+        filename: "test.pdf",
+        content_type: "application/pdf"
+      )
+
+      post bulk_download_resumes_path, params: {
+        resume_ids: [ resume_with_pdf.id, resume_without_pdf.id ],
+        page: 2
+      }
+
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(resumes_path(page: 2, resume_ids: [ resume_with_pdf.id, resume_without_pdf.id ]))
+      expect(flash[:alert]).to eq(I18n.t('resumes.controller.bulk_download_not_ready', ready: 1, total: 2))
+    end
+
+    it 'returns a see_other redirect with alert when no resumes are selected' do
+      post bulk_download_resumes_path, params: { page: 2 }
+
+      expect(response).to redirect_to(resumes_path(page: 2))
+      expect(flash[:alert]).to eq(I18n.t('resumes.controller.bulk_selection_required'))
+    end
+
+    it 'only includes resumes owned by the current user' do
+      other_user = create(:user)
+      own_resume = create(:resume, user:, template:)
+      other_resume = create(:resume, user: other_user, template:)
+      [ own_resume, other_resume ].each do |resume|
+        resume.pdf_export.attach(
+          io: StringIO.new("fake pdf for #{resume.slug}"),
+          filename: "#{resume.slug}.pdf",
+          content_type: "application/pdf"
+        )
+      end
+
+      post bulk_download_resumes_path, params: { resume_ids: [ own_resume.id, other_resume.id ] }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("application/zip")
+
+      entries = []
+      Zip::InputStream.open(StringIO.new(response.body)) do |zip|
+        while (entry = zip.get_next_entry)
+          entries << entry.name
+        end
+      end
+
+      expect(entries).to eq([ "#{own_resume.slug}.pdf" ])
+    end
+  end
 end

@@ -50,6 +50,7 @@ Rails.application.routes.draw do
   resources :resumes do
     collection do
       post :bulk_action
+      post :bulk_download
     end
 
     member do

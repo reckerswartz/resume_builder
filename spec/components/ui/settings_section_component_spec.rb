@@ -40,10 +40,10 @@ RSpec.describe Ui::SettingsSectionComponent, type: :component do
   it 'normalizes badge hashes and renders them' do
     component = described_class.new(
       title: 'Integrations',
-      badges: [{ 'label' => 'Beta', 'tone' => 'info' }]
+      badges: [ { 'label' => 'Beta', 'tone' => 'info' } ]
     )
 
-    expect(component.badges).to eq([{ label: 'Beta', tone: 'info' }])
+    expect(component.badges).to eq([ { label: 'Beta', tone: 'info' } ])
 
     render_inline(component)
 

@@ -7,6 +7,10 @@ class ResumePolicy < ApplicationPolicy
     authenticated?
   end
 
+  def bulk_download?
+    authenticated?
+  end
+
   def show?
     owner?
   end

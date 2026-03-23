@@ -15,6 +15,7 @@ RSpec.describe ResumePolicy do
     it { is_expected.to be_show }
     it { is_expected.to be_create }
     it { is_expected.to be_bulk_action }
+    it { is_expected.to be_bulk_download }
     it { is_expected.to be_update }
     it { is_expected.to be_destroy }
     it { is_expected.to be_export }
@@ -28,6 +29,7 @@ RSpec.describe ResumePolicy do
     it { is_expected.not_to be_show }
     it { is_expected.to be_create }
     it { is_expected.to be_bulk_action }
+    it { is_expected.to be_bulk_download }
     it { is_expected.not_to be_update }
     it { is_expected.not_to be_destroy }
     it { is_expected.not_to be_export }
@@ -41,6 +43,7 @@ RSpec.describe ResumePolicy do
     it { is_expected.to be_show }
     it { is_expected.to be_create }
     it { is_expected.to be_bulk_action }
+    it { is_expected.to be_bulk_download }
     it { is_expected.to be_update }
     it { is_expected.to be_destroy }
     it { is_expected.to be_export }
@@ -54,6 +57,7 @@ RSpec.describe ResumePolicy do
     it { is_expected.not_to be_show }
     it { is_expected.not_to be_create }
     it { is_expected.not_to be_bulk_action }
+    it { is_expected.not_to be_bulk_download }
     it { is_expected.not_to be_update }
     it { is_expected.not_to be_destroy }
     it { is_expected.not_to be_export }
