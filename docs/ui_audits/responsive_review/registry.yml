@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T06:23:00Z"
+updated_at: "2026-03-23T02:48:12Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/responsive-ui-audit.md"
@@ -322,6 +322,8 @@ pages:
     issues_resolved: 1
     issues_remaining: 0
     regression_detected: false
+    github_issue_numbers:
+      summary-step-mobile-2px-overflow: 60
   - page_key: "resume-builder-finalize"
     title: "Resume builder finalize step"
     path: "/resumes/:id/edit?step=finalize"

@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-finalize`
 - **Goal**: Add accessible keyboard navigation to the finalize workspace tabs so the new post-build workspace remains usable without pointer input.
 
@@ -55,8 +55,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-22-finalize-workspace-tab-keyboard-navigation/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-23-finalize-post-closeout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `finalize-sections-single-panel-surface`
+- None inside the current `resumebuilder-reference-rollout` scope.

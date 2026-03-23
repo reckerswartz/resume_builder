@@ -11,8 +11,8 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `add_targeted_specs`
-- Last reviewed: `2026-03-23T00:18:00Z`
-- Last changed: `2026-03-23T00:18:00Z`
+- Last reviewed: `2026-03-23T02:33:00Z`
+- Last changed: `2026-03-23T02:33:00Z`
 
 ## Hotspot summary
 
@@ -199,10 +199,20 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 
 - Extended `spec/services/resumes/text_exporter_spec.rb` with focused coverage for non-experience section formatting, blank-section suppression, `Current`/`Present` date normalization, contact-field whitespace cleanup, excess blank-line collapse, and trailing newline preservation.
 
+### Slice 39: ui-dashboard-panel-component-spec
+
+- Extended `spec/components/ui/shared_density_components_spec.rb` with direct default-state coverage for `Ui::DashboardPanelComponent`.
+- Added assertions for helper-backed wrapper/action class delegation, dark-surface styling branches, default spacing/typography branches, and the default brand-toned action state.
+
+### Slice 40: ui-sticky-action-bar-component-spec
+
+- Extended `spec/components/ui/shared_density_components_spec.rb` with direct default-state coverage for `Ui::StickyActionBarComponent`.
+- Added assertions for default sticky wrapper spacing/shape, the standard layout gap branch, and stable title/description/content classes on standard density.
+
 ## Pending
 
 - All inventoried service coverage gaps are now closed.
-- Remaining coverage gaps are concentrated in low-priority UI components and skip-tier models. The named verification queue remains empty after the fresh low-priority verification scan.
+- Remaining coverage gaps are concentrated in low-priority UI components and skip-tier models. The named verification queue remains empty after the fresh low-priority verification scan and `Ui::StickyActionBarComponent` follow-up.
 
 ## Open follow-up keys
 
@@ -233,13 +243,15 @@ This file tracks the comprehensive coverage gap inventory discovered during a fu
 - `add-ui-page-header-component-spec`
 - `add-ui-hero-header-component-spec`
 - `add-resumes-text-exporter-spec`
+- `add-ui-dashboard-panel-component-spec`
+- `add-ui-sticky-action-bar-component-spec`
 
 ## Verification
 
 - Specs:
   - `bundle exec rspec spec/services/resumes/export_status_broadcaster_spec.rb spec/services/errors/tracker_spec.rb spec/jobs/application_job_spec.rb` (17 examples, 0 failures)
   - `bundle exec rspec spec/components/resume_templates/base_component_spec.rb spec/services/resume_templates/pdf_rendering_spec.rb` (29 examples, 0 failures)
-  - `bundle exec rspec spec/components/ui/shared_density_components_spec.rb` (10 examples, 0 failures)
+  - `bundle exec rspec spec/components/ui/shared_density_components_spec.rb` (12 examples, 0 failures)
   - `bundle exec rspec spec/services/resumes/text_exporter_spec.rb` (3 examples, 0 failures)
 - Lint or syntax:
   - `ruby -c spec/services/resumes/export_status_broadcaster_spec.rb spec/services/errors/tracker_spec.rb` (Syntax OK)

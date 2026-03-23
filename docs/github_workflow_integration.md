@@ -314,6 +314,20 @@ Refreshes the central `docs/github_ops/registry.yml` workflow summaries from liv
 # per-workflow registry files.
 ```
 
+#### `bin/gh-bridge/write-back-registry-links`
+
+Backfills exact, unambiguous GitHub issue references into supported workflow-local registry structures using live workflow-labeled GitHub issues.
+
+```bash
+# Usage: bin/gh-bridge/write-back-registry-links \
+#   [--workflow "ux-usability-audit"] \
+#   [--dry-run]
+#
+# Supports record-level write-back for existing local registry fields such as
+# `github_issue`, `github_issue_number`, and `github_issue_numbers` maps.
+# Ambiguous matches and unsupported registry shapes are reported but skipped.
+```
+
 ### 6.2 Issue Body Templates (`docs/github_ops/issue_templates/`)
 
 Structured Markdown templates that workflows populate before calling `create-issue`.
@@ -587,6 +601,7 @@ label_taxonomy:
 bridge_scripts:
   sync_registry: "bin/gh-bridge/sync-registry"
   reconcile_registry: "bin/gh-bridge/reconcile-registry"
+  write_back_registry_links: "bin/gh-bridge/write-back-registry-links"
   roadmap_summary: "bin/gh-bridge/roadmap-summary"
 
 workflow_registries:

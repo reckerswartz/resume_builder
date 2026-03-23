@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-finalize`
 - **Goal**: Move the additional-sections editor surface into the finalize `Sections` tab so late-stage structure changes live in one cohesive workspace.
 
@@ -46,8 +46,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-22-finalize-additional-sections-workspace/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-23-finalize-post-closeout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `finalize-workspace-tab-keyboard-navigation`
+- None inside the current `resumebuilder-reference-rollout` scope.

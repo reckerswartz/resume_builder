@@ -12,8 +12,8 @@ This file tracks the maintainability hotspot around `ResumeTemplates::Catalog`, 
 - Priority: `medium`
 - Status: `improved`
 - Recommended refactor shape: `extract_shared_support`
-- Last reviewed: `2026-03-23T02:19:00Z`
-- Last changed: `2026-03-23T02:19:00Z`
+- Last reviewed: `2026-03-23T02:27:00Z`
+- Last changed: `2026-03-23T02:27:00Z`
 
 ## Hotspot summary
 
@@ -32,6 +32,7 @@ This file tracks the maintainability hotspot around `ResumeTemplates::Catalog`, 
 - Current owners:
   - `ResumeTemplates::Catalog`
   - `ResumeTemplates::Catalog::AccentConfiguration`
+  - `ResumeTemplates::Catalog::OptionRegistry`
 - Desired boundary direction:
   - Keep `ResumeTemplates::Catalog` as the public façade while extracting self-contained configuration clusters into nested support modules with unchanged public APIs.
 
@@ -43,23 +44,29 @@ This file tracks the maintainability hotspot around `ResumeTemplates::Catalog`, 
 - Reduced `app/services/resume_templates/catalog.rb` from 691 lines to 593 lines by delegating the accent cluster to the nested support module while preserving the existing `ResumeTemplates::Catalog` public API.
 - Extended direct `Catalog` coverage with explicit shorthand-hex normalization and invalid-fallback expectations.
 
+### Slice 2: extract-catalog-option-registry-support
+
+- Added `ResumeTemplates::Catalog::OptionRegistry` to own family labels/options, shared label helpers, shared option arrays, and `font_family_class`.
+- Reduced `app/services/resume_templates/catalog.rb` from 597 lines to 476 lines by delegating the option/label metadata cluster to the nested support module while preserving the existing `ResumeTemplates::Catalog` public API.
+- Extended direct `Catalog` coverage with explicit `family_options` expectations.
+
 ## Pending
 
-- `ResumeTemplates::Catalog` still mixes family/default definitions, shared label/option lookup, and layout normalization.
-- The next structural revisit should evaluate whether shared option/label metadata or normalization branching is the next smallest honest extraction.
+- `ResumeTemplates::Catalog` still mixes large family/default definitions with layout normalization and scale helpers.
+- The remaining honest structural revisit is to reduce layout-normalization branching if the file needs another follow-up slice.
 
 ## Open follow-up keys
 
-- `extract-catalog-option-registry-support`
 - `reduce-catalog-layout-normalization-branching`
 
 ## Closed follow-up keys
 
 - `extract-catalog-accent-configuration`
+- `extract-catalog-option-registry-support`
 
 ## Verification
 
 - Specs:
-  - `bundle exec rspec spec/services/resume_templates/catalog_spec.rb spec/helpers/resumes_helper_spec.rb spec/helpers/templates_helper_spec.rb spec/services/resume_templates/preview_resume_builder_spec.rb spec/presenters/templates/marketplace_state_spec.rb spec/presenters/resumes/template_picker_state_spec.rb` (61 examples, 0 failures)
+  - `bundle exec rspec spec/services/resume_templates/catalog_spec.rb spec/helpers/templates_helper_spec.rb spec/presenters/templates/marketplace_state_spec.rb spec/presenters/resumes/finalize_workspace_state_spec.rb spec/presenters/admin/templates/profile_state_spec.rb spec/requests/templates_spec.rb` (60 examples, 0 failures)
 - Lint or syntax:
-  - `ruby -c app/services/resume_templates/catalog.rb && ruby -c app/services/resume_templates/catalog/accent_configuration.rb && ruby -c spec/services/resume_templates/catalog_spec.rb` (Syntax OK)
+  - `ruby -c app/services/resume_templates/catalog.rb && ruby -c app/services/resume_templates/catalog/option_registry.rb && ruby -c spec/services/resume_templates/catalog_spec.rb` (Syntax OK)

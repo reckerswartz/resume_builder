@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-23T02:24:37Z"
+updated_at: "2026-03-23T02:48:12Z"
 
 github:
   remote: "origin"
@@ -24,6 +24,7 @@ bridge_scripts:
   close_issue: "bin/gh-bridge/close-issue"
   sync_registry: "bin/gh-bridge/sync-registry"
   reconcile_registry: "bin/gh-bridge/reconcile-registry"
+  write_back_registry_links: "bin/gh-bridge/write-back-registry-links"
   roadmap_summary: "bin/gh-bridge/roadmap-summary"
   aggregate_history: "bin/gh-bridge/aggregate-history"
 

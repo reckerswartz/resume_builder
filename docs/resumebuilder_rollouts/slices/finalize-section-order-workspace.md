@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-finalize`
 - **Goal**: Bring section ordering into the finalize workspace so late-stage structure changes happen in the same tabbed customization hub as visibility and design controls.
 
@@ -59,8 +59,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-22-finalize-section-order-workspace/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-23-finalize-post-closeout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `finalize-additional-sections-workspace`
+- None inside the current `resumebuilder-reference-rollout` scope.

@@ -1,0 +1,398 @@
+#!/usr/bin/env ruby
+
+require "json"
+require "open3"
+require "optparse"
+require "time"
+require "yaml"
+
+CENTRAL_REGISTRY_PATH = "docs/github_ops/registry.yml"
+TOP_LEVEL_TIMESTAMP_FIELDS = %w[updated_at last_updated].freeze
+SUPPORTED_COLLECTIONS = %w[pages areas proposals findings].freeze
+
+options = {
+  workflow: nil,
+  dry_run: false,
+}
+
+OptionParser.new do |parser|
+  parser.banner = "Usage: bin/gh-bridge/write-back-registry-links [--workflow NAME] [--dry-run]"
+
+  parser.on("--workflow NAME", "Limit write-back to a single workflow") do |workflow|
+    options[:workflow] = workflow
+  end
+
+  parser.on("--dry-run", "Print the planned local registry link updates without writing files") do
+    options[:dry_run] = true
+  end
+end.parse!
+
+def load_yaml(path)
+  YAML.safe_load(File.read(path), permitted_classes: [Date, Time], aliases: true) || {}
+end
+
+def run_command(command)
+  stdout, stderr, status = Open3.capture3(command)
+  return stdout if status.success?
+
+  raise "Command failed: #{command}\n#{stderr.strip}"
+end
+
+def repository_name(registry)
+  configured = registry.dig("github", "repo")
+  return configured unless configured.to_s.strip.empty?
+
+  run_command("gh repo view --json nameWithOwner -q '.nameWithOwner'").strip
+end
+
+def fetch_workflow_issues(repo, workflow)
+  command = [
+    "gh issue list",
+    "--repo #{repo}",
+    "--state all",
+    "--label workflow:#{workflow}",
+    "--limit 1000",
+    "--json number,title,body,state"
+  ].join(" ")
+
+  JSON.parse(run_command(command))
+end
+
+def extract_tracking_key(issue)
+  body = issue.fetch("body", "")
+  title = issue.fetch("title", "")
+
+  patterns = [
+    /\*\*Tracking key\*\*:\s*`([^`]+)`/,
+    /\*\*Slice\*\*:\s*`([^`]+)`/,
+    /\*\*Slice key\*\*:\s*`([^`]+)`/,
+    /\*\*Area key\*\*:\s*`([^`]+)`/,
+    /\*\*Finding ID\*\*:\s*`([^`]+)`/
+  ]
+
+  patterns.each do |pattern|
+    match = body.match(pattern)
+    return match[1] if match
+  end
+
+  title_match = title.match(/\(([^()]+)\)\s*$/)
+  title_match && title_match[1]
+end
+
+def top_level_section_range(lines, section_name)
+  start_index = lines.index { |line| line.start_with?("#{section_name}:") }
+  return nil unless start_index
+
+  end_index = ((start_index + 1)...lines.length).find { |index| lines[index].match?(/\A[^\s#][^:]*:/) }
+  [start_index, (end_index || lines.length) - 1]
+end
+
+def section_entry_ranges(section_lines)
+  ranges = []
+  start_index = nil
+
+  section_lines.each_with_index do |line, index|
+    next unless line.start_with?("  - ")
+
+    ranges << [start_index, index - 1] if start_index
+    start_index = index
+  end
+
+  ranges << [start_index, section_lines.length - 1] if start_index
+  ranges
+end
+
+def replace_top_level_timestamp!(lines, timestamp)
+  TOP_LEVEL_TIMESTAMP_FIELDS.each do |field|
+    index = lines.index { |line| line.start_with?("#{field}:") }
+    next unless index
+
+    lines[index] = %(#{field}: "#{timestamp}"\n)
+    return true
+  end
+
+  false
+end
+
+def find_block(lines, section_name, first_line_pattern)
+  range = top_level_section_range(lines, section_name)
+  return nil unless range
+
+  section_start, section_end = range
+  section_lines = lines[section_start..section_end]
+
+  section_entry_ranges(section_lines).each do |entry_start, entry_end|
+    next unless section_lines[entry_start]&.match?(first_line_pattern)
+
+    absolute_start = section_start + entry_start
+    absolute_end = section_start + entry_end
+    return [absolute_start, absolute_end]
+  end
+
+  nil
+end
+
+def upsert_singular_field!(block_lines, field_name, value)
+  prefix = "    #{field_name}:"
+  index = block_lines.index { |line| line.start_with?(prefix) }
+  replacement = "    #{field_name}: #{value}\n"
+
+  if index
+    block_lines[index] = replacement
+    return
+  end
+
+  anchor = block_lines.rindex { |line| line.start_with?("    status:") } ||
+           block_lines.rindex { |line| line.start_with?("    priority:") } ||
+           block_lines.rindex { |line| line.start_with?("    severity:") } ||
+           block_lines.length - 1
+  block_lines.insert(anchor + 1, replacement)
+end
+
+def upsert_issue_map_entry!(block_lines, key, value)
+  header_index = block_lines.index { |line| line.start_with?("    github_issue_numbers:") }
+
+  if header_index.nil?
+    anchor = block_lines.rindex { |line| line.start_with?("    regression_detected:") } ||
+             block_lines.rindex { |line| line.start_with?("    issues_remaining:") } ||
+             block_lines.rindex { |line| line.start_with?("    issues_resolved:") } ||
+             block_lines.length - 1
+    block_lines.insert(anchor + 1, "    github_issue_numbers:\n", "      #{key}: #{value}\n")
+    return
+  end
+
+  map_end = header_index
+  while map_end + 1 < block_lines.length && block_lines[map_end + 1].match?(/\A {6}\S/)
+    map_end += 1
+  end
+
+  existing_index = ((header_index + 1)..map_end).find do |index|
+    block_lines[index].start_with?("      #{key}:")
+  end
+
+  if existing_index
+    block_lines[existing_index] = "      #{key}: #{value}\n"
+    return
+  end
+
+  insert_at = map_end + 1
+  (header_index + 1..map_end).each do |index|
+    current_key = block_lines[index][/\A {6}([^:]+):/, 1]
+    next unless current_key && key < current_key
+
+    insert_at = index
+    break
+  end
+
+  block_lines.insert(insert_at, "      #{key}: #{value}\n")
+end
+
+def apply_change_to_text(registry_text, change, timestamp)
+  lines = registry_text.lines
+  replace_top_level_timestamp!(lines, timestamp)
+
+  block_range = case change.fetch(:collection)
+                when "pages"
+                  find_block(lines, "pages", /\A  - page_key: "#{Regexp.escape(change.fetch(:record_identifier))}"/)
+                when "areas"
+                  find_block(lines, "areas", /\A  - (?:area_key|key): "#{Regexp.escape(change.fetch(:record_identifier))}"/)
+                when "proposals"
+                  find_block(lines, "proposals", /\A  - id: "#{Regexp.escape(change.fetch(:record_identifier))}"/)
+                when "findings"
+                  find_block(lines, "findings", /\A  - (?:finding_id|id|key): "#{Regexp.escape(change.fetch(:record_identifier))}"/)
+                else
+                  nil
+                end
+
+  raise "Unable to locate #{change.fetch(:collection)} record #{change.fetch(:record_identifier)} in #{change.fetch(:registry_path)}" unless block_range
+
+  start_index, end_index = block_range
+  block_lines = lines[start_index..end_index]
+
+  if change.fetch(:target_field) == "github_issue_numbers"
+    upsert_issue_map_entry!(block_lines, change.fetch(:tracking_key), change.fetch(:issue_number))
+  else
+    upsert_singular_field!(block_lines, change.fetch(:target_field), change.fetch(:issue_number))
+  end
+
+  lines[start_index..end_index] = block_lines
+  lines.join
+end
+
+def supported_changes(entry, issues_by_key)
+  registry = load_yaml(entry.fetch("registry_path"))
+  changes = []
+  skipped = []
+
+  Array(registry["pages"]).each do |page|
+    page_key = page["page_key"]
+    issue_map = page["github_issue_numbers"].is_a?(Hash) ? page["github_issue_numbers"] : {}
+    keys = (Array(page["open_issue_keys"]) + Array(page["closed_issue_keys"]))
+    keys.uniq.each do |tracking_key|
+      matches = issues_by_key[tracking_key] || []
+      next if matches.empty?
+      if matches.length > 1
+        skipped << { collection: "pages", record_identifier: page_key, tracking_key: tracking_key, reason: "ambiguous_live_issues", issue_numbers: matches.map { |issue| issue.fetch("number") } }
+        next
+      end
+      next if issue_map[tracking_key]
+
+      changes << {
+        collection: "pages",
+        record_identifier: page_key,
+        tracking_key: tracking_key,
+        target_field: "github_issue_numbers",
+        issue_number: matches.first.fetch("number"),
+        registry_path: entry.fetch("registry_path")
+      }
+    end
+  end
+
+  Array(registry["areas"]).each do |area|
+    record_identifier = area["area_key"] || area["key"]
+    next unless record_identifier
+
+    matches = issues_by_key[record_identifier] || []
+    next if matches.empty?
+    if matches.length > 1
+      skipped << { collection: "areas", record_identifier: record_identifier, tracking_key: record_identifier, reason: "ambiguous_live_issues", issue_numbers: matches.map { |issue| issue.fetch("number") } }
+      next
+    end
+    next if area["github_issue_number"] || area["github_issue"]
+
+    changes << {
+      collection: "areas",
+      record_identifier: record_identifier,
+      tracking_key: record_identifier,
+      target_field: "github_issue_number",
+      issue_number: matches.first.fetch("number"),
+      registry_path: entry.fetch("registry_path")
+    }
+  end
+
+  Array(registry["proposals"]).each do |proposal|
+    record_identifier = proposal["id"]
+    next unless record_identifier
+
+    matches = issues_by_key[record_identifier] || []
+    next if matches.empty?
+    if matches.length > 1
+      skipped << { collection: "proposals", record_identifier: record_identifier, tracking_key: record_identifier, reason: "ambiguous_live_issues", issue_numbers: matches.map { |issue| issue.fetch("number") } }
+      next
+    end
+    next if proposal["github_issue"] || proposal["github_issue_number"]
+
+    changes << {
+      collection: "proposals",
+      record_identifier: record_identifier,
+      tracking_key: record_identifier,
+      target_field: "github_issue",
+      issue_number: matches.first.fetch("number"),
+      registry_path: entry.fetch("registry_path")
+    }
+  end
+
+  Array(registry["findings"]).each do |finding|
+    record_identifier = finding["finding_id"] || finding["id"] || finding["key"]
+    next unless record_identifier
+
+    matches = issues_by_key[record_identifier] || []
+    next if matches.empty?
+    if matches.length > 1
+      skipped << { collection: "findings", record_identifier: record_identifier, tracking_key: record_identifier, reason: "ambiguous_live_issues", issue_numbers: matches.map { |issue| issue.fetch("number") } }
+      next
+    end
+    next if finding["github_issue"] || finding["github_issue_number"]
+
+    target_field = finding.key?("github_issue") ? "github_issue" : "github_issue_number"
+    changes << {
+      collection: "findings",
+      record_identifier: record_identifier,
+      tracking_key: record_identifier,
+      target_field: target_field,
+      issue_number: matches.first.fetch("number"),
+      registry_path: entry.fetch("registry_path")
+    }
+  end
+
+  unsupported_collections = (registry.keys & %w[slices candidates templates]).sort
+  unsupported_collections.each do |collection|
+    Array(registry[collection]).each do |record|
+      record_identifier = record["slice_key"] || record["reference_key"] || record["slug"] || record["key"]
+      next unless record_identifier
+
+      matches = issues_by_key[record_identifier] || []
+      next if matches.empty?
+
+      skipped << { collection: collection, record_identifier: record_identifier, tracking_key: record_identifier, reason: "unsupported_registry_shape", issue_numbers: matches.map { |issue| issue.fetch("number") } }
+    end
+  end
+
+  [changes, skipped]
+end
+
+central_registry = load_yaml(CENTRAL_REGISTRY_PATH)
+repo = repository_name(central_registry)
+workflow_entries = Array(central_registry["workflow_registries"]).select { |entry| entry["registry_path"] }
+workflow_entries.select! { |entry| entry["workflow"] == options[:workflow] } if options[:workflow]
+
+if options[:workflow] && workflow_entries.empty?
+  warn "ERROR: Workflow #{options[:workflow]} not found in #{CENTRAL_REGISTRY_PATH}."
+  exit 1
+end
+
+timestamp = Time.now.utc.iso8601
+planned_changes = []
+skipped_candidates = []
+
+workflow_entries.each do |entry|
+  path = entry.fetch("registry_path")
+  next unless File.file?(path)
+
+  issues = fetch_workflow_issues(repo, entry.fetch("workflow"))
+  issues_by_key = issues.group_by { |issue| extract_tracking_key(issue) }.reject { |key, _| key.nil? || key.empty? }
+  changes, skipped = supported_changes(entry, issues_by_key)
+  planned_changes.concat(changes.map { |change| change.merge(workflow: entry.fetch("workflow")) })
+  skipped_candidates.concat(skipped.map { |skip| skip.merge(workflow: entry.fetch("workflow"), registry_path: path) })
+end
+
+puts "=== Workflow-Local Registry Link Write-Back ==="
+puts "Central registry: #{CENTRAL_REGISTRY_PATH}"
+puts "Repository: #{repo}"
+puts "Timestamp: #{timestamp}"
+puts "Mode: #{options[:dry_run] ? 'dry-run' : 'write'}"
+puts ""
+
+if planned_changes.empty?
+  puts "No supported registry link updates required."
+else
+  planned_changes.group_by { |change| change.fetch(:workflow) }.each do |workflow, changes|
+    puts "- #{workflow}:"
+    changes.each do |change|
+      puts "  - #{change.fetch(:collection)} #{change.fetch(:record_identifier)} <= ##{change.fetch(:issue_number)} via #{change.fetch(:tracking_key)}"
+    end
+  end
+end
+
+if skipped_candidates.any?
+  puts ""
+  puts "Skipped candidates:"
+  skipped_candidates.each do |candidate|
+    puts "- #{candidate.fetch(:workflow)} #{candidate.fetch(:collection)} #{candidate.fetch(:record_identifier)} (#{candidate.fetch(:tracking_key)}): #{candidate.fetch(:reason)} [#{candidate.fetch(:issue_numbers).join(', ')}]"
+  end
+end
+
+exit 0 if options[:dry_run] || planned_changes.empty?
+
+planned_changes.group_by { |change| change.fetch(:registry_path) }.each_value do |changes|
+  registry_path = changes.first.fetch(:registry_path)
+  text = File.read(registry_path)
+  changes.each do |change|
+    text = apply_change_to_text(text, change, timestamp)
+  end
+  File.write(registry_path, text)
+end
+
+puts ""
+puts "Updated registry files: #{planned_changes.map { |change| change.fetch(:registry_path) }.uniq.join(', ')}"
+puts "Applied changes: #{planned_changes.length}"

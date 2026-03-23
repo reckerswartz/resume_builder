@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-23T00:06:35Z"
+updated_at: "2026-03-23T02:49:37Z"
 workflow:
   status: ready
   path: ".windsurf/workflows/ui-guidelines-audit.md"
@@ -10,7 +10,7 @@ tracking:
   guidelines_changelog_path: "docs/ui_audits/guidelines_review/guidelines_changelog.md"
   page_doc_template: "docs/ui_audits/guidelines_review/pages/TEMPLATE.md"
   run_doc_template: "docs/ui_audits/guidelines_review/runs/TEMPLATE.md"
-  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-finalize-sections-order-card-fix/00-overview.md"
+  latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-resume-builder-summary-review-only/00-overview.md"
 artifacts:
   cache_root: "tmp/ui_audit_artifacts"
   subfolder: "guidelines"
@@ -136,11 +136,11 @@ inventory_notes:
   dynamic_page_policy: "Audit dynamic routes through a real reachable record or flow instead of fabricating IDs in the URL."
 next_step:
   recommended_scope:
-    - "template-show"
-  reason: "The finalize issue is now closed. The next honest review-only target is template-show because its routed UI changed locally and its last guidelines audit is older than the other remaining changed compliant surfaces."
-  recommended_implementation: "Run review-only for template-show, then continue across the remaining changed routed surfaces in priority order."
-  last_regression_sweep: "2026-03-23T00:01:22Z"
-  regression_sweep_scope: "resume-builder-finalize"
+    - "admin-job-log-show"
+  reason: "Resume-builder-summary remains compliant after review. The next honest changed routed surface is admin-job-log-show because app/views/admin/job_logs/show.html.erb changed locally and it shares the oldest audit timestamp among the remaining changed admin detail pages."
+  recommended_implementation: "Run review-only for admin-job-log-show, then continue across the remaining changed admin detail routes in priority order."
+  last_regression_sweep: "2026-03-23T02:49:37Z"
+  regression_sweep_scope: "resume-builder-summary"
 pages:
   - page_key: "home"
     title: "Home"
@@ -199,10 +199,10 @@ pages:
     closed_issue_keys:
       - "create-account-sign-in-link-token"
       - "create-account-password-toggle-a11y"
-    last_audited_at: "2026-03-21T02:30:00Z"
-    last_changed_at: "2026-03-21T02:30:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-2-fixes/00-overview.md"
-    next_step: "All issues closed. Re-review after shared shell or component changes."
+    last_audited_at: "2026-03-23T02:24:47Z"
+    last_changed_at: "2026-03-23T02:24:47Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-create-account-review-only/00-overview.md"
+    next_step: "All issues closed. Re-review after material changes to the public-auth shell, registration form structure, or selected-template summary treatment."
   - page_key: "password-reset-request"
     title: "Password reset request"
     path: "/passwords/new"
@@ -257,12 +257,13 @@ pages:
       - "resumes-index-action-duplication"
       - "resumes-index-card-copy-clarity"
       - "resumes-index-avatar-token"
-    last_audited_at: "2026-03-22T06:14:00Z"
-    last_changed_at: "2026-03-22T06:14:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-resumes-index-workspace-sort-review/00-overview.md"
-    next_step: "Workspace sort controls verified compliant. No new issues. Re-review after shared shell, workspace card, or helper-token changes."
-    cycle_count: 4
-    last_cycle_date: "2026-03-22T06:14:00Z"
+      - "resumes-index-bulk-actions-controller-parse-error"
+    last_audited_at: "2026-03-23T02:34:45Z"
+    last_changed_at: "2026-03-23T02:34:45Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-admin-settings-review-and-resumes-index-bulk-actions-fix/00-overview.md"
+    next_step: "All issues closed. Re-review after shared shell, workspace card, bulk-actions, or helper-token changes."
+    cycle_count: 6
+    last_cycle_date: "2026-03-23T02:34:45Z"
     compliance_score_history:
       - timestamp: "2026-03-21T02:14:00Z"
         score: 93
@@ -272,6 +273,14 @@ pages:
         score: 93
       - timestamp: "2026-03-22T06:14:00Z"
         score: 93
+      - timestamp: "2026-03-23T02:29:34Z"
+        score: 70
+      - timestamp: "2026-03-23T02:34:45Z"
+        score: 93
+    issues_found: 4
+    issues_resolved: 4
+    issues_remaining: 0
+    guideline_refinements_triggered: 0
   - page_key: "resumes-new"
     title: "New resume"
     path: "/resumes/new"
@@ -352,10 +361,10 @@ pages:
     open_issue_keys: []
     closed_issue_keys:
       - "template-show-dark-inset-token"
-    last_audited_at: "2026-03-21T02:41:00Z"
-    last_changed_at: "2026-03-21T02:41:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-3-fixes/00-overview.md"
-    next_step: "All issues closed. Re-review after shared shell or component changes."
+    last_audited_at: "2026-03-23T02:21:18Z"
+    last_changed_at: "2026-03-23T02:21:18Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-template-show-review-only/00-overview.md"
+    next_step: "All issues closed. Re-review after material changes to the preview/detail balance, sticky quick-take rail, or carry-through notes."
   - page_key: "resume-source-import"
     title: "Resume source import launcher"
     path: "/resume_source_imports/:provider"
@@ -495,15 +504,18 @@ pages:
     page_doc_path: "docs/ui_audits/guidelines_review/pages/resume-builder-summary.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-22T06:40:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-22-resume-builder-summary-library-disclosure-review/00-overview.md"
-    next_step: "Library disclosure verified compliant. Re-review after shared builder shell or summary-suggestion patterns change."
-    cycle_count: 2
-    last_cycle_date: "2026-03-22T06:40:00Z"
+    last_audited_at: "2026-03-23T02:49:37Z"
+    last_changed_at: "2026-03-23T02:49:37Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-resume-builder-summary-review-only/00-overview.md"
+    next_step: "All issues closed. Re-review after shared builder shell, summary-suggestion disclosure behavior, or summary-step guidance changes."
+    cycle_count: 3
+    last_cycle_date: "2026-03-23T02:49:37Z"
     compliance_score_history:
       - timestamp: "2026-03-21T22:48:42Z"
         score: 93
       - timestamp: "2026-03-22T06:40:00Z"
+        score: 93
+      - timestamp: "2026-03-23T02:49:37Z"
         score: 93
     issues_found: 0
     issues_resolved: 0
@@ -920,9 +932,10 @@ pages:
     page_doc_path: "docs/ui_audits/guidelines_review/pages/admin-settings.md"
     open_issue_keys: []
     closed_issue_keys: []
-    last_audited_at: "2026-03-21T03:06:00Z"
-    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-21-batch-6-review/00-overview.md"
-    next_step: "All issues closed. Re-review after shared admin shell or component changes."
+    last_audited_at: "2026-03-23T02:34:45Z"
+    last_changed_at: "2026-03-23T02:34:45Z"
+    latest_run: "docs/ui_audits/guidelines_review/runs/2026-03-23-admin-settings-review-and-resumes-index-bulk-actions-fix/00-overview.md"
+    next_step: "All issues closed. Re-review after shared admin shell, settings grouping, or helper-copy changes."
   - page_key: "admin-job-logs-index"
     title: "Admin job logs index"
     path: "/admin/job_logs"

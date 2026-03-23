@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-finalize`
 - **Goal**: Collapse the finalize `Sections` tab into one combined surface instead of splitting it across duplicate tab panels.
 
@@ -52,8 +52,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-22-finalize-sections-single-panel-surface/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-23-finalize-post-closeout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- `finalize-additional-sections-open-surface`
+- None inside the current `resumebuilder-reference-rollout` scope.

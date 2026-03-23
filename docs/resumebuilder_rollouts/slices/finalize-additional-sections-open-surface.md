@@ -2,7 +2,7 @@
 
 ## Status
 
-- **State**: `verified`
+- **State**: `closed`
 - **Page family**: `resume-builder-finalize`
 - **Goal**: Keep the additional-sections editor always visible inside the finalize `Sections` tab instead of hiding it behind a disclosure.
 
@@ -48,8 +48,8 @@
 
 ## Latest run
 
-- `docs/resumebuilder_rollouts/runs/2026-03-22-finalize-additional-sections-open-surface/00-overview.md`
+- `docs/resumebuilder_rollouts/runs/2026-03-23-finalize-post-closeout-closeout/00-overview.md`
 
 ## Next recommended slice
 
-- None committed yet for the post-closeout rollout backlog.
+- None inside the current `resumebuilder-reference-rollout` scope.

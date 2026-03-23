@@ -29,10 +29,14 @@ This directory is the durable tracking home for the reusable Rails maintainabili
 - The next verification slice is complete: `Ui::HeroHeaderComponent` now has direct default-state coverage for normalized badges/actions/metrics, default class branches, and four-metric grid behavior.
 - The next structural slice is complete: duplicated template-browser support logic shared by `Resumes::TemplatePickerState` and `Templates::MarketplaceState` now lives in `TemplateBrowserSupport`, with adjacent marketplace apply-to-resume route and authorization drift corrected during validation.
 - The next verification slice is complete: `Resumes::TextExporter` now has focused coverage for non-experience formatting branches, blank-section suppression, date normalization, and blank-line cleanup.
+- The next structural slice is improved: `ResumeTemplates::Catalog` now delegates accent palette, accent normalization, and accent variant composition to `ResumeTemplates::Catalog::AccentConfiguration`, reducing the hotspot from 691 to 593 lines while preserving the public API.
+- The next verification slice is complete: `Ui::DashboardPanelComponent` now has direct default-state coverage for helper-backed wrapper/action delegation, dark-surface styling, and standard-density spacing branches.
+- The next structural slice is improved: `ResumeTemplates::Catalog` now delegates family labels/options and shared metadata option helpers to `ResumeTemplates::Catalog::OptionRegistry`, reducing the hotspot from 597 to 476 lines while preserving the public API.
+- The next verification slice is complete: `Ui::StickyActionBarComponent` now has direct default-state coverage for standard wrapper/layout spacing and stable default content-class branches.
 
 ### Pending
 
-- The structural lane is next in round-robin, with the remaining named structural candidate reduced to `ResumeTemplates::Catalog`. The named verification queue is empty again after the fresh low-priority scan and `Resumes::TextExporter` follow-up.
+- The structural lane is next in round-robin. The remaining named structural candidate is still `ResumeTemplates::Catalog`. The named verification queue is empty again after the fresh low-priority scan and `Ui::StickyActionBarComponent` follow-up.
 
 ## Installed workflow
 
@@ -156,6 +160,9 @@ If this overview is stale, the workflow is considered incomplete even if code an
   - status: `closed`
 - `app/models/llm_provider.rb`
   - area: `llm-provider-credential-management`
+  - status: `improved`
+- `app/services/resume_templates/catalog.rb`
+  - area: `resume-templates-catalog-mixed-responsibilities`
   - status: `improved`
 
 ## Audited and completed verification hotspots

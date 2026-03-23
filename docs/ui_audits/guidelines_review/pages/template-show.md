@@ -8,26 +8,26 @@
 - Page family: templates
 - Status: `compliant`
 - Compliance score: 95
-- Last audited: `2026-03-21T02:41:00Z`
-- Last changed: `2026-03-21T02:41:00Z`
-- Latest run: `docs/ui_audits/guidelines_review/runs/2026-03-21-batch-3-fixes/00-overview.md`
+- Last audited: `2026-03-23T02:21:18Z`
+- Last changed: `2026-03-23T02:21:18Z`
+- Latest run: `docs/ui_audits/guidelines_review/runs/2026-03-23-template-show-review-only/00-overview.md`
 
 ## Compliance scorecard
 
 | Dimension | Score | Notes |
 |-----------|-------|-------|
-| Component reuse | 95 | `PageHeaderComponent` (compact), `DashboardPanelComponent` (×2, brand + compact), `SurfaceCardComponent` (×2), `GlyphComponent` (×6). Glyph-inset-card pattern used in carry-through section (×2 with `ui_inset_panel_classes`). |
-| Token compliance | 95 | Uses `atelier-pill`, `atelier-glow`, `atelier-rule-ink`, `ui_badge_classes`, `ui_inset_panel_classes`, `ui_button_classes`. Two dark sidebar cards (lines 87, 104) use raw `rounded-[1.5rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm` — could use `atelier-dark-inset` + `backdrop-blur-sm`. |
-| Design principles | 92 | Clear location ("Template detail"), strong CTA ("Use this template"), live preview dominates, supporting metadata in sidebar. Good hierarchy. |
-| Page-family rules | 92 | Follows template detail guidance well: preview-first layout, side rail for quick take and carry-through metadata, clear CTAs. |
-| Copy quality | 95 | All locale-backed via `t(...)`. Outcome-focused: "Use this layout if the page balance feels right". No technical language. |
-| Anti-patterns | 95 | Two dark sidebar card blocks (lines 87-102, 104-112) use identical raw class strings — should use `atelier-dark-inset`. The carry-through glyph-inset cards use a slightly different eyebrow style (`text-[0.68rem]`) than the shared partial's `text-sm`, so the shared partial doesn't fully apply here. |
-| Componentization gaps | 88 | Dark sidebar card pattern repeated 2× with identical raw classes. Carry-through section glyph cards have a variant eyebrow style not covered by the shared `_glyph_inset_card` partial. |
+| Component reuse | 95 | `PageHeaderComponent` (compact), `DashboardPanelComponent`, `SurfaceCardComponent`, `GlyphComponent`, and helper-backed controls continue to anchor the detail route. The chooser-based existing-resume action fits into the existing quick-take rail without introducing a new page-local action cluster. |
+| Token compliance | 95 | The current route uses shared token helpers and shared component surfaces consistently. No new raw surface or button drift was introduced by the quick-take chooser update. |
+| Design principles | 95 | The page still reads as a strong product entry point: one dominant preview surface, one sticky support rail, concise metadata, and a single authoritative CTA cluster. |
+| Page-family rules | 95 | Template-detail guidance remains intact: preview-first layout, supporting quick-take rail, and secondary carry-through notes kept below the primary decision path. |
+| Copy quality | 95 | All visible copy remains locale-backed and domain-specific. The quick-take rail and carry-through notes stay concise and user-facing. |
+| Anti-patterns | 95 | No duplicate CTA cluster, no technical-language leakage, and no new first-fold chrome duplication were found in the reviewed route. |
+| Componentization gaps | 92 | The route remains in good shape. The current chooser action stays appropriately scoped to the quick-take rail and does not create a new shared-pattern need on its own. |
 | Accessibility basics | 92 | Semantic headings (h1, h2, h3), complementary landmark on aside, keyboard-accessible links, focus states. Color swatch uses inline style — acceptable for preview accent. |
 
 ## Open issue keys
 
-(none)
+- None.
 
 ## Closed issue keys
 
@@ -35,4 +35,17 @@
 
 ## Pending
 
-(none)
+- None. This page remains compliant after the review-only pass; re-review after material changes to the preview/detail balance, sticky quick-take rail, or carry-through notes.
+
+## Verification
+
+- Playwright review:
+  - Authenticated browser review against `/templates/3`
+  - Confirmed the page header, dominant preview panel, sticky quick-take rail, chooser-based existing-resume action, and carry-through notes render cleanly on the live app
+  - Browser console errors: 0
+  - Browser console warnings: 0
+- Source review:
+  - `app/views/templates/show.html.erb`
+- Notes:
+  - The chooser-based `Open in finalize` action stayed contained inside the existing quick-take rail and did not reintroduce the duplicate CTA cluster that was removed in the recent usability cleanup.
+
