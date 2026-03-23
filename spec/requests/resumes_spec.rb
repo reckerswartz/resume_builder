@@ -923,14 +923,14 @@ RSpec.describe 'Resumes', type: :request do
       sections_panels = document.css('[data-workspace-tabs-target="panel"][data-tab-key="sections"]')
       hidden_template_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="template"][hidden]')
       hidden_design_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="design"][hidden]')
-      additional_sections_disclosure = document.at_css('details[data-finalize-additional-sections-disclosure]')
+      additional_sections_surface = document.at_css('[data-finalize-additional-sections-surface]')
       expect(output_settings).to be_present
       expect(sections_panels.size).to eq(1)
       expect(hidden_template_panel).to be_present
       expect(hidden_design_panel).to be_present
-      expect(additional_sections_disclosure).to be_present
-      expect(additional_sections_disclosure.ancestors('[data-tab-key="sections"]')).not_to be_empty
-      expect(additional_sections_disclosure['open']).to be_nil
+      expect(additional_sections_surface).to be_present
+      expect(additional_sections_surface.ancestors('[data-tab-key="sections"]')).not_to be_empty
+      expect(document.at_css('details[data-finalize-additional-sections-disclosure]')).to be_nil
       expect(document.at_css('select[name="resume[settings][font_family]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][section_spacing]"]')).to be_present
       expect(document.at_css('select[name="resume[settings][paragraph_spacing]"]')).to be_present
