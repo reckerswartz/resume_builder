@@ -1,0 +1,63 @@
+{
+  "agent": {
+    "model": "claude-opus-4-6-thinking",
+    "show_history_on_continue": true
+  },
+  "read_config_from": {
+    "cursor": false,
+    "windsurf": false,
+    "claude": false
+  },
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Exec(bundle exec rspec)",
+      "Exec(bundle exec rubocop)",
+      "Exec(bin/rails)",
+      "Exec(bin/dev)",
+      "Exec(bin/jobs)",
+      "Exec(bin/brakeman)",
+      "Exec(bin/bundler-audit)",
+      "Exec(git status)",
+      "Exec(git diff)",
+      "Exec(git log)",
+      "Exec(git add)",
+      "Exec(git commit)",
+      "Exec(git pull)",
+      "Exec(git push)",
+      "Exec(git checkout main)",
+      "Exec(git stash)",
+      "Exec(yarn)",
+      "Exec(node)",
+      "Exec(npx)",
+      "Exec(ruby -c)",
+      "Exec(cat)",
+      "Exec(ls)",
+      "Exec(echo)"
+    ],
+    "deny": [
+      "Exec(rm -rf)",
+      "Exec(sudo)",
+      "Write(.env*)",
+      "Write(config/credentials*)",
+      "Write(config/master.key)"
+    ],
+    "ask": [
+      "Write(**)",
+      "Exec(bin/rails db:drop)",
+      "Exec(bin/rails db:reset)",
+      "Exec(bin/rails generate)",
+      "Exec(bin/rails destroy)"
+    ]
+  },
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  },
+  "sandbox": {
+    "network_mode": "full"
+  },
+  "include_gitignored_files": false
+}

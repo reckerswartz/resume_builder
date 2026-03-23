@@ -1,0 +1,6 @@
+{
+  "_comment": "Personal overrides — gitignored. Copy this template and customize.",
+  "agent": {
+    "model": "claude-opus-4-6-thinking"
+  }
+}
