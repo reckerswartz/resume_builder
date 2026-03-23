@@ -28,13 +28,14 @@ module Resumes
     def actions
       @actions ||= [
         { label: I18n.t("resumes.show_state.page_header.back_to_workspace"), path: view_context.resumes_path, style: :secondary, size: :sm },
-        { label: I18n.t("resumes.show_state.page_header.edit_resume"), path: view_context.edit_resume_path(resume, step: current_step_key), style: :primary, size: :sm }
+        { label: I18n.t("resumes.show_state.page_header.edit_resume"), path: view_context.edit_resume_path(resume, step: current_step_key), style: :secondary, size: :sm }
       ]
     end
 
     def artifact_badges
       @artifact_badges ||= [
-        { label: resume.template.name, tone: :neutral }
+        { label: resume.template.name, tone: :neutral },
+        { label: export_state_label, tone: export_badge_tone }
       ]
     end
 

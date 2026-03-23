@@ -21,7 +21,7 @@ module Resumes
             {
               label: I18n.t("resumes.export_actions_state.actions.download_pdf"),
               path: view_context.download_resume_path(resume),
-              style: :secondary,
+              style: :primary,
               options: { data: { turbo: false } }
             },
             {
@@ -37,7 +37,7 @@ module Resumes
               label: I18n.t("resumes.export_actions_state.actions.export_pdf"),
               path: view_context.export_resume_path(resume),
               method: :post,
-              style: :secondary
+              style: :primary
             },
             {
               label: I18n.t("resumes.export_actions_state.actions.download_text"),

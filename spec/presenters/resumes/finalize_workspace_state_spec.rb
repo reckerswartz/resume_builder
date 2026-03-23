@@ -189,6 +189,26 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
     end
   end
 
+  describe '#sections_badges' do
+    it 'returns honest section-management counts for the finalize sections header' do
+      resume = create(:resume, settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4' })
+      experience_section = create(:section, resume: resume, title: 'Experience', section_type: 'experience', position: 0)
+      skills_section = create(:section, resume: resume, title: 'Skills', section_type: 'skills', position: 1)
+      projects_section = create(:section, resume: resume, title: 'Projects', section_type: 'projects', position: 2)
+      create(:entry, section: experience_section, content: { 'title' => 'Lead Engineer' })
+      create(:entry, section: skills_section, content: { 'name' => 'Ruby' })
+      create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
+
+      state = described_class.new(resume: resume, step_sections: [ projects_section ], view_context: view_context)
+
+      expect(state.sections_badges).to eq([
+        { label: '3 sections managed', tone: :neutral },
+        { label: '3 entries in review', tone: :neutral },
+        { label: '1 additional section', tone: :neutral }
+      ])
+    end
+  end
+
   describe '#spellcheck_review_states' do
     it 'returns honest review cards with step links and saved-content counts' do
       resume = create(
@@ -238,6 +258,73 @@ RSpec.describe Resumes::FinalizeWorkspaceState do
         include(key: 'summary', path: '/resumes/1/edit?step=summary', content_label: '7 saved words', status_label: 'Ready to review'),
         include(key: 'additional_sections', path: '/resumes/1/edit?step=finalize&tab=sections', content_label: '1 section · 1 entry', status_label: 'Ready to review')
       )
+    end
+
+    it 'sorts ready review cards ahead of empty ones' do
+      resume = create(
+        :resume,
+        headline: 'Senior Product Designer',
+        summary: '',
+        contact_details: {
+          'full_name' => 'Pat Kumar',
+          'email' => 'pat@example.com'
+        },
+        personal_details: {},
+        settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4' }
+      )
+      experience_section = create(:section, resume: resume, title: 'Experience', section_type: 'experience', position: 0)
+      create(:entry, section: experience_section, content: { 'title' => 'Lead Designer' })
+
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'heading').and_return('/resumes/1/edit?step=heading')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'personal_details').and_return('/resumes/1/edit?step=personal_details')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'experience').and_return('/resumes/1/edit?step=experience')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'education').and_return('/resumes/1/edit?step=education')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'skills').and_return('/resumes/1/edit?step=skills')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'summary').and_return('/resumes/1/edit?step=summary')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'finalize', tab: 'sections').and_return('/resumes/1/edit?step=finalize&tab=sections')
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      ordered_keys = state.spellcheck_review_states.map { |review_state| review_state.fetch(:key) }
+      ready_prefix = state.spellcheck_review_states.take_while { |review_state| review_state.fetch(:ready) }.map { |review_state| review_state.fetch(:key) }
+      empty_suffix = state.spellcheck_review_states.drop_while { |review_state| review_state.fetch(:ready) }.map { |review_state| review_state.fetch(:key) }
+
+      expect(ordered_keys).to include('heading', 'experience', 'summary', 'additional_sections')
+      expect(ready_prefix).to eq(%w[heading experience])
+      expect(empty_suffix).to eq(%w[additional_sections education personal_details summary skills])
+    end
+  end
+
+  describe '#spellcheck_badges' do
+    it 'returns honest ready vs empty counts for the spellcheck header' do
+      resume = create(
+        :resume,
+        headline: 'Senior Product Designer',
+        summary: '',
+        contact_details: {
+          'full_name' => 'Pat Kumar',
+          'email' => 'pat@example.com'
+        },
+        personal_details: {},
+        settings: { 'accent_color' => '#0F172A', 'show_contact_icons' => true, 'page_size' => 'A4' }
+      )
+      experience_section = create(:section, resume: resume, title: 'Experience', section_type: 'experience', position: 0)
+      create(:entry, section: experience_section, content: { 'title' => 'Lead Designer' })
+
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'heading').and_return('/resumes/1/edit?step=heading')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'personal_details').and_return('/resumes/1/edit?step=personal_details')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'experience').and_return('/resumes/1/edit?step=experience')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'education').and_return('/resumes/1/edit?step=education')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'skills').and_return('/resumes/1/edit?step=skills')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'summary').and_return('/resumes/1/edit?step=summary')
+      allow(view_context).to receive(:edit_resume_path).with(resume, step: 'finalize', tab: 'sections').and_return('/resumes/1/edit?step=finalize&tab=sections')
+
+      state = described_class.new(resume: resume, step_sections: [], view_context: view_context)
+
+      expect(state.spellcheck_badges).to eq([
+        { label: '2 ready to review', tone: :success },
+        { label: '5 still empty', tone: :neutral }
+      ])
     end
   end
 end

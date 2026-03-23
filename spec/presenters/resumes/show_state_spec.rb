@@ -35,7 +35,7 @@ RSpec.describe Resumes::ShowState do
         ],
         actions: [
           { label: 'Back to workspace', path: '/resumes', style: :secondary, size: :sm },
-          { label: 'Edit resume', path: "/resumes/#{resume.id}/edit?step=experience", style: :primary, size: :sm }
+          { label: 'Edit resume', path: "/resumes/#{resume.id}/edit?step=experience", style: :secondary, size: :sm }
         ],
         density: :compact
       )

@@ -7,6 +7,16 @@ RSpec.describe ResumeTemplates::Catalog do
     end
   end
 
+  describe '.family_options' do
+    it 'returns label-value pairs for the available template families' do
+      expect(described_class.family_options).to include(
+        ['Modern', 'modern'],
+        ['Classic', 'classic'],
+        ['Sidebar Accent', 'sidebar-accent']
+      )
+    end
+  end
+
   describe '.default_layout_config' do
     it 'returns the sidebar accent defaults with sidebar metadata intact' do
       expect(described_class.default_layout_config(family: 'sidebar-accent')).to include(

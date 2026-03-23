@@ -211,20 +211,55 @@ module Resumes
       section_visibility_states.any?
     end
 
+    def sections_badges
+      @sections_badges ||= [
+        {
+          label: I18n.t("resumes.editor_finalize_step.sections_workspace.count_badges.managed_sections", count: resume.ordered_sections.count),
+          tone: :neutral
+        },
+        {
+          label: I18n.t("resumes.editor_finalize_step.sections_workspace.count_badges.reviewed_entries", count: resume.ordered_sections.sum { |section| section.ordered_entries.count }),
+          tone: :neutral
+        },
+        {
+          label: I18n.t("resumes.editor_finalize_step.sections_workspace.count_badges.additional_sections", count: additional_section_count),
+          tone: :neutral
+        }
+      ]
+    end
+
     def additional_section_count
       step_sections.size
     end
 
     def spellcheck_review_states
-      @spellcheck_review_states ||= [
-        build_field_review_state(step_key: "heading", content_count: heading_field_count),
-        build_field_review_state(step_key: "personal_details", content_count: personal_details_field_count),
-        build_section_review_state("experience"),
-        build_section_review_state("education"),
-        build_section_review_state("skills"),
-        build_summary_review_state,
-        build_additional_sections_review_state
-      ]
+      @spellcheck_review_states ||= begin
+        states = [
+          build_field_review_state(step_key: "heading", content_count: heading_field_count),
+          build_field_review_state(step_key: "personal_details", content_count: personal_details_field_count),
+          build_section_review_state("experience"),
+          build_section_review_state("education"),
+          build_section_review_state("skills"),
+          build_summary_review_state,
+          build_additional_sections_review_state
+        ]
+
+        states.sort_by do |state|
+          [ state.fetch(:ready) ? 0 : 1, state.fetch(:title) ]
+        end
+      end
+    end
+
+    def spellcheck_badges
+      @spellcheck_badges ||= begin
+        ready_count = spellcheck_review_states.count { |state| state.fetch(:ready) }
+        empty_count = spellcheck_review_states.count { |state| !state.fetch(:ready) }
+
+        [
+          { label: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.count_badges.ready", count: ready_count), tone: :success },
+          { label: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.count_badges.empty", count: empty_count), tone: :neutral }
+        ]
+      end
     end
 
     private

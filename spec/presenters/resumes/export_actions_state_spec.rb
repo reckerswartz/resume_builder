@@ -25,7 +25,7 @@ RSpec.describe Resumes::ExportActionsState do
           label: 'Export PDF',
           path: "/resumes/#{resume.id}/export",
           method: :post,
-          style: :secondary
+          style: :primary
         },
         {
           label: 'Download TXT',
@@ -49,7 +49,7 @@ RSpec.describe Resumes::ExportActionsState do
         {
           label: 'Download PDF',
           path: "/resumes/#{resume.id}/download",
-          style: :secondary,
+          style: :primary,
           options: { data: { turbo: false } }
         },
         {
