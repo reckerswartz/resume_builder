@@ -329,6 +329,36 @@ RSpec.describe 'Resumes', type: :request do
       expect(page2_doc.at_css('nav[aria-label]').text).to include(I18n.t('shared.pagination.previous'))
     end
 
+    it 'preserves selected resume ids across pagination links and renders the persisted bulk selection state' do
+      selected_resume = nil
+
+      13.times do |i|
+        resume = create(:resume, user:, template:, title: "Resume #{i + 1}")
+        selected_resume ||= resume
+      end
+
+      get resumes_path, params: { resume_ids: [ selected_resume.id ] }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+      next_link = document.at_css(%(a[href*="page=2"][href*="resume_ids%5B%5D=#{selected_resume.id}"]))
+
+      expect(next_link).to be_present
+
+      get resumes_path, params: { page: 2, resume_ids: [ selected_resume.id ] }
+
+      expect(response).to have_http_status(:ok)
+      page2_doc = Nokogiri::HTML.parse(response.body)
+      bulk_form = page2_doc.at_css(%(form[action="#{bulk_action_resumes_path}"]))
+      export_button = bulk_form.at_css(%(button[name="bulk_operation"][value="export"]))
+      selection_input = bulk_form.at_css(%(input[type="hidden"][name="resume_ids[]"][value="#{selected_resume.id}"]))
+
+      expect(page2_doc.css('article').size).to eq(1)
+      expect(page2_doc.text).to include(I18n.t('resumes.index.bulk_actions.selected_count_one'))
+      expect(selection_input).to be_present
+      expect(export_button['disabled']).to be_nil
+    end
+
     it 'omits pagination navigation when all resumes fit on one page' do
       3.times { |i| create(:resume, user:, template:, title: "Small Set #{i + 1}") }
 
@@ -880,17 +910,19 @@ RSpec.describe 'Resumes', type: :request do
       expect(workspace_tabs['aria-orientation']).to eq('horizontal')
       tab_buttons = workspace_tabs.css('button[data-tab-key]')
       tab_keys = tab_buttons.map { |btn| btn['data-tab-key'] }
-      expect(tab_keys).to eq(%w[template design sections])
+      expect(tab_keys).to eq(%w[template design sections spellcheck])
       expect(tab_buttons.map { |btn| btn['data-action'] }).to all(include('keydown->workspace-tabs#navigate'))
       tab_labels = tab_buttons.map { |btn| btn.text.strip }
       expect(tab_labels).to include(
         I18n.t('resumes.editor_finalize_step.workspace_tabs.template'),
         I18n.t('resumes.editor_finalize_step.workspace_tabs.design'),
-        I18n.t('resumes.editor_finalize_step.workspace_tabs.sections')
+        I18n.t('resumes.editor_finalize_step.workspace_tabs.sections'),
+        I18n.t('resumes.editor_finalize_step.workspace_tabs.spellcheck')
       )
       expect(document.at_css('button[data-tab-key="sections"][aria-selected="true"][tabindex="0"]')).to be_present
       expect(document.at_css('button[data-tab-key="template"][aria-selected="false"][tabindex="-1"]')).to be_present
       expect(document.at_css('button[data-tab-key="design"][aria-selected="false"][tabindex="-1"]')).to be_present
+      expect(document.at_css('button[data-tab-key="spellcheck"][aria-selected="false"][tabindex="-1"]')).to be_present
 
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
@@ -923,11 +955,13 @@ RSpec.describe 'Resumes', type: :request do
       sections_panels = document.css('[data-workspace-tabs-target="panel"][data-tab-key="sections"]')
       hidden_template_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="template"][hidden]')
       hidden_design_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="design"][hidden]')
+      hidden_spellcheck_panel = document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="spellcheck"][hidden]')
       additional_sections_surface = document.at_css('[data-finalize-additional-sections-surface]')
       expect(output_settings).to be_present
       expect(sections_panels.size).to eq(1)
       expect(hidden_template_panel).to be_present
       expect(hidden_design_panel).to be_present
+      expect(hidden_spellcheck_panel).to be_present
       expect(additional_sections_surface).to be_present
       expect(additional_sections_surface.ancestors('[data-tab-key="sections"]')).not_to be_empty
       expect(document.at_css('details[data-finalize-additional-sections-disclosure]')).to be_nil
@@ -939,12 +973,65 @@ RSpec.describe 'Resumes', type: :request do
       accent_palette = document.at_css('[data-controller="accent-palette"]')
       expect(accent_palette).to be_present
       accent_swatches = accent_palette.css('button[data-accent-palette-target="swatch"]')
-      expect(accent_swatches.size).to eq(ResumeTemplates::Catalog::ACCENT_COLOR_PALETTE.size)
+      expect(accent_swatches.size).to eq(ResumeTemplates::Catalog.accent_color_palette.size)
       expect(accent_palette.at_css('input[name="resume[settings][accent_color]"]')).to be_present
       expect(accent_palette.at_css('button[data-accent-palette-target="resetButton"]')).to be_present
       expect(accent_palette.at_css('input[data-accent-palette-target="customInput"]')).to be_present
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.output_settings.accent_color_palette_label'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.output_settings.accent_color_reset'))
+    end
+
+    it 'renders a spellcheck workspace with review links back to editable builder steps' do
+      resume = create(
+        :resume,
+        user:,
+        template:,
+        headline: 'Senior Product Designer',
+        summary: 'Design systems leader with strong research habits.',
+        contact_details: {
+          'full_name' => 'Pat Kumar',
+          'email' => 'pat@example.com',
+          'phone' => '555-0100',
+          'city' => 'Bengaluru',
+          'country' => 'India'
+        },
+        personal_details: {
+          'nationality' => 'Indian',
+          'visa_status' => 'Authorized to work in India'
+        }
+      )
+      experience_section = create(:section, resume:, section_type: 'experience', title: 'Experience', position: 0)
+      education_section = create(:section, resume:, section_type: 'education', title: 'Education', position: 1)
+      skills_section = create(:section, resume:, section_type: 'skills', title: 'Skills', position: 2)
+      projects_section = create(:section, resume:, section_type: 'projects', title: 'Projects', position: 3)
+      create(:entry, section: experience_section, content: { 'title' => 'Lead Designer' })
+      create(:entry, section: education_section, content: { 'degree' => 'B.Des' })
+      create(:entry, section: skills_section, content: { 'name' => 'Figma' })
+      create(:entry, section: projects_section, content: { 'name' => 'Resume Builder' })
+
+      get edit_resume_path(resume), params: { step: 'finalize', tab: 'spellcheck' }
+
+      expect(response).to have_http_status(:ok)
+      document = Nokogiri::HTML.parse(response.body)
+
+      expect(document.at_css('button[data-tab-key="spellcheck"][aria-selected="true"][tabindex="0"]')).to be_present
+      expect(document.at_css('[data-workspace-tabs-target="panel"][data-tab-key="sections"][hidden]')).to be_present
+
+      spellcheck_panel = document.at_css('[data-finalize-spellcheck-panel]')
+      expect(spellcheck_panel).to be_present
+      expect(spellcheck_panel.text).to include(I18n.t('resumes.editor_finalize_step.spellcheck_workspace.title'))
+      expect(spellcheck_panel.text).to include(I18n.t('resumes.editor_finalize_step.spellcheck_workspace.helper_text'))
+
+      review_cards = spellcheck_panel.css('[data-finalize-spellcheck-card]')
+      expect(review_cards.map { |card| card['data-review-key'] }).to eq(%w[heading personal_details experience education skills summary additional_sections])
+
+      heading_link = spellcheck_panel.at_css('[data-review-key="heading"] a')
+      summary_link = spellcheck_panel.at_css('[data-review-key="summary"] a')
+      additional_sections_link = spellcheck_panel.at_css('[data-review-key="additional_sections"] a')
+      expect(heading_link['href']).to include('step=heading')
+      expect(summary_link['href']).to include('step=summary')
+      expect(additional_sections_link['href']).to include('step=finalize')
+      expect(additional_sections_link['href']).to include('tab=sections')
     end
 
     it 'collapses the shared add-section form on populated section steps' do
@@ -1470,6 +1557,53 @@ RSpec.describe 'Resumes', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Queued for export')
+    end
+  end
+
+  describe 'POST /resumes/bulk_action' do
+    it 'enqueues export jobs for the selected resumes and clears selection from the redirect params' do
+      resumes = Array.new(2) { create(:resume, user:, template:) }
+      ActiveJob::Base.queue_adapter.enqueued_jobs.clear
+
+      expect do
+        post bulk_action_resumes_path, params: {
+          bulk_operation: 'export',
+          resume_ids: resumes.map(&:id),
+          page: 2,
+          query: 'designer',
+          sort: 'name_asc'
+        }
+      end.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(2)
+
+      queued_arguments = ActiveJob::Base.queue_adapter.enqueued_jobs.map do |job|
+        job[:args].is_a?(Hash) ? job.dig(:args, :arguments) : job[:args]
+      end
+
+      expect(queued_arguments).to match_array(resumes.map { |resume| [ resume.id, user.id ] })
+      expect(response).to redirect_to(resumes_path(page: 2, query: 'designer', sort: 'name_asc'))
+      expect(flash[:notice]).to eq(I18n.t('resumes.controller.bulk_export_started', count: resumes.size))
+    end
+
+    it 'deletes the selected resumes and redirects back to the workspace without selected ids' do
+      resumes = Array.new(2) { create(:resume, user:, template:) }
+
+      expect do
+        post bulk_action_resumes_path, params: {
+          bulk_operation: 'delete',
+          resume_ids: resumes.map(&:id),
+          query: 'designer'
+        }
+      end.to change(Resume, :count).by(-2)
+
+      expect(response).to redirect_to(resumes_path(query: 'designer'))
+      expect(flash[:notice]).to eq(I18n.t('resumes.controller.bulk_delete_completed', count: resumes.size))
+    end
+
+    it 'requires at least one selected resume' do
+      post bulk_action_resumes_path, params: { bulk_operation: 'export', page: 2 }
+
+      expect(response).to redirect_to(resumes_path(page: 2))
+      expect(flash[:alert]).to eq(I18n.t('resumes.controller.bulk_selection_required'))
     end
   end
 end

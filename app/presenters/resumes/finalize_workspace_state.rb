@@ -10,7 +10,8 @@ module Resumes
       @workspace_tabs ||= [
         { key: "template", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.template"), glyph: :layers },
         { key: "design", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.design"), glyph: :swatches },
-        { key: "sections", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.sections"), glyph: :preview }
+        { key: "sections", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.sections"), glyph: :preview },
+        { key: "spellcheck", label: I18n.t("resumes.editor_finalize_step.workspace_tabs.spellcheck"), glyph: :shield }
       ]
     end
 
@@ -214,6 +215,18 @@ module Resumes
       step_sections.size
     end
 
+    def spellcheck_review_states
+      @spellcheck_review_states ||= [
+        build_field_review_state(step_key: "heading", content_count: heading_field_count),
+        build_field_review_state(step_key: "personal_details", content_count: personal_details_field_count),
+        build_section_review_state("experience"),
+        build_section_review_state("education"),
+        build_section_review_state("skills"),
+        build_summary_review_state,
+        build_additional_sections_review_state
+      ]
+    end
+
     private
       attr_reader :resume, :step_sections, :view_context
 
@@ -247,6 +260,110 @@ module Resumes
 
       def grouped_sections
         resume.ordered_sections.group_by(&:section_type)
+      end
+
+      def build_field_review_state(step_key:, content_count:)
+        build_review_state(
+          key: step_key,
+          title: step_title(step_key),
+          description: step_description(step_key),
+          path: view_context.edit_resume_path(resume, step: step_key),
+          content_label: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.counts.field_count", count: content_count),
+          ready: content_count.positive?
+        )
+      end
+
+      def build_section_review_state(step_key)
+        section_types = ResumeBuilder::StepCatalog.fetch(step_key).fetch(:section_types)
+        sections = resume.ordered_sections.select { |section| section_types.include?(section.section_type) }
+        entry_count = sections.sum { |section| section.ordered_entries.size }
+
+        build_review_state(
+          key: step_key,
+          title: step_title(step_key),
+          description: step_description(step_key),
+          path: view_context.edit_resume_path(resume, step: step_key),
+          content_label: section_entry_label(section_count: sections.size, entry_count: entry_count),
+          ready: sections.any? || entry_count.positive?
+        )
+      end
+
+      def build_summary_review_state
+        word_count = summary_word_count
+
+        build_review_state(
+          key: "summary",
+          title: step_title("summary"),
+          description: step_description("summary"),
+          path: view_context.edit_resume_path(resume, step: "summary"),
+          content_label: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.counts.word_count", count: word_count),
+          ready: word_count.positive?
+        )
+      end
+
+      def build_additional_sections_review_state
+        entry_count = step_sections.sum { |section| section.ordered_entries.size }
+
+        build_review_state(
+          key: "additional_sections",
+          title: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.cards.additional_sections.title"),
+          description: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.cards.additional_sections.description"),
+          path: view_context.edit_resume_path(resume, step: "finalize", tab: "sections"),
+          content_label: section_entry_label(section_count: step_sections.size, entry_count: entry_count),
+          ready: step_sections.any? || entry_count.positive?
+        )
+      end
+
+      def build_review_state(key:, title:, description:, path:, content_label:, ready:)
+        {
+          key: key,
+          title: title,
+          description: description,
+          path: path,
+          content_label: content_label,
+          ready: ready,
+          status_label: I18n.t("resumes.editor_finalize_step.spellcheck_workspace.statuses.#{ready ? :ready : :empty}"),
+          status_tone: ready ? :success : :neutral,
+          action_style: ready ? :primary : :secondary
+        }
+      end
+
+      def step_title(step_key)
+        ResumeBuilder::StepCatalog.fetch(step_key).fetch(:title)
+      end
+
+      def step_description(step_key)
+        ResumeBuilder::StepCatalog.fetch(step_key).fetch(:description)
+      end
+
+      def section_entry_label(section_count:, entry_count:)
+        I18n.t(
+          "resumes.editor_finalize_step.spellcheck_workspace.counts.section_entry_summary",
+          section_label: I18n.t("resumes.editor_finalize_step.sections_workspace.section_count", count: section_count),
+          entry_label: I18n.t("resumes.editor_finalize_step.sections_workspace.entry_count", count: entry_count)
+        )
+      end
+
+      def heading_field_count
+        [
+          resume.contact_field("full_name"),
+          resume.headline,
+          resume.contact_field("email"),
+          resume.contact_field("phone"),
+          resume.contact_field("city"),
+          resume.contact_field("country"),
+          resume.contact_field("website"),
+          resume.contact_field("linkedin")
+        ].count(&:present?)
+      end
+
+      def personal_details_field_count
+        Resume::PERSONAL_DETAIL_FIELDS.count { |field| resume.personal_detail_field(field).present? } +
+          (resume.contact_field("driving_licence").present? ? 1 : 0)
+      end
+
+      def summary_word_count
+        resume.summary.to_s.scan(/\S+/).size
       end
   end
 end

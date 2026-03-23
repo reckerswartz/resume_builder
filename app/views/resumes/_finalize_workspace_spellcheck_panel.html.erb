@@ -1,0 +1,40 @@
+<div class="space-y-5" data-finalize-spellcheck-panel>
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-500/80"><%= t("resumes.editor_finalize_step.spellcheck_workspace.eyebrow") %></p>
+      <h3 class="mt-2 text-lg font-semibold tracking-tight text-ink-950"><%= t("resumes.editor_finalize_step.spellcheck_workspace.title") %></h3>
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.spellcheck_workspace.description") %></p>
+    </div>
+
+    <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.spellcheck_workspace.badge") %></span>
+  </div>
+
+  <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
+    <p class="text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.spellcheck_workspace.helper_text") %></p>
+  </div>
+
+  <div class="grid gap-4 xl:grid-cols-2">
+    <% finalize_workspace_state.spellcheck_review_states.each do |review_state| %>
+      <%= render Ui::SurfaceCardComponent.new(padding: :sm, extra_classes: "h-full") do %>
+        <div class="flex h-full flex-col justify-between gap-4" data-finalize-spellcheck-card data-review-key="<%= review_state.fetch(:key) %>">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="<%= ui_badge_classes(review_state.fetch(:status_tone)) %>"><%= review_state.fetch(:status_label) %></span>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= review_state.fetch(:content_label) %></span>
+            </div>
+
+            <div>
+              <h4 class="text-base font-semibold tracking-tight text-ink-950"><%= review_state.fetch(:title) %></h4>
+              <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= review_state.fetch(:description) %></p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-xs font-medium uppercase tracking-[0.18em] text-ink-500/80"><%= t("resumes.editor_finalize_step.spellcheck_workspace.review_hint") %></p>
+            <%= link_to t("resumes.editor_finalize_step.spellcheck_workspace.open_step"), review_state.fetch(:path), data: { turbo_frame: "_top" }, class: ui_button_classes(review_state.fetch(:action_style), size: :sm) %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -807,6 +807,7 @@ en:
         template: "Templates"
         design: "Design & formatting"
         sections: "Sections"
+        spellcheck: "Spell check"
       template_workspace:
         eyebrow: "Templates"
         title: "Keep layout choice reversible"
@@ -900,6 +901,29 @@ en:
         title: "Additional sections"
         description: "Projects and custom sections remain available here while the main builder flow stays focused on heading, experience, education, skills, and summary."
         badge: "Inline editor"
+      spellcheck_workspace:
+        eyebrow: "Spell check"
+        title: "Review the content in editable steps"
+        description: "Use this checklist to jump back into the builder steps that contain saved resume text. Your browser's built-in spell checker works best in those editable fields."
+        badge: "Browser-assisted"
+        helper_text: "Open any saved step below to review spelling in editable fields before you preview, export, or download. Start with sections that already have drafted content."
+        review_hint: "Review in editable fields"
+        open_step: "Open step"
+        statuses:
+          ready: "Ready to review"
+          empty: "Nothing drafted yet"
+        counts:
+          field_count:
+            one: "1 saved field"
+            other: "%{count} saved fields"
+          word_count:
+            one: "1 saved word"
+            other: "%{count} saved words"
+          section_entry_summary: "%{section_label} · %{entry_label}"
+        cards:
+          additional_sections:
+            title: "Additional sections"
+            description: "Projects, certifications, languages, and other late-stage sections stay editable from the finalize sections workspace."
       empty_state:
         title: "No additional sections yet"
         description: "Add projects or other custom sections here once the core guided steps feel complete."

@@ -1,5 +1,5 @@
 <% finalize_workspace_state = resume_finalize_workspace_state(resume, step_sections: step_sections) %>
-<% active_finalize_tab = params[:tab].presence_in(%w[template design sections]) || "template" %>
+<% active_finalize_tab = params[:tab].presence_in(%w[template design sections spellcheck]) || "template" %>
 <% finalize_settings_form_id = dom_id(resume, :finalize_settings_form) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :none, extra_classes: "overflow-hidden") do %>
@@ -50,6 +50,10 @@
         step_sections: step_sections,
         add_section_types: add_section_types,
         finalize_workspace_state: finalize_workspace_state %>
+    </div>
+
+    <div class="py-5" data-tab-key="spellcheck" data-workspace-tabs-target="panel" <%= active_finalize_tab == "spellcheck" ? nil : "hidden" %>>
+      <%= render "resumes/finalize_workspace_spellcheck_panel", finalize_workspace_state: finalize_workspace_state %>
     </div>
 
     <div class="flex flex-col gap-3 border-t border-canvas-200/80 pt-5 sm:flex-row sm:items-center sm:justify-between">
