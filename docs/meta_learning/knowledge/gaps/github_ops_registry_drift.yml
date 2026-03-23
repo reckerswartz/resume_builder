@@ -1,0 +1,34 @@
+id: "ML-GAP-021"
+title: "GitHub ops registry drift"
+category: automation_gap
+status: automated
+severity: medium
+confidence: high
+discovered_at: "2026-03-22T23:58:00Z"
+automated_at: "2026-03-22T23:58:00Z"
+automated_by: "ML-GEN-003"
+evidence:
+  drifted_workflows:
+    - security-audit
+    - code-review
+    - resumebuilder-reference-rollout
+  live_issue_numbers_by_workflow:
+    security-audit: [32]
+    code-review: [34]
+    resumebuilder-reference-rollout: [11, 12, 13, 47, 50]
+  summary_issue_numbers_by_workflow:
+    security-audit: []
+    code-review: []
+    resumebuilder-reference-rollout: []
+impact: >
+  `docs/github_ops/registry.yml` can drift away from the live GitHub issue
+  inventory for workflow-labeled issues, which weakens roadmap summaries,
+  historical aggregation, and any automation that depends on central issue
+  counts being trustworthy.
+recommended_automation:
+  type: registry_observability
+  actions:
+    - "Monitor `docs/github_ops/registry.yml` workflow summaries against live GitHub issues grouped by `workflow:*` labels."
+    - "Flag registry-linked issue references that no longer exist or no longer carry the expected workflow label."
+    - "Create or close a single durable GitHub alert issue when drift appears or is reconciled."
+next_owner: "/meta-learning validate"

@@ -1,0 +1,161 @@
+name: Registry Drift Monitor
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: registry-drift-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: "Monitor GitHub Ops Registry Drift"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Generate registry drift report
+        id: drift
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_DRIFT_OUTPUT: tmp/registry-drift/report.json
+        run: ruby .github/scripts/registry-drift-check.rb
+
+      - name: Sync registry drift alert issue
+        uses: actions/github-script@v8
+        env:
+          REGISTRY_DRIFT_REPORT_PATH: ${{ steps.drift.outputs.report_path }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            const reportPath = process.env.REGISTRY_DRIFT_REPORT_PATH;
+            if (!reportPath || !fs.existsSync(reportPath)) {
+              throw new Error(`Registry drift report not found at ${reportPath || 'unknown path'}`);
+            }
+
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            const title = '[Meta-Learning] GitHub ops registry drift alert';
+            const labels = [
+              'workflow:meta-learning',
+              'domain:infrastructure',
+              'severity:medium',
+              'type:automation',
+              'status:open',
+            ];
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+
+            function numberList(numbers) {
+              return numbers.length > 0 ? numbers.join(', ') : 'none';
+            }
+
+            function buildBody(currentReport) {
+              const lines = [
+                '## GitHub Ops Registry Drift Alert',
+                '',
+                `Detected at: ${currentReport.generated_at}`,
+                '',
+                '| Workflow | Drift types | Summary open/closed | Live open/closed |',
+                '| --- | --- | --- | --- |',
+              ];
+
+              for (const workflow of currentReport.drifted_workflows) {
+                const summaryCounts = workflow.summary_issue_count;
+                const liveCounts = workflow.live_issue_count;
+                lines.push(`| ${workflow.workflow} | ${workflow.drift_types.join(', ')} | ${summaryCounts.open}/${summaryCounts.closed} | ${liveCounts.open}/${liveCounts.closed} |`);
+              }
+
+              for (const workflow of currentReport.drifted_workflows) {
+                lines.push('', `### ${workflow.workflow}`, '');
+                lines.push(`- **Registry**: \`${workflow.registry_path || 'none'}\``);
+                lines.push(`- **Summary issue numbers**: ${numberList(workflow.summary_issue_numbers)}`);
+                lines.push(`- **Live issue numbers**: ${numberList(workflow.live_issue_numbers)}`);
+
+                if (workflow.missing_from_summary.length > 0) {
+                  lines.push(`- **Missing from summary**: ${numberList(workflow.missing_from_summary)}`);
+                }
+
+                if (workflow.stale_in_summary.length > 0) {
+                  lines.push(`- **Stale in summary**: ${numberList(workflow.stale_in_summary)}`);
+                }
+
+                if (workflow.missing_on_github.length > 0) {
+                  lines.push(`- **Registry links missing on GitHub**: ${numberList(workflow.missing_on_github)}`);
+                }
+
+                if (workflow.mislabeled_registry_issues.length > 0) {
+                  const mismatches = workflow.mislabeled_registry_issues.map((item) => `#${item.number} (${item.labels.join(', ') || 'no labels'})`);
+                  lines.push(`- **Registry links without expected workflow label**: ${mismatches.join('; ')}`);
+                }
+
+                if (workflow.registry_file_missing) {
+                  lines.push('- **Registry file missing**: configured path does not exist in the repository.');
+                }
+              }
+
+              lines.push('', '### Expected follow-up', '', '- Reconcile `docs/github_ops/registry.yml` summary counts and `github_issues` arrays with live GitHub issue state', '- Backfill or correct per-workflow registry issue references when live issues exist without durable links', '', '---', '', '_This issue is maintained automatically by `registry-drift.yml`._');
+              return lines.join('\n');
+            }
+
+            if (report.drifted_workflows.length > 0) {
+              const body = buildBody(report);
+
+              if (existing) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existing.number,
+                  state: 'open',
+                  body,
+                  labels,
+                });
+                console.log(`Updated registry drift alert issue #${existing.number}`);
+              } else {
+                const created = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                  labels,
+                });
+                console.log(`Created registry drift alert issue #${created.data.number}`);
+              }
+            } else if (existing && existing.state === 'open') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Registry drift recovered on ${report.generated_at}. \`docs/github_ops/registry.yml\` now matches live workflow-labeled GitHub issues.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                labels: [
+                  'workflow:meta-learning',
+                  'domain:infrastructure',
+                  'severity:medium',
+                  'type:automation',
+                ],
+                state: 'closed',
+                state_reason: 'completed',
+              });
+              console.log(`Closed registry drift alert issue #${existing.number}`);
+            } else {
+              console.log('No registry drift detected and no open alert issue found.');
+            }

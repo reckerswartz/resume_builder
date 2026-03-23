@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-03-22T23:46:30Z"
+updated_at: "2026-03-22T23:58:00Z"
 workflow:
   status: active
   path: ".windsurf/workflows/meta-learning.md"
@@ -9,7 +9,7 @@ tracking:
   overview_path: "docs/meta_learning/README.md"
   knowledge_path: "docs/meta_learning/knowledge"
   run_doc_pattern: "docs/meta_learning/runs/<date>-<slug>/00-overview.md"
-  latest_run: "docs/meta_learning/runs/2026-03-22-workflow-health-validate/00-overview.md"
+  latest_run: "docs/meta_learning/runs/2026-03-22-registry-drift-generate/00-overview.md"
 artifacts:
   cache_root: "tmp/meta_learning"
   collection_subfolder: "collections"
@@ -85,11 +85,11 @@ cross_workflow_routing:
   feature_gaps: "/continuous-improvement"
   ci_cd_gaps: ".github/workflows/"
 cycle_metrics:
-  cycle_count: 4
-  last_cycle_date: "2026-03-22T23:46:30Z"
-  patterns_discovered: 22
-  knowledge_entries: 6
-  automations_generated: 2
+  cycle_count: 5
+  last_cycle_date: "2026-03-22T23:58:00Z"
+  patterns_discovered: 23
+  knowledge_entries: 7
+  automations_generated: 3
   automations_validated: 2
   automations_active: 2
   effectiveness_score: null
@@ -120,6 +120,7 @@ knowledge_inventory:
   gaps:
     - "docs/meta_learning/knowledge/gaps/dormant_ci_workflows.yml"
     - "docs/meta_learning/knowledge/gaps/workflow_registry_coverage_gap.yml"
+    - "docs/meta_learning/knowledge/gaps/github_ops_registry_drift.yml"
 automation_inventory:
   - id: "ML-GEN-001"
     title: "Registry foundation for code-review and security-audit"
@@ -154,6 +155,20 @@ automation_inventory:
       - "Workflow YAML parsing passed for workflow-health.yml."
       - "Live GitHub workflow run 23415403621 completed successfully."
       - "Dormant workflow alert issue #81 was created with the expected report content."
+  - id: "ML-GEN-003"
+    title: "GitHub ops registry drift monitor"
+    status: automated
+    generated_at: "2026-03-22T23:58:00Z"
+    outputs:
+      - ".github/scripts/registry-drift-check.rb"
+      - ".github/workflows/registry-drift.yml"
+      - "docs/ci_cd_pipeline.md"
+    source_findings:
+      - "ML-GAP-021"
+    validation_notes:
+      - "Ruby syntax validation passed for .github/scripts/registry-drift-check.rb."
+      - "Workflow YAML parsing passed for .github/workflows/registry-drift.yml."
+      - "Meta-learning YAML parsing passed for docs/meta_learning/registry.yml and docs/meta_learning/knowledge/gaps/github_ops_registry_drift.yml."
 findings:
   - id: "ML-PATTERN-002"
     category: recurring_issue
@@ -190,6 +205,13 @@ findings:
     status: validated
     actionability: automate
     title: "2 CI/CD workflows have no recent runs"
+  - id: "ML-GAP-021"
+    category: automation_gap
+    severity: medium
+    confidence: high
+    status: automated
+    actionability: automate
+    title: "GitHub ops registry summaries drift from live workflow-labeled issues"
   - id: "ML-SOLUTION-018"
     category: effective_solution
     severity: low
@@ -198,5 +220,5 @@ findings:
     actionability: inform
     title: "Small, focused PRs are the dominant merge pattern"
 next_step:
-  recommended_mode: "generate"
-  reason: "The dormant-workflow monitor is now live and validated. The strongest next automation slice is ML-PATTERN-002: codify maintainability verification coverage for infrastructure-heavy changes."
+  recommended_mode: "validate"
+  reason: "The GitHub ops registry drift monitor is implemented locally. The strongest next step is a live dispatch of `registry-drift.yml` from `main` to confirm alert creation and report accuracy."

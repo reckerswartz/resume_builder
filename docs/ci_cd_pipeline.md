@@ -136,7 +136,16 @@ Push/PR/Schedule
 - Publishes a step summary with last-run age and status for each monitored workflow
 - Creates, updates, or closes a single dormant-workflow alert issue when freshness falls outside the threshold
 
-### 9. Deploy (`deploy.yml`)
+### 9. Registry Drift Monitor (`registry-drift.yml`)
+
+**Triggers:** daily at 4 AM UTC, manual dispatch
+
+**Behavior:**
+- Compares `docs/github_ops/registry.yml` workflow summaries against live GitHub issues grouped by `workflow:*` labels
+- Publishes a step summary with drift types and open/closed count mismatches for affected workflows
+- Creates, updates, or closes a single registry-drift alert issue when summary counts or issue lists fall out of sync
+
+### 10. Deploy (`deploy.yml`)
 
 **Triggers:** push to `main` (auto-deploy to staging), manual dispatch for production
 
@@ -172,6 +181,7 @@ Located in `.github/scripts/`:
 | `bootstrap-labels.mjs` | Preview tool listing pipeline labels (actual sync via `bootstrap-labels.yml`) |
 | `pattern-analyzer.mjs` | Analyzes collected GitHub data to identify recurring patterns, effective solutions, and automation gaps |
 | `workflow-health-check.mjs` | Checks monitored GitHub workflow freshness and writes a dormant-workflow health report |
+| `registry-drift-check.rb` | Compares GitHub ops registry workflow summaries against live workflow-labeled GitHub issues and writes a drift report |
 
 ## Required GitHub Labels
 
@@ -259,6 +269,7 @@ The system stabilizes when all audits pass and the issue queue is empty. Any new
 │   ├── issue-sync.yml
 │   ├── playwright-audit.yml
 │   ├── pr-cleanup.yml
+│   ├── registry-drift.yml
 │   └── workflow-health.yml
 └── dependabot.yml
 ```
