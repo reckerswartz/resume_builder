@@ -136,6 +136,13 @@ RSpec.describe ResumeTemplates::Catalog do
     end
   end
 
+  describe '.normalized_accent_color' do
+    it 'expands shorthand hex values and falls back for invalid colors' do
+      expect(described_class.normalized_accent_color('#abc', fallback: '#123456')).to eq('#aabbcc')
+      expect(described_class.normalized_accent_color('not-a-color', fallback: '#123456')).to eq('#123456')
+    end
+  end
+
   describe '.accent_variants' do
     it 'returns the template default accent plus curated related swatches and appends a custom fallback when needed' do
       classic_layout = described_class.default_layout_config(family: 'classic')
