@@ -1,4 +1,4 @@
-<div class="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+<div class="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
   <div class="space-y-4">
     <%= render Ui::PageHeaderComponent.new(
       eyebrow: t("registrations.new.page_header.eyebrow"),
@@ -8,17 +8,28 @@
         { label: t("registrations.new.page_header.badges.starter_draft"), tone: :neutral },
         { label: t("registrations.new.page_header.badges.live_preview"), tone: :neutral }
       ],
+      actions: [
+        { label: t("registrations.new.page_header.actions.sign_in"), path: new_session_path, style: :secondary }
+      ],
       density: :compact
     ) %>
 
-    <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm) do %>
-      <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
-      <div class="relative space-y-3">
+    <%= render Ui::DashboardPanelComponent.new(
+      eyebrow: t("registrations.new.support_panel.eyebrow"),
+      title: t("registrations.new.support_panel.title"),
+      description: t("registrations.new.support_panel.description"),
+      tone: :subtle,
+      padding: :md,
+      density: :compact
+    ) do %>
+      <div class="space-y-3">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t("registrations.new.included_eyebrow") %></p>
 
         <%= render "shared/glyph_inset_card", glyph: :preview, title: t("registrations.new.starter_draft.title"), description: t("registrations.new.starter_draft.description") %>
 
         <%= render "shared/glyph_inset_card", glyph: :layers, title: t("registrations.new.change_layouts.title"), description: t("registrations.new.change_layouts.description") %>
+
+        <%= render "shared/glyph_inset_card", glyph: :spark, title: t("registrations.new.export_when_ready.title"), description: t("registrations.new.export_when_ready.description") %>
       </div>
     <% end %>
   </div>

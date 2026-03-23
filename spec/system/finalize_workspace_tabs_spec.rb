@@ -24,14 +24,19 @@ RSpec.describe "Finalize workspace tabs", type: :system, js: true do
     expect(page).to have_css('button[data-tab-key="design"][aria-selected="true"][tabindex="0"]')
     expect(page).to have_css('select[name="resume[settings][font_family]"]', visible: true)
 
-    find('button[data-tab-key="design"]').send_keys(:end)
+    find('button[data-tab-key="design"]').send_keys(:arrow_right)
 
     expect(page).to have_css('button[data-tab-key="sections"][aria-selected="true"][tabindex="0"]')
     expect(page).to have_css('[data-finalize-section-order]', visible: true)
 
-    find('button[data-tab-key="sections"]').send_keys(:home)
+    find('button[data-tab-key="sections"]').send_keys(:end)
+
+    expect(page).to have_css('button[data-tab-key="spellcheck"][aria-selected="true"][tabindex="0"]')
+    expect(page).to have_css('[data-finalize-spellcheck-panel]', visible: true)
+
+    find('button[data-tab-key="spellcheck"]').send_keys(:home)
 
     expect(page).to have_css('button[data-tab-key="template"][aria-selected="true"][tabindex="0"]')
-    expect(page).to have_css('button[data-tab-key="sections"][aria-selected="false"][tabindex="-1"]')
+    expect(page).to have_css('button[data-tab-key="spellcheck"][aria-selected="false"][tabindex="-1"]')
   end
 end

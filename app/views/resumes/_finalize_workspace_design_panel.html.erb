@@ -12,115 +12,139 @@
     </div>
   </div>
 
-  <div class="grid gap-5 sm:grid-cols-2" data-finalize-output-settings>
-    <div>
-      <%= form.label :slug, t("resumes.editor_finalize_step.output_settings.resume_link"), class: ui_label_classes %>
-      <%= form.text_field :slug, class: ui_input_classes %>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_page_size", t("resumes.editor_finalize_step.output_settings.page_size"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][page_size]", options_for_select(finalize_workspace_state.page_size_options, finalize_workspace_state.selected_page_size), class: ui_input_classes %>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_font_family", t("resumes.editor_finalize_step.design_workspace.font_family"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][font_family]", options_for_select(finalize_workspace_state.font_family_options, finalize_workspace_state.selected_font_family), class: ui_input_classes %>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.font_family_description") %></p>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_font_scale", t("resumes.editor_finalize_step.design_workspace.font_scale"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][font_scale]", options_for_select(finalize_workspace_state.font_scale_options, finalize_workspace_state.selected_font_scale), class: ui_input_classes %>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.font_scale_description") %></p>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_density", t("resumes.editor_finalize_step.design_workspace.density"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][density]", options_for_select(finalize_workspace_state.density_options, finalize_workspace_state.selected_density), class: ui_input_classes %>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.density_description") %></p>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_section_spacing", t("resumes.editor_finalize_step.design_workspace.section_spacing"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][section_spacing]", options_for_select(finalize_workspace_state.section_spacing_options, finalize_workspace_state.selected_section_spacing), class: ui_input_classes %>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.section_spacing_description") %></p>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_paragraph_spacing", t("resumes.editor_finalize_step.design_workspace.paragraph_spacing"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][paragraph_spacing]", options_for_select(finalize_workspace_state.paragraph_spacing_options, finalize_workspace_state.selected_paragraph_spacing), class: ui_input_classes %>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.paragraph_spacing_description") %></p>
-    </div>
-
-    <div>
-      <%= label_tag "resume_settings_line_spacing", t("resumes.editor_finalize_step.design_workspace.line_spacing"), class: ui_label_classes %>
-      <%= select_tag "resume[settings][line_spacing]", options_for_select(finalize_workspace_state.line_spacing_options, finalize_workspace_state.selected_line_spacing), class: ui_input_classes %>
-      <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.line_spacing_description") %></p>
-    </div>
-
-    <div class="sm:col-span-2" data-controller="accent-palette" data-accent-palette-default-value="<%= finalize_workspace_state.default_accent_color %>">
-      <%= hidden_field_tag "resume[settings][accent_color]", finalize_workspace_state.selected_accent_color, data: { accent_palette_target: "input" } %>
-
-      <div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="space-y-5" data-finalize-output-settings>
+    <div class="<%= [ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-4'].join(' ') %>">
+      <div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <span class="<%= ui_label_classes %>"><%= t("resumes.editor_finalize_step.output_settings.accent_color") %></span>
-          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.accent_color_description") %></p>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= t("resumes.editor_finalize_step.output_settings.eyebrow") %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.description") %></p>
         </div>
-        <button
-          type="button"
-          data-accent-palette-target="resetButton"
-          data-action="accent-palette#reset"
-          class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-canvas-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/70 <%= "opacity-40" if finalize_workspace_state.accent_color_is_default? %>"
-          <%= "disabled" if finalize_workspace_state.accent_color_is_default? %>
-        >
-          <%= t("resumes.editor_finalize_step.output_settings.accent_color_reset") %>
-        </button>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.output_settings.optional_badge") %></span>
       </div>
 
-      <div class="mt-3">
-        <p class="text-xs font-medium uppercase tracking-widest text-ink-500/80"><%= t("resumes.editor_finalize_step.output_settings.accent_color_palette_label") %></p>
-        <div class="mt-2 flex flex-wrap gap-2">
-          <% finalize_workspace_state.accent_color_palette.each do |swatch| %>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= form.label :slug, t("resumes.editor_finalize_step.output_settings.resume_link"), class: ui_label_classes %>
+          <%= form.text_field :slug, class: ui_input_classes %>
+        </div>
+
+        <div>
+          <%= label_tag "resume_settings_page_size", t("resumes.editor_finalize_step.output_settings.page_size"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][page_size]", options_for_select(finalize_workspace_state.page_size_options, finalize_workspace_state.selected_page_size), class: ui_input_classes %>
+        </div>
+
+        <div class="sm:col-span-2" data-controller="accent-palette" data-accent-palette-default-value="<%= finalize_workspace_state.default_accent_color %>">
+          <%= hidden_field_tag "resume[settings][accent_color]", finalize_workspace_state.selected_accent_color, data: { accent_palette_target: "input" } %>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="<%= ui_label_classes %>"><%= t("resumes.editor_finalize_step.output_settings.accent_color") %></span>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.accent_color_description") %></p>
+            </div>
             <button
               type="button"
-              data-accent-palette-target="swatch"
-              data-accent-color="<%= swatch.fetch(:hex) %>"
-              data-action="accent-palette#select"
-              aria-label="<%= swatch.fetch(:label) %>"
-              aria-pressed="<%= swatch.fetch(:selected) %>"
-              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-canvas-200/80 transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/70 focus-visible:ring-offset-2 <%= swatch.fetch(:selected) ? "ring-2 ring-aqua-200 ring-offset-2" : "ring-0" %>"
-              style="background-color: <%= swatch.fetch(:hex) %>"
-              title="<%= swatch.fetch(:label) %> (<%= swatch.fetch(:hex) %>)"
-            ></button>
-          <% end %>
-        </div>
-      </div>
+              data-accent-palette-target="resetButton"
+              data-action="accent-palette#reset"
+              class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-canvas-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/70 <%= "opacity-40" if finalize_workspace_state.accent_color_is_default? %>"
+              <%= "disabled" if finalize_workspace_state.accent_color_is_default? %>
+            >
+              <%= t("resumes.editor_finalize_step.output_settings.accent_color_reset") %>
+            </button>
+          </div>
 
-      <div class="mt-3 flex flex-wrap items-center gap-3">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-medium uppercase tracking-widest text-ink-500/80"><%= t("resumes.editor_finalize_step.output_settings.accent_color_custom_label") %></span>
-          <span class="<%= ui_badge_classes(:info) %> hidden" data-accent-palette-target="customIndicator"><%= t("resumes.editor_finalize_step.output_settings.accent_color_custom_indicator") %></span>
+          <div class="mt-3">
+            <p class="text-xs font-medium uppercase tracking-widest text-ink-500/80"><%= t("resumes.editor_finalize_step.output_settings.accent_color_palette_label") %></p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <% finalize_workspace_state.accent_color_palette.each do |swatch| %>
+                <button
+                  type="button"
+                  data-accent-palette-target="swatch"
+                  data-accent-color="<%= swatch.fetch(:hex) %>"
+                  data-action="accent-palette#select"
+                  aria-label="<%= swatch.fetch(:label) %>"
+                  aria-pressed="<%= swatch.fetch(:selected) %>"
+                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-canvas-200/80 transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-200/70 focus-visible:ring-offset-2 <%= swatch.fetch(:selected) ? "ring-2 ring-aqua-200 ring-offset-2" : "ring-0" %>"
+                  style="background-color: <%= swatch.fetch(:hex) %>"
+                  title="<%= swatch.fetch(:label) %> (<%= swatch.fetch(:hex) %>)"
+                ></button>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium uppercase tracking-widest text-ink-500/80"><%= t("resumes.editor_finalize_step.output_settings.accent_color_custom_label") %></span>
+              <span class="<%= ui_badge_classes(:info) %> hidden" data-accent-palette-target="customIndicator"><%= t("resumes.editor_finalize_step.output_settings.accent_color_custom_indicator") %></span>
+            </div>
+            <input
+              type="color"
+              value="<%= finalize_workspace_state.selected_accent_color %>"
+              data-accent-palette-target="customInput"
+              data-action="input->accent-palette#customChange"
+              class="h-9 w-14 cursor-pointer rounded-lg border border-canvas-200/80 bg-canvas-50 px-1 py-1"
+            >
+          </div>
         </div>
-        <input
-          type="color"
-          value="<%= finalize_workspace_state.selected_accent_color %>"
-          data-accent-palette-target="customInput"
-          data-action="input->accent-palette#customChange"
-          class="h-9 w-14 cursor-pointer rounded-lg border border-canvas-200/80 bg-canvas-50 px-1 py-1"
-        >
+
+        <div class="sm:col-span-2 <%= ui_inset_panel_classes(tone: :subtle) %>">
+          <%= hidden_field_tag "resume[settings][show_contact_icons]", false %>
+          <label class="flex items-center justify-between gap-4">
+            <span>
+              <span class="block <%= ui_label_classes %>"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons") %></span>
+              <span class="mt-1 block text-sm text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons_description") %></span>
+            </span>
+            <%= check_box_tag "resume[settings][show_contact_icons]", true, finalize_workspace_state.show_contact_icons?, class: ui_checkbox_classes %>
+          </label>
+        </div>
       </div>
     </div>
 
-    <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">
-      <%= hidden_field_tag "resume[settings][show_contact_icons]", false %>
-      <label class="flex items-center justify-between gap-4">
-        <span>
-          <span class="block <%= ui_label_classes %>"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons") %></span>
-          <span class="mt-1 block text-sm text-ink-700/80"><%= t("resumes.editor_finalize_step.output_settings.show_contact_icons_description") %></span>
-        </span>
-        <%= check_box_tag "resume[settings][show_contact_icons]", true, finalize_workspace_state.show_contact_icons?, class: ui_checkbox_classes %>
-      </label>
+    <div class="<%= [ui_inset_panel_classes(tone: :subtle, padding: :lg), 'space-y-4'].join(' ') %>">
+      <div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-ink-700/70"><%= t("resumes.editor_finalize_step.design_workspace.type_settings.eyebrow") %></p>
+          <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.type_settings.description") %></p>
+        </div>
+        <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.design_workspace.type_settings.optional_badge") %></span>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= label_tag "resume_settings_font_family", t("resumes.editor_finalize_step.design_workspace.font_family"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][font_family]", options_for_select(finalize_workspace_state.font_family_options, finalize_workspace_state.selected_font_family), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.font_family_description") %></p>
+        </div>
+
+        <div>
+          <%= label_tag "resume_settings_font_scale", t("resumes.editor_finalize_step.design_workspace.font_scale"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][font_scale]", options_for_select(finalize_workspace_state.font_scale_options, finalize_workspace_state.selected_font_scale), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.font_scale_description") %></p>
+        </div>
+
+        <div>
+          <%= label_tag "resume_settings_density", t("resumes.editor_finalize_step.design_workspace.density"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][density]", options_for_select(finalize_workspace_state.density_options, finalize_workspace_state.selected_density), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.density_description") %></p>
+        </div>
+
+        <div>
+          <%= label_tag "resume_settings_section_spacing", t("resumes.editor_finalize_step.design_workspace.section_spacing"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][section_spacing]", options_for_select(finalize_workspace_state.section_spacing_options, finalize_workspace_state.selected_section_spacing), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.section_spacing_description") %></p>
+        </div>
+
+        <div>
+          <%= label_tag "resume_settings_paragraph_spacing", t("resumes.editor_finalize_step.design_workspace.paragraph_spacing"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][paragraph_spacing]", options_for_select(finalize_workspace_state.paragraph_spacing_options, finalize_workspace_state.selected_paragraph_spacing), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.paragraph_spacing_description") %></p>
+        </div>
+
+        <div>
+          <%= label_tag "resume_settings_line_spacing", t("resumes.editor_finalize_step.design_workspace.line_spacing"), class: ui_label_classes %>
+          <%= select_tag "resume[settings][line_spacing]", options_for_select(finalize_workspace_state.line_spacing_options, finalize_workspace_state.selected_line_spacing), class: ui_input_classes %>
+          <p class="mt-2 text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.design_workspace.line_spacing_description") %></p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -100,6 +100,34 @@ RSpec.describe 'Shared density UI components' do
       expect(component.title_classes).to include('text-lg')
       expect(component.content_classes).to include('mt-4')
     end
+
+    it 'uses default panel spacing and dark-surface helper branches for standard panels with actions' do
+      component = described_class.new(
+        eyebrow: 'Admin',
+        title: 'Quick links',
+        description: 'Open the shared control hub',
+        action_label: 'Open',
+        action_path: '/admin',
+        tone: :brand
+      )
+      helpers = double('helpers')
+
+      allow(component).to receive(:helpers).and_return(helpers)
+      allow(helpers).to receive(:ui_surface_classes).with(tone: :brand, padding: :md, extra: 'overflow-hidden').and_return('surface-classes')
+      allow(helpers).to receive(:ui_button_classes).with(:hero_secondary, size: :sm).and_return('button-classes')
+
+      expect(component).not_to be_compact
+      expect(component).to be_action
+      expect(component).to be_header
+      expect(component).to be_dark_surface
+      expect(component.wrapper_classes).to eq('surface-classes')
+      expect(component.header_classes).to include('pb-5')
+      expect(component.eyebrow_classes).to include('text-white/60')
+      expect(component.title_classes).to include('text-xl')
+      expect(component.description_classes).to include('mt-2')
+      expect(component.content_classes).to eq('relative mt-5')
+      expect(component.action_classes).to eq('button-classes')
+    end
   end
 
   describe Ui::StickyActionBarComponent do
@@ -110,6 +138,19 @@ RSpec.describe 'Shared density UI components' do
       expect(component.wrapper_classes).to include('sticky-action-bar-compact')
       expect(component.wrapper_classes).to include('bottom-3')
       expect(component.layout_classes).to include('gap-3')
+    end
+
+    it 'keeps the default sticky bar spacing when density is not compact' do
+      component = described_class.new(title: 'Save settings', description: 'Review changes before publishing')
+
+      expect(component).not_to be_compact
+      expect(component.wrapper_classes).not_to include('sticky-action-bar-compact')
+      expect(component.wrapper_classes).to include('bottom-4')
+      expect(component.wrapper_classes).to include('rounded-[1.5rem]')
+      expect(component.layout_classes).to include('gap-4')
+      expect(component.title_classes).to eq('text-sm font-semibold tracking-tight text-ink-950')
+      expect(component.description_classes).to eq('mt-1 text-sm leading-6 text-ink-700/80')
+      expect(component.content_classes).to eq('flex flex-wrap gap-2 sm:justify-end')
     end
   end
 

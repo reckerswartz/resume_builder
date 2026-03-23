@@ -10,10 +10,13 @@ RSpec.describe 'Registrations', type: :request do
       get new_registration_path
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('registrations.new.page_header.title'))
+      expect(response.body).to include(I18n.t('registrations.new.page_header.actions.sign_in'))
       expect(response.body).to include('Workspace setup')
-      expect(response.body).to include('Start with a draft you can shape right away.')
+      expect(response.body).to include('Start with a real draft, not a blank page.')
       expect(response.body).to include('Starter draft included')
       expect(response.body).to include('What you get right away')
+      expect(response.body).to include(I18n.t('registrations.new.export_when_ready.title'))
       expect(response.body).to include('Already have an account?')
       expect(response.body).to include('atelier-pill')
     end

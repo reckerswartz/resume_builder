@@ -86,13 +86,22 @@ end %>
     <div class="flex flex-wrap gap-2 border-t border-canvas-200/80 pt-4 sm:justify-end">
       <%= link_to t("resumes.resume_card.actions.edit"), edit_resume_path(resume), class: ui_button_classes(:primary, size: :sm) %>
       <%= link_to t("resumes.resume_card.actions.preview"), resume_path(resume), class: ui_button_classes(:secondary, size: :sm) %>
-      <%= button_to t("resumes.resume_card.actions.duplicate"), duplicate_resume_path(resume), method: :post, form: { class: "inline-flex" }, class: ui_button_classes(:secondary, size: :sm) %>
       <% if resume.pdf_export.attached? %>
         <%= link_to t("resumes.resume_card.actions.download_pdf"), download_resume_path(resume), data: { turbo: false }, class: ui_button_classes(:secondary, size: :sm) %>
       <% else %>
         <%= button_to t("resumes.resume_card.actions.export_pdf"), export_resume_path(resume), method: :post, form: { class: "inline-flex" }, class: ui_button_classes(:secondary, size: :sm) %>
       <% end %>
-      <%= button_to t("resumes.resume_card.actions.delete"), resume_path(resume), method: :delete, form: { class: "inline-flex" }, class: ui_button_classes(:danger, size: :sm) %>
     </div>
+
+    <details class="border-t border-canvas-200/80 pt-3" data-controller="disclosure">
+      <summary class="list-none cursor-pointer">
+        <span class="<%= ui_button_classes(:ghost, size: :sm) %>"><%= t("resumes.resume_card.actions.more_actions") %></span>
+      </summary>
+
+      <div class="mt-3 flex flex-wrap gap-2 sm:justify-end">
+        <%= button_to t("resumes.resume_card.actions.duplicate"), duplicate_resume_path(resume), method: :post, form: { class: "inline-flex" }, class: ui_button_classes(:secondary, size: :sm) %>
+        <%= button_to t("resumes.resume_card.actions.delete"), resume_path(resume), method: :delete, form: { class: "inline-flex" }, class: ui_button_classes(:danger, size: :sm) %>
+      </div>
+    </details>
   </div>
 <% end %>

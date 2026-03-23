@@ -26,7 +26,7 @@
 
     <div class="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
       <div class="space-y-5">
-        <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
           <div class="max-w-3xl">
             <span class="atelier-pill">
               <%= render Ui::GlyphComponent.new(name: :preview, size: :xs, tone: :minimal) %>
@@ -35,8 +35,20 @@
             <p class="mt-3 text-sm leading-6 text-ink-700/80"><%= t("templates.index.compare_description") %></p>
           </div>
 
-          <% if marketplace_state.filters_active? %>
-            <%= link_to t("templates.index.clear_filters"), marketplace_state.clear_filters_path, class: ui_button_classes(:secondary, size: :sm) %>
+          <%= render Ui::DashboardPanelComponent.new(
+            eyebrow: t("templates.index.start_here_eyebrow"),
+            title: t("templates.index.start_here_title"),
+            description: t("templates.index.start_here_description"),
+            tone: :subtle,
+            padding: :sm,
+            density: :compact
+          ) do %>
+            <div class="flex flex-wrap gap-2">
+              <% if marketplace_state.filters_active? %>
+                <%= link_to t("templates.index.clear_filters"), marketplace_state.clear_filters_path, class: ui_button_classes(:secondary, size: :sm) %>
+              <% end %>
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= marketplace_state.results_label %></span>
+            </div>
           <% end %>
         </div>
 

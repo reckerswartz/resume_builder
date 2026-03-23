@@ -6,7 +6,11 @@
       <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.spellcheck_workspace.description") %></p>
     </div>
 
-    <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.spellcheck_workspace.badge") %></span>
+    <div class="flex flex-wrap gap-2">
+      <% finalize_workspace_state.spellcheck_badges.each do |badge| %>
+        <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+      <% end %>
+    </div>
   </div>
 
   <div class="<%= ui_inset_panel_classes(tone: :subtle) %>">

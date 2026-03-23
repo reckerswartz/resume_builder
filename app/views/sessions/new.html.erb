@@ -1,13 +1,35 @@
-<div class="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+<div class="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
   <div class="space-y-4">
-    <%= render Ui::SurfaceCardComponent.new(tone: :subtle, padding: :sm) do %>
-      <div class="absolute inset-x-5 top-0 h-px atelier-rule-ink opacity-70"></div>
-      <div class="relative space-y-3">
+    <%= render Ui::PageHeaderComponent.new(
+      eyebrow: t("sessions.new.page_header.eyebrow"),
+      title: t("sessions.new.page_header.title"),
+      description: t("sessions.new.page_header.description"),
+      badges: [
+        { label: t("sessions.new.page_header.badges.saved_drafts"), tone: :neutral },
+        { label: t("sessions.new.page_header.badges.live_preview"), tone: :neutral }
+      ],
+      actions: [
+        { label: t("sessions.new.page_header.actions.create_workspace"), path: new_registration_path, style: :secondary }
+      ],
+      density: :compact
+    ) %>
+
+    <%= render Ui::DashboardPanelComponent.new(
+      eyebrow: t("sessions.new.support_panel.eyebrow"),
+      title: t("sessions.new.support_panel.title"),
+      description: t("sessions.new.support_panel.description"),
+      tone: :subtle,
+      padding: :md,
+      density: :compact
+    ) do %>
+      <div class="space-y-3">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t("sessions.new.after_sign_in_eyebrow") %></p>
 
         <%= render "shared/glyph_inset_card", glyph: :preview, title: t("sessions.new.return_to_drafts.title"), description: t("sessions.new.return_to_drafts.description") %>
 
         <%= render "shared/glyph_inset_card", glyph: :layers, title: t("sessions.new.switch_layouts.title"), description: t("sessions.new.switch_layouts.description") %>
+
+        <%= render "shared/glyph_inset_card", glyph: :spark, title: t("sessions.new.export_when_ready.title"), description: t("sessions.new.export_when_ready.description") %>
       </div>
     <% end %>
   </div>

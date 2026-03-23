@@ -7,6 +7,7 @@
      description: t(".template_picker_description"),
      mode: :compact
    ) %>
+<% selected_template = template_picker_state.selected_card_state&.fetch(:template) %>
 
 <%= render Ui::SurfaceCardComponent.new(padding: :lg, extra_classes: "resume-create-fast-path mx-auto w-full max-w-5xl") do %>
   <%= form_with model: resume, class: "space-y-6" do |form| %>
@@ -30,6 +31,29 @@
 
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
       <div class="space-y-6">
+        <% if start_flow_state&.setup_step? %>
+          <%= render Ui::DashboardPanelComponent.new(
+            eyebrow: t(".setup_overview_eyebrow"),
+            title: t(".setup_overview_title"),
+            description: t(".setup_overview_description"),
+            tone: :subtle,
+            padding: :md,
+            density: :compact
+          ) do %>
+            <div class="space-y-3">
+              <div class="flex flex-wrap gap-2">
+                <% if start_flow_state.selected_experience_option.present? %>
+                  <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".setup_overview_badges.experience", label: start_flow_state.selected_experience_option.fetch(:label)) %></span>
+                <% end %>
+                <% if selected_template.present? %>
+                  <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".setup_overview_badges.template", template: selected_template.name) %></span>
+                <% end %>
+                <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".setup_overview_badges.live_preview") %></span>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
         <% if start_flow_state&.selected_experience_option.present? %>
           <div class="<%= [ui_inset_panel_classes(tone: :subtle), 'resume-start-flow-selection'].join(' ') %>">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".experience_level_label") %></p>
@@ -77,7 +101,7 @@
           <summary class="flex cursor-pointer list-none items-start justify-between gap-3 [&::-webkit-details-marker]:hidden">
             <div>
               <span class="text-sm font-semibold tracking-tight text-ink-950"><%= t(".template_disclosure_summary") %></span>
-              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".template_disclosure_description", template: template_picker_state.selected_card_state.fetch(:template).name) %></p>
+              <p class="mt-1 text-sm leading-6 text-ink-700/80"><%= t(".template_disclosure_description", template: selected_template.name) %></p>
               <p class="mt-1 text-xs leading-5 text-ink-700/60"><%= t(".template_disclosure_choose_later") %></p>
             </div>
             <span class="text-xs font-medium uppercase tracking-[0.2em] text-ink-700/70"><%= t(".template_disclosure_badge") %></span>

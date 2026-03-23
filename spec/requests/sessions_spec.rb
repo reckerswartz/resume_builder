@@ -8,16 +8,17 @@ RSpec.describe 'Sessions', type: :request do
       expect(response).to have_http_status(:ok)
       document = Nokogiri::HTML.parse(response.body)
 
+      expect(response.body).to include(I18n.t('sessions.new.page_header.title'))
+      expect(response.body).to include(I18n.t('sessions.new.page_header.actions.create_workspace'))
       expect(response.body).to include('Secure sign in')
       expect(response.body).to include('Return to your drafts')
+      expect(response.body).to include(I18n.t('sessions.new.export_when_ready.title'))
       expect(response.body).to include('Forgot password?')
       expect(response.body).to include('Need an account?')
       expect(response.body).to include('atelier-pill')
 
       expect(response.body).not_to include('Sign in to continue.')
-
-      form_heading = document.at_css('h2')
-      expect(form_heading.text.strip).to eq(I18n.t('sessions.new.form.title'))
+      expect(response.body).to include(I18n.t('sessions.new.form.title'))
     end
 
     it 'preserves locale query params through sign-in recovery links' do

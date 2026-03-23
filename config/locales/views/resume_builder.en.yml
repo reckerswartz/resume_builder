@@ -823,6 +823,10 @@ en:
           font_family: "Font: %{font_family}"
           font_scale: "Type: %{font_scale}"
           density: "Density: %{density}"
+        type_settings:
+          eyebrow: "Typography & spacing"
+          description: "Tune the reading rhythm here when you need a tighter or more spacious page without changing the template family."
+          optional_badge: "Optional"
         template_default_font_family: "Template default (%{font_family})"
         template_default_font_scale: "Template default (%{font_scale})"
         template_default_density: "Template default (%{density})"
@@ -846,6 +850,16 @@ en:
         title: "Decide what stays visible in output"
         description: "Keep editing all sections in the builder, then hide the ones that should stay out of the live preview and exported PDF for this draft."
         badge: "Preview-aware"
+        count_badges:
+          managed_sections:
+            one: "1 section managed"
+            other: "%{count} sections managed"
+          reviewed_entries:
+            one: "1 entry in review"
+            other: "%{count} entries in review"
+          additional_sections:
+            one: "1 additional section"
+            other: "%{count} additional sections"
         order_title: "Arrange section order"
         order_description: "Drag sections into the order you want recruiters to read them in the preview and exported PDF."
         order_badge: "Late-stage layout"
@@ -906,6 +920,13 @@ en:
         title: "Review the content in editable steps"
         description: "Use this checklist to jump back into the builder steps that contain saved resume text. Your browser's built-in spell checker works best in those editable fields."
         badge: "Browser-assisted"
+        count_badges:
+          ready:
+            one: "1 ready to review"
+            other: "%{count} ready to review"
+          empty:
+            one: "1 still empty"
+            other: "%{count} still empty"
         helper_text: "Open any saved step below to review spelling in editable fields before you preview, export, or download. Start with sections that already have drafted content."
         review_hint: "Review in editable fields"
         open_step: "Open step"
@@ -1027,12 +1048,12 @@ en:
       preview_description: "Check the latest layout, confirm the details you care about, and then download or keep editing."
       mobile_actions:
         eyebrow: "Quick actions"
-        title: "Export or keep editing"
-        description: "Use these actions before you scroll through the preview on smaller screens."
+        title: "Export first, then keep refining if needed"
+        description: "Use these actions before you scroll through the preview on smaller screens. Export or download here, then return to editing only if the page still needs changes."
       desktop_actions:
         eyebrow: "Preview actions"
-        title: "Download or go back to editing"
-        description: "Keep the current preview in view while you export, download, or return to the editor."
+        title: "Export or download from the preview"
+        description: "Keep the current preview in view while you export or download. Go back to editing only when the page still needs changes."
       what_this_shows:
         eyebrow: "What this shows"
         description: "Use this preview to make sure the layout, content, and export status look right before you download the file."

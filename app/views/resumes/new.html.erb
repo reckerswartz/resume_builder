@@ -1,10 +1,31 @@
 <% start_flow_state = Resumes::StartFlowState.new(resume: @resume, step: params[:step]) %>
+<% page_header_key = if start_flow_state.experience_step?
+                       :experience
+                     elsif start_flow_state.student_step?
+                       :student
+                     else
+                       :setup
+                     end %>
+<% page_header_badges = [] %>
+<% if start_flow_state.selected_experience_option.present? %>
+  <% page_header_badges << {
+       label: t(".page_header.badges.selected_experience", label: start_flow_state.selected_experience_option.fetch(:label)),
+       tone: :neutral
+     } %>
+<% end %>
+<% if @resume.template.present? %>
+  <% page_header_badges << {
+       label: t(".page_header.badges.selected_template", template: @resume.template.name),
+       tone: :neutral
+     } %>
+<% end %>
 
 <section class="space-y-5">
   <%= render Ui::PageHeaderComponent.new(
-    eyebrow: t(".header_eyebrow"),
-    title: t(".header_title"),
-    description: t(".header_description"),
+    eyebrow: t(".page_header.#{page_header_key}.eyebrow"),
+    title: t(".page_header.#{page_header_key}.title"),
+    description: t(".page_header.#{page_header_key}.description"),
+    badges: page_header_badges,
     actions: [
       { label: t(".back_to_workspace"), path: resumes_path, style: :secondary }
     ],

@@ -5,7 +5,11 @@
       <p class="mt-2 max-w-3xl text-sm leading-6 text-ink-700/80"><%= t("resumes.editor_finalize_step.sections_workspace.description") %></p>
     </div>
 
-    <span class="<%= ui_badge_classes(:neutral) %>"><%= t("resumes.editor_finalize_step.sections_workspace.badge") %></span>
+    <div class="flex flex-wrap gap-2">
+      <% finalize_workspace_state.sections_badges.each do |badge| %>
+        <span class="<%= ui_badge_classes(badge.fetch(:tone, :neutral)) %>"><%= badge.fetch(:label) %></span>
+      <% end %>
+    </div>
   </div>
 
   <% if finalize_workspace_state.has_section_order_controls? %>

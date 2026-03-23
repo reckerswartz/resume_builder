@@ -38,6 +38,10 @@ end %>
       { label: t(".page_header.columns_badge", columns: template_card.fetch(:column_count_label)), tone: :neutral },
       { label: t(".page_header.theme_badge", theme: template_card.fetch(:theme_tone_label)), tone: :neutral }
     ],
+    actions: [
+      { label: t(".page_header.use_template"), path: use_template_path, style: :primary },
+      { label: t(".page_header.back_to_templates"), path: templates_path_with_context, style: :secondary }
+    ],
     density: :compact
   ) %>
 
@@ -91,7 +95,6 @@ end %>
           </div>
 
           <div class="flex flex-col gap-2 text-sm">
-            <%= link_to t(".quick_take.use_template"), use_template_path, class: "#{ui_button_classes(:hero_primary)} w-full justify-center" %>
             <% if marketplace_state.apply_to_resume_available? %>
               <%= form_with url: marketplace_state.apply_to_resume_path_for(@template), method: :get, local: true, class: "space-y-2" do %>
                 <div>

@@ -50,6 +50,9 @@ en:
     index:
       compare_pill: "Compare faster"
       compare_description: "Search by name or layout details first, then narrow the gallery only when you need tighter comparison."
+      start_here_eyebrow: "Start here"
+      start_here_title: "Search first, then open the strongest few"
+      start_here_description: "Use the quick filters to narrow by family or feel. Open the full tray only when you need tighter side-by-side control."
       clear_filters: "Clear filters"
       recommended_pill: "Recommended for this draft"
       recommended_description: "Use the intake signals as a starting point, then open the strongest candidates in the full preview."

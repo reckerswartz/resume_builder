@@ -69,24 +69,33 @@ en:
       signed_out: "You are signed out."
     new:
       page_header:
-        eyebrow: "Your workspace"
-        title: "Sign in to continue."
-        description: "Open your drafts, keep editing, and export when the content looks right."
+        eyebrow: "Resume builder"
+        title: "Build a resume that gets you hired."
+        description: "Sign in to reopen your drafts, keep the live preview in view, and export when the content feels ready."
         badges:
           saved_drafts: "Saved drafts"
           live_preview: "Live preview"
+        actions:
+          create_workspace: "Create workspace"
       after_sign_in_eyebrow: "What you get"
+      support_panel:
+        eyebrow: "Keep moving"
+        title: "Everything stays in one workspace"
+        description: "Your content, preview, and export path stay together so you can return to the same draft without losing momentum."
       return_to_drafts:
         title: "Return to your drafts"
         description: "Keep your content, preview, and template choices in one place."
       switch_layouts:
         title: "Switch layouts later"
         description: "Your resume content stays reusable, so you can refine the presentation whenever you need to."
+      export_when_ready:
+        title: "Export when it is ready"
+        description: "Keep editing until the preview feels right, then generate a polished PDF without moving your content elsewhere."
       form:
         pill: "Secure sign in"
-        title: "Sign in"
+        title: "Sign in and keep your momentum"
         description: "Use the email and password for your workspace."
-        help_text: "Need help getting back in? Use the email address you signed up with, or request a password reset below."
+        help_text: "Need help getting back in? Use the same email you signed up with, or request a password reset below."
         submit: "Sign in"
         forgot_password: "Forgot password?"
         need_account: "Need an account?"
@@ -99,30 +108,39 @@ en:
     new:
       page_header:
         eyebrow: "Create your workspace"
-        title: "Start with a draft you can shape right away."
-        description: "New accounts get a starter resume so you can begin editing without extra setup."
+        title: "Start with a real draft, not a blank page."
+        description: "Create your account and we will open a starter resume you can edit, preview, and refine right away."
         badges:
           starter_draft: "Starter draft"
           live_preview: "Live preview"
+        actions:
+          sign_in: "Sign in"
       included_eyebrow: "Included on day one"
+      support_panel:
+        eyebrow: "Included on day one"
+        title: "Your first draft is ready faster"
+        description: "We create the workspace, starter sections, and preview path up front so you can focus on content instead of setup."
       starter_draft:
         title: "Starter draft included"
         description: "You will land in a workspace with a resume draft ready to edit, preview, and refine."
       change_layouts:
         title: "Change layouts later"
         description: "Your content stays reusable, so you can switch templates without starting over."
+      export_when_ready:
+        title: "Export when the content is ready"
+        description: "Finish the draft in the guided builder first, then export a polished PDF when the wording and layout feel right."
       selected_template:
         eyebrow: "Selected template"
         title: "Start with %{template}"
-        description: "We will use this template for your starter draft so you can continue with the layout you already chose."
+        description: "We will carry this template into your starter draft so the first edit already matches the look you chose."
         badge: "Ready to carry through"
         accent_description: "Your selected accent will carry into the starter draft too."
       form:
         pill: "Workspace setup"
-        title: "Create account"
-        description: "Use your email and a secure password to create your workspace."
+        title: "Create your account and start writing"
+        description: "Use your email and a secure password to open your workspace."
         what_you_get_title: "What you get right away"
-        what_you_get_description: "We use your email for sign in and recovery. After signup, you land in a starter workspace with a draft ready to edit."
+        what_you_get_description: "We use your email for sign in and recovery. As soon as signup finishes, your starter resume, guided steps, and live preview are ready."
         badges:
           starter_draft_included: "Starter draft included"
           switch_templates_later: "Switch templates later"

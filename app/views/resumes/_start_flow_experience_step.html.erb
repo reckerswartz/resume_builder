@@ -20,10 +20,17 @@
                   }
                 }
               ),
-              class: [ui_inset_panel_classes(tone: :subtle), "block transition hover:border-canvas-300 hover:bg-canvas-50/92 focus:outline-none focus:ring-2 focus:ring-ink-400/30"].join(" ") do %>
-            <div class="space-y-2">
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".option_eyebrow") %></p>
-              <p class="text-base font-semibold tracking-tight text-ink-950"><%= option.fetch(:label) %></p>
+              class: [ui_selectable_card_classes(selected: false, tone: :subtle, size: :lg), "h-full focus:outline-none focus:ring-2 focus:ring-ink-400/30"].join(" ") do %>
+            <div class="flex h-full flex-col justify-between gap-4">
+              <div class="space-y-3">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-ink-700/70"><%= t(".option_eyebrow") %></p>
+                <div class="space-y-2">
+                  <p class="text-base font-semibold tracking-tight text-ink-950"><%= option.fetch(:label) %></p>
+                  <p class="text-sm leading-6 text-ink-700/80"><%= t(".option_descriptions.#{option.fetch(:value)}") %></p>
+                </div>
+              </div>
+
+              <span class="<%= ui_badge_classes(:neutral) %>"><%= t(".step_badge") %></span>
             </div>
           <% end %>
         <% end %>

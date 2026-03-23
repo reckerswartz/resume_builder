@@ -94,6 +94,9 @@ RSpec.describe 'Resumes', type: :request do
       document = Nokogiri::HTML.parse(response.body)
       template_disclosure = document.at_css('details[data-resume-template-disclosure]')
 
+      expect(response.body).to include(I18n.t('resumes.new.page_header.setup.title'))
+      expect(response.body).to include(I18n.t('resumes.form.setup_overview_title'))
+      expect(response.body).to include(I18n.t('resumes.form.setup_overview_badges.experience', label: I18n.t('resumes.start_flow_state.experience_options.three_to_five_years')))
       expect(template_disclosure).to be_present
       expect(template_disclosure['open']).to be_nil
       expect(template_disclosure.at_css('summary').text).to include(I18n.t('resumes.form.template_disclosure_summary'))
@@ -140,6 +143,39 @@ RSpec.describe 'Resumes', type: :request do
       expect(compact_summary.text).to include(classic_template.name)
       expect(compact_summary.text).to include(I18n.t('resumes.template_picker_compact.accent_carry_through', variant: 'Slate'))
       expect(compact_summary.at_css('span[style*="#334155"]')).to be_present
+      expect(response.body).to include(I18n.t('resumes.new.page_header.badges.selected_template', template: classic_template.name))
+      expect(response.body).to include(I18n.t('resumes.form.setup_overview_badges.template', template: classic_template.name))
+    end
+
+    it 'renders richer experience-step onboarding cards before setup' do
+      template
+
+      get new_resume_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('resumes.new.page_header.experience.title'))
+      expect(response.body).to include(I18n.t('resumes.start_flow_experience_step.option_descriptions.no_experience'))
+      expect(response.body).to include(I18n.t('resumes.start_flow_experience_step.option_descriptions.ten_plus_years'))
+      expect(response.body).to include(I18n.t('resumes.start_flow_experience_step.panel_title'))
+    end
+
+    it 'renders richer student-step onboarding cards when early-career experience is selected' do
+      template
+
+      get new_resume_path, params: {
+        step: 'student',
+        resume: {
+          intake_details: {
+            experience_level: 'less_than_3_years'
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('resumes.new.page_header.student.title'))
+      expect(response.body).to include(I18n.t('resumes.start_flow_student_step.option_descriptions.student'))
+      expect(response.body).to include(I18n.t('resumes.start_flow_student_step.option_descriptions.not_student'))
+      expect(response.body).to include(I18n.t('resumes.start_flow_student_step.skip_for_now'))
     end
   end
 
@@ -200,6 +236,7 @@ RSpec.describe 'Resumes', type: :request do
       card = document.css('article').find { |article| article.at_css('h2')&.text.to_s.squish == resume.title }
       metadata_badges = card.xpath('./div[2]/div[1]/div[2]/span').map { |element| element.text.squish }
       action_row = card.xpath('./div[2]/div[2]').first
+      secondary_actions = card.at_css('details[data-controller="disclosure"]')
 
       expect(card).to be_present
       expect(metadata_badges.size).to eq(2)
@@ -209,10 +246,12 @@ RSpec.describe 'Resumes', type: :request do
       expect(action_row.css('a, button').map { |element| element.text.squish }).to eq([
         I18n.t('resumes.resume_card.actions.edit'),
         I18n.t('resumes.resume_card.actions.preview'),
-        I18n.t('resumes.resume_card.actions.duplicate'),
-        I18n.t('resumes.resume_card.actions.export_pdf'),
-        I18n.t('resumes.resume_card.actions.delete')
+        I18n.t('resumes.resume_card.actions.export_pdf')
       ])
+      expect(secondary_actions).to be_present
+      expect(secondary_actions.text).to include(I18n.t('resumes.resume_card.actions.more_actions'))
+      expect(secondary_actions.text).to include(I18n.t('resumes.resume_card.actions.duplicate'))
+      expect(secondary_actions.text).to include(I18n.t('resumes.resume_card.actions.delete'))
       expect(card.text).not_to include(resume.slug)
     end
 
@@ -299,7 +338,10 @@ RSpec.describe 'Resumes', type: :request do
       expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.description'))
       expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.counts_summary', ready_count: 1, draft_count: 1))
       expect(workspace_aside.text).to include(I18n.t('resumes.index.quick_actions.focus_note'))
-      expect(workspace_aside.css('a, button').map { |element| element.text.squish }).to include(I18n.t('resumes.index.quick_actions.create_resume'))
+      expect(workspace_aside.css('a, button').map { |element| element.text.squish }).to eq([
+        I18n.t('resumes.index.quick_actions.create_resume'),
+        I18n.t('resumes.index.quick_actions.browse_templates')
+      ])
     end
   end
 
@@ -583,8 +625,11 @@ RSpec.describe 'Resumes', type: :request do
 
       expect(response.body).to include(I18n.t('resumes.show.preview_title'))
       expect(response.body).to include(I18n.t('resumes.show.desktop_actions.title'))
+      expect(response.body).to include(I18n.t('resumes.show.desktop_actions.description'))
       expect(response.body).not_to include(I18n.t('resumes.show.what_this_shows.eyebrow'))
-      expect(preview_badges).to eq([template.name])
+      expect(preview_badges).to eq([template.name, I18n.t('resumes.export_states.draft')])
+      expect(response.body).to include(I18n.t('resumes.export_actions_state.actions.export_pdf'))
+      expect(response.body).to include(I18n.t('resumes.export_actions_state.actions.download_text'))
       expect(response.body).to include(I18n.t('resumes.helper.export_status.labels.draft_only'))
     end
   end
@@ -955,12 +1000,18 @@ RSpec.describe 'Resumes', type: :request do
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.template_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.title'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.description'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.output_settings.eyebrow'))
+      expect(response.body).to include(ERB::Util.html_escape(I18n.t('resumes.editor_finalize_step.design_workspace.type_settings.eyebrow')))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.type_settings.description'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.font_family'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.section_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.paragraph_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.design_workspace.line_spacing'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.footer_note'))
       expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.title'))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.count_badges.managed_sections', count: 2))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.count_badges.reviewed_entries', count: 2))
+      expect(response.body).to include(I18n.t('resumes.editor_finalize_step.sections_workspace.count_badges.additional_sections', count: 1))
       expect(document.at_css('input[name="tab"][value="sections"]')).to be_present
       section_order_panel = document.at_css('[data-finalize-section-order]')
       expect(section_order_panel).to be_present
@@ -1049,9 +1100,11 @@ RSpec.describe 'Resumes', type: :request do
       expect(spellcheck_panel).to be_present
       expect(spellcheck_panel.text).to include(I18n.t('resumes.editor_finalize_step.spellcheck_workspace.title'))
       expect(spellcheck_panel.text).to include(I18n.t('resumes.editor_finalize_step.spellcheck_workspace.helper_text'))
+      expect(spellcheck_panel.text).to include(I18n.t('resumes.editor_finalize_step.spellcheck_workspace.count_badges.ready', count: 7))
+      expect(spellcheck_panel.text).to include(I18n.t('resumes.editor_finalize_step.spellcheck_workspace.count_badges.empty', count: 0))
 
       review_cards = spellcheck_panel.css('[data-finalize-spellcheck-card]')
-      expect(review_cards.map { |card| card['data-review-key'] }).to eq(%w[heading personal_details experience education skills summary additional_sections])
+      expect(review_cards.map { |card| card['data-review-key'] }).to eq(%w[additional_sections education heading personal_details summary skills experience])
 
       heading_link = spellcheck_panel.at_css('[data-review-key="heading"] a')
       summary_link = spellcheck_panel.at_css('[data-review-key="summary"] a')
