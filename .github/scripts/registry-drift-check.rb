@@ -80,7 +80,8 @@ def collect_issue_refs(node, refs = Set.new)
 end
 
 def registry_issue_refs(path)
-  return { "registry_path" => path, "file_missing" => true, "linked_issue_numbers" => [] } unless path && File.file?(path)
+  return { "registry_path" => path, "file_missing" => false, "linked_issue_numbers" => [] } if path.nil? || path.empty?
+  return { "registry_path" => path, "file_missing" => true, "linked_issue_numbers" => [] } unless File.file?(path)
 
   registry = load_yaml(path)
   {
@@ -105,6 +106,12 @@ def count_mismatches(summary_counts, live_counts)
     summary_value = summary_counts.fetch(state, 0).to_i
     live_value = live_counts.fetch(state, 0).to_i
     mismatches[state] = { "summary" => summary_value, "live" => live_value } unless summary_value == live_value
+  end
+end
+
+def normalized_counts(counts)
+  SUMMARY_STATES.each_with_object({}) do |state, normalized|
+    normalized[state] = counts.fetch(state, counts.fetch(state.to_sym, 0)).to_i
   end
 end
 
@@ -144,8 +151,8 @@ def write_step_summary(report)
   ]
 
   report.fetch("drifted_workflows").each do |workflow|
-    summary_counts = workflow.fetch("summary_issue_count")
-    live_counts = workflow.fetch("live_issue_count")
+    summary_counts = normalized_counts(workflow.fetch("summary_issue_count"))
+    live_counts = normalized_counts(workflow.fetch("live_issue_count"))
     lines << "| #{workflow.fetch('workflow')} | #{workflow.fetch('drift_types').join(', ')} | #{summary_counts.fetch('open')}/#{summary_counts.fetch('closed')} | #{live_counts.fetch('open')}/#{live_counts.fetch('closed')} |"
   end
 
@@ -194,12 +201,12 @@ drifted_workflows = workflow_registries.filter_map do |entry|
   workflow_label = "workflow:#{workflow}"
   live_issues = issues.select { |issue| label_names(issue).include?(workflow_label) }
   live_issue_numbers = live_issues.map { |issue| issue.fetch("number").to_i }.sort
-  live_issue_count = issue_counts(live_issues)
+  live_issue_count = normalized_counts(issue_counts(live_issues))
   summary_issue_numbers = Array(entry["github_issues"]).map(&:to_i).uniq.sort
-  summary_issue_count = {
+  summary_issue_count = normalized_counts({
     "open" => entry.fetch("issue_count", {}).fetch("open", 0).to_i,
     "closed" => entry.fetch("issue_count", {}).fetch("closed", 0).to_i,
-  }
+  })
   registry_state = registry_issue_refs(entry["registry_path"])
   missing_from_summary = live_issue_numbers - summary_issue_numbers
   stale_in_summary = summary_issue_numbers - live_issue_numbers
@@ -233,7 +240,7 @@ drifted_workflows = workflow_registries.filter_map do |entry|
     "live_issue_numbers" => live_issue_numbers,
     "registry_issue_numbers" => registry_state.fetch("linked_issue_numbers"),
     "summary_issue_count" => summary_issue_count,
-    "live_issue_count" => live_issue_count.slice(*SUMMARY_STATES),
+    "live_issue_count" => live_issue_count,
     "missing_from_summary" => missing_from_summary,
     "stale_in_summary" => stale_in_summary,
     "missing_on_github" => missing_on_github,
