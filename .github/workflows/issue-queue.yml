@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Select issue from queue
         id: pick
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const explicitNumber = '${{ github.event.inputs.issue_number }}';
@@ -141,7 +141,7 @@ jobs:
     if: needs.pick_issue.outputs.should_process == 'true'
     steps:
       - name: Mark issue as in-progress
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const issueNumber = parseInt('${{ needs.pick_issue.outputs.issue_number }}', 10);
@@ -171,7 +171,7 @@ jobs:
           git push origin "${{ needs.pick_issue.outputs.branch_name }}"
 
       - name: Dispatch fix workflow
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({

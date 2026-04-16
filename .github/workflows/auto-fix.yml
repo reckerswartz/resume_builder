@@ -138,7 +138,7 @@ jobs:
 
       - name: Build PR description
         id: pr_body
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);
@@ -179,7 +179,7 @@ jobs:
             core.setOutput('body', body);
 
       - name: Create or update pull request
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);
@@ -238,7 +238,7 @@ jobs:
       && needs.validate.outputs.lint_pass == 'true'
     steps:
       - name: Enable auto-merge
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const branchName = '${{ github.event.inputs.branch_name }}';
@@ -299,7 +299,7 @@ jobs:
       || needs.validate.outputs.has_changes == 'false'
     steps:
       - name: Comment failure on issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const issueNumber = parseInt('${{ github.event.inputs.issue_number }}', 10);

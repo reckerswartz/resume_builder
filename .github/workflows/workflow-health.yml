@@ -30,7 +30,7 @@ jobs:
         run: node .github/scripts/workflow-health-check.mjs
 
       - name: Sync dormant workflow alert issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           WORKFLOW_HEALTH_REPORT_PATH: ${{ steps.health.outputs.report_path }}
         with:

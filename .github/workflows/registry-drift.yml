@@ -30,7 +30,7 @@ jobs:
         run: ruby .github/scripts/registry-drift-check.rb
 
       - name: Sync registry drift alert issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           REGISTRY_DRIFT_REPORT_PATH: ${{ steps.drift.outputs.report_path }}
         with:

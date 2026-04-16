@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Verify CI passed on this commit
         id: check
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const sha = context.sha;
@@ -197,7 +197,7 @@ jobs:
 
       - name: Post-deploy notification
         if: always()
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const success = '${{ job.status }}' === 'success' || '${{ job.status }}' === 'Success';
@@ -222,7 +222,7 @@ jobs:
           echo "Rollback placeholder — configure Kamal for real rollbacks"
 
       - name: Create rollback issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.issues.create({

@@ -15,7 +15,7 @@ jobs:
     if: github.event.pull_request.merged == true
     steps:
       - name: Close linked issues and clean up labels
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const prBody = context.payload.pull_request.body || '';
@@ -87,7 +87,7 @@ jobs:
 
       - name: Delete merged branch
         if: startsWith(github.event.pull_request.head.ref, 'auto-fix/')
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const branch = context.payload.pull_request.head.ref;
@@ -104,7 +104,7 @@ jobs:
 
       - name: Trigger continuous audit after merge
         if: startsWith(github.event.pull_request.head.ref, 'auto-fix/')
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             try {
