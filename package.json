@@ -22,6 +22,6 @@
     "postcss-loader": "8.2.1",
     "tailwindcss": "4.2.2",
     "webpack": "5.105.4",
-    "webpack-cli": "7.0.2"
+    "webpack-cli": "7.0.3"
   }
 }
