@@ -3160,7 +3160,7 @@ __metadata:
     postcss: "npm:8.5.8"
     postcss-loader: "npm:8.2.1"
     puppeteer: "npm:^24.40.0"
-    tailwindcss: "npm:4.2.2"
+    tailwindcss: "npm:4.3.1"
     webpack: "npm:5.105.4"
     webpack-cli: "npm:7.0.2"
   languageName: unknown
@@ -3383,6 +3383,13 @@ __metadata:
   version: 4.2.2
   resolution: "tailwindcss@npm:4.2.2"
   checksum: 6eae8a125c35d504ba6c518d26ec64fba694ff4a9ab9b9cd9883050128e0b7afdf491388c472d9bed2624664c1c7d4a133d19b653151a6b52e6ce6953168a857
+  languageName: node
+  linkType: hard
+
+"tailwindcss@npm:4.3.1":
+  version: 4.3.1
+  resolution: "tailwindcss@npm:4.3.1"
+  checksum: 7d852a242cd9367c1ba54c0aa4a9f7e437753ed3530f0dd7eb6c9c5be577323695412d3e14df80c28013bfc22cc2b55255558005fc0b73de8d633ff2dfc29b5f
   languageName: node
   linkType: hard
 
